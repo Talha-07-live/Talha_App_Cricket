@@ -1,14 +1,5 @@
-f.html?id=ICC",
-                server4: "https://cdn247.xyz/cn1/axv.php?c=supercricket",
-                server5: "https://anym3u8player.com/tv/video-player.php?url=https%3A%2F%2Fmm5-97.tinyuri.org%2Flive%2Fm4-1080p.m3u8"
-            };
-            iframePlayer.src = servers[server];
-        }
-    </script>
-</body>
-          </html>
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,16 +76,31 @@ f.html?id=ICC",
             bottom: -68px;
             width: 100%;
             overflow: hidden;
-            display: none; /* Initially hide ticker */
+            display: block; /* Ensure ticker container is displayed */
         }
-        .ticker-text {
-            display: inline-block;
+        .ticker1 {
+            display: none; /* Initially hide ticker1 */
             white-space: nowrap;
             padding-left: 100%; /* Start off-screen */
-            animation: ticker-animation 60s linear infinite; /* Adjust animation duration as needed */
+            animation: ticker-animation1 63s linear infinite; /* Adjusted animation duration for ticker speed */
             color: white;
         }
-        @keyframes ticker-animation {
+        .ticker2 {
+            display: inline-block; /* Initially show ticker2 */
+            white-space: nowrap;
+            padding-left: 100%; /* Start off-screen */
+            animation: ticker-animation2 22s linear infinite; /* Adjusted animation duration for ticker speed */
+            color: white;
+        }
+        @keyframes ticker-animation1 {
+            0% {
+                transform: translateX(2%);
+            }
+            100% {
+                transform: translateX(-1000%);
+            }
+        }
+        @keyframes ticker-animation2 {
             0% {
                 transform: translateX(2%);
             }
@@ -226,9 +232,8 @@ f.html?id=ICC",
             top: 80px; /* Adjust this value to move the buttons up or down */
             left: 50%;
             transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
             display: none; /* Initially hide server buttons */
+            gap: 10px; /* Adjust gap between server buttons */
         }
         .server-button {
             background-color: #ff6b6b;
@@ -260,8 +265,11 @@ f.html?id=ICC",
         <button id="cricket-btn" onclick="redirectToCricket()">UEFA EURO Live</button>
         <button id="copa-btn" onclick="redirectToCopa()">Copa America Live</button>
         <div class="ticker-container">
-            <div class="ticker-text">
-                Welcome To Talha's Stream App, Click Inside The Player Play Button To Play Video And Wait For A Few Second For Buffer Loading. If Video Not Play Try Other Server Or Clear App Data An Any Other Issues Click "Support" Button And Submit Your Report, Thanks!             **[Note* By accessing our streaming App you acknowledge that we aggregate freely available streaming links we are not responsible any copyright concerns, please contact us at click "support" button]**
+            <div class="ticker1">
+                Welcome To Talha's Stream App, Click Inside The Player Play Button To Play Video And Wait For A Few Second For Buffer Loading. If Video Not Play Try Other Server Or Clear App Data An Any Other Issues Click "Support" Button And Submit Your Report, Thanks! **[Note* By accessing our streaming App you acknowledge that we aggregate freely available streaming links we are not responsible any copyright concerns, please contact us at click "support" button]**
+            </div>
+            <div class="ticker2">
+                When You Try To Enter The Password And Keyboard Not Show Then Click The Submit Button First And Then Try Again.
             </div>
         </div>
         <div class="server-buttons">
@@ -285,7 +293,8 @@ f.html?id=ICC",
         const submitBtn = document.getElementById('submit-btn');
         const videoPlayer = document.getElementById('my-video');
         const iframePlayer = document.getElementById('my-iframe');
-        const tickerContainer = document.querySelector('.ticker-container'); // Select the ticker container
+        const ticker1 = document.querySelector('.ticker1');
+        const ticker2 = document.querySelector('.ticker2');
         const logoTopRight = document.getElementById('logo-top-right');
         const serverButtonsContainer = document.querySelector('.server-buttons'); // Select the server buttons container
 
@@ -294,9 +303,8 @@ f.html?id=ICC",
                 loginForm.style.display = 'none';
                 videoPlayer.style.display = 'none';
                 iframePlayer.style.display = 'block';
-                iframePlayer.onclick = () => {
-                };
-                tickerContainer.style.display = 'block'; // Show ticker after successful login
+                ticker1.style.display = 'block'; // Show ticker1 after successful login
+                ticker2.style.display = 'none'; // Hide ticker2 after successful login
                 logoTopRight.style.display = 'block'; // Show the top-right logo after successful login
                 serverButtonsContainer.style.display = 'flex'; // Show server buttons after successful login
             } else {
