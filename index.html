@@ -1,3 +1,12 @@
+f.html?id=ICC",
+                server4: "https://cdn247.xyz/cn1/axv.php?c=supercricket",
+                server5: "https://anym3u8player.com/tv/video-player.php?url=https%3A%2F%2Fmm5-97.tinyuri.org%2Flive%2Fm4-1080p.m3u8"
+            };
+            iframePlayer.src = servers[server];
+        }
+    </script>
+</body>
+          </html>
 <!DOCTYPE html>
 <html lang="en"> 
 <head>
@@ -78,29 +87,14 @@
             overflow: hidden;
             display: none; /* Initially hide ticker */
         }
-        .ticker-text, .ticker2 {
+        .ticker-text {
             display: inline-block;
             white-space: nowrap;
             padding-left: 100%; /* Start off-screen */
             animation: ticker-animation 60s linear infinite; /* Adjust animation duration as needed */
             color: white;
         }
-        .ticker2 {
-            display: inline-block; /* Initially show ticker2 */
-            white-space: nowrap;
-            padding-left: 100%; /* Start off-screen */
-            animation: ticker-animation2 35s linear infinite; /* Adjust animation duration as needed */
-            color: white;
-        }
         @keyframes ticker-animation {
-            0% {
-                transform: translateX(2%);
-            }
-            100% {
-                transform: translateX(-100%);
-            }
-        }
-        @keyframes ticker-animation2 {
             0% {
                 transform: translateX(2%);
             }
@@ -269,9 +263,6 @@
             <div class="ticker-text">
                 Welcome To Talha's Stream App, Click Inside The Player Play Button To Play Video And Wait For A Few Second For Buffer Loading. If Video Not Play Try Other Server Or Clear App Data An Any Other Issues Click "Support" Button And Submit Your Report, Thanks!             **[Note* By accessing our streaming App you acknowledge that we aggregate freely available streaming links we are not responsible any copyright concerns, please contact us at click "support" button]**
             </div>
-            <div class="ticker2">
-                When You Try To Enter The Password And Keyboard Not Showing Then Click The Submit Button First And Then Try.
-            </div>
         </div>
         <div class="server-buttons">
             <button class="server-button" id="server1-btn" onclick="changeServer('server1')">Server 1</button>
@@ -295,7 +286,6 @@
         const videoPlayer = document.getElementById('my-video');
         const iframePlayer = document.getElementById('my-iframe');
         const tickerContainer = document.querySelector('.ticker-container'); // Select the ticker container
-        const ticker2 = document.querySelector('.ticker2');
         const logoTopRight = document.getElementById('logo-top-right');
         const serverButtonsContainer = document.querySelector('.server-buttons'); // Select the server buttons container
 
@@ -307,7 +297,6 @@
                 iframePlayer.onclick = () => {
                 };
                 tickerContainer.style.display = 'block'; // Show ticker after successful login
-                ticker2.style.display = 'none'; // Hide ticker2 after successful login
                 logoTopRight.style.display = 'block'; // Show the top-right logo after successful login
                 serverButtonsContainer.style.display = 'flex'; // Show server buttons after successful login
             } else {
@@ -339,4 +328,4 @@
         }
     </script>
 </body>
-          </html>
+</html>
