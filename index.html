@@ -331,22 +331,6 @@
             };
             iframePlayer.src = servers[server];
         }
-        function changeServer(server) {
-            // Logic to change server goes here
-            console.log("Server changed to:", server);
-            
-            // Get all server buttons
-            var serverButtons = document.querySelectorAll('.server-button');
-            
-            // Remove 'active' class from all button
-            serverButtons.forEach(function(button) {
-            button.classList.remove('active');
-        });
-            
-            // Add 'active' class to the clicked button
-            var activeButton = document.getElementById(server + '-btn');
-            activeButton.classList.add('active');
-        }
     </script>
 </body>
 </html>
