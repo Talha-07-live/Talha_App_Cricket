@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Talha Stream - Cyber Edition</title>
+<link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png">
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;font-family:Arial,sans-serif;color:#fff;
+background:#050510;overflow:hidden;
+display:flex;justify-content:center;align-items:center;height:100vh;
+}
+body:before{
+content:"";position:fixed;inset:0;
+background:
+radial-gradient(circle at 20% 20%,rgba(0,255,255,.15),transparent 30%),
+radial-gradient(circle at 80% 20%,rgba(255,0,255,.15),transparent 30%),
+radial-gradient(circle at 50% 80%,rgba(0,255,120,.12),transparent 30%);
+}
+#particles{position:fixed;inset:0;pointer-events:none}
+.p{position:absolute;width:3px;height:3px;background:cyan;border-radius:50%;animation:f 18s linear infinite}
+@keyframes f{from{transform:translateY(100vh)}to{transform:translateY(-120px)}}
+#loader{position:fixed;inset:0;background:#050510;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999}
+.bar{width:260px;height:6px;background:#222;border-radius:99px;overflow:hidden}
+.bar:before{content:"";display:block;height:100%;width:40%;background:linear-gradient(90deg,cyan,magenta);animation:l 1.8s linear infinite}
+@keyframes l{from{transform:translateX(-100%)}to{transform:translateX(350%)}}
+.card{
+position:relative;width:min(95vw,900px);
+padding:25px;border-radius:24px;
+background:rgba(255,255,255,.05);
+backdrop-filter:blur(18px);
+border:1px solid rgba(255,255,255,.12);
+box-shadow:0 0 30px rgba(0,255,255,.25);
+}
+input,button{border:none;border-radius:12px;padding:12px}
+input{width:100%;margin-bottom:10px}
+button{cursor:pointer}
+#playerWrap{display:none}
+iframe{width:100%;height:420px;border:none;border-radius:18px;box-shadow:0 0 25px cyan}
+.servers{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.servers button{background:#222;color:#fff}
+footer{text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+<div id="loader"><h1>TALHA STREAM</h1><div class="bar"></div></div>
+<div id="particles"></div>
+
+<div class="card">
+<div id="login">
+<h2>Enter Password</h2>
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Submit</button>
+</div>
+
+<div id="playerWrap">
+<iframe id="frame" src="https://bdix.my.id/onair/e.php" allowfullscreen></iframe>
+<div class="servers">
+<button onclick="setServer(1)">Server 1</button>
+<button onclick="setServer(2)">Server 2</button>
+<button onclick="setServer(3)">Server 3</button>
+<button onclick="setServer(4)">Server 4</button>
+<button onclick="setServer(5)">Server 5</button>
+</div>
+</div>
+<footer>Made By Talha</footer>
+</div>
+
+<script>
+const PASSWORD="Talha";
+
+function login(){
+ if(document.getElementById('password').value===PASSWORD){
+   document.getElementById('login').style.display='none';
+   document.getElementById('playerWrap').style.display='block';
+ }else alert('Wrong Password');
+}
+
+function setServer(n){
+ const f=document.getElementById('frame');
+ const urls={
+ 1:'https://bdix.my.id/onair/e.php',
+ 2:'https://bostaflix.vercel.app/ayna.html?id=BTV%20NATIONAL%20HD',
+ 3:'https://talha-07-live.github.io/Talhas-Web-Host1/',
+ 4:'https://talha-07-live.github.io/Talhas-Web-Host2/',
+ 5:'https://talha-07-live.github.io/Talhas-Web-Host3/'
+ };
+ f.src=urls[n];
+}
+
+for(let i=0;i<60;i++){
+ let d=document.createElement('div');
+ d.className='p';
+ d.style.left=Math.random()*100+'%';
+ d.style.animationDuration=(10+Math.random()*15)+'s';
+ document.getElementById('particles').appendChild(d);
+}
+
+window.onload=()=>setTimeout(()=>document.getElementById('loader').remove(),1500);
+</script>
+</body>
+</html>
