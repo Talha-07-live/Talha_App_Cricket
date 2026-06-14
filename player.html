@@ -212,7 +212,6 @@ button, .control-btn {
 </svg>
 </button>
 
-<button id="rewBtn">
 <button class="control-btn" id="fwdBtn">⟳</button>
 
 <div class="delay-pill" id="delay">-00:00</div>
@@ -316,7 +315,6 @@ controls.classList.remove("hide");
 }
 };
 
-document.getElementById("rewBtn").onclick=()=>video.currentTime-=10;
 document.getElementById("fwdBtn").onclick=()=>video.currentTime+=10;
 
 document.getElementById("goLive").onclick=()=>{
