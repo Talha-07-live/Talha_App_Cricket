@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Talha Stream - Live Events</title>
+<link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#050510;
+overflow:hidden;
+color:#fff;
+}
+
+/* Background glow */
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:
+radial-gradient(circle at 20% 20%,rgba(0,255,255,.18),transparent 35%),
+radial-gradient(circle at 80% 20%,rgba(255,0,255,.18),transparent 35%),
+radial-gradient(circle at 50% 80%,rgba(0,255,120,.12),transparent 40%);
+filter:blur(0px);
+}
+
+/* particles */
+#particles{position:fixed;inset:0;pointer-events:none}
+.p{
+position:absolute;
+width:3px;height:3px;
+background:cyan;
+border-radius:50%;
+opacity:.7;
+animation:float linear infinite;
+}
+@keyframes float{
+from{transform:translateY(100vh)}
+to{transform:translateY(-120px)}
+}
+
+/* loader */
+#loader{
+position:fixed;
+inset:0;
+background:#050510;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+#loader h1{
+letter-spacing:4px;
+color:cyan;
+text-shadow:0 0 20px cyan;
+}
+.bar{
+width:260px;height:6px;
+background:#222;
+border-radius:50px;
+overflow:hidden;
+margin-top:20px;
+}
+.bar::before{
+content:"";
+display:block;
+height:100%;
+width:40%;
+background:linear-gradient(90deg,cyan,magenta);
+animation:load 1.5s linear infinite;
+}
+@keyframes load{
+from{transform:translateX(-100%)}
+to{transform:translateX(300%)}
+}
+
+/* main card */
+.card{
+width:min(95vw,900px);
+background:rgba(255,255,255,.06);
+backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,.15);
+border-radius:25px;
+padding:25px;
+box-shadow:0 0 40px rgba(0,255,255,.15);
+position:relative;
+z-index:2;
+}
+
+/* input */
+input{
+width:100%;
+padding:12px;
+border:none;
+border-radius:12px;
+margin-bottom:10px;
+outline:none;
+background: rgba(255,255,255,0.1);
+color: #fff;
+}
+
+/* button */
+button{
+padding:10px 14px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+transition:.3s;
+background: cyan;
+color: #000;
+font-weight: bold;
+}
+
+/* login */
+#login h2{
+margin-bottom:10px;
+}
+
+/* iframe */
+iframe{
+width:100%;
+height:300px;
+border:none;
+border-radius:18px;
+box-shadow:0 0 25px cyan;
+transition:.3s;
+}
+
+/* server buttons */
+.servers{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:12px;
+max-height: 160px;
+overflow-y: auto;
+padding: 5px;
+}
+
+.servers button{
+background:#1a1a1a;
+color:#fff;
+border:1px solid rgba(255,255,255,.15);
+font-weight: normal;
+text-align: left;
+}
+
+.servers button.active{
+background:cyan;
+color:#000;
+box-shadow:0 0 15px cyan;
+transform:scale(1.02);
+font-weight: bold;
+}
+
+/* footer */
+footer{
+text-align:center;
+margin-top:10px;
+opacity:.7;
+font-size:13px;
+}
+
+/* fade effect */
+.fade{
+animation:fade .3s ease;
+}
+@keyframes fade{
+from{opacity:.3}
+to{opacity:1}
+}
+</style>
+</head>
+
+<body>
+
+<div id="loader">
+<h1>TALHA'S STREAM</h1>
+<div class="bar"></div>
+</div>
+
+<div id="particles"></div>
+
+<div class="card">
+
+<div id="login">
+<h2>Enter Password</h2>
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Unlock</button>
+</div>
+
+<div id="playerWrap" style="display:none">
+
+<iframe id="frame" src="" scrolling="no" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope, picture-in-picture; fullscreen; geolocation; web-share; speaker-selection; screen-wake-lock; Idle-detection" allowfullscreen></iframe>
+
+<div class="servers" id="serverContainer">
+</div>
+
+</div>
+
+<footer>Made By Talha ©2020-2026</footer>
+
+</div>
+
+<script>
+const PASSWORD = "Talha";
+let liveEvents = [];
+const PLAYER_BASE_URL = "player.html"; 
+
+// তুর্কি থেকে ইংলিশ ট্রান্সলেশন ডিকশনারি
+const translationDict = {
+  "almanya": "Germany",
+  "fransa": "France",
+  "paris basketball": "Paris Basketball",
+  "as monaco": "AS Monaco",
+  "barcelona": "Barcelona",
+  "füchse berlin": "Fuchse Berlin",
+  "curaçao": "Curacao",
+  "curaca": "Curacao",
+  "türkiye": "Turkey",
+  "İngiltere": "England",
+  "ispanya": "Spain",
+  "italya": "Italy",
+  "voleybol": "Volleyball",
+  "erkekler": "Men's",
+  "kadınlar": "Women's",
+  "milletler ligi": "Nations League",
+  "lnb pro a final": "LNB Pro A Final",
+  "hentbol": "Handball",
+  "şampiyonlar ligi": "Champions League",
+  "Şampiyonlar Ligi": "Champions League",
+  "finali": "Final",
+  "final": "Final",
+  "dünya kupası": "World Cup",
+  "dunya kupasi": "World Cup",
+  "hazırlık maçı": "Friendly Match",
+  "futbol": "Football",
+  "basketbol": "Basketball",
+  "türkçe": "Turkish",
+  "canlı": "Live"
+};
+
+function translateText(text) {
+  if (!text) return "";
+  let translated = text;
+  
+  Object.keys(translationDict).forEach(turkWord => {
+    const regex = new RegExp(turkWord, "gi");
+    translated = translated.replace(regex, translationDict[turkWord]);
+  });
+  
+  translated = translated.replace(/Ã¼/g, "u")
+                         .replace(/Ã§/g, "c")
+                         .replace(/ÅŸ/g, "s")
+                         .replace(/Åž/g, "S")
+                         .replace(/Ä±/g, "i")
+                         .replace(/Ã¶/g, "o");
+                         
+  return translated;
+}
+
+function login(){
+  const pass = document.getElementById("password").value;
+  if(pass === PASSWORD){
+    document.getElementById("login").style.display = "none";
+    document.getElementById("playerWrap").style.display = "block";
+    loadTargetScript();
+  }else{
+    alert("Wrong Password");
+  }
+}
+
+function loadTargetScript() {
+  const container = document.getElementById("serverContainer");
+  container.innerHTML = "<p style='color:cyan;'>Loading Live Matches...</p>";
+
+  const oldScript = document.getElementById("mahsunScript");
+  if(oldScript) oldScript.remove();
+
+  const script = document.createElement("script");
+  script.id = "mahsunScript";
+  script.src = "https://mahsunsports39.xyz/script4.js?v=" + Date.now();
+  
+  script.onload = () => {
+    try {
+      if (typeof karsilasmalar !== "undefined" && Array.isArray(karsilasmalar)) {
+        liveEvents = karsilasmalar;
+      } else {
+        container.innerHTML = "<p style='color:red;'>Error: 'karsilasmalar' array not found!</p>";
+        return;
+      }
+
+      if (liveEvents.length === 0) {
+        container.innerHTML = "<p style='color:red;'>No live events available right now!</p>";
+        return;
+      }
+
+      // ⭐️ FIFA ম্যাচগুলোকে ফিল্টার করে লিস্টের সবার প্রথমে (Top) নিয়ে আসার লজিক ⭐️
+      liveEvents.sort((a, b) => {
+        const aTitle = String(a.title || "").toLowerCase();
+        const aLeague = String(a.league || "").toLowerCase();
+        const bTitle = String(b.title || "").toLowerCase();
+        const bLeague = String(b.league || "").toLowerCase();
+
+        const aHasFifa = aTitle.includes("fifa") || aLeague.includes("fifa") || aTitle.includes("dünya kupası") || aLeague.includes("dünya kupası");
+        const bHasFifa = bTitle.includes("fifa") || bLeague.includes("fifa") || bTitle.includes("dünya kupası") || bLeague.includes("dünya kupası");
+
+        if (aHasFifa && !bHasFifa) return -1; // 'a' উপরে যাবে
+        if (!aHasFifa && bHasFifa) return 1;  // 'b' উপরে যাবে
+        return 0; // পজিশন অপরিবর্তিত থাকবে
+      });
+
+      container.innerHTML = "";
+      liveEvents.forEach((event, index) => {
+        let id = "androstreamlivetrt1"; 
+        if(event.url && event.url.includes("id=")) {
+           const urlParams = new URLSearchParams(event.url.split('?')[1]);
+           id = urlParams.get('id') || "androstreamlivetrt1";
+        }
+
+        const btn = document.createElement("button");
+        
+        let englishTitle = translateText(event.title);
+        let englishLeague = translateText(event.league);
+        
+        // যদি এটি FIFA ম্যাচ হয়, তবে চেনার সুবিধার্থে শুরুতে একটি ⚽️ ইমোজি অ্যাড হবে
+        const isFifa = (event.title && event.title.toLowerCase().includes("fifa")) || (event.league && event.league.toLowerCase().includes("fifa")) || englishTitle.toLowerCase().includes("world cup") || englishLeague.toLowerCase().includes("world cup");
+        let prefix = isFifa ? "⚽️ " : `S${index + 1} - `;
+
+        let buttonText = `${prefix}${englishTitle}`;
+        if(englishLeague) buttonText += ` [${englishLeague}]`;
+        if(event.time) buttonText += ` (${event.time})`;
+        
+        btn.innerText = buttonText;
+        btn.onclick = () => setServer(index, id);
+        if(index === 0) btn.className = "active";
+        container.appendChild(btn);
+      });
+
+      // প্রথম বাটনটি (যা এখন নিশ্চিতভাবে FIFA ম্যাচ হবে যদি লাইভ থাকে) অটো-প্লে করা
+      if (liveEvents.length > 0) {
+        let firstId = "androstreamlivetrt1";
+        if(liveEvents[0].url && liveEvents[0].url.includes("id=")) {
+           const firstUrlParams = new URLSearchParams(liveEvents[0].url.split('?')[1]);
+           firstId = firstUrlParams.get('id') || "androstreamlivetrt1";
+        }
+        setServer(0, firstId);
+      }
+
+    } catch (err) {
+      console.error("Data Process Error:", err);
+      container.innerHTML = "<p style='color:red;'>Error processing match data.</p>";
+    }
+  };
+
+  script.onerror = () => {
+    container.innerHTML = "<p style='color:red;'>Failed to load stream script. Check connection.</p>";
+  };
+
+  document.body.appendChild(script);
+}
+
+function setServer(index, id){
+  const frame = document.getElementById("frame");
+
+  frame.classList.add("fade");
+  frame.src = `${PLAYER_BASE_URL}?Talha=${id}`;
+
+  setTimeout(()=>frame.classList.remove("fade"),400);
+
+  document.querySelectorAll(".servers button").forEach((btn)=>{
+    btn.classList.remove("active");
+  });
+  if(document.querySelectorAll(".servers button")[index]) {
+    document.querySelectorAll(".servers button")[index].classList.add("active");
+  }
+}
+
+/* particles */
+for(let i=0;i<70;i++){
+  let d = document.createElement("div");
+  d.className = "p";
+  d.style.left = Math.random()*100+"%";
+  d.style.animationDuration = (8+Math.random()*20)+"s";
+  document.getElementById("particles").appendChild(d);
+}
+
+/* loader */
+window.onload = () => {
+  setTimeout(() => {
+    document.getElementById("loader").style.opacity = "0";
+    setTimeout(() => document.getElementById("loader").remove(), 500);
+  }, 1200);
+};
+</script>
+
+</body>
+</html>
