@@ -274,15 +274,28 @@ centerPlay = document.getElementById("centerPlay");
 player = new shaka.Player(video);
 
 player.configure({
-streaming:{
-bufferingGoal:180,
-rebufferingGoal:3,
-bufferBehind:180
-}
+  streaming: {
+    bufferingGoal: 30,
+    rebufferingGoal: 10,
+    bufferBehind: 60,
+
+    lowLatencyMode: true,
+    ignoreTextStreamFailures: true,
+    stallEnabled: true,
+
+    retryParameters: {
+      maxAttempts: 5,
+      baseDelay: 1000,
+      backoffFactor: 1.5,
+      fuzzFactor: 0.5,
+      timeout: 30000
+    }
+  }
 });
 
 try{
 await player.load(STREAM_URL);
+player.setLiveSeekableRange = true;
 document.getElementById("loader").style.display="none";
 }catch(e){
 console.error(e);
@@ -368,6 +381,9 @@ throw new Error("Unauthorized Referrer");
 if(shaka.Player.isBrowserSupported()){
 init();
 }
+video.addEventListener("canplay", () => {
+  video.play().catch(() => {});
+});
 </script>
 </body>
 </html>
