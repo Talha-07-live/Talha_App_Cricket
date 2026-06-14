@@ -175,6 +175,10 @@ animation:spin 1s linear infinite;
 @keyframes spin{
 100%{transform:rotate(360deg);}
 }
+button, .control-btn {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
 </style>
 </head>
 
@@ -272,9 +276,9 @@ player = new shaka.Player(video);
 
 player.configure({
 streaming:{
-bufferingGoal:150,
-rebufferingGoal:7,
-bufferBehind:150
+bufferingGoal:45,
+rebufferingGoal:30,
+bufferBehind:60
 }
 });
 
