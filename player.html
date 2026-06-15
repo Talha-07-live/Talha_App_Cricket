@@ -34,6 +34,8 @@ background:#000;
 display:flex;
 align-items:center;
 justify-content:center;
+cursor: pointer;
+touch-action: none; /* মোবাইলের ডিফল্ট জুম/স্ক্রোল জনিত টাচ ডিলে বন্ধ করবে */
 }
 
 video{
@@ -187,28 +189,26 @@ transform:scale(0.95);
 box-shadow:0 2px 6px rgba(122,60,255,0.3);
 }
 
-/* PRELOADER */
+/* ─── SPINNER MODIFIED EXACTLY TO FIRST SCRIPT ─── */
 .loader{
 position:absolute;
 inset:0;
 display:flex;
 align-items:center;
 justify-content:center;
-background:rgba(0,0,0,0.7);
+background:#000;
 z-index:100;
-backdrop-filter:blur(5px);
--webkit-backdrop-filter:blur(5px);
-transition:opacity 0.3s ease;
+transition:opacity 0.4s ease;
 }
 
 .spinner{
 width:50px;
 height:50px;
 border-radius:50%;
-border:3px solid rgba(255,255,255,0.05);
-border-top:3px solid #9c4dff;
-border-right:3px solid #9c4dff;
-animation:spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+border:3px solid rgba(255,255,255,0.02);
+border-top:3px solid #7a3cff;
+border-right:3px solid #e04cff;
+animation:spin 0.55s linear infinite;
 }
 
 @keyframes spin{
@@ -234,9 +234,7 @@ outline: none;
 </svg>
 </div>
 
-<div class="loader" id="loader">
-<div class="spinner"></div>
-</div>
+<div class="loader" id="loader"><div class="spinner"></div></div>
 
 <div class="controls" id="controls">
 
@@ -289,13 +287,26 @@ playIcon.innerHTML = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
 }
 }
 
+// কন্ট্রোলস শো করার ফাংশন
 function showControls(){
 controls.classList.remove("hide");
 clearTimeout(hideTimer);
-if(video.paused) return;
+if(video.paused) return; 
 hideTimer = setTimeout(()=>{
 controls.classList.add("hide");
 },3500);
+}
+
+// টাচ করার সাথে সাথে কোনোরকম ডিলে ছাড়া ইনস্ট্যান্ট টগল করার লজিক
+function toggleControls(e) {
+e.preventDefault(); // ব্রাউজারের ডিলে করা ইভেন্ট ব্লক করবে
+e.stopPropagation();
+if(controls.classList.contains("hide")) {
+showControls();
+} else {
+controls.classList.add("hide");
+clearTimeout(hideTimer);
+}
 }
 
 function toggleCenterPlay(){
@@ -315,33 +326,33 @@ centerPlay = document.getElementById("centerPlay");
 
 player = new shaka.Player(video);
 
-// ০% বাফার এবং চরম লেভেলের নেটওয়ার্ক অপ্টিমাইজেশন (Ultra-Low Latency Mode)
+// ০% বাফার এবং চরম লেভেলের নেটওয়ার্ক অপ্টিমাইজেশন (Ultra-Low Latency Mode)
 player.configure({
 streaming: {
-bufferingGoal: 3, // বাফার গোল মাত্র ৩ সেকেন্ড করা হয়েছে যাতে লোডিং টাইম না থাকে
-rebufferingGoal: 1, // মাত্র ১ সেকেন্ড বাফার হলেই প্লে করা শুরু করবে
-bufferBehind: 10, // পেছনের ১০ সেকেন্ডের বেশি ডাটা র‍্যাম থেকে ইনস্ট্যান্ট ডিলিট করবে
-liveSyncDuration: 2, // লাইভ টাইম থেকে মাত্র ২ সেকেন্ড পেছনে থাকবে (রিয়েলটাইম অ্যাপ এক্সপেরিয়েন্স)
+bufferingGoal: 3, 
+rebufferingGoal: 1, 
+bufferBehind: 10, 
+liveSyncDuration: 2, 
 lowLatencyMode: true,
 ignoreTextStreamFailures: true,
 stallEnabled: true,
-stallThreshold: 1, // ১ সেকেন্ড ভিডিও আটকালে সাথে সাথে রিকভার করবে
-stallSkip: 0.2, // ড্রপ হওয়া ফ্রেম স্কিপ করে সামনে চলে যাবে (ফ্রিজ হবে না)
+stallThreshold: 1, 
+stallSkip: 0.2, 
 forceTranscode: false,
-fastSwitch: true, // নেটওয়ার্ক স্লো হলে সাথে সাথে কোয়ালিটি কমিয়ে প্লেয়ার চালু রাখবে, থামবে না
+fastSwitch: true, 
 
 retryParameters: {
-maxAttempts: 15, // নেটওয়ার্ক চলে গেলেও ১৫ বার রিকানেক্ট ট্রাই করবে
+maxAttempts: 15, 
 baseDelay: 500,
 backoffFactor: 1.2,
 timeout: 10000
 }
 },
 abr: {
-enabled: true, // অটো বিটরেট অন (নেট খারাপ হলে কোয়ালিটি কমবে কিন্তু ভিডিও স্মুথ চলবে)
+enabled: true, 
 defaultBandwidthEstimate: 500000, 
 restrictions: {
-minBandwidth: 100000 // একদম কম স্পিডেও যেন বাফার না করে আটকে থাকে
+minBandwidth: 100000 
 }
 }
 });
@@ -355,7 +366,7 @@ await player.unload();
 await player.load(STREAM_URL);
 video.play().catch(()=>{});
 } catch (e) {
-setTimeout(init, 2000); // একদম ফেইল মারলে ২ সেকেন্ড পর ফুল প্লেয়ার রিবুট নেবে
+setTimeout(init, 2000); 
 }
 }
 });
@@ -369,9 +380,18 @@ setTimeout(()=>{ document.getElementById("loader").style.display="none"; }, 300)
 console.error(e);
 }
 
-// অ্যাপ স্টাইল টাচ রেসপন্স
-playerShell.addEventListener("mousemove",showControls);
-playerShell.addEventListener("touchstart",showControls, {passive: true});
+// ডেস্কটপের জন্য মাউস ইভেন্ট
+playerShell.addEventListener("mousemove", showControls);
+
+// মোবাইলের জন্য সুপার-ফাস্ট ইনস্ট্যান্ট রেসপন্স ইভেন্ট (touchend)
+playerShell.addEventListener("touchend", toggleControls, { passive: false });
+
+// ডেস্কটপ ব্রাউজারের ব্যাকআপ ক্লিক ইভেন্ট
+playerShell.addEventListener("click", (e) => {
+    if (e.pointerType !== "touch") { // মোবাইল টাচ হলে এই ক্লিক ইভেন্ট স্কিপ করবে
+        toggleControls(e);
+    }
+});
 
 video.addEventListener("play",()=>{ showControls(); toggleCenterPlay(); });
 video.addEventListener("pause",toggleCenterPlay);
@@ -379,66 +399,87 @@ video.addEventListener("waiting",toggleCenterPlay);
 video.addEventListener("playing",toggleCenterPlay);
 video.addEventListener("ratechange", updatePlayButton);
 
+// মাঝখানের প্লে বাটনে টাচ রেসপন্স ফিক্স
+centerPlay.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    video.play().catch(()=>{});
+});
 centerPlay.onclick = (e)=>{
-e.stopPropagation();
-video.play().catch(()=>{});
+    e.stopPropagation();
+    video.play().catch(()=>{});
 };
 
-playerShell.onclick = () => {
-if(controls.classList.contains("hide")) {
-showControls();
-} else {
-controls.classList.add("hide");
-}
-};
-
+controls.addEventListener("touchend", (e) => e.stopPropagation());
 controls.onclick = (e) => e.stopPropagation();
 }
 
-/* CONTROLS INTERACTION */
-document.getElementById("playBtn").onclick=(e)=>{
-e.stopPropagation();
-if(video.paused){
-video.play().catch(()=>{});
-}else{
-video.pause();
-showControls();
-}
+/* CONTROLS INTERACTION (মোবাইল ফ্রেন্ডলি টাচ ও ক্লিকের সমন্বয়) */
+const handleBtnClick = (id, callback) => {
+    const btn = document.getElementById(id);
+    btn.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        callback();
+    });
+    btn.onclick = (e) => {
+        e.stopPropagation();
+        callback();
+    };
 };
 
-document.getElementById("fwdBtn").onclick=(e)=>{
-e.stopPropagation();
-video.currentTime += 10;
+handleBtnClick("playBtn", () => {
+    if(video.paused){
+        video.play().catch(()=>{});
+    }else{
+        video.pause();
+        showControls();
+    }
+});
+
+handleBtnClick("fwdBtn", () => {
+    video.currentTime += 10;
+    showControls();
+});
+
+handleBtnClick("goLive", () => {
+    if(!player || !player.isLive()) return;
+    const range = player.seekRange();
+    video.currentTime = range.end - 0.5; 
+    showControls();
+});
+
+handleBtnClick("fullscreenBtn", () => {
+    if(!document.fullscreenElement){
+        document.documentElement.requestFullscreen().catch(()=>{});
+        if(screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock("landscape").catch(()=>{});
+        }
+    }else{
+        document.exitFullscreen().catch(()=>{});
+    }
+    showControls();
+});
+
+// প্রোগ্রেস ট্র্যাক টাচ/ক্লিক লজিক ফিক্স
+const handleTrackSeek = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if(!player || !player.isLive()) return;
+    const range = player.seekRange();
+    const rect = document.getElementById("track").getBoundingClientRect();
+    
+    // টাচ বা মাউস উভয়ের পজিশন নেওয়া
+    const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+    const offset = (clientX - rect.left) / rect.width;
+    
+    video.currentTime = range.start + (offset * (range.end - range.start));
+    showControls();
 };
 
-document.getElementById("goLive").onclick=(e)=>{
-e.stopPropagation();
-if(!player || !player.isLive()) return;
-const range = player.seekRange();
-video.currentTime = range.end - 0.5; // একদম ইনস্ট্যান্ট লাইভ এজ
-};
+document.getElementById("track").addEventListener("touchend", handleTrackSeek);
+document.getElementById("track").onclick = handleTrackSeek;
 
-document.getElementById("fullscreenBtn").onclick=(e)=>{
-e.stopPropagation();
-if(!document.fullscreenElement){
-document.documentElement.requestFullscreen().catch(()=>{});
-if(screen.orientation && screen.orientation.lock) {
-screen.orientation.lock("landscape").catch(()=>{});
-}
-}else{
-document.exitFullscreen().catch(()=>{});
-}
-};
-
-// টাচ স্ক্রিনে প্রোগ্রেস ট্র্যাকে ক্লিক করলে যেন সিক্ক হয়
-document.getElementById("track").onclick = (e) => {
-e.stopPropagation();
-if(!player || !player.isLive()) return;
-const range = player.seekRange();
-const rect = e.currentTarget.getBoundingClientRect();
-const offset = (e.clientX - rect.left) / rect.width;
-video.currentTime = range.start + (offset * (range.end - range.start));
-};
 
 // হাই-স্পিড সিঙ্ক ইন্টারভাল
 setInterval(()=>{
@@ -453,12 +494,10 @@ document.getElementById("delay").innerText =
 const percent = ((video.currentTime - range.start) / (range.end - range.start)) * 100;
 document.getElementById("progress").style.width = Math.min(100, Math.max(0, percent)) + "%";
 
-// নেট জ্যামের কারণে লাইভ থেকে ১০ সেকেন্ডের বেশি পিছিয়ে পড়লে অটোমেটিক লাইভে টেনে নিবে
 if (delay > 10) {
 video.currentTime = range.end - 1;
 }
 
-// প্রতি ১ মিনিটে ইন্টারনাল মেমোরি ফ্লাশ
 if (video.currentTime - range.start > 40) {
 player.clearBuffer();
 }
