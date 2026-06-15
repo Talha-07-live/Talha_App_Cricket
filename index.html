@@ -2,269 +2,489 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Talha Stream - FIFA</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>Talha Stream - UNIVERSAL QUANTUM HUB</title>
 <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-user-select:none;
+    user-select:none;
+}
 
 body{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:#050510;
-overflow:hidden;
-color:#fff;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#020206;
+    overflow-x:hidden;
+    overflow-y:auto;
+    color:#fff;
+    padding: 20px 10px;
 }
 
-/* Background glow */
+/* Hyper-Ambient Neural Glow Background */
 body::before{
-content:"";
-position:fixed;
-inset:0;
-background:
-radial-gradient(circle at 20% 20%,rgba(0,255,255,.18),transparent 35%),
-radial-gradient(circle at 80% 20%,rgba(255,0,255,.18),transparent 35%),
-radial-gradient(circle at 50% 80%,rgba(0,255,120,.12),transparent 40%);
-filter:blur(0px);
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+        radial-gradient(circle at 5% 10%, rgba(122, 60, 255, 0.35), transparent 40%),
+        radial-gradient(circle at 95% 10%, rgba(0, 242, 254, 0.25), transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(224, 76, 255, 0.2), transparent 45%);
+    z-index: 0;
 }
 
-/* particles */
-#particles{position:fixed;inset:0;pointer-events:none}
+#particles{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index: 1;
+}
 .p{
-position:absolute;
-width:3px;height:3px;
-background:cyan;
-border-radius:50%;
-opacity:.7;
-animation:float linear infinite;
+    position:absolute;
+    width:2px;
+    height:2px;
+    background: linear-gradient(135deg, #7a3cff, #00f2fe);
+    border-radius:50%;
+    opacity:.35;
+    animation:float linear infinite;
 }
 @keyframes float{
-from{transform:translateY(100vh)}
-to{transform:translateY(-120px)}
+    from{transform:translateY(105vh) scale(0.8)}
+    to{transform:translateY(-120px) scale(1.4)}
 }
 
-/* loader */
+/* INITIALIZING LOADER */
 #loader{
-position:fixed;
-inset:0;
-background:#050510;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-z-index:9999;
+    position:fixed;
+    inset:0;
+    background:#020206;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 #loader h1{
-letter-spacing:4px;
-color:cyan;
-text-shadow:0 0 20px cyan;
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 900;
+    letter-spacing:6px;
+    background: linear-gradient(90deg, #7a3cff, #00f2fe, #e04cff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 25px rgba(122,60,255,0.7));
+    text-align: center;
+    padding: 0 15px;
 }
 .bar{
-width:260px;height:6px;
-background:#222;
-border-radius:50px;
-overflow:hidden;
-margin-top:20px;
+    width:min(80vw, 260px);
+    height:3px;
+    background:rgba(255,255,255,0.02);
+    border-radius:50px;
+    overflow:hidden;
+    margin-top:30px;
 }
 .bar::before{
-content:"";
-display:block;
-height:100%;
-width:40%;
-background:linear-gradient(90deg,cyan,magenta);
-animation:load 1.5s linear infinite;
+    content:"";
+    display:block;
+    height:100%;
+    width:35%;
+    background:linear-gradient(90deg, #7a3cff, #00f2fe, #e04cff);
+    animation:load 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 @keyframes load{
-from{transform:translateX(-100%)}
-to{transform:translateX(300%)}
+    from{transform:translateX(-100%)}
+    to{transform:translateX(300%)}
 }
 
-/* main card */
+/* UNIVERSAL RESPONSIVE CARD */
 .card{
-width:min(95vw,900px);
-background:rgba(255,255,255,.06);
-backdrop-filter:blur(20px);
-border:1px solid rgba(255,255,255,.15);
-border-radius:25px;
-padding:25px;
-box-shadow:0 0 40px rgba(0,255,255,.15);
-position:relative;
-z-index:2;
+    width: 100%;
+    max-width: 1100px;
+    background: rgba(5, 5, 10, 0.7);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 24px;
+    padding: clamp(15px, 4vw, 30px);
+    box-shadow: 0 40px 90px rgba(0,0,0,0.75), inset 0 1px 2px rgba(255,255,255,0.12);
+    position: relative;
+    z-index: 2;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* input */
-input{
-width:100%;
-padding:12px;
-border:none;
-border-radius:12px;
-margin-bottom:10px;
-outline:none;
-background: rgba(255,255,255,0.1);
-color: #fff;
+/* CINEMATIC THEATRE MODE */
+.card.theatre-active {
+    max-width: 100% !important;
+    width: 96vw;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.95);
+}
+.card.theatre-active .filter-bar,
+.card.theatre-active .servers,
+.card.theatre-active .analytics-panel,
+.card.theatre-active footer,
+.card.theatre-active .utility-panel {
+    display: none !important;
 }
 
-/* button */
-button{
-padding:10px 14px;
-border:none;
-border-radius:12px;
-cursor:pointer;
-transition:.3s;
-background: cyan;
-color: #000;
-font-weight: bold;
+/* LOCK INTERFACE */
+#login {
+    text-align: center;
+    padding: 40px 10px;
 }
-
-/* login */
 #login h2{
-margin-bottom:10px;
+    font-size: clamp(18px, 4vw, 26px);
+    margin-bottom:24px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    background: linear-gradient(180deg, #fff 30%, rgba(255,255,255,0.5) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+input[type="password"]{
+    width:100%;
+    max-width: 380px;
+    padding:16px 24px;
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:16px;
+    outline:none;
+    background: rgba(255,255,255,0.02);
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+}
+input[type="password"]:focus{
+    border-color: #00f2fe;
+    background: rgba(255,255,255,0.05);
+    box-shadow: 0 0 30px rgba(0,242,254,0.2);
+}
+#login button{
+    width: 100%;
+    max-width: 380px;
+    padding:16px;
+    border:none;
+    border-radius:16px;
+    cursor:pointer;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    transition: all 0.2s;
+    background: linear-gradient(90deg, #7a3cff, #00f2fe);
+    color: #fff;
+    box-shadow: 0 6px 30px rgba(122,60,255,0.4);
 }
 
-/* iframe */
+/* REAL-TIME ANALYTICS PANEL */
+.analytics-panel {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.stat-card {
+    flex: 1;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 14px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.stat-card span { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 0.5px; }
+.stat-card font { font-size: 15px; font-weight: 800; color: #00f2fe; }
+.stat-card.fifa-stat font { color: #e04cff; }
+
+/* NO-CUT RESPONSIVE VIDEO PLAYER FRAMEWORK */
+.player-container {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* Perfect 16:9 Aspect Ratio */
+    background: #000;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+}
 iframe{
-width:100%;
-height:300px;
-border:none;
-border-radius:18px;
-box-shadow:0 0 25px cyan;
-transition:.3s;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+.theatre-active .player-container {
+    padding-top: 52%; /* Adjusts perfectly for cinematic focus */
+    border-radius: 12px;
 }
 
-/* server buttons */
-.servers{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:12px;
-max-height: 160px;
-overflow-y: auto;
-padding: 5px;
+/* UTILITY / THEATER BUTTONS */
+.utility-panel {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
 }
+.util-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.4);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s;
+}
+.util-btn:hover { color: #00f2fe; }
+.theatre-exit-btn {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 10000;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    display: none;
+    font-size: 12px;
+}
+
+/* SMART FILTERS CONTROL */
+.filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.search-box { flex: 1; min-width: 240px; }
+.search-box input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.3s;
+}
+.search-box input:focus { border-color: #7a3cff; background: rgba(255, 255, 255, 0.05); }
+.filter-tabs { display: flex; gap: 8px; }
+.tab-btn {
+    padding: 11px 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.tab-btn.active {
+    background: rgba(122, 60, 255, 0.15);
+    border-color: #7a3cff;
+    color: #fff;
+}
+
+/* FLUID CHANNEL LIST SYSTEM */
+.servers{
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+    margin-top: 12px;
+    max-height: 240px;
+    overflow-y: auto;
+    padding-right: 2px;
+}
+.servers::-webkit-scrollbar { width: 3px; }
+.servers::-webkit-scrollbar-track { background: transparent; }
+.servers::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
+.servers::-webkit-scrollbar-thumb:hover { background: #7a3cff; }
 
 .servers button{
-background:#1a1a1a;
-color:#fff;
-border:1px solid rgba(255,255,255,.15);
-font-weight: normal;
-text-align: left;
+    width: 100%;
+    background: rgba(255,255,255,0.01);
+    color: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    gap: 10px;
 }
-
+.servers button span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+.servers button:hover{ background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
 .servers button.active{
-background:cyan;
-color:#000;
-box-shadow:0 0 15px cyan;
-transform:scale(1.02);
-font-weight: bold;
+    background: linear-gradient(90deg, rgba(122,60,255,0.15) 0%, rgba(0,242,254,0.02) 100%);
+    color: #fff;
+    border: 1px solid rgba(122, 60, 255, 0.4);
+    font-weight: 700;
 }
 
-/* footer */
-footer{
-text-align:center;
-margin-top:10px;
-opacity:.7;
-font-size:13px;
+/* NEON BADGES */
+.live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #00f2fe;
+    background: rgba(0, 242, 254, 0.06);
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 242, 254, 0.12);
+    white-space: nowrap;
 }
+.fifa-badge {
+    color: #e04cff;
+    background: rgba(224, 76, 255, 0.06);
+    border: 1px solid rgba(224, 76, 255, 0.15);
+}
+.live-dot {
+    width: 5px;
+    height: 5px;
+    background: #00f2fe;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #00f2fe;
+    animation: blink 1s infinite alternate;
+}
+.fifa-dot { background: #e04cff; box-shadow: 0 0 8px #e04cff; }
 
-/* fade effect */
-.fade{
-animation:fade .3s ease;
-}
-@keyframes fade{
-from{opacity:.3}
-to{opacity:1}
+@keyframes blink { from { opacity: 0.2; } to { opacity: 1; } }
+
+footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
+.fade{ animation: appFade .25s ease-out; }
+@keyframes appFade{ from{opacity:.6;} to{opacity:1;} }
+
+/* PHONE RESPONSIVE BREAKPOINTS */
+@media(max-width: 600px) {
+    body { padding: 10px 5px; }
+    .analytics-panel { display: none; }
+    .filter-bar { flex-direction: column; align-items: stretch; }
+    .search-box { min-width: 100%; }
+    .filter-tabs { width: 100%; display: flex; }
+    .filter-tabs button { flex: 1; text-align: center; }
 }
 </style>
 </head>
 
 <body>
 
+<button class="theatre-exit-btn" id="exitTheatre" onclick="toggleTheatre(false)">Exit Cinema Mode</button>
+
 <div id="loader">
-<h1>TALHA'S STREAM</h1>
-<div class="bar"></div>
+    <h1>TALHA'S STREAM</h1>
+    <div class="bar"></div>
 </div>
 
 <div id="particles"></div>
 
-<div class="card">
+<div class="card" id="mainCard">
 
-<div id="login">
-<h2>Enter Password</h2>
-<input id="password" type="password" placeholder="Password">
-<button onclick="login()">Unlock</button>
-</div>
+    <div id="login">
+        <h2>System Authentication</h2>
+        <input id="password" type="password" placeholder="Passcode Entry" onkeydown="if(event.key==='Enter') login()">
+        <br>
+        <button onclick="login()">Inter The Key</button>
+    </div>
 
-<div id="playerWrap" style="display:none">
+    <div id="playerWrap" style="display:none">
+        
+        <div class="analytics-panel">
+            <div class="stat-card">
+                <span>ACTIVE SIGNALS FEED</span>
+                <font id="countTotal">00</font>
+            </div>
+            <div class="stat-card fifa-stat">
+                <span>FIFA PREMIUM FEEDS</span>
+                <font id="countFifa">00</font>
+            </div>
+        </div>
 
-<iframe id="frame" src="" scrolling="no" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope, picture-in-picture; fullscreen; geolocation; web-share; speaker-selection; screen-wake-lock; Idle-detection" allowfullscreen></iframe>
+        <div class="player-container">
+            <iframe id="frame" src="" scrolling="no" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope, picture-in-picture; fullscreen; geolocation; web-share; speaker-selection; screen-wake-lock; Idle-detection" allowfullscreen></iframe>
+        </div>
+        
+        <div class="utility-panel">
+            <button class="util-btn" onclick="toggleTheatre(true)">🎬 Theater Mode</button>
+        </div>
 
-<div class="servers" id="serverContainer">
-</div>
+        <div class="filter-bar">
+            <div class="search-box">
+                <input type="text" id="searchChannels" placeholder="🔍 Deep search team or league..." oninput="filterMatches()">
+            </div>
+            <div class="filter-tabs">
+                <button class="tab-btn active" id="btnAll" onclick="setFilter('all')">All Feeds</button>
+                <button class="tab-btn" id="btnFifa" onclick="setFilter('fifa')">🏆 FIFA 2026</button>
+            </div>
+        </div>
 
-</div>
+        <div class="servers" id="serverContainer"></div>
+    </div>
 
-<footer>Made By Talha ©2020-2026</footer>
-
+    <footer>Made By Talha • © 2020-2026</footer>
 </div>
 
 <script>
 const PASSWORD = "Talha";
 let liveEvents = [];
+let currentFilter = 'all'; 
 const PLAYER_BASE_URL = "player.html"; 
 
-// তুর্কি থেকে ইংলিশ ট্রান্সলেশন ডিকশনারি
 const translationDict = {
-  "almanya": "Germany",
-  "fransa": "France",
-  "paris basketball": "Paris Basketball",
-  "as monaco": "AS Monaco",
-  "barcelona": "Barcelona",
-  "füchse berlin": "Fuchse Berlin",
-  "curaçao": "Curacao",
-  "curaca": "Curacao",
-  "türkiye": "Turkey",
-  "İngiltere": "England",
-  "ispanya": "Spain",
-  "italya": "Italy",
-  "voleybol": "Volleyball",
-  "erkekler": "Men's",
-  "kadınlar": "Women's",
-  "milletler ligi": "Nations League",
-  "lnb pro a final": "LNB Pro A Final",
-  "hentbol": "Handball",
-  "şampiyonlar ligi": "Champions League",
-  "Şampiyonlar Ligi": "Champions League",
-  "finali": "Final",
-  "final": "Final",
-  "dünya kupası": "World Cup",
-  "dunya kupasi": "World Cup",
-  "hazırlık maçı": "Friendly Match",
-  "futbol": "Football",
-  "basketbol": "Basketball",
-  "türkçe": "Turkish",
-  "canlı": "Live"
+  "almanya": "Germany", "fransa": "France", "paris basketball": "Paris Basketball",
+  "as monaco": "AS Monaco", "barcelona": "Barcelona", "füchse berlin": "Fuchse Berlin",
+  "curaçao": "Curacao", "curaca": "Curacao", "türkiye": "Turkey", "İngiltere": "England",
+  "ispanya": "Spain", "italya": "Italy", "voleybol": "Volleyball", "erkekler": "Men's",
+  "kadınlar": "Women's", "milletler ligi": "Nations League", "lnb pro a final": "LNB Pro A Final",
+  "hentbol": "Handball", "şampiyonlar ligi": "Champions League", "Şampiyonlar Ligi": "Champions League",
+  "finali": "Final", "final": "Final", "dünya kupası": "World Cup", "dunya kupasi": "World Cup",
+  "hazırlık maçı": "Friendly Match", "futbol": "Football", "basketbol": "Basketball",
+  "türkçe": "Turkish", "canlı": "Live"
 };
 
 function translateText(text) {
   if (!text) return "";
   let translated = text;
-  
   Object.keys(translationDict).forEach(turkWord => {
     const regex = new RegExp(turkWord, "gi");
     translated = translated.replace(regex, translationDict[turkWord]);
   });
-  
-  translated = translated.replace(/Ã¼/g, "u")
-                         .replace(/Ã§/g, "c")
-                         .replace(/ÅŸ/g, "s")
-                         .replace(/Åž/g, "S")
-                         .replace(/Ä±/g, "i")
-                         .replace(/Ã¶/g, "o");
-                         
-  return translated;
+  return translated.replace(/Ã¼/g, "u").replace(/Ã§/g, "c").replace(/ÅŸ/g, "s")
+                   .replace(/Åž/g, "S").replace(/Ä±/g, "i").replace(/Ã¶/g, "o");
 }
 
 function login(){
@@ -274,13 +494,13 @@ function login(){
     document.getElementById("playerWrap").style.display = "block";
     loadTargetScript();
   }else{
-    alert("Wrong Password");
+    alert("Authentication Failure.");
   }
 }
 
 function loadTargetScript() {
   const container = document.getElementById("serverContainer");
-  container.innerHTML = "<p style='color:cyan;'>Loading Live Matches...</p>";
+  container.innerHTML = "<p style='color:rgba(255,255,255,0.4);text-align:center;font-size:13px;padding:30px;'>Syncing system satellite channels...</p>";
 
   const oldScript = document.getElementById("mahsunScript");
   if(oldScript) oldScript.remove();
@@ -294,16 +514,11 @@ function loadTargetScript() {
       if (typeof karsilasmalar !== "undefined" && Array.isArray(karsilasmalar)) {
         liveEvents = karsilasmalar;
       } else {
-        container.innerHTML = "<p style='color:red;'>Error: 'karsilasmalar' array not found!</p>";
+        container.innerHTML = "<p style='color:#e04cff;text-align:center;'>Feed Vector Missing.</p>";
         return;
       }
 
-      if (liveEvents.length === 0) {
-        container.innerHTML = "<p style='color:red;'>No live events available right now!</p>";
-        return;
-      }
-
-      // ⭐️ FIFA ম্যাচগুলোকে ফিল্টার করে লিস্টের সবার প্রথমে (Top) নিয়ে আসার লজিক ⭐️
+      // FIFA Auto Top Sorter
       liveEvents.sort((a, b) => {
         const aTitle = String(a.title || "").toLowerCase();
         const aLeague = String(a.league || "").toLowerCase();
@@ -313,94 +528,145 @@ function loadTargetScript() {
         const aHasFifa = aTitle.includes("fifa") || aLeague.includes("fifa") || aTitle.includes("dünya kupası") || aLeague.includes("dünya kupası");
         const bHasFifa = bTitle.includes("fifa") || bLeague.includes("fifa") || bTitle.includes("dünya kupası") || bLeague.includes("dünya kupası");
 
-        if (aHasFifa && !bHasFifa) return -1; // 'a' উপরে যাবে
-        if (!aHasFifa && bHasFifa) return 1;  // 'b' উপরে যাবে
-        return 0; // পজিশন অপরিবর্তিত থাকবে
+        if (aHasFifa && !bHasFifa) return -1; 
+        if (!aHasFifa && bHasFifa) return 1;  
+        return 0; 
       });
 
-      container.innerHTML = "";
-      liveEvents.forEach((event, index) => {
-        let id = "androstreamlivetrt1"; 
-        if(event.url && event.url.includes("id=")) {
-           const urlParams = new URLSearchParams(event.url.split('?')[1]);
-           id = urlParams.get('id') || "androstreamlivetrt1";
-        }
+      updateAnalytics();
+      renderMatches();
 
-        const btn = document.createElement("button");
-        
-        let englishTitle = translateText(event.title);
-        let englishLeague = translateText(event.league);
-        
-        // যদি এটি FIFA ম্যাচ হয়, তবে চেনার সুবিধার্থে শুরুতে একটি ⚽️ ইমোজি অ্যাড হবে
-        const isFifa = (event.title && event.title.toLowerCase().includes("fifa")) || (event.league && event.league.toLowerCase().includes("fifa")) || englishTitle.toLowerCase().includes("world cup") || englishLeague.toLowerCase().includes("world cup");
-        let prefix = isFifa ? "⚽️ " : `S${index + 1} - `;
-
-        let buttonText = `${prefix}${englishTitle}`;
-        if(englishLeague) buttonText += ` [${englishLeague}]`;
-        if(event.time) buttonText += ` (${event.time})`;
-        
-        btn.innerText = buttonText;
-        btn.onclick = () => setServer(index, id);
-        if(index === 0) btn.className = "active";
-        container.appendChild(btn);
-      });
-
-      // প্রথম বাটনটি (যা এখন নিশ্চিতভাবে FIFA ম্যাচ হবে যদি লাইভ থাকে) অটো-প্লে করা
       if (liveEvents.length > 0) {
-        let firstId = "androstreamlivetrt1";
-        if(liveEvents[0].url && liveEvents[0].url.includes("id=")) {
-           const firstUrlParams = new URLSearchParams(liveEvents[0].url.split('?')[1]);
-           firstId = firstUrlParams.get('id') || "androstreamlivetrt1";
-        }
-        setServer(0, firstId);
+        triggerFirstStream();
       }
 
     } catch (err) {
-      console.error("Data Process Error:", err);
-      container.innerHTML = "<p style='color:red;'>Error processing match data.</p>";
+      container.innerHTML = "<p style='color:#e04cff;text-align:center;'>Core Exception Processing Feeds.</p>";
     }
   };
-
-  script.onerror = () => {
-    container.innerHTML = "<p style='color:red;'>Failed to load stream script. Check connection.</p>";
-  };
-
   document.body.appendChild(script);
 }
 
-function setServer(index, id){
-  const frame = document.getElementById("frame");
+function updateAnalytics() {
+    let total = liveEvents.length;
+    let fifaCount = 0;
+    liveEvents.forEach(e => {
+        let t = translateText(e.title).toLowerCase();
+        let l = translateText(e.league).toLowerCase();
+        if(t.includes("fifa") || l.includes("fifa") || t.includes("world cup") || l.includes("world cup")) { fifaCount++; }
+    });
+    document.getElementById("countTotal").innerText = String(total).padStart(2, '0');
+    document.getElementById("countFifa").innerText = String(fifaCount).padStart(2, '0');
+}
 
-  frame.classList.add("fade");
-  frame.src = `${PLAYER_BASE_URL}?Talha=${id}`;
+function renderMatches() {
+  const container = document.getElementById("serverContainer");
+  const searchQuery = document.getElementById("searchChannels").value.toLowerCase();
+  container.innerHTML = "";
 
-  setTimeout(()=>frame.classList.remove("fade"),400);
+  let visibleCount = 0;
 
-  document.querySelectorAll(".servers button").forEach((btn)=>{
-    btn.classList.remove("active");
+  liveEvents.forEach((event, index) => {
+    let englishTitle = translateText(event.title);
+    let englishLeague = translateText(event.league);
+    
+    const isFifa = (event.title && event.title.toLowerCase().includes("fifa")) || 
+                    (event.league && event.league.toLowerCase().includes("fifa")) || 
+                    englishTitle.toLowerCase().includes("world cup") || 
+                    englishLeague.toLowerCase().includes("world cup");
+
+    if (currentFilter === 'fifa' && !isFifa) return;
+
+    const fullMatchText = (englishTitle + " " + englishLeague).toLowerCase();
+    if (searchQuery && !fullMatchText.includes(searchQuery)) return;
+
+    let id = "androstreamlivetrt1"; 
+    if(event.url && event.url.includes("id=")) {
+       const urlParams = new URLSearchParams(event.url.split('?')[1]);
+       id = urlParams.get('id') || "androstreamlivetrt1";
+    }
+
+    const btn = document.createElement("button");
+    let prefix = isFifa ? "⚽ " : `LIVE ${String(index + 1).padStart(2, '0')} : `;
+    let buttonText = `<span>${prefix}${englishTitle} ${englishLeague ? `[${englishLeague}]` : ''}</span>`;
+    
+    let badgeHTML = isFifa ? 
+        `<div class="live-badge fifa-badge"><div class="live-dot fifa-dot"></div>FIFA</div>` : 
+        `<div class="live-badge"><div class="live-dot"></div>${event.time ? event.time : 'ONLINE'}</div>`;
+        
+    btn.innerHTML = buttonText + badgeHTML;
+    btn.setAttribute("data-id", id);
+    btn.setAttribute("data-index", index);
+    
+    btn.onclick = () => setServer(index, id, btn);
+    container.appendChild(btn);
+    visibleCount++;
   });
-  if(document.querySelectorAll(".servers button")[index]) {
-    document.querySelectorAll(".servers button")[index].classList.add("active");
+
+  if(visibleCount === 0) {
+      container.innerHTML = "<p style='color:rgba(255,255,255,0.3);text-align:center;font-size:13px;padding:25px;'>No channels match active matrix filters.</p>";
   }
 }
 
-/* particles */
-for(let i=0;i<70;i++){
+function triggerFirstStream() {
+    const container = document.getElementById("serverContainer");
+    const firstBtn = container.querySelector("button");
+    if (firstBtn) {
+        const id = firstBtn.getAttribute("data-id");
+        const idx = parseInt(firstBtn.getAttribute("data-index"));
+        setServer(idx, id, firstBtn);
+    }
+}
+
+function setFilter(type) {
+    currentFilter = type;
+    document.getElementById("btnAll").classList.toggle("active", type === 'all');
+    document.getElementById("btnFifa").classList.toggle("active", type === 'fifa');
+    renderMatches();
+}
+
+function filterMatches() {
+    renderMatches();
+}
+
+function setServer(index, id, targetBtn){
+  const frame = document.getElementById("frame");
+  frame.classList.add("fade");
+  frame.src = `${PLAYER_BASE_URL}?Talha=${id}`;
+  setTimeout(()=>frame.classList.remove("fade"),400);
+
+  document.querySelectorAll(".servers button").forEach(btn => btn.classList.remove("active"));
+  if(targetBtn) targetBtn.classList.add("active");
+}
+
+function toggleTheatre(status) {
+    const card = document.getElementById("mainCard");
+    const exitBtn = document.getElementById("exitTheatre");
+    if(status) {
+        card.classList.add("theatre-active");
+        exitBtn.style.display = "block";
+    } else {
+        card.classList.remove("theatre-active");
+        exitBtn.style.display = "none";
+    }
+}
+
+/* Ambient Engine Particles */
+for(let i=0; i < (window.innerWidth < 600 ? 15 : 35); i++){
   let d = document.createElement("div");
   d.className = "p";
   d.style.left = Math.random()*100+"%";
-  d.style.animationDuration = (8+Math.random()*20)+"s";
+  d.style.animationDuration = (14+Math.random()*12)+"s";
   document.getElementById("particles").appendChild(d);
 }
 
-/* loader */
 window.onload = () => {
   setTimeout(() => {
-    document.getElementById("loader").style.opacity = "0";
-    setTimeout(() => document.getElementById("loader").remove(), 500);
+    const ld = document.getElementById("loader");
+    ld.style.opacity = "0";
+    setTimeout(() => ld.remove(), 500);
   }, 1200);
 };
 </script>
-
 </body>
 </html>
