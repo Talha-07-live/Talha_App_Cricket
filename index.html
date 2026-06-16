@@ -117,7 +117,7 @@ body::before{
     margin: 0 auto 24px auto;
     max-width: 100%;
     width: 380px;
-    display: none; /* Controlled via JS */
+    display: none;
     align-items: center;
     justify-content: center;
     gap: 10px;
@@ -240,7 +240,7 @@ input[type="password"]:focus{
 .player-container {
     position: relative;
     width: 100%;
-    padding-top: 56.25%; /* Perfect 16:9 Aspect Ratio */
+    padding-top: 56.25%;
     background: #000;
     border-radius: 16px;
     overflow: hidden;
@@ -256,7 +256,7 @@ iframe{
     border: none;
 }
 .theatre-active .player-container {
-    padding-top: 52%; /* Adjusts perfectly for cinematic focus */
+    padding-top: 52%;
     border-radius: 12px;
 }
 
@@ -420,7 +420,6 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
 .fade{ animation: appFade .25s ease-out; }
 @keyframes appFade{ from{opacity:.6;} to{opacity:1;} }
 
-/* PHONE RESPONSIVE BREAKPOINTS */
 @media(max-width: 600px) {
     body { padding: 10px 5px; }
     .analytics-panel { display: flex; } 
@@ -450,6 +449,7 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
         <span>সার্ভার রক্ষণাবেক্ষণের কাজ চলায় ভিডিও বাফারিং হতে পারে। এই সাময়িক অসুবিধার জন্য আমরা দুঃখিত।</span>
     </div>
 
+    <!-- পাসকোড গেটওয়ে (এখানে কাউন্টার নেই) -->
     <div id="login">
         <h2>System Authentication</h2>
         <input id="password" type="password" placeholder="Passcode Entry" onkeydown="if(event.key==='Enter') login()">
@@ -457,6 +457,7 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
         <button onclick="login()">Enter Talha's Stream</button>
     </div>
 
+    <!-- পাসওয়ার্ড দিয়ে ঢোকার পর প্লেয়ার সেকশন -->
     <div id="playerWrap" style="display:none">
         
         <div class="analytics-panel">
@@ -468,6 +469,7 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
                 <span>FIFA PREMIUM</span>
                 <font id="countFifa">00</font>
             </div>
+            <!-- রিয়েল-টাইম লাইভ কাউন্টার (পাসওয়ার্ড সফল হলে এখানে দেখাবে) -->
             <div class="stat-card watching-stat">
                 <span>RIGHT NOW WATCHING</span>
                 <font id="liveWatching">01</font>
@@ -506,7 +508,7 @@ let liveEvents = [];
 let currentFilter = 'all'; 
 const PLAYER_BASE_URL = "player.html"; 
 
-// লাইভ কাউন্টার ক্লাউডফ্লেয়ার ওয়ার্কার এন্ডপয়েন্ট লিঙ্ক
+// ক্লাউডফ্লেয়ার ওয়ার্কার এন্ডপয়েন্ট লিঙ্ক
 const COUNTER_API_URL = "https://sndb.rajtammi111212.workers.dev/api/live-counter";
 
 const noticeBox = document.getElementById("maintenanceNotice");
@@ -539,36 +541,44 @@ function translateText(text) {
                    .replace(/Åž/g, "S").replace(/Ä±/g, "i").replace(/Ã¶/g, "o");
 }
 
+// ক্যাশ বাইপাস রিয়েল-টাইম কাউন্টার ইঞ্জিন
+async function updateLiveWatchingCount() {
+    try {
+        const cleanUrl = `${COUNTER_API_URL}?_nocache=${Date.now()}`;
+        const res = await fetch(cleanUrl, {
+            method: 'GET',
+            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const count = Math.max(1, parseInt(data.count) || 1);
+            
+            const element = document.getElementById("liveWatching");
+            if (element) {
+                element.innerText = String(count).padStart(2, '0');
+            }
+        }
+    } catch (e) {
+        console.log("Counter refresh failure.");
+    }
+}
+
+// লগইন সফল হলেই কেবল রিয়েল-টাইম কাউন্টার চালু হবে
+function startLiveCounter() {
+    updateLiveWatchingCount(); 
+    setInterval(updateLiveWatchingCount, 4000); // প্রতি ৪ সেকেন্ড পর পর রিয়েল-টাইম আপডেট
+}
+
 function login(){
   const pass = document.getElementById("password").value;
   if(pass === PASSWORD){
     document.getElementById("login").style.display = "none";
     document.getElementById("playerWrap").style.display = "block";
     loadTargetScript();
-    initLiveCounter(); 
+    startLiveCounter(); // পাসওয়ার্ড ম্যাচ করার পর কাউন্টার স্টার্ট হলো
   }else{
     alert("Authentication Failure.");
   }
-}
-
-// রিয়েল-টাইম ওয়াচার কাউন্টার আপডেট ইঞ্জিন
-async function updateLiveWatchingCount() {
-    try {
-        const res = await fetch(COUNTER_API_URL);
-        if (res.ok) {
-            const data = await res.json();
-            const count = Math.max(1, data.count || 1);
-            document.getElementById("liveWatching").innerText = String(count).padStart(2, '0');
-        }
-    } catch (e) {
-        console.log("Counter synced background.");
-    }
-}
-
-function initLiveCounter() {
-    updateLiveWatchingCount();
-    // প্রতি ৫ সেকেন্ড পর পর ব্যাকগ্রাউন্ডে চেক করবে কতজন লাইভ আছে
-    setInterval(updateLiveWatchingCount, 5000);
 }
 
 function loadTargetScript() {
