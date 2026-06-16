@@ -235,6 +235,12 @@ input[type="password"]:focus{
 .stat-card font { font-size: 15px; font-weight: 800; color: #00f2fe; }
 .stat-card.fifa-stat font { color: #e04cff; }
 .stat-card.watching-stat font { color: #00ff88; text-shadow: 0 0 10px rgba(0,255,136,0.4); }
+.stat-card.total-stat font { color: #ffd175; }
+
+/* থার্ডপার্টি কাউন্টার হিডেন কন্টেইনার স্টাইল */
+#hiddenCounterContainer {
+    display: none !important;
+}
 
 /* NO-CUT RESPONSIVE VIDEO PLAYER FRAMEWORK */
 .player-container {
@@ -469,10 +475,15 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
                 <span>FIFA PREMIUM</span>
                 <font id="countFifa">00</font>
             </div>
-            <!-- রিয়েল-টাইম লাইভ ভিউয়ার কাউন্টার -->
+            <!-- রিয়েল-টাইম লাইভ ভিউয়ার কাউন্টার (ফ্রি-কাউন্টার থেকে আসবে) -->
             <div class="stat-card watching-stat">
                 <span>RIGHT NOW WATCHING</span>
                 <font id="liveWatching">01</font>
+            </div>
+            <!-- টোটাল ভিউয়ার কাউন্টার (ফ্রি-কাউন্টার থেকে আসবে) -->
+            <div class="stat-card total-stat">
+                <span>TOTAL VIEWS</span>
+                <font id="totalViews">00</font>
             </div>
         </div>
 
@@ -495,6 +506,11 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
         </div>
 
         <div class="servers" id="serverContainer"></div>
+    </div>
+
+    <!-- আপনার দেওয়া কাউন্টার এখানে ব্যাকগ্রাউন্ডে কাজ করবে কিন্তু সরাসরি ডিজাইন নষ্ট করবে না -->
+    <div id="hiddenCounterContainer">
+        <a href='https://www.free-counters.org/'>www.Free-Counters.org</a>
     </div>
 
     <footer>Made By Talha • © 2020-2026</footer>
@@ -538,46 +554,43 @@ function translateText(text) {
                    .replace(/Åž/g, "S").replace(/Ä±/g, "i").replace(/Ã¶/g, "o");
 }
 
-// ইউনিক ট্যাব ট্র্যাকিং মেকানিজম (ভিডিওর সাথে সম্পর্ক নেই, প্রবেশ করা মাত্র আপডেট হবে)
-function startTalhasLiveCounter() {
-    // ট্যাব ট্র্যাকিংয়ের জন্য প্রতিটা ট্যাবের জন্য একটা র্যান্ডম আইডি জেনারেট করা হচ্ছে
-    const sessionKey = 'talha_session_' + Math.random().toString(36).substring(2, 9);
-    localStorage.setItem(sessionKey, Date.now().toString());
+// ফ্রি-কাউন্টার স্ক্রিপ্ট এবং ডাটা রেন্ডারিং মেকানিজম
+function injectAndFetchFreeCounter() {
+    const container = document.getElementById("hiddenCounterContainer");
+    
+    // ১ম স্ক্রিপ্ট ইনজেকশন
+    const script1 = document.createElement("script");
+    script1.type = "text/javascript";
+    script1.src = "https://www.freevisitorcounters.com/auth.php?id=efbc146568a55f8f1a6c485293a7ac911cb400e7";
+    container.appendChild(script1);
 
-    function refreshCount() {
-        let activeTabs = 0;
-        const now = Date.now();
+    // ২য় স্ক্রিপ্ট ইনজেকশন
+    const script2 = document.createElement("script");
+    script2.type = "text/javascript";
+    script2.src = "https://www.freevisitorcounters.com/en/home/counter/1573689/t/1";
+    container.appendChild(script2);
 
-        // এই ট্যাবের টাইমস্ট্যাম্প আপডেট করা হচ্ছে যাতে বোঝা যায় ট্যাবটি এখনো সচল আছে
-        localStorage.setItem(sessionKey, now.toString());
+    // উইজেট টেবিল থেকে লাইভ এবং টোটাল ভিউ এক্সট্র্যাক্ট করার প্রসেস
+    let checkInterval = setInterval(() => {
+        const counterTable = container.querySelector("table");
+        if (counterTable) {
+            const textContent = counterTable.innerText || "";
+            
+            // রেগুলার এক্সপ্রেশন দিয়ে লাইভ ও টোটাল ভিউ খুঁজে বের করা
+            const liveMatch = textContent.match(/(?:Live|Online|현재)\s*:\s*(\d+)/i) || textContent.match(/:\s*(\d+)\s*$/);
+            const totalMatch = textContent.match(/(?:Total|Hits|방문자)\s*:\s*(\d+)/i) || textContent.match(/^(\d+)/);
 
-        // ব্রাউজারে talhas.scream.site.je এর আন্ডারে খোলা সচল ট্যাবগুলোর হিসাব নিকাশ
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key.startsWith('talha_session_')) {
-                const timestamp = parseInt(localStorage.getItem(key));
-                // যদি ট্যাবটি সচল থাকে (বিগত ৮ সেকেন্ডের মধ্যে রেসপন্স করে থাকে) তবে সেটিকে অ্যাক্টিভ ধরা হবে
-                if (now - timestamp < 8000) {
-                    activeTabs++;
-                } else {
-                    localStorage.removeItem(key); // ডেড ট্যাবগুলো রিমুভ করে ক্লিন করা হচ্ছে
-                }
+            if (liveMatch && liveMatch[1]) {
+                document.getElementById("liveWatching").innerText = String(liveMatch[1]).padStart(2, '0');
+            }
+            if (totalMatch && totalMatch[1]) {
+                document.getElementById("totalViews").innerText = String(totalMatch[1]).padStart(2, '0');
             }
         }
-        
-        // বেস ভিউয়ার ১ জন সব সময়ই দেখাবে
-        const finalCount = Math.max(1, activeTabs);
-        document.getElementById("liveWatching").innerText = String(finalCount).padStart(2, '0');
-    }
+    }, 1000);
 
-    // উইন্ডো বন্ধ বা ট্যাব কেটে দিলে সেশন মুছে দেওয়ার ব্যবস্থা
-    window.addEventListener('beforeunload', () => {
-        localStorage.removeItem(sessionKey);
-    });
-
-    // রান করার সাথে সাথে প্রথম হিসাব এবং প্রতি ৩.৫ সেকেন্ড পর পর পুশ-আপডেট
-    refreshCount();
-    setInterval(refreshCount, 3500);
+    // ১০ সেকেন্ড পর চেকিং বন্ধ করা (রিসোর্স বাঁচানোর জন্য)
+    setTimeout(() => clearInterval(checkInterval), 10000);
 }
 
 function login(){
@@ -586,7 +599,7 @@ function login(){
     document.getElementById("login").style.display = "none";
     document.getElementById("playerWrap").style.display = "block";
     loadTargetScript();
-    startTalhasLiveCounter(); // ভিডিও অন হোক বা অফ হোক, পাসওয়ার্ড দিয়ে ঢুকলেই কাউন্ট আপডেট হবে
+    injectAndFetchFreeCounter(); // সঠিক পাসওয়ার্ড দিয়ে প্রবেশ করার পরই কেবল কাউন্টার স্ক্রিপ্ট লোড হবে
   }else{
     alert("Authentication Failure.");
   }
