@@ -104,6 +104,33 @@ body::before{
     to{transform:translateX(300%)}
 }
 
+/* DYNAMIC MAINTENANCE NOTICE BAR */
+.maintenance-box {
+    background: rgba(255, 165, 0, 0.12);
+    border: 1px solid rgba(255, 165, 0, 0.35);
+    color: #ffd175;
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 auto 24px auto;
+    max-width: 100%;
+    width: 380px;
+    display: none; /* Controlled via JS */
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    animation: fadeInDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes fadeInDown {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
 /* UNIVERSAL RESPONSIVE CARD */
 .card{
     width: 100%;
@@ -131,7 +158,8 @@ body::before{
 .card.theatre-active .servers,
 .card.theatre-active .analytics-panel,
 .card.theatre-active footer,
-.card.theatre-active .utility-panel {
+.card.theatre-active .utility-panel,
+.card.theatre-active .maintenance-box {
     display: none !important;
 }
 
@@ -414,6 +442,12 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
 
 <div class="card" id="mainCard">
 
+    <!-- সার্ভারের নোটিশ বার (পাসওয়ার্ড এর ঠিক ওপরে পারফেক্টলি সেট করা হয়েছে) -->
+    <div id="maintenanceNotice" class="maintenance-box">
+        <span>⚠️</span>
+        <span>সার্ভার রক্ষণাবেক্ষণের কাজ চলায় ভিডিও বাফারিং হতে পারে। এই সাময়িক অসুবিধার জন্য আমরা দুঃখিত।</span>
+    </div>
+
     <div id="login">
         <h2>System Authentication</h2>
         <input id="password" type="password" placeholder="Passcode Entry" onkeydown="if(event.key==='Enter') login()">
@@ -459,10 +493,24 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
 </div>
 
 <script>
+// ==========================================================
+// মেসেজ অন/অফ করার মাস্টার সুইচ
+// মেসেজ দেখাতে চাইলে true লিখুন, লুকাতে চাইলে false লিখুন
+// ==========================================================
+const SHOW_MAINTENANCE_MSG = true; 
+
 const PASSWORD = "Talha";
 let liveEvents = [];
 let currentFilter = 'all'; 
 const PLAYER_BASE_URL = "player.html"; 
+
+// নোটিশ শো/হাইড লজিক ইনিশিয়েলাইজেশন
+const noticeBox = document.getElementById("maintenanceNotice");
+if (SHOW_MAINTENANCE_MSG) {
+    noticeBox.style.display = "flex";
+} else {
+    noticeBox.style.display = "none";
+}
 
 const translationDict = {
   "almanya": "Germany", "fransa": "France", "paris basketball": "Paris Basketball",
