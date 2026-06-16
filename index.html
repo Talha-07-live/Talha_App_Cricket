@@ -217,9 +217,11 @@ input[type="password"]:focus{
     display: flex;
     gap: 12px;
     margin-bottom: 16px;
+    flex-wrap: wrap;
 }
 .stat-card {
     flex: 1;
+    min-width: 140px;
     background: rgba(255,255,255,0.02);
     border: 1px solid rgba(255,255,255,0.05);
     border-radius: 14px;
@@ -232,6 +234,7 @@ input[type="password"]:focus{
 .stat-card span { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 0.5px; }
 .stat-card font { font-size: 15px; font-weight: 800; color: #00f2fe; }
 .stat-card.fifa-stat font { color: #e04cff; }
+.stat-card.watching-stat font { color: #00ff88; text-shadow: 0 0 10px rgba(0,255,136,0.4); }
 
 /* NO-CUT RESPONSIVE VIDEO PLAYER FRAMEWORK */
 .player-container {
@@ -420,7 +423,7 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
 /* PHONE RESPONSIVE BREAKPOINTS */
 @media(max-width: 600px) {
     body { padding: 10px 5px; }
-    .analytics-panel { display: none; }
+    .analytics-panel { display: flex; } 
     .filter-bar { flex-direction: column; align-items: stretch; }
     .search-box { min-width: 100%; }
     .filter-tabs { width: 100%; display: flex; }
@@ -442,7 +445,6 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
 
 <div class="card" id="mainCard">
 
-    <!-- সার্ভারের নোটিশ বার (পাসওয়ার্ড এর ঠিক ওপরে পারফেক্টলি সেট করা হয়েছে) -->
     <div id="maintenanceNotice" class="maintenance-box">
         <span>⚠️</span>
         <span>সার্ভার রক্ষণাবেক্ষণের কাজ চলায় ভিডিও বাফারিং হতে পারে। এই সাময়িক অসুবিধার জন্য আমরা দুঃখিত।</span>
@@ -459,12 +461,16 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
         
         <div class="analytics-panel">
             <div class="stat-card">
-                <span>ACTIVE SIGNALS FEED</span>
+                <span>ACTIVE FEEDS</span>
                 <font id="countTotal">00</font>
             </div>
             <div class="stat-card fifa-stat">
-                <span>FIFA PREMIUM FEEDS</span>
+                <span>FIFA PREMIUM</span>
                 <font id="countFifa">00</font>
+            </div>
+            <div class="stat-card watching-stat">
+                <span>RIGHT NOW WATCHING</span>
+                <font id="liveWatching">01</font>
             </div>
         </div>
 
@@ -493,10 +499,6 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
 </div>
 
 <script>
-// ==========================================================
-// মেসেজ অন/অফ করার মাস্টার সুইচ
-// মেসেজ দেখাতে চাইলে true লিখুন, লুকাতে চাইলে false লিখুন
-// ==========================================================
 const SHOW_MAINTENANCE_MSG = true; 
 
 const PASSWORD = "Talha";
@@ -504,7 +506,9 @@ let liveEvents = [];
 let currentFilter = 'all'; 
 const PLAYER_BASE_URL = "player.html"; 
 
-// নোটিশ শো/হাইড লজিক ইনিশিয়েলাইজেশন
+// লাইভ কাউন্টার ক্লাউডফ্লেয়ার ওয়ার্কার এন্ডপয়েন্ট লিঙ্ক
+const COUNTER_API_URL = "https://sndb.rajtammi111212.workers.dev/api/live-counter";
+
 const noticeBox = document.getElementById("maintenanceNotice");
 if (SHOW_MAINTENANCE_MSG) {
     noticeBox.style.display = "flex";
@@ -541,9 +545,30 @@ function login(){
     document.getElementById("login").style.display = "none";
     document.getElementById("playerWrap").style.display = "block";
     loadTargetScript();
+    initLiveCounter(); 
   }else{
     alert("Authentication Failure.");
   }
+}
+
+// রিয়েল-টাইম ওয়াচার কাউন্টার আপডেট ইঞ্জিন
+async function updateLiveWatchingCount() {
+    try {
+        const res = await fetch(COUNTER_API_URL);
+        if (res.ok) {
+            const data = await res.json();
+            const count = Math.max(1, data.count || 1);
+            document.getElementById("liveWatching").innerText = String(count).padStart(2, '0');
+        }
+    } catch (e) {
+        console.log("Counter synced background.");
+    }
+}
+
+function initLiveCounter() {
+    updateLiveWatchingCount();
+    // প্রতি ৫ সেকেন্ড পর পর ব্যাকগ্রাউন্ডে চেক করবে কতজন লাইভ আছে
+    setInterval(updateLiveWatchingCount, 5000);
 }
 
 function loadTargetScript() {
@@ -566,7 +591,6 @@ function loadTargetScript() {
         return;
       }
 
-      // FIFA Auto Top Sorter
       liveEvents.sort((a, b) => {
         const aTitle = String(a.title || "").toLowerCase();
         const aLeague = String(a.league || "").toLowerCase();
