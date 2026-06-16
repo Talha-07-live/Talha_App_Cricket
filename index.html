@@ -117,7 +117,7 @@ body::before{
     margin: 0 auto 24px auto;
     max-width: 100%;
     width: 380px;
-    display: none;
+    display: none; /* Controlled via JS */
     align-items: center;
     justify-content: center;
     gap: 10px;
@@ -217,11 +217,9 @@ input[type="password"]:focus{
     display: flex;
     gap: 12px;
     margin-bottom: 16px;
-    flex-wrap: wrap;
 }
 .stat-card {
     flex: 1;
-    min-width: 140px;
     background: rgba(255,255,255,0.02);
     border: 1px solid rgba(255,255,255,0.05);
     border-radius: 14px;
@@ -234,19 +232,12 @@ input[type="password"]:focus{
 .stat-card span { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 0.5px; }
 .stat-card font { font-size: 15px; font-weight: 800; color: #00f2fe; }
 .stat-card.fifa-stat font { color: #e04cff; }
-.stat-card.watching-stat font { color: #00ff88; text-shadow: 0 0 10px rgba(0,255,136,0.4); }
-.stat-card.total-stat font { color: #ffd175; }
-
-/* থার্ডপার্টি কাউন্টার হিডেন কন্টেইনার স্টাইল */
-#hiddenCounterContainer {
-    display: none !important;
-}
 
 /* NO-CUT RESPONSIVE VIDEO PLAYER FRAMEWORK */
 .player-container {
     position: relative;
     width: 100%;
-    padding-top: 56.25%;
+    padding-top: 56.25%; /* Perfect 16:9 Aspect Ratio */
     background: #000;
     border-radius: 16px;
     overflow: hidden;
@@ -262,7 +253,7 @@ iframe{
     border: none;
 }
 .theatre-active .player-container {
-    padding-top: 52%;
+    padding-top: 52%; /* Adjusts perfectly for cinematic focus */
     border-radius: 12px;
 }
 
@@ -426,9 +417,10 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
 .fade{ animation: appFade .25s ease-out; }
 @keyframes appFade{ from{opacity:.6;} to{opacity:1;} }
 
+/* PHONE RESPONSIVE BREAKPOINTS */
 @media(max-width: 600px) {
     body { padding: 10px 5px; }
-    .analytics-panel { display: flex; } 
+    .analytics-panel { display: none; }
     .filter-bar { flex-direction: column; align-items: stretch; }
     .search-box { min-width: 100%; }
     .filter-tabs { width: 100%; display: flex; }
@@ -450,12 +442,12 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
 
 <div class="card" id="mainCard">
 
+    <!-- সার্ভারের নোটিশ বার (পাসওয়ার্ড এর ঠিক ওপরে পারফেক্টলি সেট করা হয়েছে) -->
     <div id="maintenanceNotice" class="maintenance-box">
         <span>⚠️</span>
         <span>সার্ভার রক্ষণাবেক্ষণের কাজ চলায় ভিডিও বাফারিং হতে পারে। এই সাময়িক অসুবিধার জন্য আমরা দুঃখিত।</span>
     </div>
 
-    <!-- পাসকোড গেটওয়ে -->
     <div id="login">
         <h2>System Authentication</h2>
         <input id="password" type="password" placeholder="Passcode Entry" onkeydown="if(event.key==='Enter') login()">
@@ -463,27 +455,16 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
         <button onclick="login()">Enter Talha's Stream</button>
     </div>
 
-    <!-- প্লেয়ার প্যানেল -->
     <div id="playerWrap" style="display:none">
         
         <div class="analytics-panel">
             <div class="stat-card">
-                <span>ACTIVE FEEDS</span>
+                <span>ACTIVE SIGNALS FEED</span>
                 <font id="countTotal">00</font>
             </div>
             <div class="stat-card fifa-stat">
-                <span>FIFA PREMIUM</span>
+                <span>FIFA PREMIUM FEEDS</span>
                 <font id="countFifa">00</font>
-            </div>
-            <!-- রিয়েল-টাইম লাইভ ভিউয়ার কাউন্টার (ফ্রি-কাউন্টার থেকে আসবে) -->
-            <div class="stat-card watching-stat">
-                <span>RIGHT NOW WATCHING</span>
-                <font id="liveWatching">01</font>
-            </div>
-            <!-- টোটাল ভিউয়ার কাউন্টার (ফ্রি-কাউন্টার থেকে আসবে) -->
-            <div class="stat-card total-stat">
-                <span>TOTAL VIEWS</span>
-                <font id="totalViews">00</font>
             </div>
         </div>
 
@@ -508,15 +489,14 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
         <div class="servers" id="serverContainer"></div>
     </div>
 
-    <!-- আপনার দেওয়া কাউন্টার এখানে ব্যাকগ্রাউন্ডে কাজ করবে কিন্তু সরাসরি ডিজাইন নষ্ট করবে না -->
-    <div id="hiddenCounterContainer">
-        <a href='https://www.free-counters.org/'>www.Free-Counters.org</a>
-    </div>
-
     <footer>Made By Talha • © 2020-2026</footer>
 </div>
 
 <script>
+// ==========================================================
+// মেসেজ অন/অফ করার মাস্টার সুইচ
+// মেসেজ দেখাতে চাইলে true লিখুন, লুকাতে চাইলে false লিখুন
+// ==========================================================
 const SHOW_MAINTENANCE_MSG = true; 
 
 const PASSWORD = "Talha";
@@ -524,6 +504,7 @@ let liveEvents = [];
 let currentFilter = 'all'; 
 const PLAYER_BASE_URL = "player.html"; 
 
+// নোটিশ শো/হাইড লজিক ইনিশিয়েলাইজেশন
 const noticeBox = document.getElementById("maintenanceNotice");
 if (SHOW_MAINTENANCE_MSG) {
     noticeBox.style.display = "flex";
@@ -554,52 +535,12 @@ function translateText(text) {
                    .replace(/Åž/g, "S").replace(/Ä±/g, "i").replace(/Ã¶/g, "o");
 }
 
-// ফ্রি-কাউন্টার স্ক্রিপ্ট এবং ডাটা রেন্ডারিং মেকানিজম
-function injectAndFetchFreeCounter() {
-    const container = document.getElementById("hiddenCounterContainer");
-    
-    // ১ম স্ক্রিপ্ট ইনজেকশন
-    const script1 = document.createElement("script");
-    script1.type = "text/javascript";
-    script1.src = "https://www.freevisitorcounters.com/auth.php?id=efbc146568a55f8f1a6c485293a7ac911cb400e7";
-    container.appendChild(script1);
-
-    // ২য় স্ক্রিপ্ট ইনজেকশন
-    const script2 = document.createElement("script");
-    script2.type = "text/javascript";
-    script2.src = "https://www.freevisitorcounters.com/en/home/counter/1573689/t/1";
-    container.appendChild(script2);
-
-    // উইজেট টেবিল থেকে লাইভ এবং টোটাল ভিউ এক্সট্র্যাক্ট করার প্রসেস
-    let checkInterval = setInterval(() => {
-        const counterTable = container.querySelector("table");
-        if (counterTable) {
-            const textContent = counterTable.innerText || "";
-            
-            // রেগুলার এক্সপ্রেশন দিয়ে লাইভ ও টোটাল ভিউ খুঁজে বের করা
-            const liveMatch = textContent.match(/(?:Live|Online|현재)\s*:\s*(\d+)/i) || textContent.match(/:\s*(\d+)\s*$/);
-            const totalMatch = textContent.match(/(?:Total|Hits|방문자)\s*:\s*(\d+)/i) || textContent.match(/^(\d+)/);
-
-            if (liveMatch && liveMatch[1]) {
-                document.getElementById("liveWatching").innerText = String(liveMatch[1]).padStart(2, '0');
-            }
-            if (totalMatch && totalMatch[1]) {
-                document.getElementById("totalViews").innerText = String(totalMatch[1]).padStart(2, '0');
-            }
-        }
-    }, 1000);
-
-    // ১০ সেকেন্ড পর চেকিং বন্ধ করা (রিসোর্স বাঁচানোর জন্য)
-    setTimeout(() => clearInterval(checkInterval), 10000);
-}
-
 function login(){
   const pass = document.getElementById("password").value;
   if(pass === PASSWORD){
     document.getElementById("login").style.display = "none";
     document.getElementById("playerWrap").style.display = "block";
     loadTargetScript();
-    injectAndFetchFreeCounter(); // সঠিক পাসওয়ার্ড দিয়ে প্রবেশ করার পরই কেবল কাউন্টার স্ক্রিপ্ট লোড হবে
   }else{
     alert("Authentication Failure.");
   }
@@ -625,6 +566,7 @@ function loadTargetScript() {
         return;
       }
 
+      // FIFA Auto Top Sorter
       liveEvents.sort((a, b) => {
         const aTitle = String(a.title || "").toLowerCase();
         const aLeague = String(a.league || "").toLowerCase();
