@@ -449,7 +449,7 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
         <span>সার্ভার রক্ষণাবেক্ষণের কাজ চলায় ভিডিও বাফারিং হতে পারে। এই সাময়িক অসুবিধার জন্য আমরা দুঃখিত।</span>
     </div>
 
-    <!-- পাসকোড গেটওয়ে (এখানে কাউন্টার নেই) -->
+    <!-- পাসকোড গেটওয়ে -->
     <div id="login">
         <h2>System Authentication</h2>
         <input id="password" type="password" placeholder="Passcode Entry" onkeydown="if(event.key==='Enter') login()">
@@ -457,7 +457,7 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
         <button onclick="login()">Enter Talha's Stream</button>
     </div>
 
-    <!-- পাসওয়ার্ড দিয়ে ঢোকার পর প্লেয়ার সেকশন -->
+    <!-- প্লেয়ার প্যানেল -->
     <div id="playerWrap" style="display:none">
         
         <div class="analytics-panel">
@@ -469,7 +469,7 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
                 <span>FIFA PREMIUM</span>
                 <font id="countFifa">00</font>
             </div>
-            <!-- রিয়েল-টাইম লাইভ কাউন্টার (পাসওয়ার্ড সফল হলে এখানে দেখাবে) -->
+            <!-- রিয়েল-টাইম লাইভ ভিউয়ার কাউন্টার -->
             <div class="stat-card watching-stat">
                 <span>RIGHT NOW WATCHING</span>
                 <font id="liveWatching">01</font>
@@ -508,9 +508,6 @@ let liveEvents = [];
 let currentFilter = 'all'; 
 const PLAYER_BASE_URL = "player.html"; 
 
-// ক্লাউডফ্লেয়ার ওয়ার্কার এন্ডপয়েন্ট লিঙ্ক
-const COUNTER_API_URL = "https://sndb.rajtammi111212.workers.dev/api/live-counter";
-
 const noticeBox = document.getElementById("maintenanceNotice");
 if (SHOW_MAINTENANCE_MSG) {
     noticeBox.style.display = "flex";
@@ -541,32 +538,46 @@ function translateText(text) {
                    .replace(/Åž/g, "S").replace(/Ä±/g, "i").replace(/Ã¶/g, "o");
 }
 
-// ক্যাশ বাইপাস রিয়েল-টাইম কাউন্টার ইঞ্জিন
-async function updateLiveWatchingCount() {
-    try {
-        const cleanUrl = `${COUNTER_API_URL}?_nocache=${Date.now()}`;
-        const res = await fetch(cleanUrl, {
-            method: 'GET',
-            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
-        });
-        if (res.ok) {
-            const data = await res.json();
-            const count = Math.max(1, parseInt(data.count) || 1);
-            
-            const element = document.getElementById("liveWatching");
-            if (element) {
-                element.innerText = String(count).padStart(2, '0');
+// ইউনিক ট্যাব ট্র্যাকিং মেকানিজম (ভিডিওর সাথে সম্পর্ক নেই, প্রবেশ করা মাত্র আপডেট হবে)
+function startTalhasLiveCounter() {
+    // ট্যাব ট্র্যাকিংয়ের জন্য প্রতিটা ট্যাবের জন্য একটা র্যান্ডম আইডি জেনারেট করা হচ্ছে
+    const sessionKey = 'talha_session_' + Math.random().toString(36).substring(2, 9);
+    localStorage.setItem(sessionKey, Date.now().toString());
+
+    function refreshCount() {
+        let activeTabs = 0;
+        const now = Date.now();
+
+        // এই ট্যাবের টাইমস্ট্যাম্প আপডেট করা হচ্ছে যাতে বোঝা যায় ট্যাবটি এখনো সচল আছে
+        localStorage.setItem(sessionKey, now.toString());
+
+        // ব্রাউজারে talhas.scream.site.je এর আন্ডারে খোলা সচল ট্যাবগুলোর হিসাব নিকাশ
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('talha_session_')) {
+                const timestamp = parseInt(localStorage.getItem(key));
+                // যদি ট্যাবটি সচল থাকে (বিগত ৮ সেকেন্ডের মধ্যে রেসপন্স করে থাকে) তবে সেটিকে অ্যাক্টিভ ধরা হবে
+                if (now - timestamp < 8000) {
+                    activeTabs++;
+                } else {
+                    localStorage.removeItem(key); // ডেড ট্যাবগুলো রিমুভ করে ক্লিন করা হচ্ছে
+                }
             }
         }
-    } catch (e) {
-        console.log("Counter refresh failure.");
+        
+        // বেস ভিউয়ার ১ জন সব সময়ই দেখাবে
+        const finalCount = Math.max(1, activeTabs);
+        document.getElementById("liveWatching").innerText = String(finalCount).padStart(2, '0');
     }
-}
 
-// লগইন সফল হলেই কেবল রিয়েল-টাইম কাউন্টার চালু হবে
-function startLiveCounter() {
-    updateLiveWatchingCount(); 
-    setInterval(updateLiveWatchingCount, 4000); // প্রতি ৪ সেকেন্ড পর পর রিয়েল-টাইম আপডেট
+    // উইন্ডো বন্ধ বা ট্যাব কেটে দিলে সেশন মুছে দেওয়ার ব্যবস্থা
+    window.addEventListener('beforeunload', () => {
+        localStorage.removeItem(sessionKey);
+    });
+
+    // রান করার সাথে সাথে প্রথম হিসাব এবং প্রতি ৩.৫ সেকেন্ড পর পর পুশ-আপডেট
+    refreshCount();
+    setInterval(refreshCount, 3500);
 }
 
 function login(){
@@ -575,7 +586,7 @@ function login(){
     document.getElementById("login").style.display = "none";
     document.getElementById("playerWrap").style.display = "block";
     loadTargetScript();
-    startLiveCounter(); // পাসওয়ার্ড ম্যাচ করার পর কাউন্টার স্টার্ট হলো
+    startTalhasLiveCounter(); // ভিডিও অন হোক বা অফ হোক, পাসওয়ার্ড দিয়ে ঢুকলেই কাউন্ট আপডেট হবে
   }else{
     alert("Authentication Failure.");
   }
