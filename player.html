@@ -11,6 +11,9 @@
         * {
             margin: 0; padding: 0; box-sizing: border-box;
             user-select: none; -webkit-user-select: none;
+            /* 💡 বাগ ফিক্স: মোবাইলে ক্লিক করার পর নীল/বেগুনী সিলেকশন এফেক্ট রিমুভ */
+            -webkit-tap-highlight-color: transparent !important;
+            outline: none !important;
         }
         body, html {
             width: 100%; height: 100%; background: #000;
@@ -25,6 +28,8 @@
 
         video {
             width: 100%; height: 100%; object-fit: contain; z-index: 1;
+            -webkit-tap-highlight-color: transparent !important;
+            outline: none !important;
         }
 
         .player-controls {
@@ -71,6 +76,9 @@
             opacity: 0; pointer-events: none;
             transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 6; 
             box-shadow: 0 0 30px rgba(122,60,255,0.4);
+            /* 💡 বাগ ফিক্স: ফোকাস এফেক্ট রিমুভ */
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
         }
         
         .center-btn.show-controls {
@@ -84,6 +92,7 @@
         .progress-container {
             width: 100%; height: 6px; background: rgba(255,255,255,0.08);
             border-radius: 10px; position: relative; cursor: pointer; transition: height 0.1s;
+            -webkit-tap-highlight-color: transparent !important;
         }
         .progress-container:hover { height: 9px; }
         
@@ -109,9 +118,16 @@
         .control-btn {
             background: none; border: none; color: #fff; font-size: 17px; cursor: pointer;
             transition: all 0.2s;
+            /* 💡 বাগ ফিক্স: বাটনের অ্যাক্টিভ/ফোকাস হাইলাইট রিমুভ */
+            outline: none !important;
+            box-shadow: none !important;
+            -webkit-tap-highlight-color: transparent !important;
         }
         
+        /* মাউস হোভার করলে গ্লো করবে কিন্তু ক্লিকে কোনো এক্সট্রা বক্স আসবে না */
         .control-btn:hover { color: #00f2fe; filter: drop-shadow(0 0 8px #00f2fe); }
+        .control-btn:active, .control-btn:focus { background: none !important; outline: none !important; }
+        
         .time-display { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.65); letter-spacing: 0.5px; }
 
         .spinner {
@@ -169,7 +185,6 @@
 </div>
 
 <script>
-    // 💡 বাগ ফিক্স: পুরো স্ক্রিপ্টটি লোড হওয়ার নিশ্চয়তা দেওয়া
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const channelId = urlParams.get('Talha') || "androstreamlivetrt1";
@@ -194,7 +209,6 @@
         let controlsTimeout;
         let isSeeking = false;
 
-        // প্লেয়ার ইঞ্জিন ইনিশিয়েলাইজেশন (Hls.js)
         if (typeof Hls !== 'undefined' && Hls.isSupported()) {
             const hlsConfig = {
                 maxBufferLength: 240,         
@@ -229,7 +243,6 @@
                 hls.startLoad(); 
             });
 
-            // বাফার ক্যালকুলেটর
             setInterval(() => {
                 if (video.buffered.length > 0 && !isSeeking) {
                     const duration = (video.duration && isFinite(video.duration) && video.duration > 0) ? video.duration : (video.currentTime + 300);
@@ -272,14 +285,12 @@
             });
 
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            // iOS ও Safari-র জন্য ফলব্যাক নেটিভ সাপোর্ট
             video.src = videoSrc;
             video.addEventListener('loadedmetadata', () => {
                 video.play().catch(() => showControls());
             });
         }
 
-        // 🕹️ ইন্টারঅ্যাকশন ফাংশন (বাগ-ফ্রি ইভেন্ট বাইন্ডিং)
         function togglePlay() {
             if (video.paused) {
                 video.play().catch(() => {});
@@ -359,7 +370,6 @@
             controlsTimeout = setTimeout(hideControls, 3000);
         }
 
-        // ইভেন্ট লিসেনারগুলো নিরাপদে যুক্ত করা হলো (বাগ প্রোটেকশন)
         midPlayBtn.onclick = togglePlay;
         playNavBtn.onclick = togglePlay;
         muteBtn.onclick = toggleMute;
