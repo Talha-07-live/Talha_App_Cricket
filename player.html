@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Talha's Player - Fixed</title>
+    <title>Talha's Player</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.0/dist/hls.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -199,22 +199,26 @@
         let isSeeking = false;
 
         if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+            // 🔥 রাশ আওয়ার ও স্লো নেটওয়ার্ক অপ্টিমাইজড কনফিগারেশন
             const hlsConfig = {
-                maxBufferLength: 240,         
-                maxMaxBufferLength: 300,      
-                liveBackBufferLength: 7200,   
-                enableWorker: true,           
-                lowLatencyMode: false,        
-                liveSyncDurationCount: 7,     
-                liveMaxLatencyDurationCount: 15,
-                maxFragLookUpTolerance: 0.2,
-                manifestLoadingTimeOut: 15000,
-                manifestLoadingMaxRetry: 6,
-                fragLoadingTimeOut: 25000,
-                fragLoadingMaxRetry: 8,
-                levelLoadingTimeOut: 15000,
-                levelLoadingMaxRetry: 6,
-                progressive: true              
+                maxBufferLength: 30,             // বাফার সাইজ কমিয়ে ৩০ সেকেন্ড করা হয়েছে যাতে রিকোয়েস্ট জ্যাম না হয়
+                maxMaxBufferLength: 60,          // সর্বোচ্চ ৬০ সেকেন্ড পর্যন্ত বাফার জমাবে
+                liveBackBufferLength: 0,         // পেছনের পুরোনো বাফার ডিলিট করে র‍্যাম ফ্রি রাখবে
+                enableWorker: true,              // ব্রাউজার পারফরম্যান্স বুস্ট করার জন্য ওয়ার্কার এনাবলড
+                lowLatencyMode: true,            // লাইভ স্ট্রিমিং ল্যাগ কমানোর মেথড
+                
+                // রাশ আওয়ারে কানেকশন ড্রপ হলে রিকভার করার জন্য টাইমআউট ও রিট্রাই পলিসি বাড়ানো হয়েছে
+                manifestLoadingTimeOut: 20000,
+                manifestLoadingMaxRetry: 10,
+                fragLoadingTimeOut: 30000,
+                fragLoadingMaxRetry: 10,
+                levelLoadingTimeOut: 20000,
+                levelLoadingMaxRetry: 10,
+                
+                // Adaptive Bitrate (ABR) মেকানিজম স্পিড-আপ করা হয়েছে
+                abrEwmaFastLive: 2.0,            
+                abrEwmaSlowLive: 9.0,            
+                testBandwidth: true              
             };
 
             const hls = new Hls(hlsConfig);
@@ -222,6 +226,7 @@
             hls.attachMedia(video);
 
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                hls.currentLevel = -1; // অটোমেটিক কোয়ালিটি সিলেকশন চালু (নেট স্লো হলে নিজে থেকেই কম কোয়ালিটিতে চলবে)
                 video.play().catch(() => showControls());
             });
 
@@ -251,7 +256,8 @@
                     bufferedTimeline.style.width = Math.min(bufferPercent, 100) + "%";
 
                     const aheadAmount = activeBufferEnd - currentTime;
-                    bufferStats.innerText = `Buffer Guard: ${Math.round(Math.max(0, aheadAmount))}s / 240s`;
+                    // টেক্সট আপডেট (কনফিগারেশনের সাথে মিল রেখে ৬০ সেকেন্ড ম্যাক্স দেখানো হচ্ছে)
+                    bufferStats.innerText = `Buffer Guard: ${Math.round(Math.max(0, aheadAmount))}s / 60s`;
                     timeShow.innerText = `${formatTime(currentTime)} / Talha's Player`;
                 }
             }, 400);
@@ -279,7 +285,7 @@
             });
         }
 
-        // 💡 ফিক্সড প্লে/পজ স্টেট লজিক (Native Event Listener ভিত্তিক)
+        // 💡 ফিক্সড প্লে/পজ স্টেট লজিক
         function togglePlay() {
             if (video.paused) {
                 video.play().catch(() => {});
@@ -288,7 +294,6 @@
             }
         }
 
-        // ব্রাউজার বা ডিভাইসের রিয়েল-টাইম ইভেন্ট অনুযায়ী বাটন আইকন চেঞ্জ (বাগ-ফ্রি মেথড)
         video.addEventListener('play', () => {
             midPlayBtn.innerHTML = '<i class="fas fa-pause"></i>';
             playNavBtn.innerHTML = '<i class="fas fa-pause"></i>';
@@ -368,7 +373,6 @@
 
         midPlayBtn.onclick = togglePlay;
         playNavBtn.onclick = togglePlay;
-        // মোবাইল ও ডেক্সটপ ব্যাকগ্রাউন্ডে ভিডিও ক্লিক করলে প্লে/পজ হবে
         video.onclick = togglePlay; 
         
         muteBtn.onclick = toggleMute;
