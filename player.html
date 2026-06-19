@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Talha's Player</title>
+    <title>Talha's Player - Fixed</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.0/dist/hls.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -11,7 +11,6 @@
         * {
             margin: 0; padding: 0; box-sizing: border-box;
             user-select: none; -webkit-user-select: none;
-            /* 💡 বাগ ফিক্স: মোবাইলে ক্লিক করার পর নীল/বেগুনী সিলেকশন এফেক্ট রিমুভ */
             -webkit-tap-highlight-color: transparent !important;
             outline: none !important;
         }
@@ -28,7 +27,6 @@
 
         video {
             width: 100%; height: 100%; object-fit: contain; z-index: 1;
-            -webkit-tap-highlight-color: transparent !important;
             outline: none !important;
         }
 
@@ -76,9 +74,6 @@
             opacity: 0; pointer-events: none;
             transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 6; 
             box-shadow: 0 0 30px rgba(122,60,255,0.4);
-            /* 💡 বাগ ফিক্স: ফোকাস এফেক্ট রিমুভ */
-            outline: none !important;
-            -webkit-tap-highlight-color: transparent !important;
         }
         
         .center-btn.show-controls {
@@ -92,7 +87,6 @@
         .progress-container {
             width: 100%; height: 6px; background: rgba(255,255,255,0.08);
             border-radius: 10px; position: relative; cursor: pointer; transition: height 0.1s;
-            -webkit-tap-highlight-color: transparent !important;
         }
         .progress-container:hover { height: 9px; }
         
@@ -118,15 +112,11 @@
         .control-btn {
             background: none; border: none; color: #fff; font-size: 17px; cursor: pointer;
             transition: all 0.2s;
-            /* 💡 বাগ ফিক্স: বাটনের অ্যাক্টিভ/ফোকাস হাইলাইট রিমুভ */
-            outline: none !important;
             box-shadow: none !important;
-            -webkit-tap-highlight-color: transparent !important;
         }
         
-        /* মাউস হোভার করলে গ্লো করবে কিন্তু ক্লিকে কোনো এক্সট্রা বক্স আসবে না */
         .control-btn:hover { color: #00f2fe; filter: drop-shadow(0 0 8px #00f2fe); }
-        .control-btn:active, .control-btn:focus { background: none !important; outline: none !important; }
+        .control-btn:active, .control-btn:focus { background: none !important; }
         
         .time-display { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.65); letter-spacing: 0.5px; }
 
@@ -188,7 +178,6 @@
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const channelId = urlParams.get('Talha') || "androstreamlivetrt1";
-        
         const videoSrc = `https://sndb.rajtammi111212.workers.dev/checklist/${channelId}.m3u8`; 
 
         const video = document.getElementById('videoEngine');
@@ -225,7 +214,7 @@
                 fragLoadingMaxRetry: 8,
                 levelLoadingTimeOut: 15000,
                 levelLoadingMaxRetry: 6,
-                progressive: true             
+                progressive: true              
             };
 
             const hls = new Hls(hlsConfig);
@@ -263,7 +252,6 @@
 
                     const aheadAmount = activeBufferEnd - currentTime;
                     bufferStats.innerText = `Buffer Guard: ${Math.round(Math.max(0, aheadAmount))}s / 240s`;
-                    
                     timeShow.innerText = `${formatTime(currentTime)} / Talha's Player`;
                 }
             }, 400);
@@ -291,19 +279,27 @@
             });
         }
 
+        // 💡 ফিক্সড প্লে/পজ স্টেট লজিক (Native Event Listener ভিত্তিক)
         function togglePlay() {
             if (video.paused) {
                 video.play().catch(() => {});
-                midPlayBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                playNavBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                resetControlsTimeout();
             } else {
                 video.pause();
-                midPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
-                playNavBtn.innerHTML = '<i class="fas fa-play"></i>';
-                showControls();
             }
         }
+
+        // ব্রাউজার বা ডিভাইসের রিয়েল-টাইম ইভেন্ট অনুযায়ী বাটন আইকন চেঞ্জ (বাগ-ফ্রি মেথড)
+        video.addEventListener('play', () => {
+            midPlayBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            playNavBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            resetControlsTimeout();
+        });
+
+        video.addEventListener('pause', () => {
+            midPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
+            playNavBtn.innerHTML = '<i class="fas fa-play"></i>';
+            showControls();
+        });
 
         function toggleMute() {
             if (video.muted) {
@@ -372,6 +368,9 @@
 
         midPlayBtn.onclick = togglePlay;
         playNavBtn.onclick = togglePlay;
+        // মোবাইল ও ডেক্সটপ ব্যাকগ্রাউন্ডে ভিডিও ক্লিক করলে প্লে/পজ হবে
+        video.onclick = togglePlay; 
+        
         muteBtn.onclick = toggleMute;
         timeline.onclick = seekVideo;
         goLiveBtn.onclick = goLive;
@@ -389,8 +388,6 @@
                 resetControlsTimeout();
             }
         }, { passive: true });
-
-        video.addEventListener('play', resetControlsTimeout);
     };
 </script>
 </body>
