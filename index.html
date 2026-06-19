@@ -117,7 +117,7 @@ body::before{
     margin: 0 auto 24px auto;
     max-width: 100%;
     width: 380px;
-    display: none; /* Controlled via JS */
+    display: none;
     align-items: center;
     justify-content: center;
     gap: 10px;
@@ -237,7 +237,7 @@ input[type="password"]:focus{
 .player-container {
     position: relative;
     width: 100%;
-    padding-top: 56.25%; /* Perfect 16:9 Aspect Ratio */
+    padding-top: 56.25%; 
     background: #000;
     border-radius: 16px;
     overflow: hidden;
@@ -253,7 +253,7 @@ iframe{
     border: none;
 }
 .theatre-active .player-container {
-    padding-top: 52%; /* Adjusts perfectly for cinematic focus */
+    padding-top: 52%; 
     border-radius: 12px;
 }
 
@@ -442,7 +442,6 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
 
 <div class="card" id="mainCard">
 
-    <!-- সার্ভারের নোটিশ বার (পাসওয়ার্ড এর ঠিক ওপরে পারফেক্টলি সেট করা হয়েছে) -->
     <div id="maintenanceNotice" class="maintenance-box">
         <span>⚠️</span>
         <span>সার্ভার রক্ষণাবেক্ষণের কাজ চলায় ভিডিও বাফারিং হতে পারে। এই সাময়িক অসুবিধার জন্য আমরা দুঃখিত।</span>
@@ -493,18 +492,46 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
 </div>
 
 <script>
-// ==========================================================
-// মেসেজ অন/অফ করার মাস্টার সুইচ
-// মেসেজ দেখাতে চাইলে true লিখুন, লুকাতে চাইলে false লিখুন
-// ==========================================================
-const SHOW_MAINTENANCE_MSG = true; 
+// =========================================================================
+// 🌟 [TALHA HYBRID CONFIG] - এখানে আপনি ম্যানুয়ালি মাল্টিপল ডিরেক্ট আইফ্রেম বা HLS যোগ করতে পারেন
+// =========================================================================
+const CUSTOM_TOP_FEEDS = [
+  {
+    title: "Football (Talha's Stream)", 
+    league: "Sports",
+    url: "https://bdix.my.id/onair/e.php", // ডিরেক্ট আইফ্রেম লিঙ্ক
+    time: "FIFA 2026",
+    isFifa: false,
+    show: true,
+    isIframeOnly: true // ⚡ এটি সরাসরি মূল আইফ্রেমে ওপেন হবে (player.html স্কিপ করবে)
+  },
+  {
+    title: "Football (Talha's Stream)", 
+    league: "Sports",
+    url: "https://www.m3u8player.online/embed/dash?url=https://live.thebosstv.com:30443/dwlive/Somoy-TV/chunks.m3u8", // ডিরেক্ট আইফ্রেম লিঙ্ক
+    time: "FIFA 2026",
+    isFifa: false,
+    show: true,
+    isIframeOnly: true // ⚡ এটি সরাসরি মূল আইফ্রেমে ওপেন হবে (player.html স্কিপ করবে)
+  },
+  {
+    title: "Football (Talha's Stream)", 
+    league: "Sports",
+    url: "https://www.m3u8player.online/embed/dash?url=https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", // ডিরেক্ট আইফ্রেম লিঙ্ক
+    time: "FIFA 2026",
+    isFifa: false,
+    show: true,
+    isIframeOnly: true // ⚡ এটি সরাসরি মূল আইফ্রেমে ওপেন হবে (player.html স্কিপ করবে)
+  }
+];
 
+const SHOW_MAINTENANCE_MSG = true; 
 const PASSWORD = "Talha";
 let liveEvents = [];
 let currentFilter = 'all'; 
 const PLAYER_BASE_URL = "player.html"; 
 
-// নোটিশ শো/হাইড লজিক ইনিশিয়েলাইজেশন
+// নোটিশ শো/হাইড লজিক
 const noticeBox = document.getElementById("maintenanceNotice");
 if (SHOW_MAINTENANCE_MSG) {
     noticeBox.style.display = "flex";
@@ -559,15 +586,16 @@ function loadTargetScript() {
   
   script.onload = () => {
     try {
+      let tempEvents = [];
       if (typeof karsilasmalar !== "undefined" && Array.isArray(karsilasmalar)) {
-        liveEvents = karsilasmalar;
+        tempEvents = karsilasmalar;
       } else {
         container.innerHTML = "<p style='color:#e04cff;text-align:center;'>Feed Vector Missing.</p>";
         return;
       }
 
-      // FIFA Auto Top Sorter
-      liveEvents.sort((a, b) => {
+      // API ডাটা সর্টিং
+      tempEvents.sort((a, b) => {
         const aTitle = String(a.title || "").toLowerCase();
         const aLeague = String(a.league || "").toLowerCase();
         const bTitle = String(b.title || "").toLowerCase();
@@ -581,6 +609,10 @@ function loadTargetScript() {
         return 0; 
       });
 
+      // কাস্টম এবং এপিআই ডাটা একত্র করা
+      const activeCustomFeeds = CUSTOM_TOP_FEEDS.filter(item => item.show === true);
+      liveEvents = [...activeCustomFeeds, ...tempEvents];
+
       updateAnalytics();
       renderMatches();
 
@@ -588,7 +620,7 @@ function loadTargetScript() {
         triggerFirstStream();
       }
 
-    } catch (err) {
+} catch (err) {
       container.innerHTML = "<p style='color:#e04cff;text-align:center;'>Core Exception Processing Feeds.</p>";
     }
   };
@@ -601,7 +633,7 @@ function updateAnalytics() {
     liveEvents.forEach(e => {
         let t = translateText(e.title).toLowerCase();
         let l = translateText(e.league).toLowerCase();
-        if(t.includes("fifa") || l.includes("fifa") || t.includes("world cup") || l.includes("world cup")) { fifaCount++; }
+        if(t.includes("fifa") || l.includes("fifa") || t.includes("world cup") || l.includes("world cup") || e.isFifa) { fifaCount++; }
     });
     document.getElementById("countTotal").innerText = String(total).padStart(2, '0');
     document.getElementById("countFifa").innerText = String(fifaCount).padStart(2, '0');
@@ -621,18 +653,12 @@ function renderMatches() {
     const isFifa = (event.title && event.title.toLowerCase().includes("fifa")) || 
                     (event.league && event.league.toLowerCase().includes("fifa")) || 
                     englishTitle.toLowerCase().includes("world cup") || 
-                    englishLeague.toLowerCase().includes("world cup");
+                    englishLeague.toLowerCase().includes("world cup") || event.isFifa;
 
     if (currentFilter === 'fifa' && !isFifa) return;
 
     const fullMatchText = (englishTitle + " " + englishLeague).toLowerCase();
     if (searchQuery && !fullMatchText.includes(searchQuery)) return;
-
-    let id = "androstreamlivetrt1"; 
-    if(event.url && event.url.includes("id=")) {
-       const urlParams = new URLSearchParams(event.url.split('?')[1]);
-       id = urlParams.get('id') || "androstreamlivetrt1";
-    }
 
     const btn = document.createElement("button");
     let prefix = isFifa ? "⚽ " : `LIVE ${String(index + 1).padStart(2, '0')} : `;
@@ -643,10 +669,8 @@ function renderMatches() {
         `<div class="live-badge"><div class="live-dot"></div>${event.time ? event.time : 'ONLINE'}</div>`;
         
     btn.innerHTML = buttonText + badgeHTML;
-    btn.setAttribute("data-id", id);
-    btn.setAttribute("data-index", index);
     
-    btn.onclick = () => setServer(index, id, btn);
+    btn.onclick = () => setServer(event, btn);
     container.appendChild(btn);
     visibleCount++;
   });
@@ -660,9 +684,7 @@ function triggerFirstStream() {
     const container = document.getElementById("serverContainer");
     const firstBtn = container.querySelector("button");
     if (firstBtn) {
-        const id = firstBtn.getAttribute("data-id");
-        const idx = parseInt(firstBtn.getAttribute("data-index"));
-        setServer(idx, id, firstBtn);
+        firstBtn.click();
     }
 }
 
@@ -677,11 +699,40 @@ function filterMatches() {
     renderMatches();
 }
 
-function setServer(index, id, targetBtn){
+// 📡 👑 স্মার্ট ইন্টেলিজেন্ট হাইব্রিড সুইচ ইঞ্জিন
+function setServer(event, targetBtn){
   const frame = document.getElementById("frame");
   frame.classList.add("fade");
-  frame.src = `${PLAYER_BASE_URL}?Talha=${id}`;
-  setTimeout(()=>frame.classList.remove("fade"),400);
+  
+  let finalUrl = "";
+  
+  if(event.url) {
+      const urlStr = event.url.toLowerCase();
+
+      // শর্ত ১: যদি ম্যানুয়ালি এড করা আইফ্রেম হয় (isIframeOnly: true)
+      if (event.isIframeOnly === true) {
+          finalUrl = event.url;
+      }
+      // শর্ত ২: যদি ডিরেক্ট HLS লিং বা .m3u8 বা স্ক্রিপ্ট ডাটার আইডি সিস্টেম হয়
+      else if (urlStr.includes(".m3u8")) {
+          finalUrl = `${PLAYER_BASE_URL}?Talha=${encodeURIComponent(event.url)}`;
+      }
+      else if (event.url.includes("id=")) {
+          const urlParams = new URLSearchParams(event.url.split('?')[1]);
+          let id = urlParams.get('id') || "androstreamlivetrt1";
+          finalUrl = `${PLAYER_BASE_URL}?Talha=${encodeURIComponent(id)}`;
+      }
+      // শর্ত ৩: কোনো কারণে সাধারণ লিংক পেলে সরাসরি ওপেন হবে
+      else {
+          finalUrl = event.url;
+      }
+  } else {
+      // ব্যাকআপ সেফটি
+      finalUrl = `${PLAYER_BASE_URL}?Talha=androstreamlivetrt1`;
+  }
+  
+  frame.src = finalUrl;
+  setTimeout(()=>frame.classList.remove("fade"), 400);
 
   document.querySelectorAll(".servers button").forEach(btn => btn.classList.remove("active"));
   if(targetBtn) targetBtn.classList.add("active");
@@ -711,8 +762,10 @@ for(let i=0; i < (window.innerWidth < 600 ? 15 : 35); i++){
 window.onload = () => {
   setTimeout(() => {
     const ld = document.getElementById("loader");
-    ld.style.opacity = "0";
-    setTimeout(() => ld.remove(), 500);
+    if(ld) {
+        ld.style.opacity = "0";
+        setTimeout(() => ld.remove(), 500);
+    }
   }, 1200);
 };
 </script>
