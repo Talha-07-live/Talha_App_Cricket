@@ -28,7 +28,6 @@ body{
     padding: 20px 10px;
 }
 
-/* Hyper-Ambient Neural Glow Background */
 body::before{
     content:"";
     position:fixed;
@@ -60,7 +59,6 @@ body::before{
     to{transform:translateY(-120px) scale(1.4)}
 }
 
-/* INITIALIZING LOADER */
 #loader{
     position:fixed;
     inset:0;
@@ -104,7 +102,6 @@ body::before{
     to{transform:translateX(300%)}
 }
 
-/* DYNAMIC MAINTENANCE NOTICE BAR */
 .maintenance-box {
     background: rgba(255, 165, 0, 0.12);
     border: 1px solid rgba(255, 165, 0, 0.35);
@@ -131,7 +128,6 @@ body::before{
     100% { opacity: 1; transform: translateY(0); }
 }
 
-/* UNIVERSAL RESPONSIVE CARD */
 .card{
     width: 100%;
     max-width: 1100px;
@@ -147,7 +143,6 @@ body::before{
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* CINEMATIC THEATRE MODE */
 .card.theatre-active {
     max-width: 100% !important;
     width: 96vw;
@@ -163,7 +158,6 @@ body::before{
     display: none !important;
 }
 
-/* LOCK INTERFACE */
 #login {
     text-align: center;
     padding: 40px 10px;
@@ -212,7 +206,6 @@ input[type="password"]:focus{
     box-shadow: 0 6px 30px rgba(122,60,255,0.4);
 }
 
-/* REAL-TIME ANALYTICS PANEL */
 .analytics-panel {
     display: flex;
     gap: 12px;
@@ -233,7 +226,6 @@ input[type="password"]:focus{
 .stat-card font { font-size: 15px; font-weight: 800; color: #00f2fe; }
 .stat-card.fifa-stat font { color: #e04cff; }
 
-/* NO-CUT RESPONSIVE VIDEO PLAYER FRAMEWORK */
 .player-container {
     position: relative;
     width: 100%;
@@ -257,7 +249,6 @@ iframe{
     border-radius: 12px;
 }
 
-/* UTILITY / THEATER BUTTONS */
 .utility-panel {
     display: flex;
     justify-content: flex-end;
@@ -294,7 +285,6 @@ iframe{
     font-size: 12px;
 }
 
-/* SMART FILTERS CONTROL */
 .filter-bar {
     display: flex;
     gap: 12px;
@@ -335,7 +325,6 @@ iframe{
     color: #fff;
 }
 
-/* FLUID CHANNEL LIST SYSTEM */
 .servers{
     display: flex;
     gap: 8px;
@@ -382,7 +371,6 @@ iframe{
     font-weight: 700;
 }
 
-/* NEON BADGES */
 .live-badge {
     display: flex;
     align-items: center;
@@ -417,7 +405,6 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
 .fade{ animation: appFade .25s ease-out; }
 @keyframes appFade{ from{opacity:.6;} to{opacity:1;} }
 
-/* PHONE RESPONSIVE BREAKPOINTS */
 @media(max-width: 600px) {
     body { padding: 10px 5px; }
     .analytics-panel { display: none; }
@@ -448,10 +435,10 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
     </div>
 
     <div id="login">
-        <h2>System Authentication</h2>
+        <h2>Authentication</h2>
         <input id="password" type="password" placeholder="Passcode Entry" onkeydown="if(event.key==='Enter') login()">
         <br>
-        <button onclick="login()">Enter Talha's Stream</button>
+        <button onclick="login()">Enter</button>
     </div>
 
     <div id="playerWrap" style="display:none">
@@ -492,36 +479,34 @@ footer{ text-align:center; margin-top:20px; opacity:.2; font-size:11px; }
 </div>
 
 <script>
-// =========================================================================
-// 🌟 [TALHA HYBRID CONFIG] - এখানে আপনি ম্যানুয়ালি মাল্টিপল ডিরেক্ট আইফ্রেম বা HLS যোগ করতে পারেন
-// =========================================================================
+
 const CUSTOM_TOP_FEEDS = [
   {
-    title: "Football (Talha's Stream)", 
+    title: "Football, Wait 30s (Talha's Stream)", 
     league: "Sports",
-    url: "https://bdix.my.id/onair/e.php", // ডিরেক্ট আইফ্রেম লিঙ্ক
+    url: "https://bdix.my.id/onair/e.php",
     time: "FIFA 2026",
     isFifa: false,
     show: true,
-    isIframeOnly: true // ⚡ এটি সরাসরি মূল আইফ্রেমে ওপেন হবে (player.html স্কিপ করবে)
+    isIframeOnly: true 
   },
   {
     title: "Football (Talha's Stream)", 
     league: "Sports",
-    url: "https://talhasplayer.stream.site.je/?url=https://live.thebosstv.com:30443/dwlive/Somoy-TV/chunks.m3u8", // ডিরেক্ট আইফ্রেম লিঙ্ক
+    url: "https://talhasplayer.stream.site.je/?url=https://live.thebosstv.com:30443/dwlive/Somoy-TV/chunks.m3u8",
     time: "FIFA 2026",
     isFifa: false,
     show: true,
-    isIframeOnly: true // ⚡ এটি সরাসরি মূল আইফ্রেমে ওপেন হবে (player.html স্কিপ করবে)
+    isIframeOnly: true 
   },
   {
     title: "Football (Talha's Stream)", 
     league: "Sports",
-    url: "https://talhasplayer.stream.site.je/?url=https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", // ডিরেক্ট আইফ্রেম লিঙ্ক
+    url: "https://talhasplayer.stream.site.je/?url=https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", 
     time: "FIFA 2026",
     isFifa: false,
     show: true,
-    isIframeOnly: true // ⚡ এটি সরাসরি মূল আইফ্রেমে ওপেন হবে (player.html স্কিপ করবে)
+    isIframeOnly: true 
   }
 ];
 
@@ -531,7 +516,6 @@ let liveEvents = [];
 let currentFilter = 'all'; 
 const PLAYER_BASE_URL = "player.html"; 
 
-// নোটিশ শো/হাইড লজিক
 const noticeBox = document.getElementById("maintenanceNotice");
 if (SHOW_MAINTENANCE_MSG) {
     noticeBox.style.display = "flex";
@@ -594,7 +578,6 @@ function loadTargetScript() {
         return;
       }
 
-      // API ডাটা সর্টিং
       tempEvents.sort((a, b) => {
         const aTitle = String(a.title || "").toLowerCase();
         const aLeague = String(a.league || "").toLowerCase();
@@ -609,7 +592,6 @@ function loadTargetScript() {
         return 0; 
       });
 
-      // কাস্টম এবং এপিআই ডাটা একত্র করা
       const activeCustomFeeds = CUSTOM_TOP_FEEDS.filter(item => item.show === true);
       liveEvents = [...activeCustomFeeds, ...tempEvents];
 
@@ -699,7 +681,6 @@ function filterMatches() {
     renderMatches();
 }
 
-// 📡 👑 স্মার্ট ইন্টেলিজেন্ট হাইব্রিড সুইচ ইঞ্জিন
 function setServer(event, targetBtn){
   const frame = document.getElementById("frame");
   frame.classList.add("fade");
@@ -709,11 +690,9 @@ function setServer(event, targetBtn){
   if(event.url) {
       const urlStr = event.url.toLowerCase();
 
-      // শর্ত ১: যদি ম্যানুয়ালি এড করা আইফ্রেম হয় (isIframeOnly: true)
       if (event.isIframeOnly === true) {
           finalUrl = event.url;
       }
-      // শর্ত ২: যদি ডিরেক্ট HLS লিং বা .m3u8 বা স্ক্রিপ্ট ডাটার আইডি সিস্টেম হয়
       else if (urlStr.includes(".m3u8")) {
           finalUrl = `${PLAYER_BASE_URL}?Talha=${encodeURIComponent(event.url)}`;
       }
@@ -722,12 +701,10 @@ function setServer(event, targetBtn){
           let id = urlParams.get('id') || "androstreamlivetrt1";
           finalUrl = `${PLAYER_BASE_URL}?Talha=${encodeURIComponent(id)}`;
       }
-      // শর্ত ৩: কোনো কারণে সাধারণ লিংক পেলে সরাসরি ওপেন হবে
       else {
           finalUrl = event.url;
       }
   } else {
-      // ব্যাকআপ সেফটি
       finalUrl = `${PLAYER_BASE_URL}?Talha=androstreamlivetrt1`;
   }
   
@@ -750,7 +727,6 @@ function toggleTheatre(status) {
     }
 }
 
-/* Ambient Engine Particles */
 for(let i=0; i < (window.innerWidth < 600 ? 15 : 35); i++){
   let d = document.createElement("div");
   d.className = "p";
