@@ -146,7 +146,7 @@
     <div class="player-controls" id="controlOverlay">
         
         <div class="top-bar">
-            <div class="live-tag">LIVE</div>
+            <div class="live-tag">LIVE BUFFER</div>
             <div class="buffer-status-badge" id="bufferStats">Engine: Syncing...</div>
         </div>
 
@@ -161,10 +161,10 @@
                 <div class="left-controls">
                     <button class="control-btn" id="playNavBtn"><i class="fas fa-play"></i></button>
                     <button class="control-btn" id="muteBtn"><i class="fas fa-volume-up"></i></button>
-                    <div class="time-display" id="timeShow">00:00 / Live</div>
+                    <div class="time-display" id="timeShow">00:00 / Live Buffer</div>
                 </div>
                 <div class="right-controls">
-                    <button class="control-btn" style="font-size:12px; font-weight:700;" id="goLiveBtn"><i class="fas fa-satellite-dish" style="color:#ff0055;"></i> GO LIVE</button>
+                    <button class="control-btn" style="font-size:12px; font-weight:700;" id="goLiveBtn"><i class="fas fa-satellite-dish" style="color:#ff0055;"></i> BUFFER LIVE</button>
                     <button class="control-btn" id="fullScreenBtn"><i class="fas fa-expand"></i></button>
                 </div>
             </div>
@@ -195,37 +195,42 @@
         const goLiveBtn = document.getElementById('goLiveBtn');
         const fullScreenBtn = document.getElementById('fullScreenBtn');
 
+        let hlsEngine = null;
         let controlsTimeout;
         let isSeeking = false;
 
         if (typeof Hls !== 'undefined' && Hls.isSupported()) {
             
+            // 🎯 আপগ্রেডেড ২-মিনিট ক্যাশ বাফার কনফিগারেশন
             const hlsConfig = {
-                maxBufferLength: 30,             
-                maxMaxBufferLength: 60,          
-                liveBackBufferLength: 0,         
-                enableWorker: true,              
-                lowLatencyMode: true,            
+                maxBufferLength: 60,             // প্লেয়ার ৬০ সেকেন্ড ডেটা ব্যাকগ্রাউন্ডে রেডি রাখবে
+                maxMaxBufferLength: 120,         // সর্বোচ্চ ১২০ সেকেন্ড ডেটা বাফার করবে
+                liveBackBufferLength: 30,        // পেছনের ৩০ সেকেন্ডের হিস্টোরি ধরে রাখবে যাতে ল্যাগ না করে
+                enableWorker: true,
+                lowLatencyMode: false,           // নো-বাফারিং এর জন্য এটিকে false রাখতে হবে
                 
-                manifestLoadingTimeOut: 20000,
-                manifestLoadingMaxRetry: 10,
-                fragLoadingTimeOut: 30000,
-                fragLoadingMaxRetry: 10,
-                levelLoadingTimeOut: 20000,
-                levelLoadingMaxRetry: 10,
+                // 🚀 ২ মিনিট (১২০ সেকেন্ড) ডিলে দিয়ে Vercel CDN থেকে নিরাপদ ডেটা প্লে করার কড়া নির্দেশ
+                liveSyncDuration: 120, 
                 
+                manifestLoadingTimeOut: 15000,
+                manifestLoadingMaxRetry: 5,
+                fragLoadingTimeOut: 20000,
+                fragLoadingMaxRetry: 5,
+                levelLoadingTimeOut: 15000,
+                levelLoadingMaxRetry: 5,
                 
-                abrEwmaFastLive: 2.0,            
-                abrEwmaSlowLive: 9.0,            
-                testBandwidth: true              
+                abrEwmaFastLive: 2.0,
+                abrEwmaSlowLive: 9.0,
+                testBandwidth: true
             };
 
             const hls = new Hls(hlsConfig);
+            hlsEngine = hls; // গ্লোবাল রেফারেন্স
             hls.loadSource(videoSrc);
             hls.attachMedia(video);
 
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                hls.currentLevel = -1; 
+                hls.currentLevel = -1; // অটো কোয়ালিটি সিলেকশন সক্রিয় রাখা
                 video.play().catch(() => showControls());
             });
 
@@ -256,8 +261,9 @@
 
                     const aheadAmount = activeBufferEnd - currentTime;
                     
+                    // প্লেয়ার স্ট্যাটাসে বাফার সেকেন্ড দেখাবে
                     bufferStats.innerText = `Buffer Guard: ${Math.round(Math.max(0, aheadAmount))}s / 60s`;
-                    timeShow.innerText = `${formatTime(currentTime)} / Talha's Player`;
+                    timeShow.innerText = `${formatTime(currentTime)} / Delayed Live (2m)`;
                 }
             }, 400);
 
@@ -328,11 +334,15 @@
             setTimeout(() => { isSeeking = false; }, 300);
         }
 
+        // 🎯 'GO LIVE' বাটনে চাপ দিলেও প্লেয়ার ২ মিনিট আগের নিরাপদ বাফার জোনেই ফিক্সড থাকবে
         function goLive() {
-            if (video.duration && isFinite(video.duration)) {
-                video.currentTime = video.duration - 10;
-            } else {
-                video.currentTime = video.currentTime + 200;
+            if (hlsEngine) {
+                const livePosition = hlsEngine.liveSyncPosition;
+                if (livePosition) {
+                    video.currentTime = livePosition - 120; // ঠিক ২ মিনিট পেছনে নিয়ে যাবে
+                }
+            } else if (video.duration && isFinite(video.duration)) {
+                video.currentTime = video.duration - 120;
             }
         }
 
