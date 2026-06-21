@@ -146,8 +146,8 @@
     <div class="player-controls" id="controlOverlay">
         
         <div class="top-bar">
-            <div class="live-tag">LIVE BUFFER</div>
-            <div class="buffer-status-badge" id="bufferStats">Engine: Syncing...</div>
+            <div class="live-tag">LIVE</div>
+            <div class="buffer-status-badge" id="bufferStats">Syncing...</div>
         </div>
 
         <div class="bottom-bar">
@@ -164,7 +164,7 @@
                     <div class="time-display" id="timeShow">00:00 / Live Buffer</div>
                 </div>
                 <div class="right-controls">
-                    <button class="control-btn" style="font-size:12px; font-weight:700;" id="goLiveBtn"><i class="fas fa-satellite-dish" style="color:#ff0055;"></i> BUFFER LIVE</button>
+                    <button class="control-btn" style="font-size:12px; font-weight:700;" id="goLiveBtn"><i class="fas fa-satellite-dish" style="color:#ff0055;"></i>GO LIVE</button>
                     <button class="control-btn" id="fullScreenBtn"><i class="fas fa-expand"></i></button>
                 </div>
             </div>
@@ -205,7 +205,7 @@
             const hlsConfig = {
                 maxBufferLength: 60,             // প্লেয়ার ৬০ সেকেন্ড ডেটা ব্যাকগ্রাউন্ডে রেডি রাখবে
                 maxMaxBufferLength: 120,         // সর্বোচ্চ ১২০ সেকেন্ড ডেটা বাফার করবে
-                liveBackBufferLength: 30,        // পেছনের ৩০ সেকেন্ডের হিস্টোরি ধরে রাখবে যাতে ল্যাগ না করে
+                liveBackBufferLength: 60,        // পেছনের ৩০ সেকেন্ডের হিস্টোরি ধরে রাখবে যাতে ল্যাগ না করে
                 enableWorker: true,
                 lowLatencyMode: false,           // নো-বাফারিং এর জন্য এটিকে false রাখতে হবে
                 
