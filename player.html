@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Talha's Player</title>
+    <title>Talha's Premium Master Player</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.0/dist/hls.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -27,12 +27,11 @@
 
         video {
             width: 100%; height: 100%; object-fit: contain; z-index: 1;
-            outline: none !important;
         }
 
         .player-controls {
             position: absolute; inset: 0;
-            background: linear-gradient(to bottom, rgba(2,2,6,0.6) 0%, transparent 25%, transparent 75%, rgba(2,2,6,0.9) 100%);
+            background: linear-gradient(to bottom, rgba(2,2,6,0.7) 0%, transparent 25%, transparent 75%, rgba(2,2,6,0.95) 100%);
             display: flex; flex-direction: column; justify-content: space-between;
             opacity: 0; pointer-events: none;
             transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -80,6 +79,17 @@
             opacity: 1 !important; pointer-events: auto !important;
         }
 
+        .seek-ripple {
+            position: absolute; width: 40%; height: 100%; top: 0;
+            background: rgba(255, 255, 255, 0.08); display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            color: #fff; font-size: 14px; font-weight: bold; opacity: 0;
+            pointer-events: none; z-index: 4; transition: opacity 0.2s;
+        }
+        .seek-ripple.left { left: 0; border-radius: 0 100px 100px 0; }
+        .seek-ripple.right { right: 0; border-radius: 100px 0 0 100px; }
+        .seek-ripple i { font-size: 24px; margin-bottom: 8px; }
+
         .bottom-bar {
             width: 100%; display: flex; flex-direction: column; gap: 12px;
         }
@@ -112,11 +122,9 @@
         .control-btn {
             background: none; border: none; color: #fff; font-size: 17px; cursor: pointer;
             transition: all 0.2s;
-            box-shadow: none !important;
         }
         
         .control-btn:hover { color: #00f2fe; filter: drop-shadow(0 0 8px #00f2fe); }
-        .control-btn:active, .control-btn:focus { background: none !important; }
         
         .time-display { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.65); letter-spacing: 0.5px; }
 
@@ -126,6 +134,23 @@
             border-radius: 50%; animation: spin 0.7s linear infinite; display: none; z-index: 10;
             filter: drop-shadow(0 0 15px #00f2fe);
         }
+
+        .settings-panel {
+            position: absolute; bottom: 70px; right: 20px;
+            background: rgba(10, 10, 20, 0.95); border: 1px solid rgba(122, 60, 255, 0.5);
+            border-radius: 12px; width: 160px; display: none; flex-direction: column;
+            overflow-y: auto; max-height: 200px; z-index: 12; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .settings-panel.active { display: flex; }
+        .settings-panel button {
+            background: none; border: none; color: #fff; padding: 12px 16px;
+            text-align: left; font-size: 13px; font-weight: 600; cursor: pointer;
+            transition: background 0.2s; display: flex; justify-content: space-between; align-items: center;
+        }
+        .settings-panel button:hover { background: rgba(122, 60, 255, 0.3); color: #00f2fe; }
+        .settings-panel button.selected { color: #00f2fe; font-weight: 700; }
+        .settings-panel button.selected::after { content: '✓'; font-weight: bold; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
@@ -137,11 +162,16 @@
     
     <div class="spinner" id="loadingSpinner"></div>
     
+    <div class="seek-ripple left" id="rippleLeft"><i class="fas fa-backward"></i>10s</div>
+    <div class="seek-ripple right" id="rippleRight"><i class="fas fa-forward"></i>10s</div>
+
     <div class="center-btn" id="midPlayBtn">
         <i class="fas fa-play"></i>
     </div>
 
-    <video id="videoEngine" playsinline></video>
+    <video id="videoEngine" playsinline webkit-playsinline></video>
+
+    <div class="settings-panel" id="settingsPanel"></div>
 
     <div class="player-controls" id="controlOverlay">
         
@@ -161,10 +191,11 @@
                 <div class="left-controls">
                     <button class="control-btn" id="playNavBtn"><i class="fas fa-play"></i></button>
                     <button class="control-btn" id="muteBtn"><i class="fas fa-volume-up"></i></button>
-                    <div class="time-display" id="timeShow">00:00 / Live Buffer</div>
+                    <div class="time-display" id="timeShow">00:00 / On Live</div>
                 </div>
                 <div class="right-controls">
                     <button class="control-btn" style="font-size:12px; font-weight:700;" id="goLiveBtn"><i class="fas fa-satellite-dish" style="color:#ff0055;"></i>GO LIVE</button>
+                    <button class="control-btn" id="gearBtn"><i class="fas fa-cog"></i></button>
                     <button class="control-btn" id="fullScreenBtn"><i class="fas fa-expand"></i></button>
                 </div>
             </div>
@@ -178,6 +209,8 @@
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const channelId = urlParams.get('Talha') || "androstreamlivetrt1";
+        
+        const currentDomain = window.location.origin;
         const videoSrc = `https://m3u8-proxy-r8j3.vercel.app/checklist/${channelId}.m3u8`; 
 
         const video = document.getElementById('videoEngine');
@@ -194,44 +227,44 @@
         const timeline = document.getElementById('timeline');
         const goLiveBtn = document.getElementById('goLiveBtn');
         const fullScreenBtn = document.getElementById('fullScreenBtn');
+        const gearBtn = document.getElementById('gearBtn');
+        const settingsPanel = document.getElementById('settingsPanel');
 
         let hlsEngine = null;
         let controlsTimeout;
         let isSeeking = false;
+        let lastTap = 0;
 
         if (typeof Hls !== 'undefined' && Hls.isSupported()) {
             
-            // 🎯 আপগ্রেডেড ২-মিনিট ক্যাশ বাফার কনফিগারেশন
             const hlsConfig = {
-                maxBufferLength: 60,             // প্লেয়ার ৬০ সেকেন্ড ডেটা ব্যাকগ্রাউন্ডে রেডি রাখবে
-                maxMaxBufferLength: 120,         // সর্বোচ্চ ১২০ সেকেন্ড ডেটা বাফার করবে
-                liveBackBufferLength: 60,        // পেছনের ৩০ সেকেন্ডের হিস্টোরি ধরে রাখবে যাতে ল্যাগ না করে
+                maxBufferLength: 60,             
+                maxMaxBufferLength: 120,         
+                liveBackBufferLength: 60,        
                 enableWorker: true,
-                lowLatencyMode: false,           // নো-বাফারিং এর জন্য এটিকে false রাখতে হবে
-                
-                // 🚀 ২ মিনিট (১২০ সেকেন্ড) ডিলে দিয়ে Vercel CDN থেকে নিরাপদ ডেটা প্লে করার কড়া নির্দেশ
+                lowLatencyMode: false,           
                 liveSyncDuration: 120, 
-                
                 manifestLoadingTimeOut: 15000,
                 manifestLoadingMaxRetry: 5,
                 fragLoadingTimeOut: 20000,
                 fragLoadingMaxRetry: 5,
                 levelLoadingTimeOut: 15000,
                 levelLoadingMaxRetry: 5,
-                
                 abrEwmaFastLive: 2.0,
                 abrEwmaSlowLive: 9.0,
                 testBandwidth: true
             };
 
             const hls = new Hls(hlsConfig);
-            hlsEngine = hls; // গ্লোবাল রেফারেন্স
+            hlsEngine = hls;
             hls.loadSource(videoSrc);
             hls.attachMedia(video);
 
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                hls.currentLevel = -1; // অটো কোয়ালিটি সিলেকশন সক্রিয় রাখা
+                hls.currentLevel = -1;
                 video.play().catch(() => showControls());
+                
+                setTimeout(setupQualityMenu, 1000);
             });
 
             video.addEventListener('waiting', () => spinner.style.display = 'block');
@@ -243,10 +276,16 @@
 
             setInterval(() => {
                 if (video.buffered.length > 0 && !isSeeking) {
-                    const duration = (video.duration && isFinite(video.duration) && video.duration > 0) ? video.duration : (video.currentTime + 300);
                     const currentTime = video.currentTime;
+                    let start = hls.liveSyncPosition ? hls.liveSyncPosition - 300 : 0;
+                    let end = hls.liveSyncPosition ? hls.liveSyncPosition : video.currentTime;
+                    if(start < 0) start = 0;
                     
-                    const currentPercent = (currentTime / duration) * 100;
+                    let totalLiveWindow = end - start;
+                    let currentPosInWindow = currentTime - start;
+                    if(currentPosInWindow < 0) currentPosInWindow = 0;
+
+                    const currentPercent = totalLiveWindow > 0 ? (currentPosInWindow / totalLiveWindow) * 100 : 0;
                     currentTimeline.style.width = Math.min(currentPercent, 100) + "%";
 
                     let activeBufferEnd = currentTime;
@@ -256,29 +295,22 @@
                         }
                     }
                     
-                    const bufferPercent = (activeBufferEnd / duration) * 100;
+                    let bufferPosInWindow = activeBufferEnd - start;
+                    const bufferPercent = totalLiveWindow > 0 ? (bufferPosInWindow / totalLiveWindow) * 100 : 0;
                     bufferedTimeline.style.width = Math.min(bufferPercent, 100) + "%";
 
                     const aheadAmount = activeBufferEnd - currentTime;
-                    
-                    // প্লেয়ার স্ট্যাটাসে বাফার সেকেন্ড দেখাবে
-                    bufferStats.innerText = `Buffer Guard: ${Math.round(Math.max(0, aheadAmount))}s / 60s`;
-                    timeShow.innerText = `${formatTime(currentTime)} / Delayed Live (2m)`;
+                    bufferStats.innerText = `Buffer: ${Math.round(Math.max(0, aheadAmount))}s / 60s`;
+                    timeShow.innerText = `${formatTime(currentTime)} / Talha's Stream`;
                 }
             }, 400);
 
             hls.on(Hls.Events.ERROR, (event, data) => {
                 if (data.fatal) {
                     switch (data.type) {
-                        case Hls.ErrorTypes.NETWORK_ERROR:
-                            hls.startLoad();
-                            break;
-                        case Hls.ErrorTypes.MEDIA_ERROR:
-                            hls.recoverMediaError();
-                            break;
-                        default:
-                            hls.recoverMediaError();
-                            break;
+                        case Hls.ErrorTypes.NETWORK_ERROR: hls.startLoad(); break;
+                        case Hls.ErrorTypes.MEDIA_ERROR: hls.recoverMediaError(); break;
+                        default: hls.recoverMediaError(); break;
                     }
                 }
             });
@@ -288,15 +320,45 @@
             video.addEventListener('loadedmetadata', () => {
                 video.play().catch(() => showControls());
             });
+            gearBtn.style.display = 'none'; 
         }
 
-       
-        function togglePlay() {
-            if (video.paused) {
-                video.play().catch(() => {});
-            } else {
-                video.pause();
+        function setupQualityMenu() {
+            if (!hlsEngine || !hlsEngine.levels || hlsEngine.levels.length === 0) {
+                gearBtn.style.display = 'none'; 
+                return;
             }
+            
+            gearBtn.style.display = 'block';
+            let menuHtml = `<button class="quality-btn selected" data-level="-1">Auto</button>`;
+            
+            hlsEngine.levels.forEach((level, index) => {
+                let name = level.name || (level.height ? `${level.height}p` : `Stream ${index + 1}`);
+                menuHtml += `<button class="quality-btn" data-level="${index}">${name}</button>`;
+            });
+            
+            settingsPanel.innerHTML = menuHtml;
+
+            document.querySelectorAll('.quality-btn').forEach(btn => {
+                btn.onclick = function(e) {
+                    e.stopPropagation();
+                    document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    const level = parseInt(this.getAttribute('data-level'));
+                    hlsEngine.currentLevel = level; 
+                    settingsPanel.classList.remove('active');
+                };
+            });
+        }
+
+        gearBtn.onclick = function(e) {
+            e.stopPropagation();
+            settingsPanel.classList.toggle('active');
+        };
+
+        function togglePlay() {
+            settingsPanel.classList.remove('active');
+            if (video.paused) { video.play().catch(() => {}); } else { video.pause(); }
         }
 
         video.addEventListener('play', () => {
@@ -327,20 +389,18 @@
             if (!clientX) return;
             
             const pos = (clientX - rect.left) / rect.width;
-            const targetDuration = (video.duration && isFinite(video.duration) && video.duration > 0) ? video.duration : (video.currentTime + 300);
+            let start = hlsEngine && hlsEngine.liveSyncPosition ? hlsEngine.liveSyncPosition - 300 : 0;
+            let end = hlsEngine && hlsEngine.liveSyncPosition ? hlsEngine.liveSyncPosition : video.currentTime;
+            if(start < 0) start = 0;
             
             isSeeking = true;
-            video.currentTime = pos * targetDuration;
+            video.currentTime = start + (pos * (end - start));
             setTimeout(() => { isSeeking = false; }, 300);
         }
 
-        // 🎯 'GO LIVE' বাটনে চাপ দিলেও প্লেয়ার ২ মিনিট আগের নিরাপদ বাফার জোনেই ফিক্সড থাকবে
         function goLive() {
-            if (hlsEngine) {
-                const livePosition = hlsEngine.liveSyncPosition;
-                if (livePosition) {
-                    video.currentTime = livePosition - 120; // ঠিক ২ মিনিট পেছনে নিয়ে যাবে
-                }
+            if (hlsEngine && hlsEngine.liveSyncPosition) {
+                video.currentTime = hlsEngine.liveSyncPosition - 120; 
             } else if (video.duration && isFinite(video.duration)) {
                 video.currentTime = video.duration - 120;
             }
@@ -371,6 +431,7 @@
             if (!video.paused) {
                 controlOverlay.classList.remove('show-controls');
                 midPlayBtn.classList.remove('show-controls');
+                settingsPanel.classList.remove('active');
             }
         }
 
@@ -380,27 +441,55 @@
             controlsTimeout = setTimeout(hideControls, 3000);
         }
 
+        playerContainer.addEventListener('touchend', (e) => {
+            if (e.target.closest('.control-btn') || e.target.closest('.progress-container') || e.target.closest('#midPlayBtn') || e.target.closest('#settingsPanel')) {
+                resetControlsTimeout();
+                return;
+            }
+
+            const now = new Date().getTime();
+            const timesince = now - lastTap;
+            
+            if (timesince < 300 && timesince > 0) {
+                const touchX = e.changedTouches[0].clientX;
+                const width = window.innerWidth;
+                
+                if (touchX > width / 2) {
+                    video.currentTime = Math.min(video.currentTime + 10, video.duration || video.currentTime + 10);
+                    triggerRipple('right');
+                } else {
+                    video.currentTime = Math.max(video.currentTime - 10, 0);
+                    triggerRipple('left');
+                }
+            } else {
+                if (controlOverlay.classList.contains('show-controls')) {
+                    hideControls();
+                } else {
+                    resetControlsTimeout();
+                }
+            }
+            lastTap = now;
+        });
+
+        function triggerRipple(side) {
+            const ripple = document.getElementById(side === 'right' ? 'rippleRight' : 'rippleLeft');
+            ripple.style.opacity = '1';
+            setTimeout(() => { ripple.style.opacity = '0'; }, 400);
+        }
+
         midPlayBtn.onclick = togglePlay;
         playNavBtn.onclick = togglePlay;
-        video.onclick = togglePlay; 
-        
         muteBtn.onclick = toggleMute;
         timeline.onclick = seekVideo;
         goLiveBtn.onclick = goLive;
         fullScreenBtn.onclick = toggleFullscreen;
-
         playerContainer.addEventListener('mousemove', resetControlsTimeout);
-        playerContainer.addEventListener('touchstart', (e) => {
-            if (e.target.closest('.control-btn') || e.target.closest('.progress-container')) {
-                resetControlsTimeout();
-                return;
+        
+        document.addEventListener('click', function(e) {
+            if (!gearBtn.contains(e.target) && !settingsPanel.contains(e.target)) {
+                settingsPanel.classList.remove('active');
             }
-            if (controlOverlay.classList.contains('show-controls')) {
-                hideControls();
-            } else {
-                resetControlsTimeout();
-            }
-        }, { passive: true });
+        });
     };
 </script>
 </body>
