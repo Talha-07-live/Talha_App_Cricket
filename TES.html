@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Team Elite Star — Nagad Customer Service Excellence</title>
-<meta name="description" content="Team Elite Star — the elite Nagad customer service squad. 14 members delivering speed, accuracy, and trust." />
+<title>Team Elite Star</title>
+<meta name="description" content="Team Elite Star — the elite Nagad customer service squad under Team Leader Albina Jahan." />
  
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -196,6 +196,7 @@ section{position:relative;padding:clamp(72px,11vh,140px) 0;}
 .member-card{position:relative;background:linear-gradient(180deg,var(--onyx),var(--obsidian-2));
   border:1px solid var(--line);border-radius:10px;padding:26px 22px 22px;transform-style:preserve-3d;
   transition:box-shadow .4s ease, border-color .4s ease, transform .1s ease-out;will-change:transform;overflow:hidden;}
+.member-card.tl-card{border-color:var(--line-strong);background:linear-gradient(180deg,#1e1b12,var(--obsidian-2));grid-column: span 4;}
 .member-card::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .4s ease;
   background:radial-gradient(240px 240px at var(--mx,50%) var(--my,0%), rgba(252,231,184,.18), transparent 60%);}
 .member-card::after{content:"";position:absolute;inset:-1px;border-radius:11px;padding:1px;pointer-events:none;opacity:0;transition:opacity .4s ease;
@@ -214,7 +215,10 @@ section{position:relative;padding:clamp(72px,11vh,140px) 0;}
 .member-card h3{font-family:var(--serif);font-size:1.42rem;font-weight:600;margin:0;line-height:1.15;transition:transform .4s ease;}
 .member-card:hover h3{transform:translateZ(20px);}
 .member-card .role{font-family:var(--util);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-top:.45rem;}
-.member-card .bio{color:var(--muted);font-size:.88rem;font-weight:300;margin:.95rem 0 1.2rem;line-height:1.55;}
+.member-card .meta-details{font-family:var(--util);font-size:.7rem;color:var(--muted);margin-top:.4rem;line-height:1.4;}
+.member-card .bio{color:var(--muted);font-size:.85rem;font-weight:300;margin:.8rem 0 1rem;line-height:1.5;}
+.member-card .metrics-badge{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.member-card .badge{font-family:var(--util);font-size:.65rem;background:rgba(232,195,107,.08);border:1px solid var(--line);padding:2px 6px;border-radius:3px;color:var(--ivory);}
 .socials{display:flex;gap:.55rem;}
 .socials a{width:34px;height:34px;border:1px solid var(--line);border-radius:6px;display:grid;place-items:center;color:var(--muted);
   transition:color .3s ease,border-color .3s ease,transform .3s ease,background .3s ease;}
@@ -233,10 +237,11 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;margin-top:40px;}
   .stat{background:var(--obsidian-2);padding:1.6rem;}
   .stat + .stat{border-left:0;padding-left:1.6rem;}
   .members-grid{grid-template-columns:repeat(3,1fr);}
+  .member-card.tl-card{grid-column: span 3;}
 }
 @media (max-width:860px){.nav-links{display:none;}.nav-toggle{display:block;}.about-grid{grid-template-columns:1fr;}}
-@media (max-width:680px){.members-grid{grid-template-columns:repeat(2,1fr);gap:14px;}.hero-cta{flex-direction:column;align-items:flex-start;}.btn{width:100%;justify-content:center;}}
-@media (max-width:460px){.members-grid{grid-template-columns:1fr;}.stats-grid{grid-template-columns:1fr;}}
+@media (max-width:680px){.members-grid{grid-template-columns:repeat(2,1fr);gap:14px;}.member-card.tl-card{grid-column: span 2;}.hero-cta{flex-direction:column;align-items:flex-start;}.btn{width:100%;justify-content:center;}}
+@media (max-width:460px){.members-grid{grid-template-columns:1fr;}.member-card.tl-card{grid-column: span 1;}.stats-grid{grid-template-columns:1fr;}}
  
 @media (prefers-reduced-motion: reduce){
   *{animation:none !important;transition:none !important;scroll-behavior:auto !important;}
@@ -287,7 +292,7 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;margin-top:40px;}
     <div class="hero-inner" id="heroInner">
       <span class="eyebrow hero-eyebrow">Nagad · Customer Service Excellence</span>
       <h1><span class="shine l1">Team Elite</span><span class="shine l2">Star</span></h1>
-      <p class="lede">Fourteen specialists. One standard. We are the customer service squad behind Nagad — resolving with speed, answering with accuracy, and earning trust on every single interaction.</p>
+      <p class="lede">Led by Team Leader Albina Jahan, our dedicated customer service squad delivers top-tier performance for Nagad — resolving queries with speed, maintaining high accuracy, and ensuring customer satisfaction.</p>
       <div class="hero-cta">
         <a href="#team" class="btn btn-primary magnet">Meet the Team <span aria-hidden="true">→</span></a>
         <a href="#impact" class="btn btn-ghost magnet">See Our Impact</a>
@@ -310,15 +315,15 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;margin-top:40px;}
           <div class="sec-head" style="margin-bottom:1.6rem;">
             <h2>Support, elevated to an&nbsp;<span class="gold-text">art</span>.</h2>
           </div>
-          <p><strong>Team Elite Star</strong> is the frontline of the Nagad customer experience. Every call, chat, and complaint that reaches us is treated as a promise — to listen fully, solve completely, and follow through.</p>
-          <p>We are fourteen people who share one belief: a customer's hardest moment is our best opportunity. From transaction disputes to merchant onboarding and fraud escalations, we cover the full spectrum of support so no query goes unanswered.</p>
+          <p><strong>Team Elite Star</strong>, under the leadership of <strong>Albina Jahan</strong>, is the frontline of the Nagad customer experience. Every call and query is handled with complete dedication, precision, and efficiency.</p>
+          <p>Our team achieves an impressive average MTD Quality Score of <strong>98.06%</strong> and maintains <strong>100% On-time Login</strong> performance across operations. Supported by QA Rasel Hossain and dedicated trainers (Reduan Islam, Md. Mynul Islam, and Md. Shahin Akter), we strive for perfection every day.</p>
           <p>Fast when it matters. Precise always. Human throughout.</p>
         </div>
         <div class="pillars reveal">
           <div class="pillar"><div class="pico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><h4>Empathy first</h4><p>We hear the person before the problem. Tone, patience, and respect on every contact.</p></div></div>
-          <div class="pillar"><div class="pico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg></div><div><h4>Speed with care</h4><p>Rapid first response without cutting corners — resolved right the first time.</p></div></div>
-          <div class="pillar"><div class="pico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div><h4>Accuracy</h4><p>Right information, right process, every time. Quality-checked and documented.</p></div></div>
-          <div class="pillar"><div class="pico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><h4>Trust &amp; security</h4><p>Guarding every account like our own — fraud-aware, privacy-first support.</p></div></div>
+          <div class="pillar"><div class="pico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg></div><div><h4>Speed with care</h4><p>Avg. AHT of 0:02:50 with rapid first response without cutting corners.</p></div></div>
+          <div class="pillar"><div class="pico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div><h4>Accuracy</h4><p>Maintaining a stellar 98.06% overall quality score with strict QA compliance.</p></div></div>
+          <div class="pillar"><div class="pico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><h4>Trust &amp; Security</h4><p>100% On-time Login rate reflecting ultimate operational discipline.</p></div></div>
         </div>
       </div>
     </div>
@@ -330,15 +335,15 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;margin-top:40px;}
       <div class="sec-head reveal">
         <span class="eyebrow">By the numbers</span>
         <h2>Proof, not promises.</h2>
-        <p>A snapshot of what the Elite Star standard delivers, quarter after quarter.</p>
+        <p>Real performance data from our team metrics report.</p>
       </div>
       <div class="stats-grid reveal">
-        <div class="stat"><div class="num" data-count="2.4" data-suffix="M+" data-dec="1">0</div><div class="lbl">Customers Served</div></div>
-        <div class="stat"><div class="num" data-count="98.6" data-suffix="%" data-dec="1">0</div><div class="lbl">Satisfaction (CSAT)</div></div>
-        <div class="stat"><div class="num" data-count="42" data-suffix="s" data-dec="0">0</div><div class="lbl">Avg. Response Time</div></div>
-        <div class="stat"><div class="num" data-count="96" data-suffix="%" data-dec="0">0</div><div class="lbl">First-Contact Resolution</div></div>
+        <div class="stat"><div class="num" data-count="98.06" data-suffix="%" data-dec="2">0</div><div class="lbl">MTD Quality Score</div></div>
+        <div class="stat"><div class="num" data-count="100" data-suffix="%" data-dec="0">0</div><div class="lbl">On-Time Login</div></div>
+        <div class="stat"><div class="num" data-count="8.28" data-suffix="h" data-dec="2">0</div><div class="lbl">Avg. Productivity / Day</div></div>
+        <div class="stat"><div class="num" data-count="85.71" data-suffix="%" data-dec="2">0</div><div class="lbl">Overall Attendance</div></div>
       </div>
-      <div class="stats-note reveal"><span>14 Elite Members</span><span>24/7 Coverage</span><span>Bangla &amp; English Support</span></div>
+      <div class="stats-note reveal"><span>TL: Albina Jahan</span><span>QA: Rasel Hossain</span><span>12 Active Team Members</span></div>
     </div>
   </section>
  
@@ -346,9 +351,9 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;margin-top:40px;}
   <section id="team" aria-label="Team members">
     <div class="wrap">
       <div class="sec-head reveal">
-        <span class="eyebrow">The fourteen</span>
+        <span class="eyebrow">Our Squad</span>
         <h2>Meet the <span class="gold-text">stars</span>.</h2>
-        <p>Every member owns a specialty — together they cover the whole customer journey.</p>
+        <p>Driven professionals delivering excellence under the guidance of Albina Jahan.</p>
       </div>
       <div class="members-grid" id="membersGrid"></div>
     </div>
@@ -358,31 +363,109 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;margin-top:40px;}
 <footer>
   <div class="wrap foot-inner">
     <a href="#top" class="brand magnet"><span class="mark" aria-hidden="true"></span>Team&nbsp;<b>Elite&nbsp;Star</b></a>
-    <p>Nagad Customer Service · Crafted with pride · <span id="year"></span></p>
+    <p>Nagad Customer Service · Team Leader: Albina Jahan · <span id="year"></span></p>
   </div>
 </footer>
  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* =========================================================
-   TEAM ELITE STAR
-   ▶ EDIT YOUR 14 MEMBERS HERE — change name / role / bio.
+   TEAM ELITE STAR DATA INTEGRATED FROM YOUR IMAGES
    ========================================================= */
+
+const TEAM_LEADER = {
+  name: "Albina Jahan",
+  role: "Team Leader",
+  bio: "Leading Team Elite Star to operational excellence, driving high quality standards and top-tier customer satisfaction.",
+  rank: "Team Lead",
+  cubeId: "TL_ALBINA_JSR"
+};
+
 const MEMBERS = [
-  { name: "Rakibul Hasan",    role: "Team Lead",              bio: "Leads the squad, owns escalations, sets the standard.", rank: "Lead" },
-  { name: "Nusrat Jahan",     role: "Assistant Team Lead",    bio: "Second-in-command; coaching, scheduling, shift flow.",   rank: "Star" },
-  { name: "Tanvir Ahmed",     role: "Quality Assurance",      bio: "Audits interactions and keeps quality razor-sharp.",     rank: "Star" },
-  { name: "Sadia Islam",      role: "Senior CSR · Voice",     bio: "Calm on calls, fast on fixes, warm every time.",         rank: "Sr." },
-  { name: "Mahmudul Karim",   role: "Senior CSR · Live Chat", bio: "Types fast, thinks faster — chat resolution pro.",       rank: "Sr." },
-  { name: "Farhana Akter",    role: "Complaint Resolution",   bio: "Turns tough complaints into loyal customers.",           rank: "CSR" },
-  { name: "Imran Hossain",    role: "Account Support",        bio: "Profiles, KYC, and account issues — sorted cleanly.",    rank: "CSR" },
-  { name: "Sumaiya Akhter",   role: "Transaction Support",    bio: "Payments, transfers, disputes — every taka tracked.",    rank: "CSR" },
-  { name: "Arif Rahman",      role: "Merchant Support",       bio: "Keeps merchant partners moving without friction.",       rank: "CSR" },
-  { name: "Jannatul Ferdous", role: "Fraud & Risk",           bio: "Spots the red flags and protects every account.",        rank: "CSR" },
-  { name: "Shakil Ahmed",     role: "Onboarding",             bio: "First impressions done right — smooth new-user starts.", rank: "CSR" },
-  { name: "Rifat Chowdhury",  role: "Escalation Desk",        bio: "Handles the hard cases others can't close.",             rank: "CSR" },
-  { name: "Maliha Tabassum",  role: "Social Media Support",   bio: "On-brand, on-time replies across every channel.",        rank: "CSR" },
-  { name: "Naimur Rahman",    role: "Back Office",            bio: "Behind-the-scenes engine — data, follow-ups, records.",  rank: "CSR" }
+  { 
+    dgId: "16546", name: "Suraya", cubeId: "Suraya46_JSR", role: "CSR · Operations", rank: "CSR",
+    qa: "Rasel Hossain", trainer: "Reduan Islam", mtdScore: "97.09%", attendance: "100.00%",
+    staffedTime: "9:00:03", prodTime: "7:41:14", breakTime: "1:18:49", aht: "0:02:39",
+    fbBreak: "0:05:08", trBreak: "0:00:00",
+    bio: "Consistent customer support provider with strong compliance and 100% attendance."
+  },
+  { 
+    dgId: "17174", name: "Sarmin Sultana Apon", cubeId: "Apon74_JSR", role: "Senior CSR", rank: "Sr. CSR",
+    qa: "Rasel Hossain", trainer: "Md. Mynul Islam", mtdScore: "98.81%", attendance: "100.00%",
+    staffedTime: "10:08:14", prodTime: "9:10:03", breakTime: "0:58:10", aht: "0:02:43",
+    fbBreak: "0:57:43", trBreak: "3:02:32",
+    bio: "Top performer with excellent 98.81% quality score and over 9 hours avg. daily productivity."
+  },
+  { 
+    dgId: "17916", name: "Md.Sajman Basar", cubeId: "Sajman_JSR", role: "CSR · Technical Support", rank: "CSR",
+    qa: "Rasel Hossain", trainer: "Reduan Islam", mtdScore: "97.91%", attendance: "100.00%",
+    staffedTime: "8:56:55", prodTime: "7:54:50", breakTime: "1:02:05", aht: "0:02:52",
+    fbBreak: "0:48:00", trBreak: "0:00:00",
+    bio: "Dedicated specialist delivering steady handling times and high quality execution."
+  },
+  { 
+    dgId: "18314", name: "MD.shakibuzzaman shacho", cubeId: "Shacho_JSR", role: "Senior CSR · Quality Specialist", rank: "Sr. CSR",
+    qa: "Rasel Hossain", trainer: "Md. Mynul Islam", mtdScore: "99.20%", attendance: "100.00%",
+    staffedTime: "8:57:50", prodTime: "8:07:30", breakTime: "0:50:19", aht: "0:02:59",
+    fbBreak: "0:33:11", trBreak: "2:10:48",
+    bio: "Outstanding performance featuring a stellar 99.20% quality score and low break durations."
+  },
+  { 
+    dgId: "18636", name: "Farjana Yesmin", cubeId: "Farjana36_JSR", role: "CSR · Resolutions", rank: "CSR",
+    qa: "Rasel Hossain", trainer: "Reduan Islam", mtdScore: "98.62%", attendance: "25.00%",
+    staffedTime: "9:00:39", prodTime: "7:55:33", breakTime: "1:05:06", aht: "0:02:35",
+    fbBreak: "0:30:11", trBreak: "0:00:00",
+    bio: "Fast AHT of 2m 35s with impressive 98.62% MTD performance rating."
+  },
+  { 
+    dgId: "19249", name: "Md. Arifuzzaman", cubeId: "Arifuzzaman_JSR", role: "CSR · Account Support", rank: "CSR",
+    qa: "Rasel Hossain", trainer: "Reduan Islam", mtdScore: "98.92%", attendance: "100.00%",
+    staffedTime: "9:01:52", prodTime: "8:01:27", breakTime: "1:00:25", aht: "0:02:40",
+    fbBreak: "0:27:27", trBreak: "0:00:00",
+    bio: "High accuracy and reliable 8+ hours productivity time with 98.92% MTD score."
+  },
+  { 
+    dgId: "19266", name: "Shuly Khatun", cubeId: "Shulykhatun_JSR", role: "CSR · Escalations", rank: "Star CSR",
+    qa: "Rasel Hossain", trainer: "Reduan Islam", mtdScore: "99.28%", attendance: "100.00%",
+    staffedTime: "9:42:03", prodTime: "8:47:14", breakTime: "0:54:49", aht: "0:02:31",
+    fbBreak: "1:11:59", trBreak: "0:41:06",
+    bio: "Elite squad member boasting an overall 99.28% MTD score and swift 2m 31s AHT."
+  },
+  { 
+    dgId: "19420", name: "Shekh Afsana mimi", cubeId: "Afsanamimi_JSR", role: "CSR · Voice Support", rank: "CSR",
+    qa: "Rasel Hossain", trainer: "Md. Shahin Akter", mtdScore: "97.20%", attendance: "100.00%",
+    staffedTime: "9:17:29", prodTime: "8:14:41", breakTime: "1:02:49", aht: "0:02:38",
+    fbBreak: "1:38:57", trBreak: "0:46:40",
+    bio: "Hardworking team member delivering over 9 hours staffed time daily with strong focus."
+  },
+  { 
+    dgId: "19667", name: "Al Tamim Hridoy", cubeId: "Tamim_JSR", role: "CSR · Live Chat", rank: "CSR",
+    qa: "Rasel Hossain", trainer: "Md. Shahin Akter", mtdScore: "97.75%", attendance: "50.00%",
+    staffedTime: "8:58:36", prodTime: "7:56:58", breakTime: "1:01:38", aht: "0:02:50",
+    fbBreak: "0:00:00", trBreak: "0:56:13",
+    bio: "Attentive support specialist with balanced AHT and active training development."
+  },
+  { 
+    dgId: "19672", name: "Rina Parvin", cubeId: "Parvin72_JSR", role: "CSR · Customer Care", rank: "CSR",
+    qa: "Rasel Hossain", trainer: "Md. Shahin Akter", mtdScore: "97.19%", attendance: "100.00%",
+    staffedTime: "9:17:26", prodTime: "8:18:29", breakTime: "0:58:58", aht: "0:02:58",
+    fbBreak: "0:41:57", trBreak: "0:41:32",
+    bio: "Dependable and disciplined, maintaining high staffed time and 100% login punctuality."
+  },
+  { 
+    dgId: "20071", name: "Abu Talha Raj", cubeId: "Talharaj_JSR", role: "CSR · Transaction Support", rank: "CSR",
+    qa: "Rasel Hossain", trainer: "Md. Shahin Akter", mtdScore: "96.06%", attendance: "100.00%",
+    staffedTime: "9:02:01", prodTime: "8:02:32", breakTime: "0:59:28", aht: "0:03:04",
+    fbBreak: "1:13:42", trBreak: "0:11:23",
+    bio: "Focused team player driving continuous customer engagement and thorough resolution."
+  },
+  { 
+    dgId: "20204", name: "Bijoya Ray", cubeId: "Bijoya_JSR", role: "CSR · Back Office", rank: "CSR",
+    qa: "Rasel Hossain", trainer: "Md. Shahin Akter", mtdScore: "97.39%", attendance: "100.00%",
+    staffedTime: "9:01:58", prodTime: "8:05:33", breakTime: "0:56:25", aht: "0:03:28",
+    fbBreak: "1:35:21", trBreak: "0:46:42",
+    bio: "Reliable member maintaining stellar attendance and consistent daily productivity."
+  }
 ];
  
 const REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -406,27 +489,60 @@ else{ window.addEventListener('load', ()=>setTimeout(hidePreloader,1400)); setTi
   const fb='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.2c-1.2 0-1.6.8-1.6 1.5V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg>';
   const li='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM10 9h3.8v1.7h.1c.5-.9 1.8-1.9 3.6-1.9 3.9 0 4.6 2.5 4.6 5.8V21h-4v-5.2c0-1.2 0-2.8-1.7-2.8s-2 1.3-2 2.7V21h-4z"/></svg>';
   const mail='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
-  grid.innerHTML = MEMBERS.map(m=>`
+
+  // Render Team Leader First
+  let html = `
+    <article class="member-card tl-card reveal" tabindex="0">
+      <span class="rank">${TEAM_LEADER.rank}</span>
+      <div class="avatar" aria-hidden="true">${initials(TEAM_LEADER.name)}</div>
+      <h3>${TEAM_LEADER.name}</h3>
+      <div class="role">${TEAM_LEADER.role} · Cube: ${TEAM_LEADER.cubeId}</div>
+      <p class="bio">${TEAM_LEADER.bio}</p>
+      <div class="metrics-badge">
+        <span class="badge" style="background:rgba(232,195,107,.2);color:var(--gold);">Lead Alignment: Albina Jahan</span>
+        <span class="badge">Team QA: Rasel Hossain</span>
+      </div>
+      <div class="socials">
+        <a href="#" class="magnet" aria-label="${TEAM_LEADER.name} on Facebook">${fb}</a>
+        <a href="#" class="magnet" aria-label="${TEAM_LEADER.name} on LinkedIn">${li}</a>
+        <a href="#" class="magnet" aria-label="Email ${TEAM_LEADER.name}">${mail}</a>
+      </div>
+    </article>
+  `;
+
+  // Render 12 Active Members with Detailed Attributes from Images
+  html += MEMBERS.map(m=>`
     <article class="member-card reveal" tabindex="0">
-      <span class="rank">${m.rank||'CSR'}</span>
+      <span class="rank">${m.rank}</span>
       <div class="avatar" aria-hidden="true">${initials(m.name)}</div>
       <h3>${m.name}</h3>
       <div class="role">${m.role}</div>
+      <div class="meta-details">
+        <b>ID:</b> ${m.dgId} | <b>Cube:</b> ${m.cubeId}<br/>
+        <b>Trainer:</b> ${m.trainer}
+      </div>
       <p class="bio">${m.bio}</p>
+      <div class="metrics-badge">
+        <span class="badge" style="color:var(--gold-shine);">Quality: ${m.mtdScore}</span>
+        <span class="badge">AHT: ${m.aht}</span>
+        <span class="badge">Prod: ${m.prodTime}</span>
+      </div>
       <div class="socials">
         <a href="#" class="magnet" aria-label="${m.name} on Facebook">${fb}</a>
         <a href="#" class="magnet" aria-label="${m.name} on LinkedIn">${li}</a>
         <a href="#" class="magnet" aria-label="Email ${m.name}">${mail}</a>
       </div>
     </article>`).join('');
+
+  grid.innerHTML = html;
 })();
  
 /* ---- Marquee ---- */
 (function marquee(){
   const t=document.getElementById('marquee'); if(!t) return;
-  const items=['Trust','Speed','Accuracy','Empathy','Security','Excellence'];
+  const items=['Albina Jahan Leadership','98.06% Quality Score','100% On-Time Login','Trust','Speed','Accuracy'];
   const unit=items.map(w=>`<span>${w}</span><span class="solid"><b>★</b></span>`).join('');
-  t.innerHTML=unit+unit; // duplicate for seamless loop
+  t.innerHTML=unit+unit;
 })();
  
 document.getElementById('year').textContent = new Date().getFullYear();
@@ -479,7 +595,7 @@ updateProgress(); window.addEventListener('scroll',updateProgress,{passive:true}
   });
 })();
  
-/* ---- Custom cursor + spotlight (fine pointers only) ---- */
+/* ---- Custom cursor + spotlight ---- */
 let MX=window.innerWidth/2, MY=window.innerHeight/2;
 if(FINE && !REDUCE){
   document.body.classList.add('fx');
