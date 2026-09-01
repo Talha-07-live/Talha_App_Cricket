@@ -249,6 +249,160 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;margin-top:40px;}
   .hero h1 .shine{opacity:1;transform:none;}
   #preloader{display:none;}
 }
+
+
+/* ---------- Ultra Interaction FX ---------- */
+:root{
+  --ease-premium:cubic-bezier(.2,.72,.2,1);
+}
+html{scroll-padding-top:90px}
+body{overscroll-behavior-y:none}
+body::selection{background:rgba(232,195,107,.35)}
+button,a,input{touch-action:manipulation}
+
+.audio-hint{
+  position:fixed;left:50%;bottom:22px;transform:translate(-50%,18px);
+  z-index:10002;display:flex;align-items:center;gap:10px;
+  padding:10px 12px 10px 14px;border:1px solid var(--line-strong);
+  border-radius:999px;background:rgba(12,11,18,.86);backdrop-filter:blur(18px);
+  box-shadow:0 18px 55px -28px rgba(0,0,0,.95),0 0 30px -18px var(--glow);
+  color:#c9c3b3;font:500 .68rem var(--util);letter-spacing:.04em;
+  opacity:0;visibility:hidden;pointer-events:none;transition:.45s var(--ease-premium);
+}
+.audio-hint.show{opacity:1;visibility:visible;transform:translate(-50%,0);pointer-events:auto}
+.audio-hint-icon{
+  width:25px;height:25px;border:1px solid var(--line-strong);border-radius:50%;
+  display:grid;place-items:center;color:var(--gold)
+}
+.audio-hint button{
+  border:1px solid var(--line-strong);background:rgba(232,195,107,.08);color:var(--gold);
+  border-radius:999px;padding:6px 10px;font:600 .59rem var(--util);letter-spacing:.12em;
+  text-transform:uppercase;cursor:pointer
+}
+.audio-hint button:hover{background:rgba(232,195,107,.16);border-color:var(--gold)}
+
+.sound-wave{display:inline-flex;align-items:flex-end;gap:2px;height:12px;width:15px}
+.sound-wave i{display:block;width:2px;background:currentColor;border-radius:2px;height:5px;animation:wave 1s ease-in-out infinite}
+.sound-wave i:nth-child(2){height:10px;animation-delay:.12s}
+.sound-wave i:nth-child(3){height:7px;animation-delay:.24s}
+.sound-wave i:nth-child(4){height:4px;animation-delay:.36s}
+@keyframes wave{50%{transform:scaleY(.35)}}
+
+body.sound-on .dock-btn#soundBtn{box-shadow:0 0 0 1px rgba(232,195,107,.08),0 0 24px -8px var(--glow)}
+body.sound-on .dock-btn#soundBtn::after{
+  content:"";position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(232,195,107,.18);
+  animation:soundPulse 1.7s ease-in-out infinite;pointer-events:none
+}
+@keyframes soundPulse{50%{transform:scale(1.25);opacity:.25}}
+
+.interaction-flash{
+  position:fixed;z-index:9998;width:16px;height:16px;border-radius:50%;pointer-events:none;
+  border:1px solid rgba(252,231,184,.8);box-shadow:0 0 24px rgba(232,195,107,.65);
+  transform:translate(-50%,-50%) scale(.25);animation:flash .55s var(--ease-premium) forwards
+}
+@keyframes flash{to{opacity:0;transform:translate(-50%,-50%) scale(4.5)}}
+
+.tap-ripple{
+  position:fixed;z-index:9997;width:18px;height:18px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(252,231,184,.3),transparent 68%);
+  transform:translate(-50%,-50%) scale(.4);animation:tapRipple .65s var(--ease-premium) forwards
+}
+@keyframes tapRipple{to{opacity:0;transform:translate(-50%,-50%) scale(6)}}
+
+.member-card,.pillar,.intel-card,.stat,.btn,.mini-btn,.filter-chip,.dock-btn,.profile-btn{
+  -webkit-tap-highlight-color:transparent;
+}
+.member-card{will-change:transform,box-shadow}
+.member-card:focus-visible{box-shadow:0 0 0 2px var(--gold),0 30px 60px -28px var(--glow)!important}
+.member-card .badge{transition:transform .3s ease,background .3s ease}
+.member-card:hover .badge{transform:translateY(-1px)}
+.btn-primary::after{
+  content:"";position:absolute;inset:-20% auto -20% -40%;width:30%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.34),transparent);
+  transform:skewX(-20deg) translateX(-220%);transition:transform .75s ease;pointer-events:none
+}
+.btn-primary:hover::after{transform:skewX(-20deg) translateX(650%)}
+
+.command-panel{position:relative;overflow:hidden}
+.command-panel::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(110deg,transparent 20%,rgba(232,195,107,.035) 50%,transparent 80%);
+  transform:translateX(-110%);animation:panelSweep 8s ease-in-out infinite
+}
+@keyframes panelSweep{50%,100%{transform:translateX(110%)}}
+
+@media (max-width:640px){
+  .audio-hint{width:calc(100% - 26px);justify-content:center;font-size:.61rem}
+  .audio-hint button{flex:0 0 auto}
+  .quick-dock{right:12px;bottom:12px}
+  .dock-btn{width:38px;height:38px}
+}
+@media (prefers-reduced-motion:reduce){
+  .audio-hint,.interaction-flash,.tap-ripple,.sound-wave i{animation:none!important}
+}
+
+/* ---------- Ultra Advanced Layer ---------- */
+.command-section{padding-top:clamp(70px,9vh,120px)}
+.command-panel{border:1px solid var(--line);background:linear-gradient(180deg,rgba(27,26,34,.78),rgba(8,7,12,.9));border-radius:14px;padding:20px;box-shadow:0 35px 90px -55px var(--glow);backdrop-filter:blur(18px)}
+.command-top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.command-status{font-family:var(--util);font-size:.65rem;letter-spacing:.2em;color:var(--gold)}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 14px var(--gold);margin-right:8px;animation:livePulse 1.6s ease-in-out infinite}
+@keyframes livePulse{50%{opacity:.35;transform:scale(.7)}}
+.command-actions{display:flex;gap:7px;flex-wrap:wrap}
+.mini-btn,.filter-chip{font:500 .68rem var(--util);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--muted);padding:8px 11px;border-radius:4px;cursor:pointer;transition:.25s ease}
+.mini-btn:hover,.filter-chip:hover,.filter-chip.active{color:var(--gold);border-color:var(--line-strong);background:rgba(232,195,107,.08)}
+.command-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:12px;margin:16px 0}
+.search-box{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:rgba(0,0,0,.18);padding:0 12px;border-radius:6px}
+.search-box>span{font-size:1.25rem;color:var(--gold)}
+.search-box input{width:100%;border:0;outline:0;background:none;color:var(--ivory);font:400 .86rem var(--sans);padding:13px 0}
+.search-box input::placeholder{color:#6e6a60}
+.search-box kbd{font:600 .58rem var(--util);color:var(--muted);border:1px solid var(--line);padding:3px 5px;border-radius:3px;white-space:nowrap}
+.filter-box{display:flex;gap:7px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+.filter-chip b{color:var(--gold-deep);font-weight:600;margin-left:4px}
+.intel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:7px;overflow:hidden;margin-bottom:16px}
+.intel-card{background:rgba(8,7,12,.72);padding:17px}
+.intel-card span,.intel-card small{display:block;font:500 .61rem var(--util);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.intel-card strong{display:block;font:600 clamp(1.05rem,2vw,1.45rem) var(--serif);color:var(--ivory);margin:5px 0 2px}
+.intel-card small{font-size:.58rem;letter-spacing:.06em;text-transform:none}
+.rank-list{display:grid;gap:8px}
+.rank-row{display:grid;grid-template-columns:38px 1.3fr .8fr .8fr 1fr auto;align-items:center;gap:12px;border:1px solid transparent;background:rgba(255,255,255,.018);padding:11px 13px;border-radius:7px;transition:.25s ease}
+.rank-row:hover{border-color:var(--line);background:rgba(232,195,107,.045);transform:translateX(3px)}
+.rank-no{font:600 .72rem var(--util);color:var(--gold-deep)}
+.rank-name{font:600 .92rem var(--serif);color:var(--ivory)}
+.rank-meta{font:500 .59rem var(--util);color:var(--muted);letter-spacing:.05em}
+.rank-score{font:600 .78rem var(--util);color:var(--gold)}
+.rank-bar{height:4px;background:#25232b;border-radius:99px;overflow:hidden}
+.rank-bar i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--gold-deep),var(--gold-shine));box-shadow:0 0 10px var(--glow)}
+.profile-btn{border:1px solid var(--line);background:none;color:var(--muted);font:600 .58rem var(--util);letter-spacing:.1em;text-transform:uppercase;padding:7px 9px;border-radius:4px;cursor:pointer}
+.profile-btn:hover{color:var(--gold);border-color:var(--gold)}
+.empty-state{text-align:center;padding:30px;color:var(--muted);font:.8rem var(--util)}
+.quick-dock{position:fixed;right:20px;bottom:20px;z-index:40;display:flex;flex-direction:column;gap:7px}
+.dock-btn{width:40px;height:40px;border:1px solid var(--line-strong);border-radius:50%;background:rgba(12,11,18,.78);backdrop-filter:blur(12px);color:var(--gold);cursor:pointer;font:600 1rem var(--util);box-shadow:0 10px 30px -15px #000;transition:.25s ease}
+.dock-btn:hover{transform:translateY(-3px);background:rgba(232,195,107,.09)}
+.member-modal{position:fixed;inset:0;z-index:10001;display:grid;place-items:center;padding:22px;opacity:0;visibility:hidden;transition:.3s ease}
+.member-modal.open{opacity:1;visibility:visible}
+.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(10px)}
+.modal-card{position:relative;width:min(620px,100%);max-height:88vh;overflow:auto;background:linear-gradient(160deg,#1a1820,#09080d);border:1px solid var(--line-strong);border-radius:14px;padding:28px;box-shadow:0 40px 100px -35px #000;transform:translateY(20px) scale(.98);transition:.35s ease}
+.member-modal.open .modal-card{transform:none}
+.modal-close{position:absolute;top:12px;right:14px;width:34px;height:34px;border:1px solid var(--line);background:none;color:var(--muted);border-radius:50%;font-size:1.3rem;cursor:pointer}
+.modal-hero{display:flex;gap:17px;align-items:center;padding-right:35px}
+.modal-avatar{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line-strong);color:var(--gold-shine);font:600 1.7rem var(--serif);background:radial-gradient(circle,#2a2620,#141219);box-shadow:0 0 30px rgba(232,195,107,.1)}
+.modal-hero h3{font:600 clamp(1.7rem,4vw,2.4rem) var(--serif);margin:5px 0 0}
+.modal-hero p{margin:2px 0 0;color:var(--gold);font:.65rem var(--util);letter-spacing:.12em;text-transform:uppercase}
+.modal-bio{color:#c5c0b2;font-weight:300;margin:20px 0}
+.modal-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.modal-metric{border:1px solid var(--line);padding:12px;border-radius:6px}
+.modal-metric span{display:block;color:var(--muted);font:.56rem var(--util);letter-spacing:.08em;text-transform:uppercase}
+.modal-metric strong{display:block;color:var(--gold);font:.9rem var(--util);margin-top:4px}
+.modal-bars{display:grid;gap:12px;margin-top:18px}
+.modal-bar-head{display:flex;justify-content:space-between;font:.62rem var(--util);color:var(--muted)}
+.modal-bar-head b{color:var(--gold)}
+.modal-bar-track{height:5px;background:#25232b;border-radius:99px;overflow:hidden;margin-top:5px}
+.modal-bar-track i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--gold-deep),var(--gold-shine))}
+body.glow-off #spotlight,body.glow-off #sparkles{display:none}
+@media(max-width:800px){.command-grid{grid-template-columns:1fr}.filter-box{justify-content:flex-start}.intel-grid{grid-template-columns:repeat(2,1fr)}.rank-row{grid-template-columns:30px 1fr auto}.rank-row .rank-meta,.rank-row .rank-bar{display:none}}
+@media(max-width:500px){.command-panel{padding:13px}.intel-grid{grid-template-columns:1fr 1fr}.modal-card{padding:20px}.modal-metrics{grid-template-columns:1fr 1fr}.rank-row{gap:7px}.rank-name{font-size:.84rem}}
+
 </style>
 </head>
 <body>
@@ -271,11 +425,11 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;margin-top:40px;}
 <!-- NAV -->
 <header class="nav" id="nav">
   <div class="nav-inner">
-    <a href="#top" class="brand magnet"><span class="mark" aria-hidden="true"></span>Team&nbsp;Elite&nbsp;Star</b></a>
+    <a href="#top" class="brand magnet"><span class="mark" aria-hidden="true"></span>Team&nbsp;Elite&nbsp;Star</span></a>
     <nav class="nav-links" aria-label="Primary">
       <a href="#about">About</a>
       <a href="#impact">Achievements</a>
-      <a href="#team">Members</a>
+      <a href="#team">Members</a><a href="#command">Command</a>
       <span class="nav-tag">Nagad&nbsp;·&nbsp;CSR</span>
     </nav>
     <button class="nav-toggle" id="navToggle" aria-label="Jump to members">
@@ -360,14 +514,362 @@ footer{border-top:1px solid var(--line);padding:46px 0 60px;margin-top:40px;}
   </section>
 </main>
  
+
+<!-- ULTRA ADVANCED DASHBOARD / INTERACTION LAYER -->
+<section id="command" class="command-section" aria-label="Team command center">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Command Center</span>
+      <h2>Performance, <span class="gold-text">decoded</span>.</h2>
+      <p>Explore the same Team Elite Star structure with live client-side filtering, ranking, metric intelligence and quick insights.</p>
+    </div>
+
+    <div class="command-panel reveal">
+      <div class="command-top">
+        <div>
+          <span class="live-dot"></span>
+          <span class="command-status">LIVE TEAM VIEW</span>
+        </div>
+        <div class="command-actions">
+          <button class="mini-btn" id="sortQuality">Quality ↓</button>
+          <button class="mini-btn" id="sortAht">AHT ↑</button>
+          <button class="mini-btn" id="resetView">Reset</button>
+        </div>
+      </div>
+
+      <div class="command-grid">
+        <div class="search-box">
+          <span aria-hidden="true">⌕</span>
+          <input id="memberSearch" type="search" placeholder="Search member, ID, cube, trainer…" autocomplete="off">
+          <kbd>⌘ K</kbd>
+        </div>
+        <div class="filter-box">
+          <button class="filter-chip active" data-filter="all">All <b id="countAll">13</b></button>
+          <button class="filter-chip" data-filter="star">Stars <b id="countStars">2</b></button>
+          <button class="filter-chip" data-filter="perfect">100% Attendance <b id="countPerfect">0</b></button>
+        </div>
+      </div>
+
+      <div class="intel-grid">
+        <div class="intel-card"><span>Top Quality</span><strong id="topQuality">—</strong><small id="topQualityValue">—</small></div>
+        <div class="intel-card"><span>Fastest AHT</span><strong id="fastestAht">—</strong><small id="fastestAhtValue">—</small></div>
+        <div class="intel-card"><span>Avg Quality</span><strong id="avgQuality">—</strong><small>Across active CSRs</small></div>
+        <div class="intel-card"><span>Avg Productivity</span><strong id="avgProd">—</strong><small>Daily productivity time</small></div>
+      </div>
+
+      <div class="rank-list" id="rankList"></div>
+      <div class="empty-state" id="emptyState" hidden>No matching team member found.</div>
+    </div>
+  </div>
+</section>
+
+<div class="quick-dock" id="quickDock" aria-label="Quick actions">
+  <button class="dock-btn" id="soundBtn" aria-label="Toggle ambience" title="Sound">◒</button>
+  <button class="dock-btn" id="themeGlow" aria-label="Toggle ambient glow" title="Ambient glow">◈</button>
+  <button class="dock-btn" id="topBtn" aria-label="Back to top" title="Back to top">↑</button>
+</div>
+
+<div class="audio-hint" id="audioHint" role="status" aria-live="polite">
+  <span class="audio-hint-icon">♪</span>
+  <span>Tap anywhere for a softer cinematic ambience</span>
+  <button id="enableSound" type="button">Enable</button>
+</div>
+
+<audio id="ambientAudio" preload="auto" loop playsinline></audio>
+
+<div class="member-modal" id="memberModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close-modal></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalName">
+    <button class="modal-close" data-close-modal aria-label="Close">×</button>
+    <div class="modal-hero">
+      <div class="modal-avatar" id="modalAvatar">—</div>
+      <div>
+        <span class="eyebrow">Team Profile</span>
+        <h3 id="modalName">—</h3>
+        <p id="modalRole">—</p>
+      </div>
+    </div>
+    <p class="modal-bio" id="modalBio">—</p>
+    <div class="modal-metrics" id="modalMetrics"></div>
+    <div class="modal-bars" id="modalBars"></div>
+  </div>
+</div>
+
 <footer>
   <div class="wrap foot-inner">
-    <a href="#top" class="brand magnet"><span class="mark" aria-hidden="true"></span>Team&nbsp;Elite&nbsp;Star</b> · Made By Talha ·</a>
+    <a href="#top" class="brand magnet"><span class="mark" aria-hidden="true"></span>Team&nbsp;Elite&nbsp;Star</span> · Made By Talha ·</a>
     <p>Nagad Customer Service · Team Leader: Albina Jahan · <span id="year"></span></p>
   </div>
 </footer>
  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+/* ---------- Ultra Advanced Intelligence ---------- */
+(function ultraCommand(){
+  const panel = document.getElementById('rankList');
+  const search = document.getElementById('memberSearch');
+  const empty = document.getElementById('emptyState');
+  if(!panel || !search) return;
+
+  const all = [
+    ...MEMBERS.map(m=>({...m, leader:false})),
+    {name:TEAM_LEADER.name, role:TEAM_LEADER.role, rank:TEAM_LEADER.rank, cubeId:TEAM_LEADER.cubeId,
+     bio:TEAM_LEADER.bio, mtdScore:"100%", attendance:"100%", aht:"—", prodTime:"—", dgId:"TL", leader:true}
+  ];
+  let data=[...all], filter='all';
+
+  const secs=s=>{const p=s.split(':').map(Number);return p.length===3?p[0]*3600+p[1]*60+p[2]:p[0]*60+p[1]}
+  const ahtSecs=s=>s==='—'?99999:secs(s);
+  const quality=m=>parseFloat(m.mtdScore)||0;
+  const initials=n=>n.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+  function visible(){
+    const q=search.value.trim().toLowerCase();
+    return data.filter(m=>{
+      const match=!q || [m.name,m.dgId,m.cubeId,m.trainer,m.role].filter(Boolean).join(' ').toLowerCase().includes(q);
+      const f=filter==='all'||(filter==='star' && /star/i.test(m.rank))||(filter==='perfect' && parseFloat(m.attendance)===100);
+      return match&&f;
+    });
+  }
+
+  function draw(){
+    const list=visible();
+    empty.hidden=!!list.length;
+    panel.innerHTML=list.map((m,i)=>`
+      <div class="rank-row">
+        <div class="rank-no">${String(i+1).padStart(2,'0')}</div>
+        <div><div class="rank-name">${m.name}</div><div class="rank-meta">${m.role||''} · ${m.dgId||''}</div></div>
+        <div class="rank-score">${m.mtdScore||'—'}</div>
+        <div class="rank-meta">AHT ${m.aht||'—'}</div>
+        <div class="rank-bar"><i style="--w:${Math.min(100,quality(m))}%"></i></div>
+        <button class="profile-btn" data-profile="${all.indexOf(m)}">View</button>
+      </div>`).join('');
+    panel.querySelectorAll('[data-profile]').forEach(b=>b.addEventListener('click',()=>openProfile(all[+b.dataset.profile])));
+  }
+
+  function updateIntel(){
+    const active=MEMBERS;
+    const top=[...active].sort((a,b)=>quality(b)-quality(a))[0];
+    const fast=[...active].sort((a,b)=>ahtSecs(a.aht)-ahtSecs(b.aht))[0];
+    const avg=active.reduce((s,m)=>s+quality(m),0)/active.length;
+    const parseH=s=>{const p=s.split(':').map(Number);return p[0]*3600+p[1]*60+p[2]}
+    const avgP=active.reduce((s,m)=>s+parseH(m.prodTime),0)/active.length;
+    const hh=Math.floor(avgP/3600),mm=Math.round((avgP%3600)/60);
+    document.getElementById('topQuality').textContent=top.name;
+    document.getElementById('topQualityValue').textContent=top.mtdScore;
+    document.getElementById('fastestAht').textContent=fast.name;
+    document.getElementById('fastestAhtValue').textContent=fast.aht;
+    document.getElementById('avgQuality').textContent=avg.toFixed(2)+'%';
+    document.getElementById('avgProd').textContent=hh+'h '+String(mm).padStart(2,'0')+'m';
+    document.getElementById('countAll').textContent=all.length;
+    document.getElementById('countStars').textContent=all.filter(m=>/star/i.test(m.rank)).length;
+    document.getElementById('countPerfect').textContent=all.filter(m=>parseFloat(m.attendance)===100).length;
+  }
+
+  document.querySelectorAll('.filter-chip').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); filter=b.dataset.filter; draw();
+  }));
+  search.addEventListener('input',draw);
+
+  document.getElementById('sortQuality').addEventListener('click',()=>{data.sort((a,b)=>quality(b)-quality(a));draw()});
+  document.getElementById('sortAht').addEventListener('click',()=>{data.sort((a,b)=>ahtSecs(a.aht)-ahtSecs(b.aht));draw()});
+  document.getElementById('resetView').addEventListener('click',()=>{data=[...all];filter='all';search.value='';document.querySelectorAll('.filter-chip').forEach((x,i)=>x.classList.toggle('active',i===0));draw()});
+
+  function openProfile(m){
+    const modal=document.getElementById('memberModal');
+    document.getElementById('modalAvatar').textContent=initials(m.name);
+    document.getElementById('modalName').textContent=m.name;
+    document.getElementById('modalRole').textContent=(m.role||'CSR')+' · '+(m.cubeId||'');
+    document.getElementById('modalBio').textContent=m.bio||'Team Elite Star member.';
+    const metrics=[['Quality',m.mtdScore],['AHT',m.aht],['Attendance',m.attendance],['Productivity',m.prodTime],['Staffed',m.staffedTime],['Trainer',m.trainer||'Leadership']];
+    document.getElementById('modalMetrics').innerHTML=metrics.map(x=>`<div class="modal-metric"><span>${x[0]}</span><strong>${x[1]||'—'}</strong></div>`).join('');
+    document.getElementById('modalBars').innerHTML=`
+      <div><div class="modal-bar-head"><span>Quality Index</span><b>${m.mtdScore||'—'}</b></div><div class="modal-bar-track"><i style="--w:${Math.min(100,quality(m))}%"></i></div></div>
+      <div><div class="modal-bar-head"><span>Attendance</span><b>${m.attendance||'—'}</b></div><div class="modal-bar-track"><i style="--w:${Math.min(100,parseFloat(m.attendance)||0)}%"></i></div></div>`;
+    modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+  }
+  function closeProfile(){const modal=document.getElementById('memberModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';}
+  document.querySelectorAll('[data-close-modal]').forEach(x=>x.addEventListener('click',closeProfile));
+  document.addEventListener('keydown',e=>{
+    if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();search.focus()}
+    if(e.key==='Escape')closeProfile();
+  });
+
+  document.getElementById('topBtn').addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
+  document.getElementById('themeGlow').addEventListener('click',()=>document.body.classList.toggle('glow-off'));
+
+  updateIntel();draw();
+})();
+
+
+/* ---------- Ultra Interaction Engine ---------- */
+(function ultraInteractionEngine(){
+  const $ = (s,root=document)=>root.querySelector(s);
+  const $$ = (s,root=document)=>[...root.querySelectorAll(s)];
+
+  /* Reliable top button: works even when smooth scrolling is unavailable. */
+  const topBtn = $('#topBtn');
+  if(topBtn){
+    const goTop = () => {
+      try{ window.scrollTo({top:0,left:0,behavior:'smooth'}); }
+      catch(_){ window.scrollTo(0,0); }
+      document.documentElement.scrollTop=0;
+      document.body.scrollTop=0;
+    };
+    topBtn.addEventListener('click', goTop, {passive:true});
+    topBtn.addEventListener('touchend', goTop, {passive:true});
+  }
+
+  /* Audio: best-effort autoplay + first-gesture fallback due to browser autoplay policies.
+     Uses Web Audio generated ambience, so there is no external music file dependency. */
+  const soundBtn=$('#soundBtn'), audioHint=$('#audioHint'), enableSound=$('#enableSound');
+  let audioCtx=null, master=null, ambientTimer=null, soundOn=false, primed=false;
+
+  function audioAllowed(){
+    try{
+      audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+      master = master || audioCtx.createGain();
+      master.gain.value = 0.0;
+      master.connect(audioCtx.destination);
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function tone(freq, duration, gain=0.018, type='sine', when=0){
+    if(!audioCtx || !master) return;
+    const osc=audioCtx.createOscillator(), g=audioCtx.createGain();
+    osc.type=type; osc.frequency.setValueAtTime(freq,audioCtx.currentTime+when);
+    g.gain.setValueAtTime(0,audioCtx.currentTime+when);
+    g.gain.linearRampToValueAtTime(gain,audioCtx.currentTime+when+0.04);
+    g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+when+duration);
+    osc.connect(g);g.connect(master);osc.start(audioCtx.currentTime+when);osc.stop(audioCtx.currentTime+when+duration+0.05);
+  }
+
+  function startAmbience(){
+    if(soundOn) return true;
+    if(!audioAllowed()) return false;
+    soundOn=true; document.body.classList.add('sound-on');
+    if(soundBtn){
+      soundBtn.innerHTML='<span class="sound-wave"><i></i><i></i><i></i><i></i></span>';
+      soundBtn.setAttribute('aria-label','Mute ambience');
+      soundBtn.title='Mute ambience';
+    }
+    master.gain.cancelScheduledValues(audioCtx.currentTime);
+    master.gain.linearRampToValueAtTime(0.020,audioCtx.currentTime+2.2);
+
+    /* Gentle endless harmonic bed: deliberately extremely quiet. */
+    clearInterval(ambientTimer);
+    const sequence=[261.63,329.63,392.00,523.25,392.00,329.63];
+    let step=0;
+    const schedule=()=>{
+      if(!soundOn) return;
+      const f=sequence[step++%sequence.length];
+      tone(f,2.8,0.008,'sine',0);
+      tone(f/2,3.4,0.004,'triangle',0.15);
+    };
+    schedule(); ambientTimer=setInterval(schedule,2200);
+    if(audioHint) audioHint.classList.remove('show');
+    return true;
+  }
+
+  function stopAmbience(){
+    soundOn=false; document.body.classList.remove('sound-on');
+    clearInterval(ambientTimer);ambientTimer=null;
+    if(master && audioCtx){
+      master.gain.cancelScheduledValues(audioCtx.currentTime);
+      master.gain.linearRampToValueAtTime(0.0001,audioCtx.currentTime+0.55);
+    }
+    if(soundBtn){
+      soundBtn.textContent='◒';
+      soundBtn.setAttribute('aria-label','Enable ambience');
+      soundBtn.title='Enable ambience';
+    }
+  }
+
+  function toggleSound(){ soundOn ? stopAmbience() : startAmbience(); }
+  soundBtn?.addEventListener('click',toggleSound);
+  enableSound?.addEventListener('click',(e)=>{e.stopPropagation();startAmbience()});
+
+  /* Try immediately when the page is entered. Modern browsers may block it; first interaction then unlocks it. */
+  setTimeout(()=>{
+    const ok=startAmbience();
+    if(!ok && audioHint){
+      audioHint.classList.add('show');
+      setTimeout(()=>audioHint.classList.remove('show'),7000);
+    }
+    primed=ok;
+  },450);
+
+  const unlockOnce=()=>{
+    if(soundOn) return;
+    if(startAmbience()) document.removeEventListener('pointerdown',unlockOnce);
+  };
+  document.addEventListener('pointerdown',unlockOnce,{passive:true});
+  document.addEventListener('keydown',unlockOnce,{passive:true});
+
+  /* Subtle interaction sounds for hover, focus, touch and clicks. */
+  let lastHover=0;
+  const interactive='a,button,.btn,.member-card,.pillar,.intel-card,.filter-chip,.mini-btn,.profile-btn,.dock-btn';
+  document.addEventListener('pointerover',e=>{
+    const el=e.target.closest(interactive);
+    if(!el || !soundOn) return;
+    const now=performance.now(); if(now-lastHover<90) return; lastHover=now;
+    tone(740,0.055,0.009,'sine');
+  },{passive:true});
+
+  document.addEventListener('focusin',e=>{
+    if(soundOn && e.target.closest(interactive)) tone(620,0.07,0.008,'triangle');
+  });
+
+  document.addEventListener('click',e=>{
+    const el=e.target.closest(interactive);
+    if(!el) return;
+    if(soundOn) tone(980,0.07,0.012,'sine');
+    const x=e.clientX, y=e.clientY;
+    if(x||y){
+      const flash=document.createElement('span');flash.className='interaction-flash';
+      flash.style.left=x+'px';flash.style.top=y+'px';document.body.appendChild(flash);
+      setTimeout(()=>flash.remove(),600);
+    }
+  },{passive:true});
+
+  /* Touch feedback without interfering with native clicks. */
+  document.addEventListener('touchstart',e=>{
+    const t=e.touches[0], el=e.target.closest(interactive);
+    if(!el) return;
+    if(soundOn) tone(560,0.055,0.007,'sine');
+    const r=document.createElement('span');r.className='tap-ripple';
+    r.style.left=t.clientX+'px';r.style.top=t.clientY+'px';document.body.appendChild(r);
+    setTimeout(()=>r.remove(),700);
+  },{passive:true});
+
+  /* Better scroll reveal: stagger cards by row. */
+  if('IntersectionObserver' in window && !REDUCE){
+    const obs=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting) return;
+        entry.target.style.transitionDelay=(Number(entry.target.dataset.stagger||0))+'ms';
+        entry.target.classList.add('in');
+        obs.unobserve(entry.target);
+      });
+    },{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+    $$('.member-card,.pillar,.intel-card,.rank-row').forEach((el,i)=>{
+      el.dataset.stagger=(i%4)*75; obs.observe(el);
+    });
+  }
+
+  /* Fix command panel's dynamic list after it re-renders by applying stagger vars. */
+  const rankList=$('#rankList');
+  if(rankList){
+    const mo=new MutationObserver(()=>{
+      $$('.rank-row',rankList).forEach((el,i)=>el.style.transitionDelay=(i%6)*35+'ms');
+    });
+    mo.observe(rankList,{childList:true});
+  }
+})();
+
+</script>
 <script>
 
 const TEAM_LEADER = {
@@ -548,7 +1050,10 @@ document.getElementById('year').textContent = new Date().getFullYear();
 const nav=document.getElementById('nav');
 const onScroll=()=>nav.classList.toggle('scrolled', window.scrollY>40);
 onScroll(); window.addEventListener('scroll',onScroll,{passive:true});
-document.getElementById('navToggle').addEventListener('click',()=>document.getElementById('team').scrollIntoView({behavior:'smooth'}));
+document.getElementById('navToggle').addEventListener('click',()=>{
+  const target=document.getElementById('command')||document.getElementById('team');
+  target?.scrollIntoView({behavior:'smooth',block:'start'});
+});
  
 /* ---- Scroll progress ---- */
 const prog=document.getElementById('progress');
