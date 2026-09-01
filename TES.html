@@ -332,7 +332,8 @@ body.sound-on .dock-btn#soundBtn::after{
 @keyframes panelSweep{50%,100%{transform:translateX(110%)}}
 
 @media (max-width:640px){
-  .audio-hint{width:calc(100% - 26px);justify-content:center;font-size:.61rem}
+  .audio-hint{width:calc(100% - 96px);left:12px;right:auto;transform:translateY(18px);justify-content:center;font-size:.6rem;padding:9px 10px 9px 12px;gap:7px}
+  .audio-hint.show{transform:none}
   .audio-hint button{flex:0 0 auto}
   .quick-dock{right:12px;bottom:12px}
   .dock-btn{width:38px;height:38px}
@@ -351,6 +352,8 @@ body.sound-on .dock-btn#soundBtn::after{
 .command-actions{display:flex;gap:7px;flex-wrap:wrap}
 .mini-btn,.filter-chip{font:500 .68rem var(--util);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--muted);padding:8px 11px;border-radius:4px;cursor:pointer;transition:.25s ease}
 .mini-btn:hover,.filter-chip:hover,.filter-chip.active{color:var(--gold);border-color:var(--line-strong);background:rgba(232,195,107,.08)}
+.mini-btn:active,.filter-chip:active,.profile-btn:active{transform:scale(.95)}
+.btn:active{transform:scale(.97)}
 .command-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:12px;margin:16px 0}
 .search-box{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:rgba(0,0,0,.18);padding:0 12px;border-radius:6px}
 .search-box>span{font-size:1.25rem;color:var(--gold)}
@@ -376,9 +379,10 @@ body.sound-on .dock-btn#soundBtn::after{
 .profile-btn{border:1px solid var(--line);background:none;color:var(--muted);font:600 .58rem var(--util);letter-spacing:.1em;text-transform:uppercase;padding:7px 9px;border-radius:4px;cursor:pointer}
 .profile-btn:hover{color:var(--gold);border-color:var(--gold)}
 .empty-state{text-align:center;padding:30px;color:var(--muted);font:.8rem var(--util)}
-.quick-dock{position:fixed;right:20px;bottom:20px;z-index:40;display:flex;flex-direction:column;gap:7px}
-.dock-btn{width:40px;height:40px;border:1px solid var(--line-strong);border-radius:50%;background:rgba(12,11,18,.78);backdrop-filter:blur(12px);color:var(--gold);cursor:pointer;font:600 1rem var(--util);box-shadow:0 10px 30px -15px #000;transition:.25s ease}
+.quick-dock{position:fixed;right:20px;bottom:20px;z-index:9200;display:flex;flex-direction:column;gap:7px;touch-action:manipulation}
+.dock-btn{position:relative;width:40px;height:40px;border:1px solid var(--line-strong);border-radius:50%;background:rgba(12,11,18,.78);backdrop-filter:blur(12px);color:var(--gold);cursor:pointer;font:600 1rem var(--util);box-shadow:0 10px 30px -15px #000;transition:transform .2s ease,background .25s ease,box-shadow .25s ease;-webkit-tap-highlight-color:transparent}
 .dock-btn:hover{transform:translateY(-3px);background:rgba(232,195,107,.09)}
+.dock-btn:active{transform:translateY(-1px) scale(.94)}
 .member-modal{position:fixed;inset:0;z-index:10001;display:grid;place-items:center;padding:22px;opacity:0;visibility:hidden;transition:.3s ease}
 .member-modal.open{opacity:1;visibility:visible}
 .modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(10px)}
@@ -602,7 +606,8 @@ body.glow-off #spotlight,body.glow-off #sparkles{display:none}
   </div>
 </footer>
  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
 /* ---------- Ultra Advanced Intelligence ---------- */
 (function ultraCommand(){
   const panel = document.getElementById('rankList');
@@ -695,9 +700,6 @@ body.glow-off #spotlight,body.glow-off #sparkles{display:none}
     if(e.key==='Escape')closeProfile();
   });
 
-  document.getElementById('topBtn').addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
-  document.getElementById('themeGlow').addEventListener('click',()=>document.body.classList.toggle('glow-off'));
-
   updateIntel();draw();
 })();
 
@@ -707,18 +709,34 @@ body.glow-off #spotlight,body.glow-off #sparkles{display:none}
   const $ = (s,root=document)=>root.querySelector(s);
   const $$ = (s,root=document)=>[...root.querySelectorAll(s)];
 
+  /* Shared tap binder: on touch devices a click normally follows touchend, which would
+     fire toggle-style handlers (sound, glow) twice. This runs the handler once on
+     touchend (preventing the trailing synthetic click) and falls back to click for
+     mouse/keyboard/trackpad input. */
+  function bindTap(el, handler){
+    if(!el) return;
+    let touched=false;
+    el.addEventListener('touchend', e=>{
+      touched=true;
+      e.preventDefault();
+      handler(e);
+      setTimeout(()=>{touched=false;},400);
+    }, {passive:false});
+    el.addEventListener('click', e=>{
+      if(touched) return;
+      handler(e);
+    });
+  }
+
   /* Reliable top button: works even when smooth scrolling is unavailable. */
   const topBtn = $('#topBtn');
-  if(topBtn){
-    const goTop = () => {
-      try{ window.scrollTo({top:0,left:0,behavior:'smooth'}); }
-      catch(_){ window.scrollTo(0,0); }
-      document.documentElement.scrollTop=0;
-      document.body.scrollTop=0;
-    };
-    topBtn.addEventListener('click', goTop, {passive:true});
-    topBtn.addEventListener('touchend', goTop, {passive:true});
-  }
+  const goTop = () => {
+    try{ window.scrollTo({top:0,left:0,behavior:'smooth'}); }
+    catch(_){ window.scrollTo(0,0); }
+    document.documentElement.scrollTop=0;
+    document.body.scrollTop=0;
+  };
+  bindTap(topBtn, goTop);
 
   /* Audio: best-effort autoplay + first-gesture fallback due to browser autoplay policies.
      Uses Web Audio generated ambience, so there is no external music file dependency. */
@@ -788,8 +806,8 @@ body.glow-off #spotlight,body.glow-off #sparkles{display:none}
   }
 
   function toggleSound(){ soundOn ? stopAmbience() : startAmbience(); }
-  soundBtn?.addEventListener('click',toggleSound);
-  enableSound?.addEventListener('click',(e)=>{e.stopPropagation();startAmbience()});
+  bindTap(soundBtn, toggleSound);
+  bindTap(enableSound, (e)=>{e.stopPropagation();startAmbience();});
 
   /* Try immediately when the page is entered. Modern browsers may block it; first interaction then unlocks it. */
   setTimeout(()=>{
@@ -807,6 +825,19 @@ body.glow-off #spotlight,body.glow-off #sparkles{display:none}
   };
   document.addEventListener('pointerdown',unlockOnce,{passive:true});
   document.addEventListener('keydown',unlockOnce,{passive:true});
+
+  /* Ambient glow dock button — same touch-safe binder as sound/top. */
+  const themeGlow=$('#themeGlow');
+  bindTap(themeGlow, ()=>document.body.classList.toggle('glow-off'));
+
+  /* Keyboard shortcuts: Home -> scroll to top, S -> toggle ambience.
+     Skipped while typing in the search field or any other text input. */
+  document.addEventListener('keydown', e=>{
+    const tag=(e.target && e.target.tagName || '').toLowerCase();
+    if(tag==='input' || tag==='textarea' || e.target?.isContentEditable) return;
+    if(e.key==='Home'){ e.preventDefault(); goTop(); }
+    else if(e.key.toLowerCase()==='s' && !e.metaKey && !e.ctrlKey && !e.altKey){ toggleSound(); }
+  });
 
   /* Subtle interaction sounds for hover, focus, touch and clicks. */
   let lastHover=0;
