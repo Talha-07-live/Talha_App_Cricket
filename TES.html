@@ -608,300 +608,6 @@ body.glow-off #spotlight,body.glow-off #sparkles{display:none}
  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-/* ---------- Ultra Advanced Intelligence ---------- */
-(function ultraCommand(){
-  const panel = document.getElementById('rankList');
-  const search = document.getElementById('memberSearch');
-  const empty = document.getElementById('emptyState');
-  if(!panel || !search) return;
-
-  const all = [
-    ...MEMBERS.map(m=>({...m, leader:false})),
-    {name:TEAM_LEADER.name, role:TEAM_LEADER.role, rank:TEAM_LEADER.rank, cubeId:TEAM_LEADER.cubeId,
-     bio:TEAM_LEADER.bio, mtdScore:"100%", attendance:"100%", aht:"—", prodTime:"—", dgId:"TL", leader:true}
-  ];
-  let data=[...all], filter='all';
-
-  const secs=s=>{const p=s.split(':').map(Number);return p.length===3?p[0]*3600+p[1]*60+p[2]:p[0]*60+p[1]}
-  const ahtSecs=s=>s==='—'?99999:secs(s);
-  const quality=m=>parseFloat(m.mtdScore)||0;
-  const initials=n=>n.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
-
-  function visible(){
-    const q=search.value.trim().toLowerCase();
-    return data.filter(m=>{
-      const match=!q || [m.name,m.dgId,m.cubeId,m.trainer,m.role].filter(Boolean).join(' ').toLowerCase().includes(q);
-      const f=filter==='all'||(filter==='star' && /star/i.test(m.rank))||(filter==='perfect' && parseFloat(m.attendance)===100);
-      return match&&f;
-    });
-  }
-
-  function draw(){
-    const list=visible();
-    empty.hidden=!!list.length;
-    panel.innerHTML=list.map((m,i)=>`
-      <div class="rank-row">
-        <div class="rank-no">${String(i+1).padStart(2,'0')}</div>
-        <div><div class="rank-name">${m.name}</div><div class="rank-meta">${m.role||''} · ${m.dgId||''}</div></div>
-        <div class="rank-score">${m.mtdScore||'—'}</div>
-        <div class="rank-meta">AHT ${m.aht||'—'}</div>
-        <div class="rank-bar"><i style="--w:${Math.min(100,quality(m))}%"></i></div>
-        <button class="profile-btn" data-profile="${all.indexOf(m)}">View</button>
-      </div>`).join('');
-    panel.querySelectorAll('[data-profile]').forEach(b=>b.addEventListener('click',()=>openProfile(all[+b.dataset.profile])));
-  }
-
-  function updateIntel(){
-    const active=MEMBERS;
-    const top=[...active].sort((a,b)=>quality(b)-quality(a))[0];
-    const fast=[...active].sort((a,b)=>ahtSecs(a.aht)-ahtSecs(b.aht))[0];
-    const avg=active.reduce((s,m)=>s+quality(m),0)/active.length;
-    const parseH=s=>{const p=s.split(':').map(Number);return p[0]*3600+p[1]*60+p[2]}
-    const avgP=active.reduce((s,m)=>s+parseH(m.prodTime),0)/active.length;
-    const hh=Math.floor(avgP/3600),mm=Math.round((avgP%3600)/60);
-    document.getElementById('topQuality').textContent=top.name;
-    document.getElementById('topQualityValue').textContent=top.mtdScore;
-    document.getElementById('fastestAht').textContent=fast.name;
-    document.getElementById('fastestAhtValue').textContent=fast.aht;
-    document.getElementById('avgQuality').textContent=avg.toFixed(2)+'%';
-    document.getElementById('avgProd').textContent=hh+'h '+String(mm).padStart(2,'0')+'m';
-    document.getElementById('countAll').textContent=all.length;
-    document.getElementById('countStars').textContent=all.filter(m=>/star/i.test(m.rank)).length;
-    document.getElementById('countPerfect').textContent=all.filter(m=>parseFloat(m.attendance)===100).length;
-  }
-
-  document.querySelectorAll('.filter-chip').forEach(b=>b.addEventListener('click',()=>{
-    document.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active'); filter=b.dataset.filter; draw();
-  }));
-  search.addEventListener('input',draw);
-
-  document.getElementById('sortQuality').addEventListener('click',()=>{data.sort((a,b)=>quality(b)-quality(a));draw()});
-  document.getElementById('sortAht').addEventListener('click',()=>{data.sort((a,b)=>ahtSecs(a.aht)-ahtSecs(b.aht));draw()});
-  document.getElementById('resetView').addEventListener('click',()=>{data=[...all];filter='all';search.value='';document.querySelectorAll('.filter-chip').forEach((x,i)=>x.classList.toggle('active',i===0));draw()});
-
-  function openProfile(m){
-    const modal=document.getElementById('memberModal');
-    document.getElementById('modalAvatar').textContent=initials(m.name);
-    document.getElementById('modalName').textContent=m.name;
-    document.getElementById('modalRole').textContent=(m.role||'CSR')+' · '+(m.cubeId||'');
-    document.getElementById('modalBio').textContent=m.bio||'Team Elite Star member.';
-    const metrics=[['Quality',m.mtdScore],['AHT',m.aht],['Attendance',m.attendance],['Productivity',m.prodTime],['Staffed',m.staffedTime],['Trainer',m.trainer||'Leadership']];
-    document.getElementById('modalMetrics').innerHTML=metrics.map(x=>`<div class="modal-metric"><span>${x[0]}</span><strong>${x[1]||'—'}</strong></div>`).join('');
-    document.getElementById('modalBars').innerHTML=`
-      <div><div class="modal-bar-head"><span>Quality Index</span><b>${m.mtdScore||'—'}</b></div><div class="modal-bar-track"><i style="--w:${Math.min(100,quality(m))}%"></i></div></div>
-      <div><div class="modal-bar-head"><span>Attendance</span><b>${m.attendance||'—'}</b></div><div class="modal-bar-track"><i style="--w:${Math.min(100,parseFloat(m.attendance)||0)}%"></i></div></div>`;
-    modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
-  }
-  function closeProfile(){const modal=document.getElementById('memberModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';}
-  document.querySelectorAll('[data-close-modal]').forEach(x=>x.addEventListener('click',closeProfile));
-  document.addEventListener('keydown',e=>{
-    if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();search.focus()}
-    if(e.key==='Escape')closeProfile();
-  });
-
-  updateIntel();draw();
-})();
-
-
-/* ---------- Ultra Interaction Engine ---------- */
-(function ultraInteractionEngine(){
-  const $ = (s,root=document)=>root.querySelector(s);
-  const $$ = (s,root=document)=>[...root.querySelectorAll(s)];
-
-  /* Shared tap binder: on touch devices a click normally follows touchend, which would
-     fire toggle-style handlers (sound, glow) twice. This runs the handler once on
-     touchend (preventing the trailing synthetic click) and falls back to click for
-     mouse/keyboard/trackpad input. */
-  function bindTap(el, handler){
-    if(!el) return;
-    let touched=false;
-    el.addEventListener('touchend', e=>{
-      touched=true;
-      e.preventDefault();
-      handler(e);
-      setTimeout(()=>{touched=false;},400);
-    }, {passive:false});
-    el.addEventListener('click', e=>{
-      if(touched) return;
-      handler(e);
-    });
-  }
-
-  /* Reliable top button: works even when smooth scrolling is unavailable. */
-  const topBtn = $('#topBtn');
-  const goTop = () => {
-    try{ window.scrollTo({top:0,left:0,behavior:'smooth'}); }
-    catch(_){ window.scrollTo(0,0); }
-    document.documentElement.scrollTop=0;
-    document.body.scrollTop=0;
-  };
-  bindTap(topBtn, goTop);
-
-  /* Audio: best-effort autoplay + first-gesture fallback due to browser autoplay policies.
-     Uses Web Audio generated ambience, so there is no external music file dependency. */
-  const soundBtn=$('#soundBtn'), audioHint=$('#audioHint'), enableSound=$('#enableSound');
-  let audioCtx=null, master=null, ambientTimer=null, soundOn=false, primed=false;
-
-  function audioAllowed(){
-    try{
-      audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
-      if(audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
-      master = master || audioCtx.createGain();
-      master.gain.value = 0.0;
-      master.connect(audioCtx.destination);
-      return true;
-    }catch(e){ return false; }
-  }
-
-  function tone(freq, duration, gain=0.018, type='sine', when=0){
-    if(!audioCtx || !master) return;
-    const osc=audioCtx.createOscillator(), g=audioCtx.createGain();
-    osc.type=type; osc.frequency.setValueAtTime(freq,audioCtx.currentTime+when);
-    g.gain.setValueAtTime(0,audioCtx.currentTime+when);
-    g.gain.linearRampToValueAtTime(gain,audioCtx.currentTime+when+0.04);
-    g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+when+duration);
-    osc.connect(g);g.connect(master);osc.start(audioCtx.currentTime+when);osc.stop(audioCtx.currentTime+when+duration+0.05);
-  }
-
-  function startAmbience(){
-    if(soundOn) return true;
-    if(!audioAllowed()) return false;
-    soundOn=true; document.body.classList.add('sound-on');
-    if(soundBtn){
-      soundBtn.innerHTML='<span class="sound-wave"><i></i><i></i><i></i><i></i></span>';
-      soundBtn.setAttribute('aria-label','Mute ambience');
-      soundBtn.title='Mute ambience';
-    }
-    master.gain.cancelScheduledValues(audioCtx.currentTime);
-    master.gain.linearRampToValueAtTime(0.020,audioCtx.currentTime+2.2);
-
-    /* Gentle endless harmonic bed: deliberately extremely quiet. */
-    clearInterval(ambientTimer);
-    const sequence=[261.63,329.63,392.00,523.25,392.00,329.63];
-    let step=0;
-    const schedule=()=>{
-      if(!soundOn) return;
-      const f=sequence[step++%sequence.length];
-      tone(f,2.8,0.008,'sine',0);
-      tone(f/2,3.4,0.004,'triangle',0.15);
-    };
-    schedule(); ambientTimer=setInterval(schedule,2200);
-    if(audioHint) audioHint.classList.remove('show');
-    return true;
-  }
-
-  function stopAmbience(){
-    soundOn=false; document.body.classList.remove('sound-on');
-    clearInterval(ambientTimer);ambientTimer=null;
-    if(master && audioCtx){
-      master.gain.cancelScheduledValues(audioCtx.currentTime);
-      master.gain.linearRampToValueAtTime(0.0001,audioCtx.currentTime+0.55);
-    }
-    if(soundBtn){
-      soundBtn.textContent='◒';
-      soundBtn.setAttribute('aria-label','Enable ambience');
-      soundBtn.title='Enable ambience';
-    }
-  }
-
-  function toggleSound(){ soundOn ? stopAmbience() : startAmbience(); }
-  bindTap(soundBtn, toggleSound);
-  bindTap(enableSound, (e)=>{e.stopPropagation();startAmbience();});
-
-  /* Try immediately when the page is entered. Modern browsers may block it; first interaction then unlocks it. */
-  setTimeout(()=>{
-    const ok=startAmbience();
-    if(!ok && audioHint){
-      audioHint.classList.add('show');
-      setTimeout(()=>audioHint.classList.remove('show'),7000);
-    }
-    primed=ok;
-  },450);
-
-  const unlockOnce=()=>{
-    if(soundOn) return;
-    if(startAmbience()) document.removeEventListener('pointerdown',unlockOnce);
-  };
-  document.addEventListener('pointerdown',unlockOnce,{passive:true});
-  document.addEventListener('keydown',unlockOnce,{passive:true});
-
-  /* Ambient glow dock button — same touch-safe binder as sound/top. */
-  const themeGlow=$('#themeGlow');
-  bindTap(themeGlow, ()=>document.body.classList.toggle('glow-off'));
-
-  /* Keyboard shortcuts: Home -> scroll to top, S -> toggle ambience.
-     Skipped while typing in the search field or any other text input. */
-  document.addEventListener('keydown', e=>{
-    const tag=(e.target && e.target.tagName || '').toLowerCase();
-    if(tag==='input' || tag==='textarea' || e.target?.isContentEditable) return;
-    if(e.key==='Home'){ e.preventDefault(); goTop(); }
-    else if(e.key.toLowerCase()==='s' && !e.metaKey && !e.ctrlKey && !e.altKey){ toggleSound(); }
-  });
-
-  /* Subtle interaction sounds for hover, focus, touch and clicks. */
-  let lastHover=0;
-  const interactive='a,button,.btn,.member-card,.pillar,.intel-card,.filter-chip,.mini-btn,.profile-btn,.dock-btn';
-  document.addEventListener('pointerover',e=>{
-    const el=e.target.closest(interactive);
-    if(!el || !soundOn) return;
-    const now=performance.now(); if(now-lastHover<90) return; lastHover=now;
-    tone(740,0.055,0.009,'sine');
-  },{passive:true});
-
-  document.addEventListener('focusin',e=>{
-    if(soundOn && e.target.closest(interactive)) tone(620,0.07,0.008,'triangle');
-  });
-
-  document.addEventListener('click',e=>{
-    const el=e.target.closest(interactive);
-    if(!el) return;
-    if(soundOn) tone(980,0.07,0.012,'sine');
-    const x=e.clientX, y=e.clientY;
-    if(x||y){
-      const flash=document.createElement('span');flash.className='interaction-flash';
-      flash.style.left=x+'px';flash.style.top=y+'px';document.body.appendChild(flash);
-      setTimeout(()=>flash.remove(),600);
-    }
-  },{passive:true});
-
-  /* Touch feedback without interfering with native clicks. */
-  document.addEventListener('touchstart',e=>{
-    const t=e.touches[0], el=e.target.closest(interactive);
-    if(!el) return;
-    if(soundOn) tone(560,0.055,0.007,'sine');
-    const r=document.createElement('span');r.className='tap-ripple';
-    r.style.left=t.clientX+'px';r.style.top=t.clientY+'px';document.body.appendChild(r);
-    setTimeout(()=>r.remove(),700);
-  },{passive:true});
-
-  /* Better scroll reveal: stagger cards by row. */
-  if('IntersectionObserver' in window && !REDUCE){
-    const obs=new IntersectionObserver(entries=>{
-      entries.forEach(entry=>{
-        if(!entry.isIntersecting) return;
-        entry.target.style.transitionDelay=(Number(entry.target.dataset.stagger||0))+'ms';
-        entry.target.classList.add('in');
-        obs.unobserve(entry.target);
-      });
-    },{threshold:.12,rootMargin:'0px 0px -6% 0px'});
-    $$('.member-card,.pillar,.intel-card,.rank-row').forEach((el,i)=>{
-      el.dataset.stagger=(i%4)*75; obs.observe(el);
-    });
-  }
-
-  /* Fix command panel's dynamic list after it re-renders by applying stagger vars. */
-  const rankList=$('#rankList');
-  if(rankList){
-    const mo=new MutationObserver(()=>{
-      $$('.rank-row',rankList).forEach((el,i)=>el.style.transitionDelay=(i%6)*35+'ms');
-    });
-    mo.observe(rankList,{childList:true});
-  }
-})();
-
-</script>
-<script>
 
 const TEAM_LEADER = {
   name: "Albina Jahan",
@@ -1237,6 +943,300 @@ if(!REDUCE){
   window.addEventListener('resize',()=>{W=innerWidth;H=innerHeight;camera.aspect=W/H;camera.updateProjectionMatrix();renderer.setSize(W,H);},{passive:true});
   if(REDUCE){renderer.render(scene,camera);}else{loop();}
 })();
+</script>
+<script>
+/* ---------- Ultra Advanced Intelligence ---------- */
+(function ultraCommand(){
+  const panel = document.getElementById('rankList');
+  const search = document.getElementById('memberSearch');
+  const empty = document.getElementById('emptyState');
+  if(!panel || !search) return;
+
+  const all = [
+    ...MEMBERS.map(m=>({...m, leader:false})),
+    {name:TEAM_LEADER.name, role:TEAM_LEADER.role, rank:TEAM_LEADER.rank, cubeId:TEAM_LEADER.cubeId,
+     bio:TEAM_LEADER.bio, mtdScore:"100%", attendance:"100%", aht:"—", prodTime:"—", dgId:"TL", leader:true}
+  ];
+  let data=[...all], filter='all';
+
+  const secs=s=>{const p=s.split(':').map(Number);return p.length===3?p[0]*3600+p[1]*60+p[2]:p[0]*60+p[1]}
+  const ahtSecs=s=>s==='—'?99999:secs(s);
+  const quality=m=>parseFloat(m.mtdScore)||0;
+  const initials=n=>n.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+  function visible(){
+    const q=search.value.trim().toLowerCase();
+    return data.filter(m=>{
+      const match=!q || [m.name,m.dgId,m.cubeId,m.trainer,m.role].filter(Boolean).join(' ').toLowerCase().includes(q);
+      const f=filter==='all'||(filter==='star' && /star/i.test(m.rank))||(filter==='perfect' && parseFloat(m.attendance)===100);
+      return match&&f;
+    });
+  }
+
+  function draw(){
+    const list=visible();
+    empty.hidden=!!list.length;
+    panel.innerHTML=list.map((m,i)=>`
+      <div class="rank-row">
+        <div class="rank-no">${String(i+1).padStart(2,'0')}</div>
+        <div><div class="rank-name">${m.name}</div><div class="rank-meta">${m.role||''} · ${m.dgId||''}</div></div>
+        <div class="rank-score">${m.mtdScore||'—'}</div>
+        <div class="rank-meta">AHT ${m.aht||'—'}</div>
+        <div class="rank-bar"><i style="--w:${Math.min(100,quality(m))}%"></i></div>
+        <button class="profile-btn" data-profile="${all.indexOf(m)}">View</button>
+      </div>`).join('');
+    panel.querySelectorAll('[data-profile]').forEach(b=>b.addEventListener('click',()=>openProfile(all[+b.dataset.profile])));
+  }
+
+  function updateIntel(){
+    const active=MEMBERS;
+    const top=[...active].sort((a,b)=>quality(b)-quality(a))[0];
+    const fast=[...active].sort((a,b)=>ahtSecs(a.aht)-ahtSecs(b.aht))[0];
+    const avg=active.reduce((s,m)=>s+quality(m),0)/active.length;
+    const parseH=s=>{const p=s.split(':').map(Number);return p[0]*3600+p[1]*60+p[2]}
+    const avgP=active.reduce((s,m)=>s+parseH(m.prodTime),0)/active.length;
+    const hh=Math.floor(avgP/3600),mm=Math.round((avgP%3600)/60);
+    document.getElementById('topQuality').textContent=top.name;
+    document.getElementById('topQualityValue').textContent=top.mtdScore;
+    document.getElementById('fastestAht').textContent=fast.name;
+    document.getElementById('fastestAhtValue').textContent=fast.aht;
+    document.getElementById('avgQuality').textContent=avg.toFixed(2)+'%';
+    document.getElementById('avgProd').textContent=hh+'h '+String(mm).padStart(2,'0')+'m';
+    document.getElementById('countAll').textContent=all.length;
+    document.getElementById('countStars').textContent=all.filter(m=>/star/i.test(m.rank)).length;
+    document.getElementById('countPerfect').textContent=all.filter(m=>parseFloat(m.attendance)===100).length;
+  }
+
+  document.querySelectorAll('.filter-chip').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); filter=b.dataset.filter; draw();
+  }));
+  search.addEventListener('input',draw);
+
+  document.getElementById('sortQuality').addEventListener('click',()=>{data.sort((a,b)=>quality(b)-quality(a));draw()});
+  document.getElementById('sortAht').addEventListener('click',()=>{data.sort((a,b)=>ahtSecs(a.aht)-ahtSecs(b.aht));draw()});
+  document.getElementById('resetView').addEventListener('click',()=>{data=[...all];filter='all';search.value='';document.querySelectorAll('.filter-chip').forEach((x,i)=>x.classList.toggle('active',i===0));draw()});
+
+  function openProfile(m){
+    const modal=document.getElementById('memberModal');
+    document.getElementById('modalAvatar').textContent=initials(m.name);
+    document.getElementById('modalName').textContent=m.name;
+    document.getElementById('modalRole').textContent=(m.role||'CSR')+' · '+(m.cubeId||'');
+    document.getElementById('modalBio').textContent=m.bio||'Team Elite Star member.';
+    const metrics=[['Quality',m.mtdScore],['AHT',m.aht],['Attendance',m.attendance],['Productivity',m.prodTime],['Staffed',m.staffedTime],['Trainer',m.trainer||'Leadership']];
+    document.getElementById('modalMetrics').innerHTML=metrics.map(x=>`<div class="modal-metric"><span>${x[0]}</span><strong>${x[1]||'—'}</strong></div>`).join('');
+    document.getElementById('modalBars').innerHTML=`
+      <div><div class="modal-bar-head"><span>Quality Index</span><b>${m.mtdScore||'—'}</b></div><div class="modal-bar-track"><i style="--w:${Math.min(100,quality(m))}%"></i></div></div>
+      <div><div class="modal-bar-head"><span>Attendance</span><b>${m.attendance||'—'}</b></div><div class="modal-bar-track"><i style="--w:${Math.min(100,parseFloat(m.attendance)||0)}%"></i></div></div>`;
+    modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+  }
+  function closeProfile(){const modal=document.getElementById('memberModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';}
+  document.querySelectorAll('[data-close-modal]').forEach(x=>x.addEventListener('click',closeProfile));
+  document.addEventListener('keydown',e=>{
+    if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();search.focus()}
+    if(e.key==='Escape')closeProfile();
+  });
+
+  updateIntel();draw();
+})();
+
+
+/* ---------- Ultra Interaction Engine ---------- */
+(function ultraInteractionEngine(){
+  const $ = (s,root=document)=>root.querySelector(s);
+  const $$ = (s,root=document)=>[...root.querySelectorAll(s)];
+
+  /* Shared tap binder: on touch devices a click normally follows touchend, which would
+     fire toggle-style handlers (sound, glow) twice. This runs the handler once on
+     touchend (preventing the trailing synthetic click) and falls back to click for
+     mouse/keyboard/trackpad input. */
+  function bindTap(el, handler){
+    if(!el) return;
+    let touched=false;
+    el.addEventListener('touchend', e=>{
+      touched=true;
+      e.preventDefault();
+      handler(e);
+      setTimeout(()=>{touched=false;},400);
+    }, {passive:false});
+    el.addEventListener('click', e=>{
+      if(touched) return;
+      handler(e);
+    });
+  }
+
+  /* Reliable top button: works even when smooth scrolling is unavailable. */
+  const topBtn = $('#topBtn');
+  const goTop = () => {
+    try{ window.scrollTo({top:0,left:0,behavior:'smooth'}); }
+    catch(_){ window.scrollTo(0,0); }
+    document.documentElement.scrollTop=0;
+    document.body.scrollTop=0;
+  };
+  bindTap(topBtn, goTop);
+
+  /* Audio: best-effort autoplay + first-gesture fallback due to browser autoplay policies.
+     Uses Web Audio generated ambience, so there is no external music file dependency. */
+  const soundBtn=$('#soundBtn'), audioHint=$('#audioHint'), enableSound=$('#enableSound');
+  let audioCtx=null, master=null, ambientTimer=null, soundOn=false, primed=false;
+
+  function audioAllowed(){
+    try{
+      audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+      master = master || audioCtx.createGain();
+      master.gain.value = 0.0;
+      master.connect(audioCtx.destination);
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function tone(freq, duration, gain=0.018, type='sine', when=0){
+    if(!audioCtx || !master) return;
+    const osc=audioCtx.createOscillator(), g=audioCtx.createGain();
+    osc.type=type; osc.frequency.setValueAtTime(freq,audioCtx.currentTime+when);
+    g.gain.setValueAtTime(0,audioCtx.currentTime+when);
+    g.gain.linearRampToValueAtTime(gain,audioCtx.currentTime+when+0.04);
+    g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+when+duration);
+    osc.connect(g);g.connect(master);osc.start(audioCtx.currentTime+when);osc.stop(audioCtx.currentTime+when+duration+0.05);
+  }
+
+  function startAmbience(){
+    if(soundOn) return true;
+    if(!audioAllowed()) return false;
+    soundOn=true; document.body.classList.add('sound-on');
+    if(soundBtn){
+      soundBtn.innerHTML='<span class="sound-wave"><i></i><i></i><i></i><i></i></span>';
+      soundBtn.setAttribute('aria-label','Mute ambience');
+      soundBtn.title='Mute ambience';
+    }
+    master.gain.cancelScheduledValues(audioCtx.currentTime);
+    master.gain.linearRampToValueAtTime(0.020,audioCtx.currentTime+2.2);
+
+    /* Gentle endless harmonic bed: deliberately extremely quiet. */
+    clearInterval(ambientTimer);
+    const sequence=[261.63,329.63,392.00,523.25,392.00,329.63];
+    let step=0;
+    const schedule=()=>{
+      if(!soundOn) return;
+      const f=sequence[step++%sequence.length];
+      tone(f,2.8,0.008,'sine',0);
+      tone(f/2,3.4,0.004,'triangle',0.15);
+    };
+    schedule(); ambientTimer=setInterval(schedule,2200);
+    if(audioHint) audioHint.classList.remove('show');
+    return true;
+  }
+
+  function stopAmbience(){
+    soundOn=false; document.body.classList.remove('sound-on');
+    clearInterval(ambientTimer);ambientTimer=null;
+    if(master && audioCtx){
+      master.gain.cancelScheduledValues(audioCtx.currentTime);
+      master.gain.linearRampToValueAtTime(0.0001,audioCtx.currentTime+0.55);
+    }
+    if(soundBtn){
+      soundBtn.textContent='◒';
+      soundBtn.setAttribute('aria-label','Enable ambience');
+      soundBtn.title='Enable ambience';
+    }
+  }
+
+  function toggleSound(){ soundOn ? stopAmbience() : startAmbience(); }
+  bindTap(soundBtn, toggleSound);
+  bindTap(enableSound, (e)=>{e.stopPropagation();startAmbience();});
+
+  /* Try immediately when the page is entered. Modern browsers may block it; first interaction then unlocks it. */
+  setTimeout(()=>{
+    const ok=startAmbience();
+    if(!ok && audioHint){
+      audioHint.classList.add('show');
+      setTimeout(()=>audioHint.classList.remove('show'),7000);
+    }
+    primed=ok;
+  },450);
+
+  const unlockOnce=()=>{
+    if(soundOn) return;
+    if(startAmbience()) document.removeEventListener('pointerdown',unlockOnce);
+  };
+  document.addEventListener('pointerdown',unlockOnce,{passive:true});
+  document.addEventListener('keydown',unlockOnce,{passive:true});
+
+  /* Ambient glow dock button — same touch-safe binder as sound/top. */
+  const themeGlow=$('#themeGlow');
+  bindTap(themeGlow, ()=>document.body.classList.toggle('glow-off'));
+
+  /* Keyboard shortcuts: Home -> scroll to top, S -> toggle ambience.
+     Skipped while typing in the search field or any other text input. */
+  document.addEventListener('keydown', e=>{
+    const tag=(e.target && e.target.tagName || '').toLowerCase();
+    if(tag==='input' || tag==='textarea' || e.target?.isContentEditable) return;
+    if(e.key==='Home'){ e.preventDefault(); goTop(); }
+    else if(e.key.toLowerCase()==='s' && !e.metaKey && !e.ctrlKey && !e.altKey){ toggleSound(); }
+  });
+
+  /* Subtle interaction sounds for hover, focus, touch and clicks. */
+  let lastHover=0;
+  const interactive='a,button,.btn,.member-card,.pillar,.intel-card,.filter-chip,.mini-btn,.profile-btn,.dock-btn';
+  document.addEventListener('pointerover',e=>{
+    const el=e.target.closest(interactive);
+    if(!el || !soundOn) return;
+    const now=performance.now(); if(now-lastHover<90) return; lastHover=now;
+    tone(740,0.055,0.009,'sine');
+  },{passive:true});
+
+  document.addEventListener('focusin',e=>{
+    if(soundOn && e.target.closest(interactive)) tone(620,0.07,0.008,'triangle');
+  });
+
+  document.addEventListener('click',e=>{
+    const el=e.target.closest(interactive);
+    if(!el) return;
+    if(soundOn) tone(980,0.07,0.012,'sine');
+    const x=e.clientX, y=e.clientY;
+    if(x||y){
+      const flash=document.createElement('span');flash.className='interaction-flash';
+      flash.style.left=x+'px';flash.style.top=y+'px';document.body.appendChild(flash);
+      setTimeout(()=>flash.remove(),600);
+    }
+  },{passive:true});
+
+  /* Touch feedback without interfering with native clicks. */
+  document.addEventListener('touchstart',e=>{
+    const t=e.touches[0], el=e.target.closest(interactive);
+    if(!el) return;
+    if(soundOn) tone(560,0.055,0.007,'sine');
+    const r=document.createElement('span');r.className='tap-ripple';
+    r.style.left=t.clientX+'px';r.style.top=t.clientY+'px';document.body.appendChild(r);
+    setTimeout(()=>r.remove(),700);
+  },{passive:true});
+
+  /* Better scroll reveal: stagger cards by row. */
+  if('IntersectionObserver' in window && !REDUCE){
+    const obs=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting) return;
+        entry.target.style.transitionDelay=(Number(entry.target.dataset.stagger||0))+'ms';
+        entry.target.classList.add('in');
+        obs.unobserve(entry.target);
+      });
+    },{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+    $$('.member-card,.pillar,.intel-card,.rank-row').forEach((el,i)=>{
+      el.dataset.stagger=(i%4)*75; obs.observe(el);
+    });
+  }
+
+  /* Fix command panel's dynamic list after it re-renders by applying stagger vars. */
+  const rankList=$('#rankList');
+  if(rankList){
+    const mo=new MutationObserver(()=>{
+      $$('.rank-row',rankList).forEach((el,i)=>el.style.transitionDelay=(i%6)*35+'ms');
+    });
+    mo.observe(rankList,{childList:true});
+  }
+})();
+
 </script>
 </body>
 </html>
