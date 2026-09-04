@@ -388,7 +388,7 @@ body.sound-on .dock-btn#soundBtn::after{
 .rank-score{font:600 .78rem var(--util);color:var(--gold)}
 .rank-bar{height:4px;background:#25232b;border-radius:99px;overflow:hidden}
 .rank-bar i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--gold-deep),var(--gold-shine));box-shadow:0 0 10px var(--glow)}
-.profile-btn{border:1px solid var(--line);background:none;color:var(--muted);font:600 .58rem var(--util);letter-spacing:.1em;text-transform:uppercase;padding:7px 9px;border-radius:4px;cursor:pointer}
+.profile-btn{border:1px solid var(--line);background:none;color:var(--muted);font:600 .58rem var(--util);letter-spacing:.1em;text-transform:uppercase;padding:7px 10px;border-radius:4px;cursor:pointer;white-space:nowrap;flex:none;}
 .profile-btn:hover{color:var(--gold);border-color:var(--gold)}
 .empty-state{text-align:center;padding:30px;color:var(--muted);font:.8rem var(--util)}
 .quick-dock{position:fixed;right:20px;bottom:20px;z-index:9200;display:flex;flex-direction:column;gap:7px;touch-action:manipulation}
@@ -416,7 +416,7 @@ body.sound-on .dock-btn#soundBtn::after{
 .modal-bar-track{height:5px;background:#25232b;border-radius:99px;overflow:hidden;margin-top:5px}
 .modal-bar-track i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--gold-deep),var(--gold-shine))}
 body.glow-off #spotlight,body.glow-off #sparkles{display:none}
-@media(max-width:800px){.command-grid{grid-template-columns:1fr}.filter-box{justify-content:flex-start}.intel-grid{grid-template-columns:repeat(2,1fr)}.rank-row{grid-template-columns:30px 1fr auto}.rank-row .rank-meta,.rank-row .rank-bar{display:none}}
+@media(max-width:800px){.command-grid{grid-template-columns:1fr}.filter-box{justify-content:flex-start}.intel-grid{grid-template-columns:repeat(2,1fr)}.rank-row{grid-template-columns:24px 1fr auto auto;gap:10px}.rank-row .rank-meta,.rank-row .rank-bar{display:none}}
 @media(max-width:500px){.command-panel{padding:13px}.intel-grid{grid-template-columns:1fr 1fr}.modal-card{padding:20px}.modal-metrics{grid-template-columns:1fr 1fr}.rank-row{gap:7px}.rank-name{font-size:.84rem}}
 
 </style>
@@ -428,6 +428,21 @@ body.glow-off #spotlight,body.glow-off #sparkles{display:none}
   body{touch-action:manipulation;padding-bottom:calc(64px + env(safe-area-inset-bottom));}
   #quickDock{display:none;} /* replaced by the app tab-bar on mobile */
   header.nav{padding-top:env(safe-area-inset-top);}
+
+  /* iOS Safari auto-zooms any input with font-size below 16px on focus — keep it at 16px on mobile */
+  .search-box input{font-size:16px;}
+
+  /* Touch has no :hover — give the same visual feedback on tap instead */
+  .rank-row:active{border-color:var(--line);background:rgba(232,195,107,.06);}
+  .member-card:active{transform:scale(.98);}
+  .profile-btn:active{color:var(--gold);border-color:var(--gold);}
+
+  /* Smooth momentum scrolling inside the profile modal on iOS */
+  .modal-card{-webkit-overflow-scrolling:touch;}
+
+  /* Comfortable minimum tap-target sizing */
+  .mini-btn,.filter-chip{min-height:38px;}
+  .modal-card [data-close-modal]{min-width:40px;min-height:40px;}
 }
 
 /* Bottom app tab-bar — hidden on desktop by default */
@@ -484,6 +499,22 @@ body.standalone-app .app-tabbar{padding-bottom:calc(10px + env(safe-area-inset-b
 
 /* Swipe-affordance on modal/sheet while dragging */
 .modal-card.dragging,.action-sheet.dragging{transition:none;}
+
+.modal-kbd-hint{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font:500 .62rem var(--util);letter-spacing:.04em;color:var(--muted);text-align:center;display:none;}
+@media (pointer:fine){.modal-kbd-hint{display:block;}}
+
+/* ---- Print stylesheet: clean leaderboard printout, no chrome/decoration ---- */
+@media print{
+  header.nav,.quick-dock,.app-tabbar,.sheet-backdrop,.action-sheet,.hero canvas,.hero-veil,
+  .scroll-cue,#cursorDot,#cursorRing,#spotlight,#sparkles,#progress,.audio-hint,footer,
+  .command-actions,.search-box,.filter-box{display:none!important;}
+  body{background:#fff;color:#111;}
+  .command-panel{border:1px solid #ccc;box-shadow:none;backdrop-filter:none;background:#fff;}
+  .rank-row{background:#fff;border-bottom:1px solid #ddd;border-radius:0;color:#111;}
+  .rank-name,.rank-score,.rank-no,.rank-meta{color:#111!important;}
+  .profile-btn{display:none;}
+  a[href]::after{content:none;}
+}
 </style>
 </head>
 <body>
@@ -615,6 +646,7 @@ body.standalone-app .app-tabbar{padding-bottom:calc(10px + env(safe-area-inset-b
           <button class="mini-btn" id="sortQuality">Quality ↓</button>
           <button class="mini-btn" id="sortAht">AHT ↑</button>
           <button class="mini-btn" id="resetView">Reset</button>
+          <button class="mini-btn" id="exportCsv" title="Download the current view as a CSV file">Export CSV</button>
         </div>
       </div>
 
@@ -692,6 +724,7 @@ body.standalone-app .app-tabbar{padding-bottom:calc(10px + env(safe-area-inset-b
     <p class="modal-bio" id="modalBio">—</p>
     <div class="modal-metrics" id="modalMetrics"></div>
     <div class="modal-bars" id="modalBars"></div>
+    <p class="modal-kbd-hint">← → Navigate profiles · Esc Close · Click the ID above to copy</p>
   </div>
 </div>
 
@@ -1054,11 +1087,7 @@ if(!REDUCE){
   const empty = document.getElementById('emptyState');
   if(!panel || !search) return;
 
-  const all = [
-    ...MEMBERS.map(m=>({...m, leader:false})),
-    {name:TEAM_LEADER.name, role:TEAM_LEADER.role, rank:TEAM_LEADER.rank, cubeId:TEAM_LEADER.cubeId,
-     bio:TEAM_LEADER.bio, mtdScore:"100%", attendance:"100%", aht:"—", prodTime:"—", dgId:"TL", leader:true}
-  ];
+  const all = MEMBERS.map(m=>({...m, leader:false}));
   let data=[...all], filter='all';
 
   const secs=s=>{const p=s.split(':').map(Number);return p.length===3?p[0]*3600+p[1]*60+p[2]:p[0]*60+p[1]}
@@ -1119,7 +1148,25 @@ if(!REDUCE){
   document.getElementById('sortAht').addEventListener('click',()=>{data.sort((a,b)=>ahtSecs(a.aht)-ahtSecs(b.aht));draw()});
   document.getElementById('resetView').addEventListener('click',()=>{data=[...all];filter='all';search.value='';document.querySelectorAll('.filter-chip').forEach((x,i)=>x.classList.toggle('active',i===0));draw()});
 
+  /* ---- Export current view to CSV (desktop power-user feature) ---- */
+  document.getElementById('exportCsv')?.addEventListener('click',()=>{
+    const rows=visible();
+    if(!rows.length) return;
+    const cols=['name','role','dgId','cubeId','mtdScore','aht','attendance','prodTime','trainer'];
+    const head=['Name','Role','DG ID','Cube ID','Quality','AHT','Attendance','Productivity','Trainer'];
+    const esc=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+    const csv=[head.join(','), ...rows.map(m=>cols.map(c=>esc(m[c])).join(','))].join('\r\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=`team-elite-star-${filter}-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  let currentProfile=null;
   function openProfile(m){
+    currentProfile=m;
     const modal=document.getElementById('memberModal');
     document.getElementById('modalAvatar').textContent=initials(m.name);
     document.getElementById('modalName').textContent=m.name;
@@ -1132,11 +1179,35 @@ if(!REDUCE){
       <div><div class="modal-bar-head"><span>Attendance</span><b>${m.attendance||'—'}</b></div><div class="modal-bar-track"><i style="--w:${Math.min(100,parseFloat(m.attendance)||0)}%"></i></div></div>`;
     modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
   }
-  function closeProfile(){const modal=document.getElementById('memberModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';}
+  function closeProfile(){currentProfile=null;const modal=document.getElementById('memberModal');modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';}
   document.querySelectorAll('[data-close-modal]').forEach(x=>x.addEventListener('click',closeProfile));
+
+  /* Click the ID line in a profile to copy it (Cube/DG ID) — handy for CSR lookups */
+  const modalRoleEl=document.getElementById('modalRole');
+  if(modalRoleEl){
+    modalRoleEl.style.cursor='pointer';
+    modalRoleEl.title='Click to copy Cube ID';
+    modalRoleEl.addEventListener('click',async ()=>{
+      if(!currentProfile?.cubeId) return;
+      try{
+        await navigator.clipboard.writeText(currentProfile.cubeId);
+        const prev=modalRoleEl.textContent;
+        modalRoleEl.textContent='Copied ✓';
+        setTimeout(()=>{ modalRoleEl.textContent=prev; },1100);
+      }catch(_){/* clipboard unavailable, ignore silently */}
+    });
+  }
+
   document.addEventListener('keydown',e=>{
     if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();search.focus()}
     if(e.key==='Escape')closeProfile();
+    if(currentProfile && (e.key==='ArrowRight'||e.key==='ArrowLeft')){
+      const list=visible();
+      const i=list.indexOf(currentProfile);
+      if(i===-1) return;
+      const next=e.key==='ArrowRight' ? list[(i+1)%list.length] : list[(i-1+list.length)%list.length];
+      if(next) openProfile(next);
+    }
   });
 
   updateIntel();draw();
@@ -1349,6 +1420,24 @@ if(!REDUCE){
   function haptic(ms=8){
     try{ if('vibrate' in navigator) navigator.vibrate(ms); }catch(_){/* silent */}
   }
+
+  /* ---- Live screen-mode detection ----
+     One responsive document adapts instead of shipping two separate pages:
+     the mobile app-shell (tab-bar, action sheet, PWA install) shows under 860px,
+     the desktop layout (quick-dock, hover cursor, wide grids) shows above it —
+     all driven by CSS media queries already in this file. This just exposes the
+     current mode as html[data-mode] / html.is-mobile / html.is-desktop so any
+     future script or CSS can hook into it, and keeps it correct live if someone
+     resizes the window or rotates/docks a tablet — no reload needed. */
+  const screenModeQuery = window.matchMedia('(max-width:860px)');
+  function applyScreenMode(mql){
+    const mobile = mql.matches;
+    document.documentElement.setAttribute('data-mode', mobile?'mobile':'desktop');
+    document.documentElement.classList.toggle('is-mobile', mobile);
+    document.documentElement.classList.toggle('is-desktop', !mobile);
+  }
+  applyScreenMode(screenModeQuery);
+  (screenModeQuery.addEventListener ? screenModeQuery.addEventListener.bind(screenModeQuery) : screenModeQuery.addListener.bind(screenModeQuery))('change', applyScreenMode);
 
   /* ---- Standalone (installed) app detection ---- */
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
