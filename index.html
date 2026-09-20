@@ -391,7 +391,8 @@ const translationDict = {
   "bakim": "Maintenance",
   "sunucu": "Server",
   "bağlantı": "Connection",
-  "baglanti": "Connection"
+  "baglanti": "Connection",
+  "yedek": "Backup"
 };
 
 const dictEntries = Object.keys(translationDict)
@@ -671,31 +672,12 @@ bootLoader();
 
 function renderLeagueTabs(){
   const tabs=document.getElementById('leagueTabs');if(!tabs)return;
-  const counts={};
-  let favCount=0;
-  liveEvents.forEach((e,i)=>{
-    const name=leagueName(e);
-    counts[name]=(counts[name]||0)+1;
-    if(favoriteKeys.includes(eventKey(e,i))) favCount++;
-  });
-
+  const counts={};liveEvents.forEach(e=>{const name=leagueName(e);counts[name]=(counts[name]||0)+1});
   const priority=name=>{const n=name.toLowerCase();if(n.includes('la liga'))return 0;if(n.includes('uefa'))return 1;return 2};
-  const leagues=Object.keys(counts).sort((a,b)=>priority(a)-priority(b)||a.localeCompare(b));
-  tabs.innerHTML='';
-
-  const addTab=(name,active,cb,count)=>{
-    const b=document.createElement('button');
-    b.className='tab-btn'+(active?' active':'');
-    b.type='button';
-    b.setAttribute('role','tab');
-    b.textContent=`${name} (${count})`;
-    b.onclick=cb;
-    tabs.appendChild(b);
-  };
-
-  addTab('All', currentLeague==='all', ()=>setFilter('all'), liveEvents.length);
-  addTab('★ Favorites', currentLeague==='favorites', ()=>setFilter('favorites'), favCount);
-  leagues.forEach(name=>addTab(name, currentLeague===name, ()=>setFilter('league',name), counts[name]));
+  const leagues=Object.keys(counts).sort((a,b)=>priority(a)-priority(b)||a.localeCompare(b));tabs.innerHTML='';
+  const addTab=(name,active,cb,count)=>{const b=document.createElement('button');b.className='tab-btn'+(active?' active':'');b.type='button';b.setAttribute('role','tab');b.textContent=`${name} (${count})`;b.onclick=cb;tabs.appendChild(b)};
+  addTab('All',currentLeague==='all',()=>setFilter('all'),liveEvents.length);
+  leagues.forEach(name=>addTab(name,currentLeague===name,()=>setFilter('league',name),counts[name]));
 }
 
 function renderRecent(){
@@ -726,68 +708,29 @@ function renderMatches(){
   const container=document.getElementById('serverContainer');if(!container)return;
   const input=document.getElementById('searchChannels');const searchQuery=(input?.value||'').trim().toLowerCase();
   container.innerHTML='';let visibleCount=0;let displayIndex=0;
-  
   liveEvents.forEach((event,index)=>{
-    const key=eventKey(event,index);
-    const favorite=favoriteKeys.includes(key);
-
-    if(currentLeague==='favorites'){
-      if(!favorite) return;
-    } else if(currentLeague!=='all' && leagueName(event)!==currentLeague){
-      return;
-    }
-
     const englishTitle=translateText(event?.title||'Live channel');
     const englishLeague=translateText(event?.league||'');
-    const full=(englishTitle+' '+englishLeague).toLowerCase();
-    if(searchQuery&&!full.includes(searchQuery))return;
+    if(currentLeague!=='all'&&leagueName(event)!==currentLeague)return;
+    const full=(englishTitle+' '+englishLeague).toLowerCase();if(searchQuery&&!full.includes(searchQuery))return;
 
     displayIndex++;
+    const key=eventKey(event,index),favorite=favoriteKeys.includes(key);
     const row=document.createElement('div');row.className='server-item';row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label','Play '+englishTitle);
     const badge=`<div class="live-badge"><div class="live-dot"></div>${escapeHTML(event?.time||'ONLINE')}</div>`;
     row.innerHTML=`<div class="channel-main"><div class="channel-index">${String(displayIndex).padStart(2,'0')}</div><div class="channel-copy"><strong>${escapeHTML(englishTitle)}</strong><small>${escapeHTML(englishLeague||'Live feed')}</small></div></div><div style="display:flex;align-items:center;gap:7px">${badge}<button class="fav-toggle ${favorite?'active':''}" type="button" aria-label="${favorite?'Remove from':'Add to'} favorites" aria-pressed="${favorite}">★</button></div>`;
-    
     row.onclick=()=>setServer(event,row);
     row.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();setServer(event,row)}};
-    
-    row.querySelector('.fav-toggle').onclick=ev=>{
-      ev.stopPropagation();
-      favoriteKeys=favorite?favoriteKeys.filter(k=>k!==key):[...favoriteKeys,key];
-      storageSet('talhaFavorites',JSON.stringify(favoriteKeys));
-      renderLeagueTabs();
-      renderMatches();
-      updateAnalytics();
-    };
-    
-    container.appendChild(row);
-    visibleCount++;
+    row.querySelector('.fav-toggle').onclick=ev=>{ev.stopPropagation();favoriteKeys=favorite?favoriteKeys.filter(k=>k!==key):[...favoriteKeys,key];storageSet('talhaFavorites',JSON.stringify(favoriteKeys));renderMatches();updateAnalytics()};
+    container.appendChild(row);visibleCount++;
   });
-
-  if(!visibleCount){
-    if(currentLeague==='favorites'){
-      container.innerHTML='<div class="empty-state">No favorites saved yet. Tap ★ on any channel to save it.</div>';
-    } else {
-      container.innerHTML='<div class="empty-state">No channels match your filters.</div>';
-    }
-  }
-
+  if(!visibleCount)container.innerHTML='<div class="empty-state">No channels match your filters.</div>';
   document.getElementById('channelSummary').textContent=`${visibleCount} shown · ${liveEvents.length} total`;
   updateAnalytics();
   renderRecent();
 }
 
-function setFilter(type,name='all'){
-  if(type==='favorites'){
-    currentLeague='favorites';
-  } else if(type==='league'){
-    currentLeague=name;
-  } else {
-    currentLeague='all';
-  }
-  renderLeagueTabs();
-  renderMatches();
-}
-
+function setFilter(type,name='all'){currentLeague=type==='league'?name:'all';renderLeagueTabs();renderMatches()}
 function filterMatches(){renderMatches()}
 function rememberRecent(event,index=''){
   const key=eventKey(event,index);
@@ -931,9 +874,23 @@ function scrollToChannels(){document.querySelector('.channels-panel')?.scrollInt
 
 function showFavorites(){
   closeMenu();
-  const searchInput=document.getElementById('searchChannels');
-  if(searchInput) searchInput.value='';
-  setFilter('favorites');
+  document.getElementById('searchChannels').value='';
+  currentLeague='all';
+  const container=document.getElementById('serverContainer');
+  container.innerHTML='';
+  let shown=0;
+  liveEvents.forEach((event,index)=>{
+    if(!favoriteKeys.includes(eventKey(event,index)))return;
+
+    shown++;
+    const row=document.createElement('div');row.className='server-item';row.tabIndex=0;row.setAttribute('role','button');
+    const title=translateText(event?.title||'Live channel'),league=translateText(event?.league||'');
+    row.innerHTML=`<div class="channel-main"><div class="channel-index">${String(shown).padStart(2,'0')}</div><div class="channel-copy"><strong>${escapeHTML(title)}</strong><small>${escapeHTML(league||'Live feed')}</small></div></div><div class="live-badge"><div class="live-dot"></div>${escapeHTML(event?.time||'ONLINE')}</div>`;
+    row.onclick=()=>{setServer(event,row)};container.appendChild(row);
+  });
+  if(!shown)container.innerHTML='<div class="empty-state">No favorites saved yet. Tap ★ on a channel to save it.</div>';
+  document.getElementById('channelSummary').textContent=`${shown} favorites`;
+  updateAnalytics();
   scrollToChannels();
 }
 
@@ -970,7 +927,7 @@ function lockSession(){
 }
 
 function handleMenuAction(action){
-  if(action==='home'){closeMenu();setFilter('all');scrollToChannels();}
+  if(action==='home'){closeMenu();currentLeague='all';renderLeagueTabs();renderMatches();scrollToChannels();}
   else if(action==='favorites')showFavorites();
   else if(action==='recent'){closeMenu();document.getElementById('recentSection')?.scrollIntoView({behavior:'smooth',block:'center'});}
   else if(action==='cinema'){closeMenu();toggleTheatre(true)}
@@ -1005,7 +962,7 @@ document.getElementById('menuBtn').addEventListener('click',openMenu);
 document.getElementById('closeMenuBtn').addEventListener('click',closeMenu);
 document.getElementById('menuBackdrop').addEventListener('click',closeMenu);
 document.querySelectorAll('.menu-item').forEach(btn=>btn.addEventListener('click',()=>handleMenuAction(btn.dataset.action)));
-document.getElementById('clearSearchBtn').addEventListener('click',()=>{const input=document.getElementById('searchChannels');if(input)input.value='';setFilter('all');});
+document.getElementById('clearSearchBtn').addEventListener('click',()=>{const input=document.getElementById('searchChannels');input.value='';input.focus();currentLeague='all';renderLeagueTabs();renderMatches()});
 document.getElementById('searchChannels').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(renderMatches,SEARCH_DELAY)});
 
 window.addEventListener('online',()=>{updateNetwork();if(!document.body.classList.contains('auth-locked')&&!liveEvents.length)loadTargetScript(true)});
