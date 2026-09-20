@@ -244,10 +244,10 @@
         .error-card.active { display:block; }
         .error-card h2 { font-size:16px; margin-bottom:8px; }
         .error-card p { color:rgba(255,255,255,.55); font-size:12px; line-height:1.5; margin-bottom:16px; }
-        .retry-btn { border:0; border-radius:9px; padding:10px 16px; background:linear-gradient(100deg,#7a3cff,#00bcd4); color:#fff; font-weight:800; cursor:pointer; }
+        .retry-btn { border:0; border-radius:99px; padding:10px 16px; background:linear-gradient(100deg,#7a3cff,#00bcd4); color:#fff; font-weight:800; cursor:pointer; }
         .toast { position:absolute; z-index:20; left:50%; bottom:28%; transform:translate(-50%,12px); opacity:0; pointer-events:none; padding:9px 14px; border-radius:9px; background:rgba(8,8,18,.85); color:#fff; font-size:12px; font-weight:700; transition:.25s; }
         .toast.show { opacity:1; transform:translate(-50%,0); }
-        /* Complete player skins — every visible surface adopts the selected theme. */
+
         body { --accent:#7a3cff; --accent2:#00f2fe; --accent-rgb:122,60,255; --surface:rgba(10,10,20,.95); --canvas:#020206; --live:#ff0055; }
         .player-wrapper { background:var(--canvas); }
         .player-controls { background:linear-gradient(to bottom,rgba(2,2,6,.78),transparent 27%,transparent 67%,rgba(2,2,6,.98)); }
@@ -272,11 +272,11 @@
         .theme-gold .player-wrapper::after { content:''; position:absolute; inset:0; pointer-events:none; z-index:2; background:linear-gradient(115deg,rgba(255,217,124,.12),transparent 40%); }
         .theme-midnight { --accent:#4e78b7; --accent2:#b6d6ff; --accent-rgb:78,120,183; --surface:rgba(8,18,34,.96); --canvas:#030914; --live:#ec4d6f; }
         .theme-midnight .player-wrapper::after { content:''; position:absolute; inset:0; pointer-events:none; z-index:2; background:radial-gradient(circle at 15% 8%,rgba(87,148,231,.18),transparent 32%),radial-gradient(circle at 88% 92%,rgba(25,57,107,.24),transparent 35%); }
+
         @media(max-width:700px){ .player-controls{padding:clamp(9px,3vw,14px);} .control-row{flex-wrap:wrap;gap:10px;} .left-controls,.right-controls{gap:clamp(9px,3vw,14px);} .right-controls{width:100%;justify-content:flex-end;} .bottom-bar{gap:9px;} .theme-panel{right:10px;top:max(48px,env(safe-area-inset-top));} .settings-panel{right:8px;bottom:max(58px,calc(env(safe-area-inset-bottom) + 52px));width:min(320px,calc(100vw - 16px));max-height:calc(100dvh - 100px);} .diagnostics{top:56px;left:10px;} .volume-slider{width:clamp(38px,13vw,58px);} .channel-title{font-size:12px;max-width:48vw;} .channel-avatar{width:29px;height:29px;font-size:12px;} .center-skip.left{left:12%;}.center-skip.right{right:12%;}.chapter-label{left:12px;bottom:104px;} }
         @media(max-width:390px){ .time-display{font-size:10px;} .live-tag{padding:4px 7px;font-size:9px;} .buffer-status-badge{padding:5px 7px;font-size:9px;} .control-btn{font-size:15px;} .channel-subtitle{display:none;} .right-controls{gap:11px;} }
         @media(max-height:440px) and (orientation:landscape){ .player-controls{padding:8px 14px;} .channel-subtitle,.chapter-label{display:none;} .settings-panel{max-height:calc(100dvh - 68px);bottom:46px;} .bottom-bar{gap:7px;} .top-bar{transform:scale(.9);transform-origin:top left;width:111%;} }
 
-        /* Cross-browser/WebView playback hardening */
         html, body, .player-wrapper { min-height: 100%; min-height: 100dvh; }
         .player-wrapper { touch-action: manipulation; }
         video {
@@ -309,17 +309,7 @@
             max-height:100dvh;
             object-fit:contain;
         }
-        @media (max-width:700px){
-            .unmute-prompt{
-                min-width:min(78vw,220px);
-                min-height:54px;
-                padding:11px 15px;
-            }
-        }
-        @media (max-width:390px){
-            .unmute-prompt{ min-width:min(84vw,205px); }
-            .unmute-sub{ display:none; }
-        }
+
         .manual-start {
             position:absolute;
             z-index:14;
@@ -349,7 +339,7 @@
             position: absolute;
             z-index: 13;
             left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);
-            top: calc(12% + env(safe-area-inset-top) / 2 - env(safe-area-inset-bottom) / 2);
+            top: calc(10% + env(safe-area-inset-top) / 2 - env(safe-area-inset-bottom) / 2);
             transform: translate(-50%, -50%);
             display: none;
             align-items: center;
@@ -411,9 +401,6 @@
         @media(max-width:700px){
             .connection-pill { top:max(8px, env(safe-area-inset-top)); font-size:9px; }
             .manual-start { min-width:138px; min-height:48px; }
-        }
-        @media(prefers-reduced-motion:reduce){
-            .connection-pill,.manual-start { transition:none; }
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -486,8 +473,8 @@
             <button class="theme-swatch" data-theme="violet" aria-label="Violet theme"></button>
             <button class="theme-swatch" data-theme="rose" aria-label="Rose theme"></button>
             <button class="theme-swatch" data-theme="emerald" aria-label="Emerald theme"></button>
-<button class="theme-swatch" data-theme="gold" aria-label="Gold theme"></button>
-<button class="theme-swatch" data-theme="midnight" aria-label="Midnight theme"></button>
+            <button class="theme-swatch" data-theme="gold" aria-label="Gold theme"></button>
+            <button class="theme-swatch" data-theme="midnight" aria-label="Midnight theme"></button>
         </div>
 
         <div class="bottom-bar">
@@ -574,12 +561,16 @@
         let toastTimer = null;
         let connectionTimer = null;
         let progressTimer = null;
+        let singleTapTimer = null;
         let isSeeking = false;
         let seekingPointer = false;
         let lastTap = 0;
         let retryCount = 0;
         let startupAttempted = false;
         let destroyed = false;
+
+        let controlsWereVisibleOnDown = false;
+        let ignoreNextClick = false;
 
         let playerPrefs = {};
         try { playerPrefs = JSON.parse(localStorage.getItem('talhaPlayerPrefs') || '{}'); }
@@ -1129,6 +1120,10 @@ ${liveEdge !== null ? `Live edge: ${liveEdge.toFixed(1)}s` : 'Live edge: native 
             updateDiagnostics();
         }
 
+        function areControlsVisible() {
+            return controlOverlay.classList.contains('show-controls');
+        }
+
         function togglePlay() {
             settingsPanel.classList.remove('active');
             if (video.paused) {
@@ -1198,6 +1193,7 @@ ${liveEdge !== null ? `Live edge: ${liveEdge.toFixed(1)}s` : 'Live edge: native 
         }
 
         function beginSeek(evt) {
+            if (!areControlsVisible() || !controlsWereVisibleOnDown) return;
             seekingPointer = true;
             try { timeline.setPointerCapture?.(evt.pointerId); } catch (_) {}
             seekVideo(evt);
@@ -1372,9 +1368,49 @@ ${liveEdge !== null ? `Live edge: ${liveEdge.toFixed(1)}s` : 'Live edge: native 
         timeline.addEventListener('pointerup', endSeek, {passive:true});
         timeline.addEventListener('pointercancel', endSeek, {passive:true});
 
-        playerContainer.addEventListener('touchend', event => {
+
+        playerContainer.addEventListener('pointerdown', event => {
+            const isPrompt = event.target.closest('#manualStartBtn') || event.target.closest('#unmutePrompt');
+            controlsWereVisibleOnDown = areControlsVisible();
+
+            if (!controlsWereVisibleOnDown && !isPrompt) {
+                resetControlsTimeout();
+                lastTap = 0;
+                ignoreNextClick = true;
+                clearTimeout(singleTapTimer);
+                return;
+            }
+
+            if (isPrompt) return;
+
+            if (!userGestureUnlockedAudio && video.paused) {
+                unlockAudioAndPlay();
+            }
+        }, { passive: true });
+
+        document.addEventListener('click', event => {
+            if (ignoreNextClick) {
+                ignoreNextClick = false;
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+                event.preventDefault();
+                return;
+            }
+
             if (
-                event.target.closest('.control-btn') ||
+                !gearBtn.contains(event.target) &&
+                !settingsPanel.contains(event.target) &&
+                !themeBtn.contains(event.target) &&
+                !themePanel.contains(event.target)
+            ) {
+                settingsPanel.classList.remove('active');
+                themePanel.classList.remove('active');
+                if (areControlsVisible()) resetControlsTimeout();
+            }
+        }, true);
+
+        playerContainer.addEventListener('touchend', event => {
+            const isInteractiveTarget = event.target.closest('.control-btn') ||
                 event.target.closest('.progress-container') ||
                 event.target.closest('#midPlayBtn') ||
                 event.target.closest('#skipBackBtn') ||
@@ -1383,29 +1419,43 @@ ${liveEdge !== null ? `Live edge: ${liveEdge.toFixed(1)}s` : 'Live edge: native 
                 event.target.closest('#themePanel') ||
                 event.target.closest('#manualStartBtn') ||
                 event.target.closest('#unmutePrompt') ||
-                event.target.closest('#errorCard')
-            ) return;
+                event.target.closest('#errorCard') ||
+                event.target.closest('.volume-slider');
+
+            if (isInteractiveTarget) {
+                if (controlsWereVisibleOnDown) resetControlsTimeout();
+                return;
+            }
+
+            if (!controlsWereVisibleOnDown) {
+                lastTap = 0;
+                clearTimeout(singleTapTimer);
+                return;
+            }
 
             const now = Date.now();
             const delta = now - lastTap;
+
             if (delta > 0 && delta < 300) {
-                const touchX = event.changedTouches?.[0]?.clientX ?? 0;
+                clearTimeout(singleTapTimer);
+                const touchX = event.changedTouches?.[0]?.clientX ?? event.clientX ?? 0;
                 const width = playerContainer.clientWidth || window.innerWidth;
                 skip(touchX > width / 2 ? 10 : -10);
+                lastTap = 0;
             } else {
-                if (controlOverlay.classList.contains('show-controls')) hideControls();
-                else resetControlsTimeout();
+                lastTap = now;
+                clearTimeout(singleTapTimer);
+                singleTapTimer = setTimeout(() => {
+                    if (areControlsVisible() && !video.paused && !hasOpenPanel()) {
+                        hideControls();
+                    }
+                }, 280);
             }
-            lastTap = now;
-        }, {passive:true});
+        }, { passive: true });
 
-        playerContainer.addEventListener('mousemove', resetControlsTimeout, {passive:true});
-
-        // First direct interaction is a safe place to satisfy autoplay/audio policies.
-        playerContainer.addEventListener('pointerdown', event => {
-            if (event.target.closest('#unmutePrompt') || event.target.closest('#manualStartBtn')) return;
-            if (!userGestureUnlockedAudio && video.paused) unlockAudioAndPlay();
-        }, {passive:true});
+        playerContainer.addEventListener('mousemove', () => {
+            resetControlsTimeout();
+        }, { passive: true });
 
         [settingsPanel, themePanel].forEach(panel => {
             panel.addEventListener('pointerdown', keepControlsVisible);
@@ -1423,19 +1473,6 @@ ${liveEdge !== null ? `Live edge: ${liveEdge.toFixed(1)}s` : 'Live edge: native 
             else if (event.key === 'ArrowLeft') skip(-10);
             else if (event.key === 'ArrowRight') skip(10);
             resetControlsTimeout();
-        });
-
-        document.addEventListener('click', event => {
-            if (
-                !gearBtn.contains(event.target) &&
-                !settingsPanel.contains(event.target) &&
-                !themeBtn.contains(event.target) &&
-                !themePanel.contains(event.target)
-            ) {
-                settingsPanel.classList.remove('active');
-                themePanel.classList.remove('active');
-                resetControlsTimeout();
-            }
         });
 
         document.addEventListener('visibilitychange', () => {
@@ -1480,6 +1517,7 @@ ${liveEdge !== null ? `Live edge: ${liveEdge.toFixed(1)}s` : 'Live edge: native 
             destroyed = true;
             clearTimeout(retryTimer);
             clearTimeout(controlsTimeout);
+            clearTimeout(singleTapTimer);
             clearInterval(progressTimer);
             cleanupHls();
         });
