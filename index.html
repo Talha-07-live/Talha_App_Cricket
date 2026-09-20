@@ -30,7 +30,6 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
 #particles{position:fixed;inset:0;pointer-events:none;z-index:1}
 .p{position:absolute;width:2px;height:2px;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-radius:50%;opacity:.35;animation:float linear infinite}
 @keyframes float{from{transform:translateY(105vh) scale(.8)}to{transform:translateY(-120px) scale(1.4)}}
-
 #loader{position:fixed;inset:0;background:#020206;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;transition:opacity .35s ease,visibility .35s ease;padding:20px;text-align:center}
 #loader.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
 #loader h1{font-size:clamp(22px,5vw,32px);font-weight:900;letter-spacing:6px;background:linear-gradient(90deg,#7a3cff,#00f2fe,#e04cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 25px rgba(122,60,255,.7));text-align:center;padding:0 15px}
@@ -42,23 +41,19 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
 @keyframes load{from{transform:translateX(-100%)}to{transform:translateX(300%)}}
 .maintenance-box{background:rgba(255,165,0,.12);border:1px solid rgba(255,165,0,.35);color:#ffd175;padding:12px 20px;border-radius:14px;font-size:13px;font-weight:600;text-align:center;margin:0 auto 24px;max-width:100%;width:380px;display:none;align-items:center;justify-content:center;gap:10px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 10px 30px rgba(0,0,0,.3);animation:fadeInDown .4s cubic-bezier(.175,.885,.32,1.275)}
 @keyframes fadeInDown{0%{opacity:0;transform:translateY(-10px)}100%{opacity:1;transform:translateY(0)}}
-
 .card{width:100%;max-width:1100px;background:var(--panel);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border:1px solid rgba(255,255,255,.06);border-radius:24px;padding:clamp(15px,4vw,30px);box-shadow:0 40px 90px rgba(0,0,0,.75),inset 0 1px 2px rgba(255,255,255,.12);position:relative;z-index:2;transition:max-width .35s ease,width .35s ease,padding .25s ease}
 .card::after{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(120deg,color-mix(in srgb,var(--accent-2) 75%,transparent),transparent 34%,color-mix(in srgb,var(--accent-3) 55%,transparent),transparent 72%,color-mix(in srgb,var(--accent) 65%,transparent));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.45;z-index:-1;animation:borderFlow 9s linear infinite}
 @keyframes borderFlow{to{filter:hue-rotate(360deg)}}
 .app-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:12px;min-width:0}.brand-mark{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));font-size:20px;box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 20%,transparent);flex:0 0 auto}.brand h1{font-size:clamp(18px,3vw,24px);letter-spacing:-.5px}.brand p{font-size:11px;color:var(--muted);margin-top:3px}.header-actions{display:flex;align-items:center;gap:8px}.theme-picker,.icon-btn{border:1px solid color-mix(in srgb,var(--accent-2) 30%,rgba(255,255,255,.12));background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.025));box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 24px rgba(0,0,0,.2);color:#fff;border-radius:12px;padding:10px 34px 10px 12px;font-size:12px;cursor:pointer;appearance:none}.theme-picker{background-image:linear-gradient(45deg,transparent 50%,var(--accent-2) 50%),linear-gradient(135deg,var(--accent-2) 50%,transparent 50%),linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.025));background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%,0 0;background-size:5px 5px,5px 5px,100% 100%;background-repeat:no-repeat}.theme-picker option{background:#17121d;color:#fff}.icon-btn{padding:10px 13px;display:grid;place-items:center;min-width:42px}.theme-picker:focus-visible,.icon-btn:focus-visible,.servers .server-item:focus-visible,.tab-btn:focus-visible,.fav-toggle:focus-visible,.search-box input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
 .status-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;padding:8px 11px;border:1px solid rgba(255,255,255,.055);border-radius:12px;background:rgba(255,255,255,.018);font-size:10px;color:var(--muted)}.status-left,.status-right{display:flex;align-items:center;gap:7px;min-width:0}.status-dot{width:6px;height:6px;border-radius:50%;background:#00f2fe;box-shadow:0 0 9px #00f2fe;flex:0 0 auto}.status-dot.offline{background:#ff5d7a;box-shadow:0 0 9px #ff5d7a}.status-dot.busy{background:#ffd166;box-shadow:0 0 9px #ffd166}.status-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
 .content-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}.player-column{min-width:0}.channels-panel{min-width:0;border:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.16);border-radius:18px;padding:14px;position:sticky;top:16px}.panel-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.panel-heading h2{font-size:14px}.panel-heading small{color:var(--muted);font-size:11px}.panel-heading-actions{display:flex;align-items:center;gap:7px}.mini-btn{border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.025);color:var(--muted);border-radius:9px;padding:6px 8px;font-size:11px;cursor:pointer}.mini-btn:hover{color:#fff;border-color:color-mix(in srgb,var(--accent-2) 35%,rgba(255,255,255,.08));background:rgba(255,255,255,.05)}
 .channel-tools{display:block;margin-bottom:10px}.channel-tools .search-box{min-width:0}.league-tabs{display:flex;gap:7px;overflow-x:auto;padding:8px 1px 7px}.league-tabs::-webkit-scrollbar{height:3px}.league-tabs::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--accent) 50%,transparent);border-radius:8px}.panel-subtitle{font-size:10px;color:var(--muted);margin:0 0 8px;text-transform:uppercase;letter-spacing:.8px}.recent-row{display:flex;gap:6px;overflow:auto;margin-bottom:10px}.recent-chip{flex:0 0 auto;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);color:var(--muted);border-radius:999px;padding:6px 9px;font-size:10px;cursor:pointer}.fav-toggle{border:0;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;padding:2px;flex:0 0 auto}.fav-toggle.active{color:#ffd166;text-shadow:0 0 10px rgba(255,209,102,.3)}
 .channel-main{display:flex;align-items:center;gap:9px;min-width:0}.channel-index{width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:rgba(255,255,255,.06);font-size:10px;color:var(--muted);flex:0 0 auto}.channel-copy{min-width:0;text-align:left}.channel-copy strong{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.channel-copy small{display:block;color:var(--muted);font-size:10px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .card.theatre-active{max-width:100%!important;width:96vw;padding:10px;background:rgba(0,0,0,.95)}.card.theatre-active .filter-bar,.card.theatre-active .servers,.card.theatre-active .analytics-panel,.card.theatre-active footer,.card.theatre-active .utility-panel,.card.theatre-active .status-strip,.card.theatre-active .maintenance-box{display:none!important}.card.theatre-active .content-grid{display:block}.card.theatre-active .player-column{width:100%}
-
 #login{text-align:center;padding:40px 10px}.login-kicker{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}#login h2{font-size:clamp(18px,4vw,26px);margin-bottom:24px;font-weight:800;letter-spacing:.5px;background:linear-gradient(180deg,#fff 30%,rgba(255,255,255,.5) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}input[type="password"]{width:100%;max-width:380px;padding:16px 24px;border:1px solid rgba(255,255,255,.05);border-radius:16px;outline:none;background:rgba(255,255,255,.02);color:#fff;font-size:16px;text-align:center;transition:all .3s;margin-bottom:14px;-webkit-user-select:text;user-select:text}input[type="password"]:focus{border-color:#00f2fe;background:rgba(255,255,255,.05);box-shadow:0 0 30px rgba(0,242,254,.2)}#login button{width:100%;max-width:380px;padding:16px;border:none;border-radius:16px;cursor:pointer;font-size:15px;font-weight:800;letter-spacing:1.5px;transition:transform .2s ease,filter .2s ease,box-shadow .2s ease;background:linear-gradient(90deg,#7a3cff,#00f2fe);color:#fff;box-shadow:0 6px 30px rgba(122,60,255,.4)}#login button:hover{transform:translateY(-1px);filter:brightness(1.06)}#login button:active{transform:translateY(0) scale(.99)}
 .analytics-panel{display:flex;gap:12px;margin-bottom:16px}.stat-card{flex:1;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}.stat-card span{font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.5px}.stat-card font{font-size:15px;font-weight:800;color:#00f2fe}.stat-card font{color:#e04cff}
 .player-container{position:relative;width:100%;padding-top:56.25%;background:#000;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.05);box-shadow:0 25px 60px rgba(0,0,0,.7)}iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;background:#000}.theatre-active .player-container{padding-top:52%;border-radius:12px}
 .utility-panel{display:flex;justify-content:flex-end;margin-top:8px}.util-btn{background:transparent;border:none;color:rgba(255,255,255,.4);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:color .2s}.util-btn:hover{color:#00f2fe}.theatre-exit-btn{position:fixed;top:max(15px,env(safe-area-inset-top));right:15px;z-index:10000;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:10px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.1);color:#fff;font-weight:700;cursor:pointer;display:none;font-size:12px}
-
 .filter-bar{display:flex;gap:12px;margin-top:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}.search-box{flex:1;min-width:240px}.search-box input{width:100%;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:12px;color:#fff;font-size:13px;outline:none;transition:all .3s;-webkit-user-select:text;user-select:text}.search-box input:focus{border-color:#7a3cff;background:rgba(255,255,255,.05)}.filter-tabs{display:flex;gap:8px}.tab-btn{padding:11px 16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.5);border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}.tab-btn.active{background:color-mix(in srgb,var(--accent) 15%,transparent);border-color:var(--accent);color:#fff}
 .servers{display:flex;gap:8px;flex-direction:column;margin-top:12px;max-height:420px;overflow-y:auto;padding-right:2px}.servers::-webkit-scrollbar{width:3px}.servers::-webkit-scrollbar-track{background:transparent}.servers::-webkit-scrollbar-thumb{background:rgba(255,255,255,.05);border-radius:10px}.servers::-webkit-scrollbar-thumb:hover{background:#7a3cff}.servers .server-item{width:100%;background:rgba(255,255,255,.01);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.04);padding:12px 10px 12px 14px;border-radius:12px;font-size:13px;font-weight:600;text-align:left;display:flex;align-items:center;justify-content:space-between;transition:background .2s ease,border-color .2s ease,transform .12s ease;cursor:pointer;gap:10px}.servers .server-item:hover{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.1)}.servers .server-item:active{transform:scale(.995)}.servers .server-item.active{background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 15%,transparent),rgba(0,242,254,.02));color:#fff;border-color:color-mix(in srgb,var(--accent) 60%,transparent);font-weight:700}.live-badge{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;color:#00f2fe;background:rgba(0,242,254,.06);padding:4px 8px;border-radius:6px;border:1px solid rgba(0,242,254,.12);white-space:nowrap}.live-dot{width:5px;height:5px;background:#00f2fe;border-radius:50%;box-shadow:0 0 8px #00f2fe;animation:blink 1s infinite alternate}@keyframes blink{from{opacity:.2}to{opacity:1}}
 .empty-state{padding:30px 12px;text-align:center;color:rgba(255,255,255,.4);font-size:12px}.feed-error{padding:26px 10px;text-align:center;color:#e04cff;font-size:12px}.feed-error button{margin-top:12px;padding:9px 13px;border:1px solid rgba(224,76,255,.3);background:rgba(224,76,255,.08);color:#fff;border-radius:10px;cursor:pointer}
@@ -115,7 +110,7 @@ body.menu-open{overflow:hidden}.focus-mode .channels-panel,.focus-mode .status-s
     <div class="status-right"><span id="syncText" class="status-text">Feed not synced</span></div>
   </div>
 
-  <div id="maintenanceNotice" class="maintenance-box"><span>⚠️</span><span>Server maintenance under way. Brief buffering may occur.</span></div>
+  <div id="maintenanceNotice" class="maintenance-box"><span>⚠️</span><span>Server maintenance under progress. Audio/video buffering may occur.</span></div>
 
   <div id="login">
     <div class="login-kicker">TALHA'S STREAM</div>
@@ -212,321 +207,6 @@ let favoriteKeys = safeJSON('talhaFavorites', []);
 let recentEvents = safeJSON('talhaRecent', []);
 let feedBusy = false;
 
-const translationDict = {
-  "motor sporları": "Motorsports",
-  "motor sporlari": "Motorsports",
-  "hazırlık maçı": "Friendly Match",
-  "hazirlik maci": "Friendly Match",
-  "paris basketball": "Paris Basketball",
-  "şampiyonlar ligi": "Champions League",
-  "sampiyonlar ligi": "Champions League",
-  "avrupa ligi": "Europa League",
-  "konferans ligi": "Conference League",
-  "milletler ligi": "Nations League",
-  "dünya kupası": "World Cup",
-  "dunya kupasi": "World Cup",
-  "avrupa şampiyonası": "European Championship",
-  "avrupa sampiyonasi": "European Championship",
-  "süper lig": "Super League",
-  "super lig": "Super League",
-  "1. lig": "1st Division",
-  "2. lig": "2nd Division",
-  "füchse berlin": "Fuchse Berlin",
-  "fuchse berlin": "Fuchse Berlin",
-  "as monaco": "AS Monaco",
-  "lnb pro a final": "LNB Pro A Final",
-  "masa tenisi": "Table Tennis",
-  "amerikan futbolu": "American Football",
-  "buz hokeyi": "Ice Hockey",
-  "at yarışı": "Horse Racing",
-  "at yarisi": "Horse Racing",
-  "su topu": "Water Polo",
-  "maç özeti": "Match Highlights",
-  "mac ozeti": "Match Highlights",
-  "suudi arabistan": "Saudi Arabia",
-  "güney kore": "South Korea",
-  "guney kore": "South Korea",
-  "çeyrek final": "Quarter-Final",
-  "ceyrek final": "Quarter-Final",
-  "yarı final": "Semi-Final",
-  "yari final": "Semi-Final",
-  "grup maçı": "Group Stage",
-  "grup maci": "Group Stage",
-  "hafta sonu": "Weekend",
-  "hafta içi": "Weekday",
-  "hafta ici": "Weekday",
-  
-  "voleybol": "Volleyball",
-  "basketbol": "Basketball",
-  "futbol": "Football",
-  "hentbol": "Handball",
-  "tenis": "Tennis",
-  "dövüş": "Fighting",
-  "dovus": "Fighting",
-  "bisiklet": "Cycling",
-  "yüzme": "Swimming",
-  "yuzme": "Swimming",
-  "boks": "Boxing",
-  "güreş": "Wrestling",
-  "gures": "Wrestling",
-  "futsal": "Futsal",
-  "espor": "E-Sports",
-  "e-spor": "E-Sports",
-  
-  "erkekler": "Men's",
-  "kadınlar": "Women's",
-  "kadinlar": "Women's",
-  "erkek": "Men",
-  "kadın": "Women",
-  "kadin": "Women",
-  "gençler": "Youth",
-  "gencler": "Youth",
-  
-  "hazırlık": "Friendly",
-  "hazirlik": "Friendly",
-  "canlı": "LIVE",
-  "canli": "LIVE",
-  "yayın": "Broadcast",
-  "yayin": "Broadcast",
-  "yayında": "On Air",
-  "yayinda": "On Air",
-  "finali": "Final",
-  "final": "Final",
-  "kupa": "Cup",
-  "kupası": "Cup",
-  "kupasi": "Cup",
-  "eleme": "Qualifier",
-  "elemeleri": "Qualifiers",
-  "özet": "Highlights",
-  "ozet": "Highlights",
-  "maçı": "Match",
-  "maci": "Match",
-  "maç": "Match",
-  "mac": "Match",
-  "takımı": "Team",
-  "takimi": "Team",
-  "hafta": "Week",
-  "tur": "Round",
-  "etap": "Stage",
-  "devre": "Half",
-  "uzatmalar": "Extra Time",
-  "penaltılar": "Penalties",
-  "penaltilar": "Penalties",
-  "ertelendi": "Postponed",
-  "iptal": "Canceled",
-
-  "türkiye": "Turkey",
-  "turkiye": "Turkey",
-  "türk": "Turkish",
-  "turk": "Turkish",
-  "İngiltere": "England",
-  "ingiltere": "England",
-  "ispanya": "Spain",
-  "italya": "Italy",
-  "almanya": "Germany",
-  "fransa": "France",
-  "hollanda": "Netherlands",
-  "portekiz": "Portugal",
-  "rusya": "Russia",
-  "yunanistan": "Greece",
-  "belçika": "Belgium",
-  "belcika": "Belgium",
-  "avusturya": "Austria",
-  "danimarka": "Denmark",
-  "İsveç": "Sweden",
-  "isvec": "Sweden",
-  "İsviçre": "Switzerland",
-  "isvicre": "Switzerland",
-  "brezilya": "Brazil",
-  "arjantin": "Argentina",
-  "Çekya": "Czechia",
-  "polonya": "Poland",
-  "japonya": "Japan",
-  "çin": "China",
-  "cin": "China",
-  "avustralya": "Australia",
-  "hırvatistan": "Croatia",
-  "hirvatistan": "Croatia",
-  "sırbistan": "Serbia",
-  "sirbistan": "Serbia",
-  "romanya": "Romania",
-  "macaristan": "Hungary",
-  "ukrayna": "Ukraine",
-  "mısır": "Egypt",
-  "misir": "Egypt",
-  "fas": "Morocco",
-  "cezayir": "Algeria",
-  "kanada": "Canada",
-  "meksika": "Mexico",
-  "şili": "Chile",
-  "sili": "Chile",
-  "kolombiya": "Colombia",
-  "uruguay": "Uruguay",
-  "paraguay": "Paraguay",
-  "curaçao": "Curacao",
-  "curaca": "Curacao",
-
-  "galatasaray": "Galatasaray",
-  "fenerbahçe": "Fenerbahce",
-  "fenerbahce": "Fenerbahce",
-  "beşiktaş": "Besiktas",
-  "besiktas": "Besiktas",
-  "trabzonspor": "Trabzonspor",
-  "başakşehir": "Basaksehir",
-  "basaksehir": "Basaksehir",
-  "barcelona": "Barcelona",
-  "real madrid": "Real Madrid",
-
-  "bugün": "Today",
-  "bugun": "Today",
-  "yarın": "Tomorrow",
-  "yarin": "Tomorrow",
-  "dün": "Yesterday",
-  "dun": "Yesterday",
-  "saat": "Time",
-  "dakika": "min",
-  "saniye": "sec",
-  "bakım": "Maintenance",
-  "bakim": "Maintenance",
-  "sunucu": "Server",
-  "bağlantı": "Connection",
-  "baglanti": "Connection"
-};
-
-const dictEntries = Object.keys(translationDict)
-  .sort((a, b) => b.length - a.length)
-  .map(key => ({
-    key: key,
-    pattern: new RegExp(`(?<=[\\s\\b\\(\\[\\{:/\\-,]|^)${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=[\\s\\b\\)\\]\\}:/\\-,]|$)`, 'gi'),
-    replacement: translationDict[key]
-  }));
-
-function normalizeTurkishText(str) {
-  if (!str) return '';
-  let s = String(str);
-  return s.replace(/Ã¼/g, 'ü').replace(/Ãœ/g, 'Ü')
-          .replace(/Ã§/g, 'ç').replace(/Ã‡/g, 'Ç')
-          .replace(/ÅŸ/g, 'ş').replace(/Åž/g, 'Ş')
-          .replace(/Ä±/g, 'ı').replace(/Ä°/g, 'İ')
-          .replace(/Ã¶/g, 'ö').replace(/Ã–/g, 'Ö')
-          .replace(/ÃĞ/g, 'Ğ').replace(/Ãğ/g, 'ğ')
-          .replace(/â€™/g, "'").replace(/â€œ/g, '"').replace(/â€/g, '"')
-          .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-}
-
-function translateText(text) {
-  if (!text) return '';
-  let str = normalizeTurkishText(text);
-  
-  for (let i = 0; i < dictEntries.length; i++) {
-    const entry = dictEntries[i];
-    if (entry.pattern.test(str)) {
-      str = str.replace(entry.pattern, (match) => {
-        if (match === match.toUpperCase()) return entry.replacement.toUpperCase();
-        if (match[0] === match[0].toUpperCase()) return entry.replacement.charAt(0).toUpperCase() + entry.replacement.slice(1);
-        return entry.replacement;
-      });
-    }
-  }
-
-  return str
-    .replace(/ş/g, 's').replace(/Ş/g, 'S')
-    .replace(/ı/g, 'i').replace(/İ/g, 'I')
-    .replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
-    .replace(/ü/g, 'u').replace(/Ü/g, 'U')
-    .replace(/ö/g, 'o').replace(/Ö/g, 'O')
-    .replace(/ç/g, 'c').replace(/Ç/g, 'C');
-}
-
-let isTranslatingDOM = false;
-
-function translateNode(node) {
-  if (!node || node.nodeType !== Node.TEXT_NODE) return;
-  const parent = node.parentNode;
-  if (!parent) return;
-  
-  const parentTag = parent.tagName ? parent.tagName.toUpperCase() : '';
-  if (['SCRIPT', 'STYLE', 'IFRAME', 'INPUT', 'TEXTAREA', 'OPTION', 'SELECT', 'CODE'].includes(parentTag)) return;
-  if (parent.closest && parent.closest('[data-no-translate="true"]')) return;
-
-  const originalText = node.nodeValue;
-  if (!originalText || !originalText.trim()) return;
-
-  const normalized = normalizeTurkishText(originalText);
-  const hasTrChars = /[şŞıİğĞüÜöÖçÇÃÅÄ]/i.test(originalText);
-  const needsTrans = hasTrChars || Object.keys(translationDict).some(k => originalText.toLowerCase().includes(k));
-
-  if (needsTrans || originalText !== normalized) {
-    const translated = translateText(originalText);
-    if (translated && translated !== originalText) {
-      node.nodeValue = translated;
-    }
-  }
-}
-
-function autoTranslateDOM(rootElement = document.body) {
-  if (isTranslatingDOM || !rootElement) return;
-  isTranslatingDOM = true;
-
-  try {
-    const walker = document.createTreeWalker(
-      rootElement,
-      NodeFilter.SHOW_TEXT,
-      {
-        acceptNode: function(node) {
-          if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_SKIP;
-          const tag = node.parentNode ? node.parentNode.tagName : '';
-          if (['SCRIPT', 'STYLE', 'IFRAME', 'INPUT', 'TEXTAREA', 'OPTION', 'SELECT', 'CODE'].includes(tag)) {
-            return NodeFilter.FILTER_SKIP;
-          }
-          return NodeFilter.FILTER_ACCEPT;
-        }
-      },
-      false
-    );
-
-    let currentNode;
-    while ((currentNode = walker.nextNode())) {
-      translateNode(currentNode);
-    }
-  } catch (e) {
-  } finally {
-    isTranslatingDOM = false;
-  }
-}
-
-function initDOMTranslator() {
-  autoTranslateDOM(document.body);
-
-  const observer = new MutationObserver((mutations) => {
-    if (isTranslatingDOM) return;
-    for (let i = 0; i < mutations.length; i++) {
-      const mut = mutations[i];
-      if (mut.type === 'childList') {
-        mut.addedNodes.forEach(node => {
-          if (node.nodeType === Node.TEXT_NODE) {
-            translateNode(node);
-          } else if (node.nodeType === Node.ELEMENT_NODE) {
-            autoTranslateDOM(node);
-          }
-        });
-      } else if (mut.type === 'characterData') {
-        translateNode(mut.target);
-      }
-    }
-  });
-
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    characterData: true
-  });
-
-  setInterval(() => {
-    autoTranslateDOM(document.body);
-  }, 750);
-}
-
 function storageGet(key, fallback = null){
   try{return localStorage.getItem(key) ?? fallback}catch(e){return fallback}
 }
@@ -536,11 +216,16 @@ function storageSet(key,value){
 function safeJSON(key,fallback){
   try{const raw=storageGet(key,null);if(!raw)return fallback;const value=JSON.parse(raw);return value ?? fallback}catch(e){return fallback}
 }
-function eventKey(event,index=''){
-  const base = event && (event.id ?? event.url ?? event.title ?? '');
-  if(base!=='' && base!==null) return String(base);
-  return `${String(event?.title||'Live channel')}|${String(event?.league||'')}|${index}`;
+
+function eventKey(event, index = 0){
+  if(!event) return `ch_${index}`;
+  const id = event.id ? String(event.id).trim() : '';
+  const title = String(event.title || '').trim();
+  const league = String(event.league || '').trim();
+  const url = String(event.url || '').trim();
+  return id ? `id_${id}` : `key_${title}_${league}_${url}_${index}`;
 }
+
 function changeTheme(theme){document.body.dataset.theme=theme;storageSet('talhaTheme',theme)}
 function leagueName(event){return translateText(String(event?.league||'Other')).trim()||'Other'}
 function setStatus(text,state='ready'){
@@ -551,19 +236,75 @@ function setStatus(text,state='ready'){
 function setSync(text){const el=document.getElementById('syncText');if(el)el.textContent=text}
 function escapeHTML(value){return String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 
-function showToast(title, message) {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-  const msg = document.createElement('div');
-  msg.className = 'toast';
-  msg.innerHTML = `<strong>${escapeHTML(title)}</strong><span>${escapeHTML(message)}</span>`;
-  document.body.appendChild(msg);
-  requestAnimationFrame(() => msg.classList.add('show'));
-  setTimeout(() => {
-    msg.classList.remove('show');
-    setTimeout(() => msg.remove(), 250);
-  }, 3500);
+const translationDict = {
+  "almanya": "Germany", "fransa": "France", "paris basketball": "Paris Basketball",
+  "as monaco": "AS Monaco", "barcelona": "Barcelona", "füchse berlin": "Fuchse Berlin",
+  "fuchse berlin": "Fuchse Berlin", "curaçao": "Curacao", "curaca": "Curacao",
+  "türkiye": "Turkey", "turkiye": "Turkey", "İngiltere": "England", "ingiltere": "England",
+  "ispanya": "Spain", "italya": "Italy", "voleybol": "Volleyball", "erkekler": "Men's",
+  "kadınlar": "Women's", "kadinlar": "Women's", "milletler ligi": "Nations League",
+  "lnb pro a final": "LNB Pro A Final", "hentbol": "Handball",
+  "şampiyonlar ligi": "Champions League", "sampiyonlar ligi": "Champions League",
+  "Şampiyonlar Ligi": "Champions League", "finali": "Final", "final": "Final",
+  "hazırlık maçı": "Friendly Match", "hazirlik maci": "Friendly Match",
+  "futbol": "Football", "basketbol": "Basketball", "türkçe": "Turkish", "turkce": "Turkish",
+  "canlı": "Live", "canli": "Live", "yayın": "Broadcast", "yayini": "Broadcast",
+  "lig": "League", "ligi": "League", "kupası": "Cup", "kupasi": "Cup",
+  "avrupa": "Europe", "dünya": "World", "dunya": "World", "hazırlık": "Friendly",
+  "çeyrek final": "Quarter Final", "yarı final": "Semi Final", "derbi": "Derby"
+};
+
+function normalizeTurkishText(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/Ã¼/g, 'ü').replace(/Ã§/g, 'ç').replace(/ÅŸ/g, 'ş')
+    .replace(/Åž/g, 'Ş').replace(/Ä±/g, 'ı').replace(/Ã¶/g, 'ö')
+    .replace(/Ã„/g, 'Ä').replace(/Ã–/g, 'Ö').replace(/Ãœ/g, 'Ü')
+    .replace(/Ã‡/g, 'Ç');
 }
+
+function translateText(text) {
+  if (!text) return "";
+  let translated = normalizeTurkishText(String(text));
+  Object.keys(translationDict).forEach(word => {
+    try {
+      const regex = new RegExp('\\b' + word + '\\b', 'gi');
+      translated = translated.replace(regex, translationDict[word.toLowerCase()]);
+    } catch(e) {}
+  });
+  return translated;
+}
+
+function autoTranslateDOM(node = document.body) {
+  if (!node) return;
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null, false);
+  let textNode;
+  while ((textNode = walker.nextNode())) {
+    const parentTag = textNode.parentNode ? textNode.parentNode.tagName : '';
+    if (['SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA'].includes(parentTag)) continue;
+    const val = textNode.nodeValue;
+    if (val && val.trim().length > 0) {
+      const translated = translateText(val);
+      if (translated !== val) textNode.nodeValue = translated;
+    }
+  }
+}
+
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    mutation.addedNodes.forEach((node) => {
+      if (node.nodeType === 1) autoTranslateDOM(node);
+      else if (node.nodeType === 3) {
+        const val = node.nodeValue;
+        if (val) {
+          const tr = translateText(val);
+          if (tr !== val) node.nodeValue = tr;
+        }
+      }
+    });
+  });
+});
+observer.observe(document.body, { childList: true, subtree: true });
 
 function hideLoader(reason='Ready'){
   const loader=document.getElementById('loader');if(!loader||loader.dataset.hidden==='1')return;
@@ -606,19 +347,52 @@ bootLoader();
 
 function renderLeagueTabs(){
   const tabs=document.getElementById('leagueTabs');if(!tabs)return;
-  const counts={};liveEvents.forEach(e=>{const name=leagueName(e);counts[name]=(counts[name]||0)+1});
+  const counts={};
+  let totalFavs = 0;
+  liveEvents.forEach((e, i)=>{
+    const name=leagueName(e);
+    counts[name]=(counts[name]||0)+1;
+    if(favoriteKeys.includes(eventKey(e, i))) totalFavs++;
+  });
+  
   const priority=name=>{const n=name.toLowerCase();if(n.includes('la liga'))return 0;if(n.includes('uefa'))return 1;return 2};
-  const leagues=Object.keys(counts).sort((a,b)=>priority(a)-priority(b)||a.localeCompare(b));tabs.innerHTML='';
-  const addTab=(name,active,cb,count)=>{const b=document.createElement('button');b.className='tab-btn'+(active?' active':'');b.type='button';b.setAttribute('role','tab');b.textContent=`${name} (${count})`;b.onclick=cb;tabs.appendChild(b)};
-  addTab('All',currentLeague==='all',()=>setFilter('all'),liveEvents.length);
-  leagues.forEach(name=>addTab(name,currentLeague===name,()=>setFilter('league',name),counts[name]));
+  const leagues=Object.keys(counts).sort((a,b)=>priority(a)-priority(b)||a.localeCompare(b));
+  tabs.innerHTML='';
+  
+  const addTab=(name,active,cb,count)=>{
+    const b=document.createElement('button');
+    b.className='tab-btn'+(active?' active':'');
+    b.type='button';
+    b.setAttribute('role','tab');
+    b.textContent=`${name} (${count})`;
+    b.onclick=cb;
+    tabs.appendChild(b);
+  };
+
+  addTab('All', currentLeague==='all', ()=>setFilter('all'), liveEvents.length);
+  if(totalFavs > 0){
+    addTab('★ Favorites', currentLeague==='favorites', ()=>setFilter('favorites'), totalFavs);
+  }
+  leagues.forEach(name=>addTab(name, currentLeague===name, ()=>setFilter('league',name), counts[name]));
 }
 
 function renderRecent(){
   const section=document.getElementById('recentSection'),row=document.getElementById('recentRow');if(!section||!row)return;
   if(!recentEvents.length){section.style.display='none';return}
   section.style.display='block';row.innerHTML='';
-  recentEvents.slice(0,5).forEach(item=>{const chip=document.createElement('button');chip.className='recent-chip';chip.type='button';chip.textContent=item.title;chip.title='Play '+item.title;chip.onclick=()=>{const found=liveEvents.find((e,i)=>eventKey(e,i)===item.key);if(found)setServer(found)};row.appendChild(chip)});
+  recentEvents.slice(0,5).forEach(item=>{
+    const chip=document.createElement('button');
+    chip.className='recent-chip';
+    chip.type='button';
+    chip.textContent=translateText(item.title);
+    chip.title='Play '+item.title;
+    chip.onclick=()=>{
+      const found=liveEvents.find((e,i)=>eventKey(e,i)===item.key);
+      if(found) setServer(found);
+      else if(liveEvents.length) setServer(liveEvents[0]);
+    };
+    row.appendChild(chip);
+  });
 }
 
 function updateAnalytics(){
@@ -633,31 +407,65 @@ function updateAnalytics(){
 function renderMatches(){
   const container=document.getElementById('serverContainer');if(!container)return;
   const input=document.getElementById('searchChannels');const searchQuery=(input?.value||'').trim().toLowerCase();
-  container.innerHTML='';let visibleCount=0;
+  container.innerHTML='';
+  let visibleCount=0;
+
   liveEvents.forEach((event,index)=>{
     const englishTitle=translateText(event?.title||'Live channel');
     const englishLeague=translateText(event?.league||'');
-    if(currentLeague!=='all'&&leagueName(event)!==currentLeague)return;
-    const full=(englishTitle+' '+englishLeague).toLowerCase();if(searchQuery&&!full.includes(searchQuery))return;
-    const key=eventKey(event,index),favorite=favoriteKeys.includes(key);
-    const row=document.createElement('div');row.className='server-item';row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label','Play '+englishTitle);
+    const key=eventKey(event,index);
+    const favorite=favoriteKeys.includes(key);
+
+    if(currentLeague==='favorites' && !favorite) return;
+    if(currentLeague!=='all' && currentLeague!=='favorites' && leagueName(event)!==currentLeague) return;
+
+    const full=(englishTitle+' '+englishLeague).toLowerCase();
+    if(searchQuery && !full.includes(searchQuery)) return;
+
+    visibleCount++;
+
+    const row=document.createElement('div');
+    row.className='server-item';
+    row.tabIndex=0;
+    row.setAttribute('role','button');
+    row.setAttribute('aria-label','Play '+englishTitle);
+
     const badge=`<div class="live-badge"><div class="live-dot"></div>${escapeHTML(event?.time||'ONLINE')}</div>`;
-    row.innerHTML=`<div class="channel-main"><div class="channel-index">${String(index+1).padStart(2,'0')}</div><div class="channel-copy"><strong>${escapeHTML(englishTitle)}</strong><small>${escapeHTML(englishLeague||'Live feed')}</small></div></div><div style="display:flex;align-items:center;gap:7px">${badge}<button class="fav-toggle ${favorite?'active':''}" type="button" aria-label="${favorite?'Remove from':'Add to'} favorites" aria-pressed="${favorite}">★</button></div>`;
+    
+    row.innerHTML=`<div class="channel-main"><div class="channel-index">${String(visibleCount).padStart(2,'0')}</div><div class="channel-copy"><strong>${escapeHTML(englishTitle)}</strong><small>${escapeHTML(englishLeague||'Live feed')}</small></div></div><div style="display:flex;align-items:center;gap:7px">${badge}<button class="fav-toggle ${favorite?'active':''}" type="button" aria-label="${favorite?'Remove from':'Add to'} favorites" aria-pressed="${favorite}">★</button></div>`;
+    
     row.onclick=()=>setServer(event,row);
     row.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();setServer(event,row)}};
-    row.querySelector('.fav-toggle').onclick=ev=>{ev.stopPropagation();favoriteKeys=favorite?favoriteKeys.filter(k=>k!==key):[...favoriteKeys,key];storageSet('talhaFavorites',JSON.stringify(favoriteKeys));renderMatches();updateAnalytics()};
-    container.appendChild(row);visibleCount++;
+    
+    row.querySelector('.fav-toggle').onclick=ev=>{
+      ev.stopPropagation();
+      favoriteKeys=favorite ? favoriteKeys.filter(k=>k!==key) : [...favoriteKeys,key];
+      storageSet('talhaFavorites',JSON.stringify(favoriteKeys));
+      renderLeagueTabs();
+      renderMatches();
+      updateAnalytics();
+    };
+    container.appendChild(row);
   });
-  if(!visibleCount)container.innerHTML='<div class="empty-state">No channels match your filters.</div>';
+
+  if(!visibleCount) container.innerHTML='<div class="empty-state">No channels match your filters.</div>';
   document.getElementById('channelSummary').textContent=`${visibleCount} shown · ${liveEvents.length} total`;
   updateAnalytics();
   renderRecent();
+  autoTranslateDOM(container);
 }
 
-function setFilter(type,name='all'){currentLeague=type==='league'?name:'all';renderLeagueTabs();renderMatches()}
-function filterMatches(){renderMatches()}
-function rememberRecent(event,index=''){
-  const key=eventKey(event,index);recentEvents=[{key,title:translateText(event?.title||'Live channel')},...recentEvents.filter(x=>x.key!==key)].slice(0,5);storageSet('talhaRecent',JSON.stringify(recentEvents))
+function setFilter(type,name='all'){
+  if(type==='favorites') currentLeague='favorites';
+  else currentLeague=type==='league'?name:'all';
+  renderLeagueTabs();
+  renderMatches();
+}
+
+function rememberRecent(event,index=0){
+  const key=eventKey(event,index);
+  recentEvents=[{key,title:translateText(event?.title||'Live channel')},...recentEvents.filter(x=>x.key!==key)].slice(0,5);
+  storageSet('talhaRecent',JSON.stringify(recentEvents));
 }
 
 function setServer(event,targetBtn){
@@ -673,14 +481,19 @@ function setServer(event,targetBtn){
     }else finalUrl=raw;
   }else finalUrl=`${PLAYER_BASE_URL}?Talha=androstreamlivetrt1`;
   try{frame.src='about:blank';setTimeout(()=>{frame.src=finalUrl},20)}catch(e){frame.src=finalUrl}
-  rememberRecent(event);renderRecent();
-  document.querySelectorAll('.servers .server-item').forEach(btn=>btn.classList.remove('active'));if(targetBtn)targetBtn.classList.add('active');
+  const idx = liveEvents.indexOf(event);
+  rememberRecent(event, idx >= 0 ? idx : 0);
+  renderRecent();
+  document.querySelectorAll('.servers .server-item').forEach(btn=>btn.classList.remove('active'));
+  if(targetBtn)targetBtn.classList.add('active');
 }
+
 function triggerFirstStream(){const first=document.querySelector('.servers .server-item');if(first)first.click()}
 
 function feedError(message){
   updateAnalytics();
-  const container=document.getElementById('serverContainer');container.innerHTML=`<div class="feed-error">${escapeHTML(message)}<br><button type="button" id="retryFeedBtn">Retry Feed Sync</button></div>`;
+  const container=document.getElementById('serverContainer');
+  container.innerHTML=`<div class="feed-error">${escapeHTML(message)}<br><button type="button" id="retryFeedBtn">Retry Feed Sync</button></div>`;
   document.getElementById('retryFeedBtn').onclick=()=>loadTargetScript(true);
   setStatus('Feed sync failed','offline');
 }
@@ -688,7 +501,8 @@ function feedError(message){
 function loadTargetScript(force=false){
   if(feedBusy&&!force)return;
   feedBusy=true;setStatus('Syncing live feeds…','busy');setSync('Connecting…');
-  const container=document.getElementById('serverContainer');container.innerHTML='<p style="color:rgba(255,255,255,.4);text-align:center;font-size:13px;padding:30px">Syncing system satellite channels…</p>';
+  const container=document.getElementById('serverContainer');
+  container.innerHTML='<p style="color:rgba(255,255,255,.4);text-align:center;font-size:13px;padding:30px">Syncing system satellite channels…</p>';
   const old=document.getElementById('mahsunScript');if(old)old.remove();
   const script=document.createElement('script');script.id='mahsunScript';script.async=true;script.src=FEED_URL+'?v='+Date.now();
   let settled=false;
@@ -724,16 +538,7 @@ function login(){
     updateAnalytics();
     loadTargetScript();
   }else{
-    input.select();
-    input.animate([
-      { transform: 'translateX(0)' },
-      { transform: 'translateX(-8px)' },
-      { transform: 'translateX(8px)' },
-      { transform: 'translateX(-4px)' },
-      { transform: 'translateX(4px)' },
-      { transform: 'translateX(0)' }
-    ], { duration: 300 });
-    showToast('Access Denied', 'Incorrect passcode entered. Please check and try again.');
+    input.select();input.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:180});alert('Authentication Failure.');
   }
 }
 
@@ -742,44 +547,28 @@ function toggleTheatre(status){
   if(status){card.classList.add('theatre-active');exitBtn.style.display='block';document.documentElement.style.overflow='hidden'}
   else{card.classList.remove('theatre-active');exitBtn.style.display='none';document.documentElement.style.overflow='';}
 }
-
 function updateClock(){
   const now=new Date();
   const time=new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now);
   const clock=document.getElementById('clockText');if(clock)clock.textContent=time;
   const menuClock=document.getElementById('menuClock');if(menuClock)menuClock.textContent=time;
 }
-
 function openMenu(){
   const menu=document.getElementById('quickMenu'),backdrop=document.getElementById('menuBackdrop'),btn=document.getElementById('menuBtn');
   menu?.classList.add('open');backdrop?.classList.add('open');document.body.classList.add('menu-open');
   if(menu)menu.setAttribute('aria-hidden','false');if(btn)btn.setAttribute('aria-expanded','true');
 }
-
 function closeMenu(){
   const menu=document.getElementById('quickMenu'),backdrop=document.getElementById('menuBackdrop'),btn=document.getElementById('menuBtn');
   menu?.classList.remove('open');backdrop?.classList.remove('open');document.body.classList.remove('menu-open');
   if(menu)menu.setAttribute('aria-hidden','true');if(btn)btn.setAttribute('aria-expanded','false');
 }
-
 function scrollToChannels(){document.querySelector('.channels-panel')?.scrollIntoView({behavior:'smooth',block:'start'})}
 
 function showFavorites(){
   closeMenu();
   document.getElementById('searchChannels').value='';
-  const container=document.getElementById('serverContainer');
-  container.innerHTML='';
-  let shown=0;
-  liveEvents.forEach((event,index)=>{
-    if(!favoriteKeys.includes(eventKey(event,index)))return;
-    const row=document.createElement('div');row.className='server-item';row.tabIndex=0;
-    const title=translateText(event?.title||'Live channel'),league=translateText(event?.league||'');
-    row.innerHTML=`<div class="channel-main"><div class="channel-index">★</div><div class="channel-copy"><strong>${escapeHTML(title)}</strong><small>${escapeHTML(league||'Live feed')}</small></div></div><div class="live-badge"><div class="live-dot"></div>${escapeHTML(event?.time||'ONLINE')}</div>`;
-    row.onclick=()=>{setServer(event,row)};container.appendChild(row);shown++;
-  });
-  if(!shown)container.innerHTML='<div class="empty-state">No favorites saved yet. Tap ★ on a channel to save it.</div>';
-  document.getElementById('channelSummary').textContent=`${shown} favorites`;
-  updateAnalytics();
+  setFilter('favorites');
   scrollToChannels();
 }
 
@@ -789,12 +578,11 @@ function cycleTheme(){
   changeTheme(next);const picker=document.getElementById('themePicker');if(picker)picker.value=next;
   closeMenu();
 }
-
 function showShortcutToast(){
   closeMenu();
-  showToast('Shortcuts', '/ or Ctrl/⌘+K: Search · Ctrl/⌘+R: Sync · Esc: Close menu / Cinema');
+  const msg=document.createElement('div');msg.className='toast';msg.innerHTML='<strong>Shortcuts</strong><span>/ or Ctrl/⌘+K: Search · Ctrl/⌘+R: Sync · Esc: Close menu / Cinema</span>';
+  document.body.appendChild(msg);setTimeout(()=>msg.classList.add('show'),20);setTimeout(()=>{msg.classList.remove('show');setTimeout(()=>msg.remove(),220)},3200);
 }
-
 function toggleFocus(){
   document.body.classList.toggle('focus-mode');
   closeMenu();
@@ -802,7 +590,6 @@ function toggleFocus(){
     document.getElementById('mainCard')?.scrollIntoView({behavior:'smooth',block:'center'});
   }
 }
-
 function lockSession(){
   closeMenu();
   toggleTheatre(false);
@@ -814,7 +601,6 @@ function lockSession(){
   document.getElementById('password').value='';
   document.getElementById('password').focus();
 }
-
 function handleMenuAction(action){
   if(action==='home'){closeMenu();currentLeague='all';renderLeagueTabs();renderMatches();scrollToChannels();}
   else if(action==='favorites')showFavorites();
@@ -826,7 +612,6 @@ function handleMenuAction(action){
   else if(action==='theme')cycleTheme();
   else if(action==='shortcuts')showShortcutToast();
 }
-
 function updateNetwork(){
   const online=navigator.onLine!==false;
   setStatus(online?'System ready':'Offline mode · network unavailable',online?'ready':'offline');
@@ -863,8 +648,6 @@ window.addEventListener('keydown',e=>{
   if(e.key==='Escape'){if(document.getElementById('mainCard').classList.contains('theatre-active'))toggleTheatre(false);else closeMenu();}
   if(e.key.toLowerCase()==='r'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(!document.body.classList.contains('auth-locked'))loadTargetScript(true)}
 });
-
-initDOMTranslator();
 
 updateNetwork();
 updateClock();
