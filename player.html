@@ -751,7 +751,7 @@
             const liveEdge = range ? Math.max(0, range.end - video.currentTime) : null;
             const engine = hlsEngine ? `HLS.js ${window.Hls?.version || ''}`.trim() : 'Native HLS';
             const mode = range ? 'LIVE' : 'VOD';
-            const text = `Source: ${isDirectStream ? 'Direct HLS' : 'Channel proxy'}<br>
+            const text = `Source: ${isDirectStream ? 'Talhas Stream' : 'Talhas Stream'}<br>
 Engine: ${engine}<br>
 Mode: ${mode}<br>
 Buffer: ${bufferStats.textContent.replace('Buffer: ','')}<br>
