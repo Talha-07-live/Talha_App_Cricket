@@ -213,10 +213,10 @@
         .error-card.active { display:block; }
         .error-card h2 { font-size:16px; margin-bottom:8px; }
         .error-card p { color:rgba(255,255,255,.55); font-size:12px; line-height:1.5; margin-bottom:16px; }
-        .retry-btn { border:0; border-radius:9px; padding:10px 16px; background:linear-gradient(100deg,#7a3cff,#00bcd4); color:#fff; font-weight:800; cursor:pointer; }
+        .retry-btn { border:0; border-radius:99px; padding:10px 16px; background:linear-gradient(100deg,#7a3cff,#00bcd4); color:#fff; font-weight:800; cursor:pointer; }
         .toast { position:absolute; z-index:20; left:50%; bottom:28%; transform:translate(-50%,12px); opacity:0; pointer-events:none; padding:9px 14px; border-radius:9px; background:rgba(8,8,18,.85); color:#fff; font-size:12px; font-weight:700; transition:.25s; }
         .toast.show { opacity:1; transform:translate(-50%,0); }
-        /* Complete player skins — every visible surface adopts the selected theme. */
+
         body { --accent:#7a3cff; --accent2:#00f2fe; --accent-rgb:122,60,255; --surface:rgba(10,10,20,.95); --canvas:#020206; --live:#ff0055; }
         .player-wrapper { background:var(--canvas); }
         .player-controls { background:linear-gradient(to bottom,rgba(2,2,6,.78),transparent 27%,transparent 67%,rgba(2,2,6,.98)); }
@@ -272,7 +272,7 @@
     <div class="toast" id="toast"></div>
     <div class="diagnostics" id="diagnostics">Waiting for stream diagnostics…</div>
 
-    <video id="videoEngine" playsinline webkit-playsinline></video>
+    <video id="videoEngine" playsinline webkit-playsinline x5-playsinline></video>
 
     <div class="settings-panel" id="settingsPanel"></div>
 
@@ -290,8 +290,8 @@
             <button class="theme-swatch" data-theme="violet" aria-label="Violet theme"></button>
             <button class="theme-swatch" data-theme="rose" aria-label="Rose theme"></button>
             <button class="theme-swatch" data-theme="emerald" aria-label="Emerald theme"></button>
-<button class="theme-swatch" data-theme="gold" aria-label="Gold theme"></button>
-<button class="theme-swatch" data-theme="midnight" aria-label="Midnight theme"></button>
+            <button class="theme-swatch" data-theme="gold" aria-label="Gold theme"></button>
+            <button class="theme-swatch" data-theme="midnight" aria-label="Midnight theme"></button>
         </div>
 
         <div class="bottom-bar">
@@ -331,7 +331,6 @@
         const channelId = urlParams.get('Talha') || "androstreamlivetrt1";
         const channelName = urlParams.get('name') || urlParams.get('channel') || "Talha's Stream";
         
-        const currentDomain = window.location.origin;
         const isDirectStream = /^https?:\/\//i.test(channelId);
         const videoSrc = isDirectStream
             ? channelId
@@ -422,8 +421,24 @@
             };
         });
 
+        function tryAutoplay() {
+            if (playerPrefs.autoplay === false) {
+                showControls();
+                return;
+            }
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    video.muted = true;
+                    muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                    video.play().catch(() => {
+                        showControls();
+                    });
+                });
+            }
+        }
+
         if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-            
             const hlsConfig = {
                 maxBufferLength: 75,
                 maxMaxBufferLength: 150,
@@ -467,8 +482,7 @@
                 retryCount = 0;
                 clearError();
                 video.playbackRate = playerPrefs.speed || 1;
-                if (playerPrefs.autoplay !== false) video.play().catch(() => showControls());
-                
+                tryAutoplay();
                 setTimeout(setupQualityMenu, 1000);
             });
 
@@ -478,40 +492,6 @@
                 spinner.style.display = 'block';
                 hls.startLoad();
             });
-
-            setInterval(() => {
-                if (video.buffered.length > 0 && !isSeeking) {
-                    const currentTime = video.currentTime;
-                    let start = hls.liveSyncPosition ? hls.liveSyncPosition - 300 : 0;
-                    let end = hls.liveSyncPosition ? hls.liveSyncPosition : video.currentTime;
-                    if(start < 0) start = 0;
-                    
-                    let totalLiveWindow = end - start;
-                    let currentPosInWindow = currentTime - start;
-                    if(currentPosInWindow < 0) currentPosInWindow = 0;
-
-                    const currentPercent = totalLiveWindow > 0 ? (currentPosInWindow / totalLiveWindow) * 100 : 0;
-                    currentTimeline.style.width = Math.min(currentPercent, 100) + "%";
-                    progressThumb.style.left = Math.min(currentPercent, 100) + "%";
-
-                    let activeBufferEnd = currentTime;
-                    for (let i = 0; i < video.buffered.length; i++) {
-                        if (video.buffered.start(i) <= currentTime && video.buffered.end(i) >= currentTime) {
-                            activeBufferEnd = video.buffered.end(i);
-                        }
-                    }
-                    
-                    let bufferPosInWindow = activeBufferEnd - start;
-                    const bufferPercent = totalLiveWindow > 0 ? (bufferPosInWindow / totalLiveWindow) * 100 : 0;
-                    bufferedTimeline.style.width = Math.min(bufferPercent, 100) + "%";
-
-                    const aheadAmount = activeBufferEnd - currentTime;
-                    bufferStats.innerText = `Buffer: ${Math.round(Math.max(0, aheadAmount))}s`;
-                    timeShow.innerText = `${formatTime(currentTime)} / Talha's Stream`;
-                    const diagnosticCard = document.getElementById('diagnosticCard');
-                    if (diagnosticCard) diagnosticCard.innerHTML = `Source: ${isDirectStream ? 'Direct HLS' : 'Proxy channel'}<br>Engine: ${hlsEngine ? 'HLS.js' : 'Native'}<br>Buffer: ${Math.round(Math.max(0, aheadAmount))}s · Rate: ${video.playbackRate}x`;
-                }
-            }, 400);
 
             hls.on(Hls.Events.ERROR, (event, data) => {
                 if (data.fatal) {
@@ -532,13 +512,47 @@
             video.src = videoSrc;
             video.addEventListener('loadedmetadata', () => {
                 video.playbackRate = playerPrefs.speed || 1;
-                if (playerPrefs.autoplay !== false) video.play().catch(() => showControls());
+                tryAutoplay();
             });
             setupQualityMenu();
         } else {
             spinner.style.display = 'none';
             showError('The HLS playback engine could not be loaded. Check your internet connection and retry.');
         }
+
+        setInterval(() => {
+            if (video.buffered.length > 0 && !isSeeking) {
+                const currentTime = video.currentTime;
+                let start = (hlsEngine && hlsEngine.liveSyncPosition) ? hlsEngine.liveSyncPosition - 300 : 0;
+                let end = (hlsEngine && hlsEngine.liveSyncPosition) ? hlsEngine.liveSyncPosition : (video.duration && isFinite(video.duration) ? video.duration : video.currentTime);
+                if (start < 0) start = 0;
+                
+                let totalLiveWindow = end - start;
+                let currentPosInWindow = currentTime - start;
+                if (currentPosInWindow < 0) currentPosInWindow = 0;
+
+                const currentPercent = totalLiveWindow > 0 ? (currentPosInWindow / totalLiveWindow) * 100 : 0;
+                currentTimeline.style.width = Math.min(Math.max(currentPercent, 0), 100) + "%";
+                progressThumb.style.left = Math.min(Math.max(currentPercent, 0), 100) + "%";
+
+                let activeBufferEnd = currentTime;
+                for (let i = 0; i < video.buffered.length; i++) {
+                    if (video.buffered.start(i) <= currentTime && video.buffered.end(i) >= currentTime) {
+                        activeBufferEnd = video.buffered.end(i);
+                    }
+                }
+                
+                let bufferPosInWindow = activeBufferEnd - start;
+                const bufferPercent = totalLiveWindow > 0 ? (bufferPosInWindow / totalLiveWindow) * 100 : 0;
+                bufferedTimeline.style.width = Math.min(Math.max(bufferPercent, 0), 100) + "%";
+
+                const aheadAmount = activeBufferEnd - currentTime;
+                bufferStats.innerText = `Buffer: ${Math.round(Math.max(0, aheadAmount))}s`;
+                timeShow.innerText = `${formatTime(currentTime)} / Talha's Stream`;
+                const diagnosticCard = document.getElementById('diagnosticCard');
+                if (diagnosticCard) diagnosticCard.innerHTML = `Source: ${isDirectStream ? 'Direct HLS' : 'Proxy channel'}<br>Engine: ${hlsEngine ? 'HLS.js' : 'Native'}<br>Buffer: ${Math.round(Math.max(0, aheadAmount))}s · Rate: ${video.playbackRate}x`;
+            }
+        }, 400);
 
         retryBtn.onclick = () => {
             clearError();
@@ -664,9 +678,9 @@
             if (!clientX) return;
             
             const pos = (clientX - rect.left) / rect.width;
-            let start = hlsEngine && hlsEngine.liveSyncPosition ? hlsEngine.liveSyncPosition - 300 : 0;
-            let end = hlsEngine && hlsEngine.liveSyncPosition ? hlsEngine.liveSyncPosition : video.currentTime;
-            if(start < 0) start = 0;
+            let start = (hlsEngine && hlsEngine.liveSyncPosition) ? hlsEngine.liveSyncPosition - 300 : 0;
+            let end = (hlsEngine && hlsEngine.liveSyncPosition) ? hlsEngine.liveSyncPosition : (video.duration && isFinite(video.duration) ? video.duration : video.currentTime);
+            if (start < 0) start = 0;
             
             isSeeking = true;
             video.currentTime = start + (pos * (end - start));
@@ -675,17 +689,25 @@
 
         function goLive() {
             if (hlsEngine && hlsEngine.liveSyncPosition) {
-                video.currentTime = hlsEngine.liveSyncPosition - 120; 
+                video.currentTime = hlsEngine.liveSyncPosition; 
             } else if (video.duration && isFinite(video.duration)) {
-                video.currentTime = video.duration - 120;
+                video.currentTime = video.duration;
             }
         }
 
         function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                playerContainer.requestFullscreen().catch(() => {});
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (playerContainer.requestFullscreen) {
+                    playerContainer.requestFullscreen().catch(() => {});
+                } else if (video.webkitEnterFullscreen) {
+                    video.webkitEnterFullscreen();
+                }
             } else {
-                document.exitFullscreen().catch(() => {});
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
             }
         }
 
@@ -696,10 +718,15 @@
         }
 
         async function togglePictureInPicture() {
-            if (!document.pictureInPictureEnabled) return showToast('Picture-in-picture is not supported');
+            if (!document.pictureInPictureEnabled && !video.webkitSupportsPresentationMode) return showToast('Picture-in-picture is not supported');
             try {
-                if (document.pictureInPictureElement) await document.exitPictureInPicture();
-                else await video.requestPictureInPicture();
+                if (document.pictureInPictureElement) {
+                    await document.exitPictureInPicture();
+                } else if (video.requestPictureInPicture) {
+                    await video.requestPictureInPicture();
+                } else if (video.webkitSetPresentationMode) {
+                    video.webkitSetPresentationMode(video.webkitPresentationMode === 'picture-in-picture' ? 'inline' : 'picture-in-picture');
+                }
             } catch (error) { showToast('Picture-in-picture unavailable'); }
         }
 
@@ -750,7 +777,7 @@
         });
 
         playerContainer.addEventListener('touchend', (e) => {
-            if (e.target.closest('.control-btn') || e.target.closest('.progress-container') || e.target.closest('#midPlayBtn') || e.target.closest('#settingsPanel')) {
+            if (e.target.closest('.control-btn') || e.target.closest('.progress-container') || e.target.closest('#midPlayBtn') || e.target.closest('#settingsPanel') || e.target.closest('#themePanel')) {
                 resetControlsTimeout();
                 return;
             }
