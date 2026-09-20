@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>Talha's Event Player</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{display:flex;align-items:center;justify-content:center}
+.player{position:relative;width:100vw;height:100dvh;background:#000;overflow:hidden}
+.frame-wrap{position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center}
+iframe{width:100%;height:100%;border:0;display:block;background:#000}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(circle at center,rgba(65,30,125,.08),transparent 55%)}
+.badge{position:absolute;top:max(14px,env(safe-area-inset-top));left:max(14px,env(safe-area-inset-left));padding:7px 11px;border-radius:10px;color:#fff;background:rgba(8,8,18,.72);border:1px solid rgba(122,60,255,.42);backdrop-filter:blur(12px);font-size:11px;font-weight:800;letter-spacing:.7px;pointer-events:none}
+.live{position:absolute;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));padding:7px 10px;border-radius:9px;color:#fff;background:#ff174f;box-shadow:0 0 18px rgba(255,23,79,.38);font-size:10px;font-weight:900;letter-spacing:1px;pointer-events:none}
+.status{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:min(88vw,360px);padding:22px 18px;border-radius:18px;background:rgba(8,8,18,.9);border:1px solid rgba(122,60,255,.45);color:#fff;text-align:center;box-shadow:0 18px 60px rgba(0,0,0,.6);backdrop-filter:blur(18px);display:none;pointer-events:auto}
+.status.show{display:block}
+.status h2{font-size:17px;margin-bottom:8px}
+.status p{font-size:12px;line-height:1.55;color:rgba(255,255,255,.58);margin-bottom:15px}
+.btn{border:0;border-radius:10px;padding:10px 15px;background:linear-gradient(110deg,#7a3cff,#00cfea);color:#fff;font-size:12px;font-weight:850;cursor:pointer}
+.fullscreen-btn{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));width:42px;height:42px;border:1px solid rgba(255,255,255,.15);border-radius:12px;background:rgba(5,5,10,.65);color:#fff;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(10px);z-index:5}
+.fullscreen-btn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2}
+.spinner{width:34px;height:34px;border:3px solid rgba(255,255,255,.14);border-top-color:#00d8ff;border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:600px){.badge{font-size:10px}.live{font-size:9px}.fullscreen-btn{width:40px;height:40px}}
+@media(max-height:430px) and (orientation:landscape){.badge,.live{top:7px}.fullscreen-btn{bottom:7px}}
+</style>
+</head>
+<body>
+<div class="player" id="player">
+  <div class="frame-wrap" id="frameWrap"></div>
+  <div class="overlay">
+    <div class="badge">TALHA'S PLAYER</div>
+    <div class="live">LIVE</div>
+  </div>
+
+  <div class="status show" id="statusCard">
+    <div class="spinner" id="spinner"></div>
+    <h2 id="statusTitle">Checking stream…</h2>
+    <p id="statusText">Validating the event ID before loading the player.</p>
+    <button class="btn" id="retryBtn" style="display:none">Retry</button>
+  </div>
+
+  <button class="fullscreen-btn" id="fullscreenBtn" aria-label="Fullscreen">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+  </button>
+</div>
+
+<script>
+(() => {
+  const player = document.getElementById('player');
+  const frameWrap = document.getElementById('frameWrap');
+  const statusCard = document.getElementById('statusCard');
+  const statusTitle = document.getElementById('statusTitle');
+  const statusText = document.getElementById('statusText');
+  const spinner = document.getElementById('spinner');
+  const retryBtn = document.getElementById('retryBtn');
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+  function showStatus(title, text, canRetry = false) {
+    statusCard.classList.add('show');
+    statusTitle.textContent = title;
+    statusText.textContent = text;
+    spinner.style.display = canRetry ? 'none' : 'block';
+    retryBtn.style.display = canRetry ? 'inline-block' : 'none';
+  }
+
+  function hideStatus() {
+    statusCard.classList.remove('show');
+  }
+
+  function getChannelId() {
+    const params = new URLSearchParams(location.search);
+    return (
+      params.get('Talha') ||
+      params.get('channelId') ||
+      params.get('id') ||
+      params.get('channel') ||
+      ''
+    ).trim();
+  }
+
+  // Only allow IDs whose LAST characters are numeric.
+  // Example allowed: androstreamlivech20389023
+  // Rejected: androstreamlivech / androstreamlivech20389023abc
+  function isValidChannelId(channelId) {
+    return /^[A-Za-z0-9_-]*\d+$/.test(channelId);
+  }
+
+  function buildIframe(channelId) {
+    frameWrap.innerHTML = '';
+
+    const iframe = document.createElement('iframe');
+    iframe.title = 'Live Event Player';
+    iframe.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope';
+    iframe.setAttribute('allowfullscreen', 'true');
+    iframe.setAttribute('webkitallowfullscreen', 'true');
+    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+    iframe.loading = 'eager';
+
+    // IMPORTANT: the external player is loaded only after the trailing-number check.
+    iframe.src = 'https://mahsunsports.xyz/event.html?id=' + encodeURIComponent(channelId);
+
+    iframe.addEventListener('load', () => {
+      hideStatus();
+    }, {once:true});
+
+    frameWrap.appendChild(iframe);
+  }
+
+  function loadPlayer() {
+    const channelId = getChannelId();
+
+    if (!channelId) {
+      showStatus('No event ID found', 'Use a URL such as ?Talha=androstreamlivech20389023.', true);
+      return;
+    }
+
+    if (!isValidChannelId(channelId)) {
+      showStatus('Invalid event ID', 'The player loads only when the channel ID ends with a numeric value.', true);
+      return;
+    }
+
+    showStatus('Loading event…', 'Connecting to the event player.');
+    buildIframe(channelId);
+  }
+
+  async function toggleFullscreen() {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        return;
+      }
+      if (player.requestFullscreen) {
+        await player.requestFullscreen({navigationUI:'hide'});
+      } else if (player.webkitRequestFullscreen) {
+        player.webkitRequestFullscreen();
+      }
+    } catch (_) {
+      showStatus('Fullscreen unavailable', 'Your browser does not allow fullscreen for this player.', true);
+    }
+  }
+
+  retryBtn.addEventListener('click', loadPlayer);
+  fullscreenBtn.addEventListener('click', toggleFullscreen);
+  loadPlayer();
+})();
+</script>
+</body>
+</html>
