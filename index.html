@@ -49,14 +49,26 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
 .app-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:12px;min-width:0}.brand-mark{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));font-size:20px;box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 20%,transparent);flex:0 0 auto}.brand h1{font-size:clamp(18px,3vw,24px);letter-spacing:-.5px}.brand p{font-size:11px;color:var(--muted);margin-top:3px}.header-actions{display:flex;align-items:center;gap:8px}.theme-picker,.icon-btn{border:1px solid color-mix(in srgb,var(--accent-2) 30%,rgba(255,255,255,.12));background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.025));box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 24px rgba(0,0,0,.2);color:#fff;border-radius:12px;padding:10px 34px 10px 12px;font-size:12px;cursor:pointer;appearance:none}.theme-picker{background-image:linear-gradient(45deg,transparent 50%,var(--accent-2) 50%),linear-gradient(135deg,var(--accent-2) 50%,transparent 50%),linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.025));background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%,0 0;background-size:5px 5px,5px 5px,100% 100%;background-repeat:no-repeat}.theme-picker option{background:#17121d;color:#fff}.icon-btn{padding:10px 13px;display:grid;place-items:center;min-width:42px}.theme-picker:focus-visible,.icon-btn:focus-visible,.servers .server-item:focus-visible,.tab-btn:focus-visible,.fav-toggle:focus-visible,.search-box input:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
 .status-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;padding:8px 11px;border:1px solid rgba(255,255,255,.055);border-radius:12px;background:rgba(255,255,255,.018);font-size:10px;color:var(--muted)}.status-left,.status-right{display:flex;align-items:center;gap:7px;min-width:0}.status-dot{width:6px;height:6px;border-radius:50%;background:#00f2fe;box-shadow:0 0 9px #00f2fe;flex:0 0 auto}.status-dot.offline{background:#ff5d7a;box-shadow:0 0 9px #ff5d7a}.status-dot.busy{background:#ffd166;box-shadow:0 0 9px #ffd166}.status-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-.content-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}.player-column{min-width:0}.channels-panel{min-width:0;border:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.16);border-radius:18px;padding:14px;position:sticky;top:16px}.panel-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.panel-heading h2{font-size:14px}.panel-heading small{color:var(--muted);font-size:11px}.panel-heading-actions{display:flex;align-items:center;gap:7px}.mini-btn{border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.025);color:var(--muted);border-radius:9px;padding:6px 8px;font-size:11px;cursor:pointer}.mini-btn:hover{color:#fff;border-color:color-mix(in srgb,var(--accent-2) 35%,rgba(255,255,255,.08));background:rgba(255,255,255,.05)}
+.content-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+
+.player-column{min-width:0;position:sticky;top:15px;z-index:100;}
+
+.channels-panel{min-width:0;border:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.16);border-radius:18px;padding:14px;position:sticky;top:16px}.panel-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.panel-heading h2{font-size:14px}.panel-heading small{color:var(--muted);font-size:11px}.panel-heading-actions{display:flex;align-items:center;gap:7px}.mini-btn{border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.025);color:var(--muted);border-radius:9px;padding:6px 8px;font-size:11px;cursor:pointer}.mini-btn:hover{color:#fff;border-color:color-mix(in srgb,var(--accent-2) 35%,rgba(255,255,255,.08));background:rgba(255,255,255,.05)}
 .channel-tools{display:block;margin-bottom:10px}.channel-tools .search-box{min-width:0}.league-tabs{display:flex;gap:7px;overflow-x:auto;padding:8px 1px 7px}.league-tabs::-webkit-scrollbar{height:3px}.league-tabs::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--accent) 50%,transparent);border-radius:8px}.panel-subtitle{font-size:10px;color:var(--muted);margin:0 0 8px;text-transform:uppercase;letter-spacing:.8px}.recent-row{display:flex;gap:6px;overflow:auto;margin-bottom:10px}.recent-chip{flex:0 0 auto;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);color:var(--muted);border-radius:999px;padding:6px 9px;font-size:10px;cursor:pointer}.fav-toggle{border:0;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;padding:2px;flex:0 0 auto}.fav-toggle.active{color:#ffd166;text-shadow:0 0 10px rgba(255,209,102,.3)}
 .channel-main{display:flex;align-items:center;gap:9px;min-width:0}.channel-index{width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:rgba(255,255,255,.06);font-size:10px;color:var(--muted);flex:0 0 auto}.channel-copy{min-width:0;text-align:left}.channel-copy strong{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.channel-copy small{display:block;color:var(--muted);font-size:10px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.card.theatre-active{max-width:100%!important;width:96vw;padding:10px;background:rgba(0,0,0,.95)}.card.theatre-active .filter-bar,.card.theatre-active .servers,.card.theatre-active .analytics-panel,.card.theatre-active footer,.card.theatre-active .utility-panel,.card.theatre-active .status-strip,.card.theatre-active .maintenance-box{display:none!important}.card.theatre-active .content-grid{display:block}.card.theatre-active .player-column{width:100%}
+.card.theatre-active{max-width:100%!important;width:96vw;padding:10px;background:rgba(0,0,0,.95)}.card.theatre-active .filter-bar,.card.theatre-active .servers,.card.theatre-active .analytics-panel,.card.theatre-active footer,.card.theatre-active .utility-panel,.card.theatre-active .status-strip,.card.theatre-active .maintenance-box,.card.theatre-active .player-count-bar{display:none!important}.card.theatre-active .content-grid{display:block}.card.theatre-active .player-column{width:100%}
 
 #login{text-align:center;padding:40px 10px}.login-kicker{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}#login h2{font-size:clamp(18px,4vw,26px);margin-bottom:24px;font-weight:800;letter-spacing:.5px;background:linear-gradient(180deg,#fff 30%,rgba(255,255,255,.5) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}input[type="password"]{width:100%;max-width:380px;padding:16px 24px;border:1px solid rgba(255,255,255,.05);border-radius:16px;outline:none;background:rgba(255,255,255,.02);color:#fff;font-size:16px;text-align:center;transition:all .3s;margin-bottom:14px;-webkit-user-select:text;user-select:text}input[type="password"]:focus{border-color:#00f2fe;background:rgba(255,255,255,.05);box-shadow:0 0 30px rgba(0,242,254,.2)}#login button{width:100%;max-width:380px;padding:16px;border:none;border-radius:16px;cursor:pointer;font-size:15px;font-weight:800;letter-spacing:1.5px;transition:transform .2s ease,filter .2s ease,box-shadow .2s ease;background:linear-gradient(90deg,#7a3cff,#00f2fe);color:#fff;box-shadow:0 6px 30px rgba(122,60,255,.4)}#login button:hover{transform:translateY(-1px);filter:brightness(1.06)}#login button:active{transform:translateY(0) scale(.99)}
-.analytics-panel{display:flex;gap:12px;margin-bottom:16px}.stat-card{flex:1;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}.stat-card span{font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.5px}.stat-card font{font-size:15px;font-weight:800;color:#00f2fe}.stat-card font{color:#e04cff}
+.analytics-panel{display:flex;gap:12px;margin-bottom:16px}.stat-card{flex:1;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}.stat-card span{font-size:11px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.5px}.stat-card font{font-size:15px;font-weight:800;color:#00f2fe}
 .player-container{position:relative;width:100%;padding-top:56.25%;background:#000;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.05);box-shadow:0 25px 60px rgba(0,0,0,.7)}iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;background:#000}.theatre-active .player-container{padding-top:52%;border-radius:12px}
+
+.player-count-bar{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px;padding:9px 14px;border:1px solid rgba(255,255,255,.06);border-radius:12px;background:rgba(255,255,255,.02);font-size:11px;letter-spacing:.5px}
+.pcb-item{display:flex;align-items:center;gap:7px;color:rgba(255,255,255,.55);font-weight:700}
+.pcb-item b{color:var(--accent-2);font-weight:900;font-variant-numeric:tabular-nums}
+.pcb-live .live-dot{margin:0}
+.pcb-static b{color:#ffd166}
+@media(max-width:600px){.player-count-bar{gap:10px;padding:8px 10px;font-size:10px}}
+
 .utility-panel{display:flex;justify-content:flex-end;margin-top:8px}.util-btn{background:transparent;border:none;color:rgba(255,255,255,.4);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:color .2s}.util-btn:hover{color:#00f2fe}.theatre-exit-btn{position:fixed;top:max(15px,env(safe-area-inset-top));right:15px;z-index:10000;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:10px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.1);color:#fff;font-weight:700;cursor:pointer;display:none;font-size:12px}
 
 .filter-bar{display:flex;gap:12px;margin-top:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}.search-box{flex:1;min-width:240px}.search-box input{width:100%;padding:12px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:12px;color:#fff;font-size:13px;outline:none;transition:all .3s;-webkit-user-select:text;user-select:text}.search-box input:focus{border-color:#7a3cff;background:rgba(255,255,255,.05)}.filter-tabs{display:flex;gap:8px}.tab-btn{padding:11px 16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.5);border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}.tab-btn.active{background:color-mix(in srgb,var(--accent) 15%,transparent);border-color:var(--accent);color:#fff}
@@ -78,8 +90,54 @@ footer{text-align:center;margin-top:20px;opacity:.2;font-size:11px}.fade{animati
 .quick-menu{position:fixed;z-index:10002;top:0;right:0;width:min(390px,92vw);height:100dvh;background:linear-gradient(180deg,rgba(15,10,25,.97),rgba(4,5,10,.98));border-left:1px solid rgba(255,255,255,.08);box-shadow:-30px 0 80px rgba(0,0,0,.5);padding:22px 18px calc(18px + env(safe-area-inset-bottom));transform:translateX(105%);transition:transform .32s cubic-bezier(.22,1,.36,1);overflow:auto;overscroll-behavior:contain}.quick-menu.open{transform:translateX(0)}
 .menu-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:env(safe-area-inset-top);margin-bottom:20px}.menu-head small,.menu-section-title{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.32);font-weight:800}.menu-head h3{font-size:21px;margin-top:4px}.menu-profile{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid rgba(255,255,255,.07);background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border-radius:15px;margin-bottom:20px}.menu-avatar{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent-2));font-size:11px;font-weight:900;flex:0 0 auto}.menu-profile strong{display:block;font-size:12px}.menu-profile span:not(.premium-pill){display:block;font-size:9px;color:var(--muted);margin-top:3px}.premium-pill{margin-left:auto;font-size:8px;font-weight:900;letter-spacing:1px;padding:5px 7px;border-radius:999px;background:rgba(255,209,102,.09);border:1px solid rgba(255,209,102,.2);color:#ffd166}.menu-section-title{margin:17px 3px 8px}.menu-item{width:100%;display:flex;align-items:center;gap:11px;text-align:left;padding:11px 10px;margin:4px 0;border:1px solid transparent;background:transparent;color:#fff;border-radius:13px;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}.menu-item>span{width:31px;height:31px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.04);color:var(--accent-2);font-size:14px;flex:0 0 auto}.menu-item div{min-width:0;flex:1}.menu-item strong{display:block;font-size:11px}.menu-item small{display:block;color:rgba(255,255,255,.35);font-size:9px;margin-top:3px}.menu-item>b{font-size:17px;color:rgba(255,255,255,.2);font-weight:400}.menu-item:hover,.menu-item:active{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.06);transform:translateX(2px)}.menu-footer{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px}.menu-footer>div{padding:10px 11px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);border-radius:12px}.menu-footer span{display:block;font-size:8px;color:rgba(255,255,255,.28);letter-spacing:1px}.menu-footer strong{display:block;font-size:10px;margin-top:4px;color:#a8fff4;font-variant-numeric:tabular-nums}.toast{position:fixed;left:50%;bottom:24px;z-index:10050;transform:translate(-50%,18px);opacity:0;width:min(520px,calc(100vw - 28px));padding:12px 14px;border:1px solid rgba(255,255,255,.08);background:rgba(10,10,18,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.4);transition:all .22s ease}.toast.show{transform:translate(-50%,0);opacity:1}.toast strong{display:block;font-size:11px}.toast span{display:block;margin-top:4px;color:rgba(255,255,255,.45);font-size:9px;line-height:1.5}
 body.menu-open{overflow:hidden}.focus-mode .channels-panel,.focus-mode .status-strip,.focus-mode .analytics-panel,.focus-mode .utility-panel{display:none!important}.focus-mode .content-grid{display:block!important}.focus-mode .player-column{width:100%!important}.focus-mode .player-container{padding-top:55%!important;border-radius:18px}.focus-mode .card{max-width:1200px;width:96vw}.focus-mode .app-header{margin-bottom:10px}.menu-danger>span{color:#ff7a98}.menu-danger strong{color:#ff9aae}
-@media(max-width:600px){.status-center{display:none}.analytics-panel{display:grid;grid-template-columns:1fr 1fr;gap:8px}.analytics-panel .stat-card:first-child{grid-column:span 2}.stat-card{min-height:62px}.stat-hint{font-size:7px}.player-tools{gap:10px}.util-btn{font-size:10px}.quick-menu{width:94vw;padding-left:14px;padding-right:14px}.menu-item{padding:10px 8px}}
-@media(max-width:600px){body{padding:10px 8px;align-items:flex-start}.card{border-radius:18px;padding:14px}.app-header{align-items:flex-start}.header-actions{flex-wrap:wrap;justify-content:flex-end}.brand-mark{width:34px;height:34px}.brand h1{font-size:17px}.brand p{max-width:180px}.theme-picker{max-width:100px}.content-grid{display:flex;flex-direction:column;gap:12px}.channels-panel{width:100%;position:static;order:2;padding:11px}.player-column{width:100%;order:1}.channel-tools .search-box{min-width:0}.analytics-panel{margin-bottom:10px;gap:8px}.stat-card{flex:1;min-width:0;padding:10px}.stat-card span{font-size:9px}.stat-card font{font-size:14px}.player-container{border-radius:12px}.utility-panel{margin-top:6px}.card.theatre-active .channels-panel{display:none!important}.status-strip{font-size:9px}.status-right{max-width:48%}.panel-heading h2{font-size:13px}}
+
+@media(max-width:600px){
+    body{padding:10px 8px;align-items:flex-start}
+    .card{border-radius:18px;padding:14px}
+    .app-header{align-items:flex-start}
+    .header-actions{flex-wrap:wrap;justify-content:flex-end}
+    .brand-mark{width:34px;height:34px}
+    .brand h1{font-size:17px}
+    .brand p{max-width:180px}
+    .theme-picker{max-width:100px}
+    .content-grid{display:flex;flex-direction:column;gap:12px}
+
+    .player-column {
+        width: 100%;
+        order: 1;
+        position: sticky;
+        top: -10px;
+        z-index: 100;
+        background: var(--panel);
+        padding: 10px;
+        margin: -4px -10px 10px -10px;
+        border-radius: 18px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+    .channels-panel{width:100%;position:static;order:2;padding:11px}
+    .channel-tools .search-box{min-width:0}
+    .analytics-panel{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+    .analytics-panel .stat-card:first-child{grid-column:span 2}
+    .stat-card{flex:1;min-width:0;padding:10px;min-height:62px}
+    .stat-card span{font-size:9px}
+    .stat-card font{font-size:14px}
+    .stat-hint{font-size:7px}
+    .player-container{border-radius:12px}
+    .utility-panel{margin-top:6px}
+    .card.theatre-active .channels-panel{display:none!important}
+    .status-strip{font-size:9px}
+    .status-right{max-width:48%}
+    .status-center{display:none}
+    .panel-heading h2{font-size:13px}
+    .player-tools{gap:10px}
+    .util-btn{font-size:10px}
+    .quick-menu{width:94vw;padding-left:14px;padding-right:14px}
+    .menu-item{padding:10px 8px}
+}
 </style>
 </head>
 
@@ -133,6 +191,12 @@ body.menu-open{overflow:hidden}.focus-mode .channels-panel,.focus-mode .status-s
           <div class="stat-card"><span>FAVORITES</span><font id="countFavorites">00</font><small class="stat-hint">saved by you</small></div>
           <div class="stat-card"><span>RECENT</span><font id="countRecent">00</font><small class="stat-hint">last watched</small></div>
         </div>
+
+        <div class="player-count-bar" id="playerCountBar">
+          <span class="pcb-item pcb-live"><span class="live-dot"></span>Live: <b id="pcbLive">00</b></span>
+          <span class="pcb-item pcb-static">📺 24/7: <b id="pcbStatic">00</b></span>
+        </div>
+
         <div class="player-container">
           <iframe id="frame" src="about:blank" loading="eager" scrolling="no" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen; geolocation; web-share; speaker-selection; screen-wake-lock; idle-detection" allowfullscreen></iframe>
         </div>
@@ -155,7 +219,13 @@ body.menu-open{overflow:hidden}.focus-mode .channels-panel,.focus-mode .status-s
           <div class="league-tabs" id="leagueTabs" role="tablist"></div>
         </div>
         <div id="recentSection" style="display:none"><p class="panel-subtitle">Recently watched</p><div class="recent-row" id="recentRow"></div></div>
+
         <div class="servers" id="serverContainer" aria-live="polite"></div>
+
+        <div id="staticSectionWrap" style="margin-top: 18px;">
+          <p class="panel-subtitle">24/7 Channels (<span id="staticChannelCount">0</span>)</p>
+          <div class="servers" id="staticServerContainer"></div>
+        </div>
       </aside>
     </div>
   </div>
@@ -208,6 +278,62 @@ const FEED_URL = "https://mahsunsports39.xyz/script4.js";
 const FEED_TIMEOUT = 12000;
 const SEARCH_DELAY = 80;
 
+const STATIC_CHANNELS = [
+    { title: "BeIN Sports 1", url: "/event.html?id=androstreamlivebs1" },
+    { title: "BeIN Sports 2", url: "/event.html?id=androstreamlivebs2" },
+    { title: "BeIN Sports 3", url: "/event.html?id=androstreamlivebs3" },
+    { title: "BeIN Sports 4", url: "/event.html?id=androstreamlivebs4" },
+    { title: "BeIN Sports 5", url: "/event.html?id=androstreamlivebs5" },
+    { title: "BeIN Sports Max 1", url: "/event.html?id=androstreamlivebsm1" },
+    { title: "BeIN Sports Max 2", url: "/event.html?id=androstreamlivebsm2" },
+    { title: "S Sport", url: "/event.html?id=androstreamlivess1" },
+    { title: "S Sport 2", url: "/event.html?id=androstreamlivess2" },
+    { title: "S Sport Plus", url: "/event.html?id=androstreamlivessplus1" },
+    { title: "Tivibu Spor", url: "/event.html?id=androstreamlivets" },
+    { title: "Tivibu Spor 1", url: "/event.html?id=androstreamlivets1" },
+    { title: "Tivibu Spor 2", url: "/event.html?id=androstreamlivets2" },
+    { title: "Tivibu Spor 3", url: "/event.html?id=androstreamlivets3" },
+    { title: "Tivibu Spor 4", url: "/event.html?id=androstreamlivets4" },
+    { title: "Smart Spor 1", url: "/event.html?id=androstreamlivesm1" },
+    { title: "Smart Spor 2", url: "/event.html?id=androstreamlivesm2" },
+    { title: "Euro Sport 1", url: "/event.html?id=androstreamlivees1" },
+    { title: "Euro Sport 2", url: "/event.html?id=androstreamlivees2" },
+    { title: "iDMAN Tv", url: "/event.html?id=androstreamliveidm" },
+    { title: "Trt 1", url: "/event.html?id=androstreamlivetrt1" },
+    { title: "Trt Spor", url: "/event.html?id=androstreamlivetrts" },
+    { title: "Trt Spor Yıldız", url: "/event.html?id=androstreamlivetrtsy" },
+    { title: "Atv", url: "/event.html?id=androstreamliveatv" },
+    { title: "A Spor", url: "/event.html?id=androstreamliveas" },
+    { title: "A2", url: "/event.html?id=androstreamlivea2" },
+    { title: "Tjk Tv", url: "/event.html?id=androstreamlivetjk" },
+    { title: "Ht Spor", url: "/event.html?id=androstreamliveht" },
+    { title: "Nba Tv", url: "/event.html?id=androstreamlivenba" },
+    { title: "Tv8", url: "/event.html?id=androstreamlivetv8" },
+    { title: "Tv8,5", url: "/event.html?id=androstreamlivetv85" },
+    { title: "Tabi Spor", url: "/event.html?id=androstreamlivetb" },
+    { title: "Tabi Spor 1", url: "/event.html?id=androstreamlivetb1" },
+    { title: "Tabi Spor 2", url: "/event.html?id=androstreamlivetb2" },
+    { title: "Tabi Spor 3", url: "/event.html?id=androstreamlivetb3" },
+    { title: "Tabi Spor 4", url: "/event.html?id=androstreamlivetb4" },
+    { title: "Tabi Spor 5", url: "/event.html?id=androstreamlivetb5" },
+    { title: "Tabi Spor 6", url: "/event.html?id=androstreamlivetb6" },
+    { title: "Tabi Spor 7", url: "/event.html?id=androstreamlivetb7" },
+    { title: "Tabi Spor 8", url: "/event.html?id=androstreamlivetb8" },
+    { title: "Fb Tv", url: "/event.html?id=androstreamlivefb" },
+    { title: "Cbc Sport", url: "/event.html?id=androstreamlivecbcs" },
+    { title: "Gs Tv", url: "/event.html?id=androstreamlivegs" },
+    { title: "Sports Tv", url: "/event.html?id=androstreamlivesptstv" },
+    { title: "Exxen Tv", url: "/event.html?id=androstreamliveexn" },
+    { title: "Exxen Sports 1", url: "/event.html?id=androstreamliveexn1" },
+    { title: "Exxen Sports 2", url: "/event.html?id=androstreamliveexn2" },
+    { title: "Exxen Sports 3", url: "/event.html?id=androstreamliveexn3" },
+    { title: "Exxen Sports 4", url: "/event.html?id=androstreamliveexn4" },
+    { title: "Exxen Sports 5", url: "/event.html?id=androstreamliveexn5" },
+    { title: "Exxen Sports 6", url: "/event.html?id=androstreamliveexn6" },
+    { title: "Exxen Sports 7", url: "/event.html?id=androstreamliveexn7" },
+    { title: "Exxen Sports 8", url: "/event.html?id=androstreamliveexn8" }
+];
+
 let liveEvents = [];
 let currentLeague = 'all';
 let favoriteKeys = safeJSON('talhaFavorites', []);
@@ -215,187 +341,7 @@ let recentEvents = safeJSON('talhaRecent', []);
 let feedBusy = false;
 let feedRequestToken = 0;
 
-const translationDict = {
-  "motor sporları": "Motorsports",
-  "motor sporlari": "Motorsports",
-  "hazırlık maçı": "Friendly Match",
-  "hazirlik maci": "Friendly Match",
-  "paris basketball": "Paris Basketball",
-  "şampiyonlar ligi": "Champions League",
-  "sampiyonlar ligi": "Champions League",
-  "avrupa ligi": "Europa League",
-  "konferans ligi": "Conference League",
-  "milletler ligi": "Nations League",
-  "dünya kupası": "World Cup",
-  "dunya kupasi": "World Cup",
-  "avrupa şampiyonası": "European Championship",
-  "avrupa sampiyonasi": "European Championship",
-  "süper lig": "Super League",
-  "super lig": "Super League",
-  "1. lig": "1st Division",
-  "2. lig": "2nd Division",
-  "füchse berlin": "Fuchse Berlin",
-  "fuchse berlin": "Fuchse Berlin",
-  "as monaco": "AS Monaco",
-  "lnb pro a final": "LNB Pro A Final",
-  "masa tenisi": "Table Tennis",
-  "amerikan futbolu": "American Football",
-  "buz hokeyi": "Ice Hockey",
-  "at yarışı": "Horse Racing",
-  "at yarisi": "Horse Racing",
-  "su topu": "Water Polo",
-  "maç özeti": "Match Highlights",
-  "mac ozeti": "Match Highlights",
-  "suudi arabistan": "Saudi Arabia",
-  "güney kore": "South Korea",
-  "guney kore": "South Korea",
-  "çeyrek final": "Quarter-Final",
-  "ceyrek final": "Quarter-Final",
-  "yarı final": "Semi-Final",
-  "yari final": "Semi-Final",
-  "grup maçı": "Group Stage",
-  "grup maci": "Group Stage",
-  "hafta sonu": "Weekend",
-  "hafta içi": "Weekday",
-  "hafta ici": "Weekday",
-  
-  "voleybol": "Volleyball",
-  "basketbol": "Basketball",
-  "futbol": "Football",
-  "hentbol": "Handball",
-  "tenis": "Tennis",
-  "dövüş": "Fighting",
-  "dovus": "Fighting",
-  "bisiklet": "Cycling",
-  "yüzme": "Swimming",
-  "yuzme": "Swimming",
-  "boks": "Boxing",
-  "güreş": "Wrestling",
-  "gures": "Wrestling",
-  "futsal": "Futsal",
-  "espor": "E-Sports",
-  "e-spor": "E-Sports",
-  
-  "erkekler": "Men's",
-  "kadınlar": "Women's",
-  "kadinlar": "Women's",
-  "erkek": "Men",
-  "kadın": "Women",
-  "kadin": "Women",
-  "gençler": "Youth",
-  "gencler": "Youth",
-  
-  "hazırlık": "Friendly",
-  "hazirlik": "Friendly",
-  "canlı": "LIVE",
-  "canli": "LIVE",
-  "yayın": "Broadcast",
-  "yayin": "Broadcast",
-  "yayında": "On Air",
-  "yayinda": "On Air",
-  "finali": "Final",
-  "final": "Final",
-  "kupa": "Cup",
-  "kupası": "Cup",
-  "kupasi": "Cup",
-  "eleme": "Qualifier",
-  "elemeleri": "Qualifiers",
-  "özet": "Highlights",
-  "ozet": "Highlights",
-  "maçı": "Match",
-  "maci": "Match",
-  "maç": "Match",
-  "mac": "Match",
-  "takımı": "Team",
-  "takimi": "Team",
-  "hafta": "Week",
-  "tur": "Round",
-  "etap": "Stage",
-  "devre": "Half",
-  "uzatmalar": "Extra Time",
-  "penaltılar": "Penalties",
-  "penaltilar": "Penalties",
-  "ertelendi": "Postponed",
-  "iptal": "Canceled",
-  
-  "türkiye": "Turkey",
-  "turkiye": "Turkey",
-  "türk": "Turkish",
-  "turk": "Turkish",
-  "İngiltere": "England",
-  "ingiltere": "England",
-  "ispanya": "Spain",
-  "italya": "Italy",
-  "almanya": "Germany",
-  "fransa": "France",
-  "hollanda": "Netherlands",
-  "portekiz": "Portugal",
-  "rusya": "Russia",
-  "yunanistan": "Greece",
-  "belçika": "Belgium",
-  "belcika": "Belgium",
-  "avusturya": "Austria",
-  "danimarka": "Denmark",
-  "İsveç": "Sweden",
-  "isvec": "Sweden",
-  "İsviçre": "Switzerland",
-  "isvicre": "Switzerland",
-  "brezilya": "Brazil",
-  "arjantin": "Argentina",
-  "Çekya": "Czechia",
-  "polonya": "Poland",
-  "japonya": "Japan",
-  "çin": "China",
-  "cin": "China",
-  "avustralya": "Australia",
-  "hırvatistan": "Croatia",
-  "hirvatistan": "Croatia",
-  "sırbistan": "Serbia",
-  "sirbistan": "Serbia",
-  "romanya": "Romania",
-  "macaristan": "Hungary",
-  "ukrayna": "Ukraine",
-  "mısır": "Egypt",
-  "misir": "Egypt",
-  "fas": "Morocco",
-  "cezayir": "Algeria",
-  "kanada": "Canada",
-  "meksika": "Mexico",
-  "şili": "Chile",
-  "sili": "Chile",
-  "kolombiya": "Colombia",
-  "uruguay": "Uruguay",
-  "paraguay": "Paraguay",
-  "curaçao": "Curacao",
-  "curaca": "Curacao",
-
-  "galatasaray": "Galatasaray",
-  "fenerbahçe": "Fenerbahce",
-  "fenerbahce": "Fenerbahce",
-  "beşiktaş": "Besiktas",
-  "besiktas": "Besiktas",
-  "trabzonspor": "Trabzonspor",
-  "başakşehir": "Basaksehir",
-  "basaksehir": "Basaksehir",
-  "barcelona": "Barcelona",
-  "real madrid": "Real Madrid",
-
-  "bugün": "Today",
-  "bugun": "Today",
-  "yarın": "Tomorrow",
-  "yarin": "Tomorrow",
-  "dün": "Yesterday",
-  "dun": "Yesterday",
-  "saat": "Time",
-  "dakika": "min",
-  "saniye": "sec",
-  "bakım": "Maintenance",
-  "bakim": "Maintenance",
-  "sunucu": "Server",
-  "bağlantı": "Connection",
-  "baglanti": "Connection",
-  "yedek": "Backup"
-};
+const translationDict = {"motor sporları":"Motorsports","motor sporlari":"Motorsports","hazırlık maçı":"Friendly Match","hazirlik maci":"Friendly Match","paris basketball":"Paris Basketball","şampiyonlar ligi":"Champions League","sampiyonlar ligi":"Champions League","avrupa ligi":"Europa League","konferans ligi":"Conference League","milletler ligi":"Nations League","dünya kupası":"World Cup","dunya kupasi":"World Cup","avrupa şampiyonası":"European Championship","avrupa sampiyonasi":"European Championship","süper lig":"Super League","super lig":"Super League","1. lig":"1st Division","2. lig":"2nd Division","füchse berlin":"Fuchse Berlin","fuchse berlin":"Fuchse Berlin","as monaco":"AS Monaco","lnb pro a final":"LNB Pro A Final","masa tenisi":"Table Tennis","amerikan futbolu":"American Football","buz hokeyi":"Ice Hockey","at yarışı":"Horse Racing","at yarisi":"Horse Racing","su topu":"Water Polo","maç özeti":"Match Highlights","mac ozeti":"Match Highlights","suudi arabistan":"Saudi Arabia","güney kore":"South Korea","guney kore":"South Korea","çeyrek final":"Quarter-Final","ceyrek final":"Quarter-Final","yarı final":"Semi-Final","yari final":"Semi-Final","grup maçı":"Group Stage","grup maci":"Group Stage","hafta sonu":"Weekend","hafta içi":"Weekday","hafta ici":"Weekday","voleybol":"Volleyball","basketbol":"Basketball","futbol":"Football","hentbol":"Handball","tenis":"Tennis","dövüş":"Fighting","dovus":"Fighting","bisiklet":"Cycling","yüzme":"Swimming","yuzme":"Swimming","boks":"Boxing","güreş":"Wrestling","gures":"Wrestling","futsal":"Futsal","espor":"E-Sports","e-spor":"E-Sports","erkekler":"Men's","kadınlar":"Women's","kadinlar":"Women's","erkek":"Men","kadın":"Women","kadin":"Women","gençler":"Youth","gencler":"Youth","hazırlık":"Friendly","hazirlik":"Friendly","canlı":"LIVE","canli":"LIVE","yayın":"Broadcast","yayin":"Broadcast","yayında":"On Air","yayinda":"On Air","finali":"Final","final":"Final","kupa":"Cup","kupası":"Cup","kupasi":"Cup","eleme":"Qualifier","elemeleri":"Qualifiers","özet":"Highlights","ozet":"Highlights","maçı":"Match","maci":"Match","maç":"Match","mac":"Match","takımı":"Team","takimi":"Team","hafta":"Week","tur":"Round","etap":"Stage","devre":"Half","uzatmalar":"Extra Time","penaltılar":"Penalties","penaltilar":"Penalties","ertelendi":"Postponed","iptal":"Canceled","türkiye":"Turkey","turkiye":"Turkey","türk":"Turkish","turk":"Turkish","İngiltere":"England","ingiltere":"England","ispanya":"Spain","italya":"Italy","almanya":"Germany","fransa":"France","hollanda":"Netherlands","portekiz":"Portugal","rusya":"Russia","yunanistan":"Greece","belçika":"Belgium","belcika":"Belgium","avusturya":"Austria","danimarka":"Denmark","İsveç":"Sweden","isvec":"Sweden","İsviçre":"Switzerland","isvicre":"Switzerland","brezilya":"Brazil","arjantin":"Argentina","Çekya":"Czechia","polonya":"Poland","japonya":"Japan","çin":"China","cin":"China","avustralya":"Australia","hırvatistan":"Croatia","hirvatistan":"Croatia","sırbistan":"Serbia","sirbistan":"Serbia","romanya":"Romania","macaristan":"Hungary","ukrayna":"Ukraine","mısır":"Egypt","misir":"Egypt","fas":"Morocco","cezayir":"Algeria","kanada":"Canada","meksika":"Mexico","şili":"Chile","sili":"Chile","kolombiya":"Colombia","uruguay":"Uruguay","paraguay":"Paraguay","curaçao":"Curacao","curaca":"Curacao","galatasaray":"Galatasaray","fenerbahçe":"Fenerbahce","fenerbahce":"Fenerbahce","beşiktaş":"Besiktas","besiktas":"Besiktas","trabzonspor":"Trabzonspor","başakşehir":"Basaksehir","basaksehir":"Basaksehir","barcelona":"Barcelona","real madrid":"Real Madrid","bugün":"Today","bugun":"Today","yarın":"Tomorrow","yarin":"Tomorrow","dün":"Yesterday","dun":"Yesterday","saat":"Time","dakika":"min","saniye":"sec","bakım":"Maintenance","bakim":"Maintenance","sunucu":"Server","bağlantı":"Connection","baglanti":"Connection","yedek":"Backup"};
 
 const dictEntries = Object.keys(translationDict)
   .sort((a, b) => b.length - a.length)
@@ -421,7 +367,7 @@ function normalizeTurkishText(str) {
 function translateText(text) {
   if (!text) return '';
   let str = normalizeTurkishText(text);
-  
+
   for (let i = 0; i < dictEntries.length; i++) {
     const entry = dictEntries[i];
     if (entry.pattern.test(str)) {
@@ -448,7 +394,7 @@ function translateNode(node) {
   if (!node || node.nodeType !== Node.TEXT_NODE) return;
   const parent = node.parentNode;
   if (!parent) return;
-  
+
   const parentTag = parent.tagName ? parent.tagName.toUpperCase() : '';
   if (['SCRIPT', 'STYLE', 'IFRAME', 'INPUT', 'TEXTAREA', 'OPTION', 'SELECT', 'CODE'].includes(parentTag)) return;
   if (parent.closest && parent.closest('[data-no-translate="true"]')) return;
@@ -692,6 +638,10 @@ function renderRecent(){
     chip.onclick=()=>{
       const found=liveEvents.find((e,i)=>eventKey(e,i)===item.key);
       if(found)setServer(found);
+      else{
+        const staticFound=STATIC_CHANNELS.find((e,i)=>eventKey(e,i)===item.key);
+        if(staticFound)setServer(staticFound);
+      }
     };
     row.appendChild(chip);
   });
@@ -704,6 +654,11 @@ function updateAnalytics(){
   document.getElementById('countTotal').textContent=String(total).padStart(2,'0');
   document.getElementById('countFavorites').textContent=String(favorites).padStart(2,'0');
   document.getElementById('countRecent').textContent=String(recentCount).padStart(2,'0');
+
+  const pcbLive=document.getElementById('pcbLive');
+  const pcbStatic=document.getElementById('pcbStatic');
+  if(pcbLive)pcbLive.textContent=String(total).padStart(2,'0');
+  if(pcbStatic)pcbStatic.textContent=String(STATIC_CHANNELS.length).padStart(2,'0');
 }
 
 function renderMatches(){
@@ -730,6 +685,7 @@ function renderMatches(){
   document.getElementById('channelSummary').textContent=`${visibleCount} shown · ${liveEvents.length} total`;
   updateAnalytics();
   renderRecent();
+  renderStaticChannels();
 }
 
 function setFilter(type,name='all'){currentLeague=type==='league'?name:'all';renderLeagueTabs();renderMatches()}
@@ -776,17 +732,30 @@ function setServer(event,targetBtn){
   const eventIndex=liveEvents.indexOf(event);
   rememberRecent(event,eventIndex);
   renderRecent();
+
   document.querySelectorAll('.servers .server-item').forEach(btn=>btn.classList.remove('active'));
   if(targetBtn)targetBtn.classList.add('active');
 }
 
-function triggerFirstStream(){const first=document.querySelector('.servers .server-item');if(first)first.click()}
+function triggerFirstStream(){
+  if((!liveEvents||liveEvents.length===0)&&(Array.isArray(recentEvents)&&recentEvents.length===0)){
+    if(STATIC_CHANNELS.length>0){
+      const firstStaticRow=document.querySelector('#staticServerContainer .server-item');
+      setServer(STATIC_CHANNELS[0],firstStaticRow);
+      return;
+    }
+  }
+  const first=document.querySelector('.servers .server-item');
+  if(first)first.click();
+}
 
 function feedError(message){
   updateAnalytics();
-  const container=document.getElementById('serverContainer');container.innerHTML=`<div class="feed-error">${escapeHTML(message)}<br><button type="button" id="retryFeedBtn">Retry Feed Sync</button></div>`;
+  const container=document.getElementById('serverContainer');
+  container.innerHTML=`<div class="feed-error">${escapeHTML(message)}<br><button type="button" id="retryFeedBtn">Retry Feed Sync</button></div>`;
   document.getElementById('retryFeedBtn').onclick=()=>loadTargetScript(true);
-  setStatus('Feed sync failed','offline');
+  setStatus('Feed sync failed · 24/7 available below','offline');
+  triggerFirstStream();
 }
 
 function loadTargetScript(force=false){
@@ -843,6 +812,7 @@ function loadTargetScript(force=false){
       setStatus(navigator.onLine===false?'Offline mode · cached UI':'System ready','ready');
       setSync(`Synced ${new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit'}).format(new Date())}`);
       if(liveEvents.length)triggerFirstStream();
+      else triggerFirstStream();
     }catch(err){
       feedError('Feed data could not be processed.');
     }
@@ -853,7 +823,7 @@ function loadTargetScript(force=false){
 
 function login(){
   const input = document.getElementById('password');
-  const pass  = input.value;
+  const pass = input.value;
 
   let chosenPlayer = PLAYER_BASE_URL;
   if (pass === ALT_PASSWORD) {
@@ -923,6 +893,14 @@ function showFavorites(){
     const row=document.createElement('div');row.className='server-item';row.tabIndex=0;row.setAttribute('role','button');
     const title=translateText(event?.title||'Live channel'),league=translateText(event?.league||'');
     row.innerHTML=`<div class="channel-main"><div class="channel-index">${String(shown).padStart(2,'0')}</div><div class="channel-copy"><strong>${escapeHTML(title)}</strong><small>${escapeHTML(league||'Live feed')}</small></div></div><div class="live-badge"><div class="live-dot"></div>${escapeHTML(event?.time||'ONLINE')}</div>`;
+    row.onclick=()=>{setServer(event,row)};container.appendChild(row);
+  });
+  STATIC_CHANNELS.forEach((event,index)=>{
+    if(!favoriteKeys.includes(eventKey(event,index)))return;
+    shown++;
+    const row=document.createElement('div');row.className='server-item';row.tabIndex=0;row.setAttribute('role','button');
+    const title=translateText(event?.title||'Live channel');
+    row.innerHTML=`<div class="channel-main"><div class="channel-index">${String(shown).padStart(2,'0')}</div><div class="channel-copy"><strong>${escapeHTML(title)}</strong><small>24/7 Network</small></div></div><div class="live-badge"><div class="live-dot"></div>24/7</div>`;
     row.onclick=()=>{setServer(event,row)};container.appendChild(row);
   });
   if(!shown)container.innerHTML='<div class="empty-state">No favorites saved yet. Tap ★ on a channel to save it.</div>';
@@ -1013,6 +991,35 @@ window.addEventListener('keydown',e=>{
 });
 
 initDOMTranslator();
+
+function renderStaticChannels() {
+    const container = document.getElementById('staticServerContainer');
+    if(!container) return;
+    container.innerHTML = '';
+
+    const countEl = document.getElementById('staticChannelCount');
+    if(countEl) countEl.textContent = String(STATIC_CHANNELS.length);
+
+    let startIndex = liveEvents.length;
+
+    STATIC_CHANNELS.forEach((event, index) => {
+        const row = document.createElement('div');
+        row.className = 'server-item';
+        row.tabIndex = 0;
+        row.setAttribute('role', 'button');
+        row.setAttribute('aria-label', 'Play ' + event.title);
+
+        const channelNumber = startIndex + index + 1;
+
+        row.innerHTML = `<div class="channel-main"><div class="channel-index">${String(channelNumber).padStart(2,'0')}</div><div class="channel-copy"><strong>${escapeHTML(event.title)}</strong><small>24/7 Network</small></div></div><div class="live-badge"><div class="live-dot"></div>24/7</div>`;
+
+        row.onclick = () => setServer(event, row);
+        row.onkeydown = ev => { if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();setServer(event, row)} };
+
+        container.appendChild(row);
+    });
+}
+renderStaticChannels();
 
 updateNetwork();
 updateClock();
