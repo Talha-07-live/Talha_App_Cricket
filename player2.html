@@ -3,37 +3,161 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<title>Talha's Event Player</title>
+<title>Talha's Ultra Player 🔒 v3</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overscroll-behavior:none;user-select:none}
 body{display:flex;align-items:center;justify-content:center}
 .player{position:relative;width:100vw;height:100dvh;background:#000;overflow:hidden}
-.frame-wrap{position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center}
-iframe{width:100%;height:100%;border:0;display:block;background:#000}
-.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;background:radial-gradient(circle at center,rgba(65,30,125,.08),transparent 55%)}
-.badge{position:absolute;top:max(14px,env(safe-area-inset-top));left:max(14px,env(safe-area-inset-left));padding:7px 11px;border-radius:10px;color:#fff;background:rgba(8,8,18,.72);border:1px solid rgba(122,60,255,.42);backdrop-filter:blur(12px);font-size:11px;font-weight:800;letter-spacing:.7px;pointer-events:none}
-.live{position:absolute;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));padding:7px 10px;border-radius:9px;color:#fff;background:#ff174f;box-shadow:0 0 18px rgba(255,23,79,.38);font-size:10px;font-weight:900;letter-spacing:1px;pointer-events:none}
-.status{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:min(88vw,360px);padding:22px 18px;border-radius:18px;background:rgba(8,8,18,.9);border:1px solid rgba(122,60,255,.45);color:#fff;text-align:center;box-shadow:0 18px 60px rgba(0,0,0,.6);backdrop-filter:blur(18px);display:none;pointer-events:auto}
-.status.show{display:block}
+
+.frame-wrap{position:absolute;inset:0;background:#000;transition:transform .3s}
+.frame-wrap iframe{width:100%;height:100%;border:0;display:block;background:#000}
+
+/* ✅ NO GLASS — clicks pass through to the video (native player works!) */
+
+.overlay{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at center,rgba(65,30,125,.06),transparent 60%)}
+.badge{position:absolute;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));
+  padding:7px 12px;border-radius:10px;color:#fff;background:rgba(8,8,18,.7);
+  border:1px solid rgba(122,60,255,.4);backdrop-filter:blur(14px);
+  font-size:11px;font-weight:800;letter-spacing:.8px;pointer-events:none;
+  display:flex;align-items:center;gap:6px;z-index:6}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 8px #00e676;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.lockchip{position:absolute;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));
+  padding:7px 11px;border-radius:9px;color:#fff;background:#ff174f;
+  box-shadow:0 0 18px rgba(255,23,79,.4);font-size:10px;font-weight:900;letter-spacing:1.2px;pointer-events:none;z-index:6}
+
+/* 🛡 SIDE GUARDS: screen er bam/dan edge e click korle block (ad zone),
+   center tap player e jay */
+.guard{position:absolute;top:0;bottom:0;width:14%;z-index:6;pointer-events:auto}
+.guard.left{left:0}
+.guard.right{right:0}
+
+/* top guard: uporer banner/ad zone block */
+.guard.top{top:0;left:0;right:0;height:13%;width:auto}
+
+.status{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:min(88vw,380px);
+  padding:26px 20px;border-radius:20px;background:rgba(10,10,22,.92);
+  border:1px solid rgba(122,60,255,.45);color:#fff;text-align:center;
+  box-shadow:0 18px 60px rgba(0,0,0,.7);backdrop-filter:blur(18px);display:none;pointer-events:auto;z-index:40}
+.status.show{display:block;animation:pop .3s ease}
+@keyframes pop{from{transform:translate(-50%,-50%) scale(.9);opacity:0}}
 .status h2{font-size:17px;margin-bottom:8px}
-.status p{font-size:12px;line-height:1.55;color:rgba(255,255,255,.58);margin-bottom:15px}
-.btn{border:0;border-radius:10px;padding:10px 15px;background:linear-gradient(110deg,#7a3cff,#00cfea);color:#fff;font-size:12px;font-weight:850;cursor:pointer}
-.fullscreen-btn{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));width:42px;height:42px;border:1px solid rgba(255,255,255,.15);border-radius:12px;background:rgba(5,5,10,.65);color:#fff;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(10px);z-index:5}
-.fullscreen-btn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2}
+.status p{font-size:12px;line-height:1.6;color:rgba(255,255,255,.6);margin-bottom:16px}
+.btn{border:0;border-radius:10px;padding:11px 18px;background:linear-gradient(110deg,#7a3cff,#00cfea);
+  color:#fff;font-size:12px;font-weight:850;cursor:pointer;margin:0 5px}
+
+/* ================= APP CONTROL PANEL (z-index 20 — sobar upore) ================= */
+.panel{position:absolute;left:0;right:0;bottom:0;z-index:20;
+  padding:0 max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  background:linear-gradient(to top,rgba(0,0,0,.94) 60%,transparent);
+  transition:opacity .35s,transform .35s}
+.panel.hidden{opacity:0;transform:translateY(16px);pointer-events:none}
+
+.seekrow{display:flex;align-items:center;gap:10px;padding:6px 2px 10px}
+.time{color:#fff;font-size:11px;font-weight:800;font-variant-numeric:tabular-nums;min-width:44px;text-align:center}
+.track{position:relative;flex:1;height:26px;display:flex;align-items:center;cursor:pointer;touch-action:none}
+.track .bg{position:absolute;left:0;right:0;height:4px;border-radius:4px;background:rgba(255,255,255,.18)}
+.track .fill{position:absolute;left:0;height:4px;border-radius:4px;width:0%;
+  background:linear-gradient(90deg,#7a3cff,#00cfea);box-shadow:0 0 10px rgba(0,207,234,.6)}
+.track .knob{position:absolute;width:13px;height:13px;border-radius:50%;background:#fff;
+  box-shadow:0 0 8px rgba(0,207,234,.9);left:0;transform:translateX(-50%);transition:width .1s,height .1s}
+.track:active .knob{width:18px;height:18px}
+.track.live .fill{background:#ff174f;box-shadow:0 0 10px rgba(255,23,79,.7)}
+
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cgroup{display:flex;gap:8px}
+.cbtn{width:44px;height:44px;border:1px solid rgba(255,255,255,.18);border-radius:14px;
+  background:rgba(8,8,16,.8);color:#fff;display:grid;place-items:center;cursor:pointer;
+  backdrop-filter:blur(10px);transition:transform .12s;touch-action:manipulation}
+.cbtn:active{transform:scale(.85);background:rgba(122,60,255,.45)}
+.cbtn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cbtn svg .solid{fill:currentColor;stroke:none}
+.cbtn.big{width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,#7a3cff,#00cfea);
+  border:0;box-shadow:0 6px 22px rgba(122,60,255,.45)}
+.cbtn.big svg{width:27px;height:27px}
+.cbtn.on{border-color:#00e676;box-shadow:0 0 10px rgba(0,230,118,.4)}
+
+.toast{position:absolute;left:50%;bottom:160px;transform:translateX(-50%) translateY(10px);
+  padding:9px 16px;border-radius:12px;font-size:12px;font-weight:700;color:#fff;
+  background:rgba(10,10,22,.92);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(12px);
+  opacity:0;pointer-events:none;transition:.3s;z-index:25;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* double-tap seek ripple */
+.ripple{position:absolute;width:64px;height:64px;border-radius:50%;background:rgba(0,207,234,.35);
+  display:grid;place-items:center;color:#fff;font-size:13px;font-weight:900;
+  animation:rip .6s ease forwards;pointer-events:none;z-index:15}
+@keyframes rip{from{transform:scale(.4);opacity:1}to{transform:scale(2.2);opacity:0}}
+
 .spinner{width:34px;height:34px;border:3px solid rgba(255,255,255,.14);border-top-color:#00d8ff;border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:600px){.badge{font-size:10px}.live{font-size:9px}.fullscreen-btn{width:40px;height:40px}}
-@media(max-height:430px) and (orientation:landscape){.badge,.live{top:7px}.fullscreen-btn{bottom:7px}}
+
+@media(max-height:430px) and (orientation:landscape){
+  .badge,.lockchip{top:7px}.panel{padding-bottom:7px}
+  .cbtn{width:38px;height:38px}.cbtn.big{width:48px;height:48px}
+  .toast{bottom:112px}
+}
 </style>
 </head>
 <body>
 <div class="player" id="player">
+
   <div class="frame-wrap" id="frameWrap"></div>
+
+  <!-- 🛡 guards: edge + top ad zones block hoy, center tap player e jay -->
+  <div class="guard left" id="guardL"></div>
+  <div class="guard right" id="guardR"></div>
+  <div class="guard top" id="guardT"></div>
+
   <div class="overlay">
-    <div class="badge">TALHA'S PLAYER</div>
-    <div class="live">LIVE</div>
+    <div class="badge"><span class="dot"></span>TALHA'S ULTRA PLAYER</div>
+    <div class="lockchip">🔒 LOCKED</div>
   </div>
+
+  <!-- ============ APP-STYLE CONTROL PANEL ============ -->
+  <div class="panel" id="panel">
+
+    <div class="seekrow">
+      <div class="time" id="curTime">0:00</div>
+      <div class="track" id="track">
+        <div class="bg"></div>
+        <div class="fill" id="fill"></div>
+        <div class="knob" id="knob"></div>
+      </div>
+      <div class="time" id="durTime">LIVE</div>
+    </div>
+
+    <div class="row">
+      <div class="cgroup">
+        <button class="cbtn" id="reloadBtn" aria-label="Reload">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg>
+        </button>
+        <button class="cbtn" id="rewBtn" aria-label="Rewind 10s">
+          <svg viewBox="0 0 24 24"><path class="solid" d="M11 8L5 12l6 4v-3.3c4 0 6.5 1.2 8 3.3-.5-4-3.5-7-8-7V8z"/></svg>
+        </button>
+      </div>
+
+      <button class="cbtn big" id="playBtn" aria-label="Play/Pause">
+        <svg id="playIcon" viewBox="0 0 24 24"><path class="solid" d="M8 5l11 7-11 7z"/></svg>
+      </button>
+
+      <div class="cgroup">
+        <button class="cbtn" id="fwdBtn" aria-label="Forward 10s">
+          <svg viewBox="0 0 24 24"><path class="solid" d="M13 8l6 4-6 4v-3.3c-4 0-6.5 1.2-8 3.3.5-4 3.5-7 8-7V8z"/></svg>
+        </button>
+        <button class="cbtn" id="muteBtn" aria-label="Mute">
+          <svg id="volIcon" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7"/></svg>
+        </button>
+        <button class="cbtn" id="fsBtn" aria-label="Fullscreen">
+          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
 
   <div class="status show" id="statusCard">
     <div class="spinner" id="spinner"></div>
@@ -41,109 +165,319 @@ iframe{width:100%;height:100%;border:0;display:block;background:#000}
     <p id="statusText">Validating the event ID before loading the player.</p>
     <button class="btn" id="retryBtn" style="display:none">Retry</button>
   </div>
-
-  <button class="fullscreen-btn" id="fullscreenBtn" aria-label="Fullscreen">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-  </button>
 </div>
 
 <script>
 (() => {
-  const player = document.getElementById('player');
-  const frameWrap = document.getElementById('frameWrap');
-  const statusCard = document.getElementById('statusCard');
-  const statusTitle = document.getElementById('statusTitle');
-  const statusText = document.getElementById('statusText');
-  const spinner = document.getElementById('spinner');
-  const retryBtn = document.getElementById('retryBtn');
-  const fullscreenBtn = document.getElementById('fullscreenBtn');
+  const $ = id => document.getElementById(id);
+  const playerEl = $('player'), frameWrap = $('frameWrap'), statusCard = $('statusCard'),
+        statusTitle = $('statusTitle'), statusText = $('statusText'), spinner = $('spinner'),
+        retryBtn = $('retryBtn'), panel = $('panel'), toast = $('toast'),
+        fill = $('fill'), knob = $('knob'), track = $('track'),
+        curTime = $('curTime'), durTime = $('durTime');
 
-  function showStatus(title, text, canRetry = false) {
+  let wrapperIframe = null;
+  let video = null;
+  let videoMode = 'unknown'; // 'direct' | 'tap' | 'none'
+  let isLive = true;
+  let dragging = false;
+  let lastTap = 0, lastTapX = 0;
+
+  /* ---------------- UI helpers ---------------- */
+  function showStatus(title, text, canRetry=false){
     statusCard.classList.add('show');
     statusTitle.textContent = title;
     statusText.textContent = text;
     spinner.style.display = canRetry ? 'none' : 'block';
     retryBtn.style.display = canRetry ? 'inline-block' : 'none';
   }
+  const hideStatus = () => statusCard.classList.remove('show');
 
-  function hideStatus() {
-    statusCard.classList.remove('show');
+  let toastTimer;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>toast.classList.remove('show'), 1800);
   }
 
-  function getChannelId() {
-    const params = new URLSearchParams(location.search);
-    return (
-      params.get('Talha') ||
-      params.get('channelId') ||
-      params.get('id') ||
-      params.get('channel') ||
-      ''
-    ).trim();
+  function ripple(x, y, text){
+    const r = document.createElement('div');
+    r.className = 'ripple';
+    r.textContent = text;
+    r.style.left = (x-32)+'px'; r.style.top = (y-32)+'px';
+    playerEl.appendChild(r);
+    setTimeout(()=>r.remove(), 650);
   }
 
-  // Only allow IDs whose LAST characters are numeric.
-  // Example allowed: androstreamlivech20389023
-  // Rejected: androstreamlivech / androstreamlivech20389023abc
-  function isValidChannelId(channelId) {
-    return /^[A-Za-z0-9_-]*\d+$/.test(channelId);
+  /* ---------------- Channel ID ---------------- */
+  function getChannelId(){
+    const p = new URLSearchParams(location.search);
+    return (p.get('Talha')||p.get('channelId')||p.get('id')||p.get('channel')||'').trim();
   }
+  const isValidChannelId = id => /^[A-Za-z0-9_-]*\d+$/.test(id);
 
-  function buildIframe(channelId) {
+  /* ============================================================
+     🔒 LOCK SNIPPET (inner wrapper e inject hoi)
+  ============================================================ */
+  const LOCK_SNIPPET = `
+  <style id="talha-lock">
+    img, image, picture, source, [style*="background-image"], [style*="background:url"]{
+      pointer-events:none!important;user-select:none!important;
+      -webkit-user-drag:none!important;-webkit-touch-callout:none!important}
+    a,[role="link"],[onclick],area{pointer-events:none!important}
+    *{-webkit-touch-callout:none!important;user-select:none!important}
+    iframe[src*="doubleclick"],iframe[src*="googlesyndication"],iframe[src*="ads."],
+    ins.adsbygoogle,[class*="banner-ad"],[id*="popup"],[class*="popup"],
+    [class*="interstitial"],[class*="overlay-ad"]{display:none!important}
+    html,body{overflow:hidden!important;background:#000!important}
+  </style>
+  <script>
+    (function lock(){
+      document.addEventListener('contextmenu',e=>e.preventDefault(),true);
+      document.addEventListener('dragstart',e=>e.preventDefault(),true);
+      // center tap pass through (video play/pause), others blocked
+      document.addEventListener('click',function(e){
+        const ok = e.target.closest('video,[class*="player"],[class*="video"]');
+        if(!ok){e.preventDefault();e.stopPropagation();}
+      },true);
+    })();
+    (function sweep(){
+      document.querySelectorAll('ins.adsbygoogle,[id*="popup"],[class*="popup"],[class*="banner-ad"],[class*="interstitial"]').forEach(e=>e.remove());
+      setTimeout(sweep,700);
+    })();
+    (function closer(){
+      document.querySelectorAll('[class*="close"],[class*="skip"],[aria-label*="Close"],[aria-label*="Skip"]').forEach(b=>{try{b.click()}catch(e){}});
+      setTimeout(closer,1400);
+    })();
+  <\/script>`;
+
+  function buildLockedPlayer(channelId){
     frameWrap.innerHTML = '';
+    const eventUrl = 'https://mahsunsports.xyz/event.html?id=' + encodeURIComponent(channelId);
 
-    const iframe = document.createElement('iframe');
-    iframe.title = 'Live Event Player';
-    iframe.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope';
-    iframe.setAttribute('allowfullscreen', 'true');
-    iframe.setAttribute('webkitallowfullscreen', 'true');
-    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-    iframe.loading = 'eager';
+    const innerDoc = `<!DOCTYPE html><html><head>
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <style>html,body{margin:0;height:100%;background:#000;overflow:hidden}
+      #ev{position:fixed;inset:0;width:100%;height:100%;border:0}</style>
+      </head><body>
+      <iframe id="ev" src="${eventUrl}" allow="autoplay; fullscreen; encrypted-media"
+        allowfullscreen webkitallowfullscreen
+        referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      ${LOCK_SNIPPET}
+      </body></html>`;
 
-    // IMPORTANT: the external player is loaded only after the trailing-number check.
-    iframe.src = 'https://mahsunsports.xyz/event.html?id=' + encodeURIComponent(channelId);
+    wrapperIframe = document.createElement('iframe');
+    wrapperIframe.title = 'Talha Locked Player';
+    wrapperIframe.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-presentation');
+    wrapperIframe.allow = 'autoplay; fullscreen; encrypted-media';
+    wrapperIframe.setAttribute('allowfullscreen','true');
+    wrapperIframe.srcdoc = innerDoc;
 
-    iframe.addEventListener('load', () => {
+    wrapperIframe.addEventListener('load', () => {
       hideStatus();
+      showToast('🔒 Lock ON · 🛡 Shield ON · 🎮 Controls ready');
+      setTimeout(findVideo, 1500);
+      setTimeout(findVideo, 4000); // retry — video late load hole o dhore
     }, {once:true});
-
-    frameWrap.appendChild(iframe);
+    frameWrap.appendChild(wrapperIframe);
   }
 
-  function loadPlayer() {
+  /* ============================================================
+     🎮 VIDEO DETECTION + CONTROL ENGINE
+  ============================================================ */
+  function findVideo(){
+    video = null;
+    try{
+      const wdoc = wrapperIframe && wrapperIframe.contentDocument;
+      if(wdoc){
+        video = wdoc.querySelector('video');
+        if(!video){
+          const inner = wdoc.querySelector('iframe');
+          try{ if(inner && inner.contentDocument) video = inner.contentDocument.querySelector('video'); }catch(e){}
+        }
+      }
+      if(!video) video = document.querySelector('video');
+    }catch(e){}
+
+    if(video && videoMode !== 'direct'){
+      videoMode = 'direct';
+      video.addEventListener('timeupdate', updateSeek);
+      video.addEventListener('progress', updateSeek);
+      video.addEventListener('play', ()=>setPlayIcon(false));
+      video.addEventListener('pause', ()=>setPlayIcon(true));
+      updateSeek();
+      showToast('🎮 Direct control connected ✅');
+    }else if(!video && videoMode === 'unknown'){
+      videoMode = 'tap';
+      showToast('👆 Tap mode: video tap = play/pause, buttons native e pathabe');
+    }
+  }
+
+  function fmt(s){
+    s = Math.max(0, Math.floor(s||0));
+    return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+  }
+
+  function updateSeek(){
+    if(!video || dragging) return;
+    const d = video.duration;
+    if(!d || !isFinite(d) || d === Infinity){
+      isLive = true;
+      track.classList.add('live');
+      fill.style.width = '100%'; knob.style.left = '100%';
+      curTime.textContent = 'LIVE'; durTime.textContent = '●';
+      return;
+    }
+    isLive = false;
+    track.classList.remove('live');
+    durTime.textContent = fmt(d);
+    curTime.textContent = fmt(video.currentTime);
+    const pct = (video.currentTime / d) * 100;
+    fill.style.width = pct + '%'; knob.style.left = pct + '%';
+  }
+
+  function setPlayIcon(paused){
+    $('playIcon').innerHTML = paused
+      ? '<path class="solid" d="M8 5l11 7-11 7z"/>'      // paused → play arrow
+      : '<path class="solid" d="M8 5h3v14H8zM13 5h3v14h-3z"/>'; // playing → pause bars
+  }
+
+  /* ---- command: direct video control ---- */
+  function cmd(action, val){
+    if(video){
+      try{
+        if(action==='toggle'){ video.paused ? video.play() : video.pause(); return true; }
+        if(action==='skip'){ video.currentTime = Math.min(video.duration||1e9, Math.max(0, video.currentTime + val)); return true; }
+        if(action==='seek'){ video.currentTime = val * (video.duration||0); return true; }
+        if(action==='mute'){ video.muted = !video.muted; setVolIcon(video.muted); return true; }
+      }catch(e){}
+    }
+    if(action==='mute'){ setVolIcon($('volIcon').dataset.mute !== '1'); }
+    return false;
+  }
+
+  function setVolIcon(muted){
+    const ic = $('volIcon');
+    ic.dataset.mute = muted ? '1' : '0';
+    ic.innerHTML = muted
+      ? '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9l5 6M21 9l-5 6"/>'
+      : '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7"/>';
+  }
+
+  /* ---------------- Double-tap gesture on video area ---------------- */
+  playerEl.addEventListener('pointerup', e => {
+    if(panel.contains(e.target)) return;               // panel e click → ignore
+    if(e.target.closest('.guard,.badge,.lockchip,.toast,.status')) return;
+    const now = Date.now();
+    if(now - lastTap < 320 && Math.abs(e.clientX - lastTapX) < 60){
+      // double tap!
+      const goFwd = e.clientX > innerWidth/2;
+      if(cmd('skip', goFwd ? 10 : -10)){
+        ripple(e.clientX, e.clientY, goFwd ? '⏩ +10s' : '⏪ -10s');
+        pokePanel();
+      }else{
+        showToast('⚠️ Video not reachable — tap native player controls');
+      }
+      lastTap = 0;
+    }else{
+      lastTap = now; lastTapX = e.clientX;
+    }
+  });
+
+  /* ---------------- Seek bar drag ---------------- */
+  function pctFromEvent(e){
+    const r = track.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+    return Math.min(1, Math.max(0, x / r.width));
+  }
+  function startDrag(e){
+    if(isLive){ showToast('⏱ Live stream — seek off'); return; }
+    if(!video){ showToast('⚠️ Seek needs direct video access'); return; }
+    dragging = true;
+    moveDrag(e);
+  }
+  function moveDrag(e){
+    if(!dragging) return;
+    const p = pctFromEvent(e);
+    fill.style.width = (p*100) + '%'; knob.style.left = (p*100) + '%';
+    curTime.textContent = fmt(p * (video.duration||0));
+    if(e.cancelable) e.preventDefault();
+  }
+  function endDrag(e){
+    if(!dragging) return;
+    dragging = false;
+    const p = e.changedTouches
+      ? Math.min(1, Math.max(0, (e.changedTouches[0].clientX - track.getBoundingClientRect().left) / track.getBoundingClientRect().width))
+      : pctFromEvent(e);
+    try{ video.currentTime = p * (video.duration||0); }catch(err){}
+    updateSeek();
+    pokePanel();
+  }
+  track.addEventListener('pointerdown', startDrag);
+  window.addEventListener('pointermove', moveDrag, {passive:false});
+  window.addEventListener('pointerup', endDrag);
+
+  /* ---------------- Buttons (ebar kaj korbe!) ---------------- */
+  $('playBtn').onclick = () => {
+    pokePanel();
+    if(cmd('toggle')){
+      setPlayIcon(video ? video.paused : false);
+      showToast(video && video.paused ? '▶ Playing' : '⏸ Paused');
+    }else{
+      showToast('👆 Tap the video center to play/pause');
+    }
+  };
+  $('rewBtn').onclick = () => { pokePanel(); cmd('skip',-10) ? showToast('⏪ -10 sec') : showToast('⚠️ Use double-tap left on video'); };
+  $('fwdBtn').onclick = () => { pokePanel(); cmd('skip',10) ? showToast('⏩ +10 sec') : showToast('⚠️ Use double-tap right on video'); };
+  $('muteBtn').onclick = () => {
+    pokePanel();
+    if(cmd('mute')) showToast('🔊/🔇 Toggled');
+    else{
+      // fallback: try double-tap center trick won't mute; inform
+      showToast('⚠️ Native player er volume use koro');
+    }
+  };
+  $('reloadBtn').onclick = () => { showToast('Reloading…'); loadPlayer(); };
+  $('fsBtn').onclick = async () => {
+    pokePanel();
+    try{
+      if(document.fullscreenElement){ await document.exitFullscreen(); return; }
+      if(playerEl.requestFullscreen) await playerEl.requestFullscreen({navigationUI:'hide'});
+      else if(playerEl.webkitRequestFullscreen) playerEl.webkitRequestFullscreen();
+      else showToast('Fullscreen unavailable');
+    }catch(_){ showToast('Fullscreen blocked'); }
+  };
+  retryBtn.onclick = loadPlayer;
+
+  /* ---------------- Auto-hide panel ---------------- */
+  let hideTimer;
+  function pokePanel(){
+    panel.classList.remove('hidden');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(()=>panel.classList.add('hidden'), 4000);
+  }
+  ['pointerdown','pointermove','touchstart'].forEach(ev=>
+    playerEl.addEventListener(ev, pokePanel, {passive:true}));
+
+  /* ---------------- Load ---------------- */
+  function loadPlayer(){
     const channelId = getChannelId();
-
-    if (!channelId) {
-      showStatus('No event ID found', 'Use a URL such as ?Talha=androstreamlivech20389023.', true);
+    if(!channelId){
+      showStatus('No event ID found','Use a URL such as ?Talha=androstreamlivech20389023.', true);
       return;
     }
-
-    if (!isValidChannelId(channelId)) {
-      showStatus('Invalid event ID', 'The player loads only when the channel ID ends with a numeric value.', true);
+    if(!isValidChannelId(channelId)){
+      showStatus('Invalid event ID','Channel ID must end with a numeric value.', true);
       return;
     }
-
-    showStatus('Loading event…', 'Connecting to the event player.');
-    buildIframe(channelId);
+    video = null; videoMode = 'unknown'; isLive = true;
+    setPlayIcon(true);
+    showStatus('Loading event…','Connecting to the locked event player.');
+    buildLockedPlayer(channelId);
+    pokePanel();
   }
 
-  async function toggleFullscreen() {
-    try {
-      if (document.fullscreenElement) {
-        await document.exitFullscreen();
-        return;
-      }
-      if (player.requestFullscreen) {
-        await player.requestFullscreen({navigationUI:'hide'});
-      } else if (player.webkitRequestFullscreen) {
-        player.webkitRequestFullscreen();
-      }
-    } catch (_) {
-      showStatus('Fullscreen unavailable', 'Your browser does not allow fullscreen for this player.', true);
-    }
-  }
-
-  retryBtn.addEventListener('click', loadPlayer);
-  fullscreenBtn.addEventListener('click', toggleFullscreen);
   loadPlayer();
 })();
 </script>
