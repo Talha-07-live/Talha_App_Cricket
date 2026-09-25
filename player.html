@@ -565,7 +565,7 @@ input[type="range"]:focus-visible{box-shadow:0 0 0 2px rgba(255,255,255,.18)}
   const VALID_THEMES = new Set(['cyber','netflix','prime','gold','emerald','amethyst']);
   const urlParams = new URLSearchParams(window.location.search);
   const themeParam = String(urlParams.get('theme') || '').toLowerCase();
-  const savedTheme = String(localStorage.getItem('player_skin_theme') || 'cyber').toLowerCase();
+  const savedTheme = String(localStorage.getItem('player_skin_theme') || 'gold').toLowerCase();
   const activeTheme = VALID_THEMES.has(themeParam) ? themeParam : (VALID_THEMES.has(savedTheme) ? savedTheme : 'cyber');
 
   document.documentElement.setAttribute('data-theme', activeTheme);
