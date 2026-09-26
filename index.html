@@ -791,9 +791,19 @@ function loadTargetScript(force=false){
     settled=true;clearTimeout(timeout);feedBusy=false;
 
     try{
-      let tempEvents=[];
-      if(typeof karsilasmalar!=='undefined'&&Array.isArray(karsilasmalar))tempEvents=karsilasmalar.slice();
-      else throw new Error('Feed Vector Missing');
+      let tempEvents = [];
+
+if(typeof karsilasmalar !== 'undefined' && Array.isArray(karsilasmalar)){
+    tempEvents.push(...karsilasmalar);
+}
+
+if(typeof futbolMatches !== 'undefined' && Array.isArray(futbolMatches)){
+    tempEvents.push(...futbolMatches);
+}
+
+if(!tempEvents.length){
+    throw new Error('Feed Vector Missing');
+}
 
       tempEvents.sort((a,b)=>{
         const at=String(a?.time||'').toLowerCase();
