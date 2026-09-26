@@ -535,7 +535,8 @@ body::before{
   min-width:0
 }
 
-.status-left,.status-right{
+.status-left,
+.status-right{
   display:flex;
   align-items:center;
   gap:6px;
@@ -702,8 +703,8 @@ body::before{
   display:grid;
   grid-template-columns:minmax(0,1fr) minmax(230px,320px);
   gap:var(--gap);
-  flex:1;
-  align-items:start;
+  flex:1 1 auto;
+  align-items:stretch;
   min-height:0;
   min-width:0
 }
@@ -713,6 +714,7 @@ body::before{
   flex-direction:column;
   gap:10px;
   min-width:0;
+  min-height:0;
   position:sticky;
   top:12px;
   z-index:50;
@@ -729,7 +731,8 @@ body::before{
   overflow:hidden;
   border:1px solid rgba(255,255,255,.05);
   box-shadow:0 20px 50px rgba(0,0,0,.6);
-  min-width:0
+  min-width:0;
+  flex-shrink:0
 }
 
 .player-wrap iframe{
@@ -747,7 +750,8 @@ body::before{
   align-items:center;
   gap:8px;
   flex-wrap:wrap;
-  min-width:0
+  min-width:0;
+  flex-shrink:0
 }
 
 .tool-btn{
@@ -899,8 +903,7 @@ body::before{
   overflow-x:auto;
   padding:2px 1px 4px;
   flex-shrink:0;
-  min-width:0;
-  scrollbar-width:thin
+  min-width:0
 }
 
 .league-tabs::-webkit-scrollbar{
@@ -1214,13 +1217,15 @@ body.theatre .theatre-exit{
 body.theatre .app-shell{
   width:100%;
   max-width:none;
+  min-height:100dvh;
   padding:0
 }
 
 body.theatre .main-card{
   border-radius:0;
   border:none;
-  min-height:100dvh
+  min-height:100dvh;
+  height:100dvh
 }
 
 body.theatre .top-bar,
@@ -1235,7 +1240,8 @@ body.theatre footer{
 
 body.theatre .content-grid{
   grid-template-columns:1fr;
-  min-height:100dvh
+  min-height:100dvh;
+  height:100dvh
 }
 
 body.theatre .player-col{
@@ -1243,14 +1249,14 @@ body.theatre .player-col{
   top:auto;
   height:100dvh;
   min-height:100dvh;
-  justify-content:center
+  justify-content:center;
+  align-items:center
 }
 
 body.theatre .player-wrap{
-  width:min(100%,177.78dvh);
+  width:min(100%,177.7778dvh);
   aspect-ratio:16/9;
-  margin:0 auto;
-  padding-top:0
+  margin:0 auto
 }
 
 body.focus .status-bar,
@@ -1265,8 +1271,8 @@ body.focus .content-grid{
 }
 
 body.focus .player-wrap{
-  aspect-ratio:16/9;
-  padding-top:0
+  width:100%;
+  aspect-ratio:16/9
 }
 
 .menu-backdrop{
@@ -1584,34 +1590,289 @@ body.low-power #particles{
   display:none
 }
 
-@media(max-width:1100px){
-  :root{
-    --gap:12px
+/* PC / TABLET SCREEN-FIT */
+@media(min-width:761px){
+
+  html{
+    height:100%;
+    overflow:hidden
   }
 
-  .content-grid{
-    grid-template-columns:minmax(0,1fr) minmax(230px,28vw)
-  }
-}
-
-@media(max-width:900px){
-  .content-grid{
-    grid-template-columns:minmax(0,1fr) minmax(220px,250px)
+  body{
+    height:100dvh;
+    min-height:100dvh;
+    overflow:hidden
   }
 
-  .brand-text p{
-    max-width:260px
-  }
-}
-
-@media(max-width:760px){
-  :root{
-    --sidebar-w:100%;
-    --gap:10px
+  .app-shell{
+    height:100dvh;
+    min-height:0;
+    overflow:hidden
   }
 
   .main-card{
-    padding:12px
+    height:100%;
+    min-height:0;
+    overflow:hidden
+  }
+
+  .content-grid{
+    min-height:0;
+    height:100%;
+    overflow:hidden
+  }
+
+  .player-col{
+    position:relative;
+    top:auto;
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+    align-items:center;
+    justify-content:flex-start
+  }
+
+  .player-wrap{
+    width:min(100%,calc(177.7778dvh - 640px));
+    aspect-ratio:16/9;
+    flex:0 0 auto
+  }
+
+  .sidebar{
+    position:relative;
+    top:auto;
+    height:100%;
+    max-height:none;
+    min-height:0;
+    overflow-y:auto
+  }
+}
+
+/* NORMAL DESKTOP */
+@media(min-width:1101px){
+  .main-card{
+    padding:18px;
+    gap:12px
+  }
+
+  .content-grid{
+    gap:12px;
+    grid-template-columns:minmax(0,1fr) 300px
+  }
+
+  .status-bar{
+    padding:7px 12px
+  }
+
+  .stats-row{
+    gap:7px
+  }
+
+  .stat{
+    min-height:58px;
+    padding:9px 11px
+  }
+
+  .counter-bar{
+    padding:7px 12px
+  }
+
+  .player-tools{
+    gap:7px
+  }
+
+  .sidebar{
+    gap:12px
+  }
+
+  .ch-panel{
+    padding:11px;
+    gap:9px
+  }
+}
+
+/* COMPACT TABLET / SMALL DESKTOP */
+@media(min-width:761px) and (max-width:1100px){
+
+  :root{
+    --gap:8px
+  }
+
+  .app-shell{
+    padding:
+      max(8px,env(safe-area-inset-top))
+      10px
+      max(10px,env(safe-area-inset-bottom))
+  }
+
+  .main-card{
+    padding:10px;
+    gap:8px;
+    border-radius:16px
+  }
+
+  .content-grid{
+    gap:8px
+  }
+
+  .player-wrap{
+    width:min(100%,calc(177.7778dvh - 410px))
+  }
+
+  .player-tools{
+    gap:5px
+  }
+
+  .tool-btn{
+    font-size:10px
+  }
+
+  .brand-mark{
+    width:34px;
+    height:34px;
+    font-size:16px
+  }
+
+  .brand-text h2{
+    font-size:16px
+  }
+
+  .brand-text p{
+    font-size:9px
+  }
+
+  .icon-btn{
+    width:34px;
+    height:34px;
+    font-size:14px
+  }
+
+  .theme-select{
+    height:34px;
+    width:100px;
+    max-width:100px
+  }
+
+  .status-bar{
+    padding:6px 10px;
+    font-size:9px
+  }
+
+  .stats-row{
+    gap:6px
+  }
+
+  .stat{
+    min-height:52px;
+    padding:8px 9px
+  }
+
+  .stat-value{
+    font-size:15px
+  }
+
+  .stat-hint{
+    font-size:7px
+  }
+
+  .counter-bar{
+    padding:6px 10px;
+    gap:12px;
+    font-size:9px
+  }
+
+  footer{
+    padding:5px 0 2px;
+    font-size:8px
+  }
+
+  .sidebar{
+    gap:8px
+  }
+
+  .ch-panel{
+    padding:9px;
+    gap:8px
+  }
+
+  .panel-head h3{
+    font-size:12px
+  }
+
+  .search-wrap input{
+    height:34px;
+    font-size:11px
+  }
+
+  .ch-list{
+    max-height:none
+  }
+
+  .static-ch-list{
+    max-height:none
+  }
+}
+
+@media(max-width:900px) and (min-width:761px){
+
+  .content-grid{
+    grid-template-columns:minmax(0,1fr) 240px
+  }
+
+  .player-wrap{
+    width:min(100%,calc(177.7778dvh - 410px))
+  }
+
+  .brand-text p{
+    display:none
+  }
+}
+
+/* MOBILE */
+@media(max-width:760px){
+
+  html{
+    overflow-x:hidden;
+    overflow-y:auto
+  }
+
+  body{
+    height:auto;
+    min-height:100dvh;
+    overflow-x:hidden;
+    overflow-y:auto
+  }
+
+  .app-shell{
+    height:auto;
+    min-height:100dvh;
+    overflow:visible
+  }
+
+  .main-card{
+    height:auto;
+    min-height:0;
+    overflow:visible
+  }
+
+  .content-grid{
+    height:auto;
+    min-height:0;
+    overflow:visible
+  }
+
+  .player-col{
+    position:sticky;
+    top:0;
+    height:auto;
+    min-height:0;
+    align-items:stretch;
+    overflow:visible
+  }
+
+  :root{
+    --sidebar-w:100%;
+    --gap:10px
   }
 
   .content-grid{
@@ -1619,8 +1880,11 @@ body.low-power #particles{
     gap:10px
   }
 
+  .main-card{
+    padding:12px
+  }
+
   .player-col{
-    top:0;
     background:var(--panel);
     margin:-12px -12px 0;
     padding:10px 12px 10px;
@@ -1645,6 +1909,7 @@ body.low-power #particles{
 
   .sidebar{
     position:static;
+    height:auto;
     max-height:none;
     overflow:visible;
     padding-right:0
@@ -1704,6 +1969,7 @@ body.low-power #particles{
 }
 
 @media(max-width:560px){
+
   .top-bar{
     flex-wrap:wrap
   }
@@ -1742,6 +2008,7 @@ body.low-power #particles{
 }
 
 @media(max-width:420px){
+
   .app-shell{
     padding-left:8px;
     padding-right:8px
@@ -1844,6 +2111,7 @@ body.low-power #particles{
 }
 
 @media(max-width:360px){
+
   .top-actions{
     gap:4px
   }
@@ -1880,6 +2148,7 @@ body.low-power #particles{
 }
 
 @media(max-width:760px) and (orientation:landscape){
+
   .main-card{
     padding:10px
   }
@@ -1892,6 +2161,7 @@ body.low-power #particles{
 
   .player-wrap{
     width:min(100%,calc(100dvh * 1.7777778));
+    aspect-ratio:16/9;
     margin:0 auto
   }
 
@@ -1925,7 +2195,7 @@ body.low-power #particles{
   <div class="auth-card">
     <div class="auth-kicker">PREMIUM ACCESS</div>
     <div class="auth-title">Welcome back</div>
-    <p class="auth-sub">Enter Your Passcode To Access Talha's stream.</p>
+    <p class="auth-sub">Enter your passcode to continue streaming.</p>
     <input class="auth-input" id="password" type="password" autocomplete="current-password" placeholder="Passcode">
     <button class="auth-btn" id="loginBtn" type="button">Enter Stream</button>
   </div>
@@ -1934,6 +2204,7 @@ body.low-power #particles{
 <div class="menu-backdrop" id="menuBackdrop"></div>
 
 <aside class="quick-menu" id="quickMenu" aria-hidden="true">
+
   <div class="menu-head">
     <div class="menu-head-text">
       <small>CONTROL CENTER</small>
@@ -2041,6 +2312,7 @@ body.low-power #particles{
       <span>SESSION</span>
       <strong id="menuSession">ACTIVE</strong>
     </div>
+
     <div class="menu-footer-item">
       <span>LOCAL TIME</span>
       <strong id="menuClock">--:--</strong>
@@ -2049,11 +2321,14 @@ body.low-power #particles{
 </aside>
 
 <div class="app-shell" id="appShell" style="display:none">
+
   <div class="main-card" id="mainCard">
 
     <div class="top-bar">
+
       <div class="brand">
         <div class="brand-mark">📺</div>
+
         <div class="brand-text">
           <h2>Talha's Stream</h2>
           <p>Live sports · organized for every screen</p>
@@ -2061,6 +2336,7 @@ body.low-power #particles{
       </div>
 
       <div class="top-actions">
+
         <select class="theme-select" id="themePicker" aria-label="Theme">
           <option value="violet">Violet</option>
           <option value="ocean">Ocean</option>
@@ -2072,12 +2348,16 @@ body.low-power #particles{
         </select>
 
         <button class="icon-btn" id="refreshFeedBtn" type="button" aria-label="Refresh" title="Refresh feed">↻</button>
+
         <button class="icon-btn" id="theatreBtn" type="button" aria-label="Cinema mode" title="Cinema mode">⛶</button>
+
         <button class="icon-btn" id="menuBtn" type="button" aria-label="Quick menu" aria-expanded="false">☰</button>
+
       </div>
     </div>
 
     <div class="status-bar">
+
       <div class="status-left">
         <span class="status-dot" id="networkDot"></span>
         <span class="status-text" id="networkText">System ready</span>
@@ -2091,6 +2371,7 @@ body.low-power #particles{
       <div class="status-right">
         <span class="status-text" id="syncText">Feed not synced</span>
       </div>
+
     </div>
 
     <div class="notice" id="maintenanceNotice">
@@ -2099,6 +2380,7 @@ body.low-power #particles{
     </div>
 
     <div class="stats-row">
+
       <div class="stat">
         <span class="stat-label">LIVE CHANNELS</span>
         <span class="stat-value" id="countTotal">00</span>
@@ -2116,9 +2398,11 @@ body.low-power #particles{
         <span class="stat-value" id="countRecent">00</span>
         <span class="stat-hint">last watched</span>
       </div>
+
     </div>
 
     <div class="counter-bar">
+
       <span class="cbar-item cbar-live">
         <span class="live-dot"></span>
         Live: <b id="pcbLive">00</b>
@@ -2127,12 +2411,15 @@ body.low-power #particles{
       <span class="cbar-item cbar-static">
         📺 24/7: <b id="pcbStatic">00</b>
       </span>
+
     </div>
 
     <div class="content-grid">
 
       <section class="player-col">
+
         <div class="player-wrap">
+
           <iframe
             id="frame"
             src="about:blank"
@@ -2142,13 +2429,25 @@ body.low-power #particles{
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen; geolocation; web-share; speaker-selection; screen-wake-lock; idle-detection"
             allowfullscreen>
           </iframe>
+
         </div>
 
         <div class="player-tools">
-          <button class="tool-btn" id="theatreTextBtn" type="button">🎬 Cinema Mode</button>
-          <button class="tool-btn" id="favoriteFilterBtn" type="button">★ Favorites</button>
-          <button class="tool-btn" id="menuTextBtn" type="button">☰ Quick Menu</button>
+
+          <button class="tool-btn" id="theatreTextBtn" type="button">
+            🎬 Cinema Mode
+          </button>
+
+          <button class="tool-btn" id="favoriteFilterBtn" type="button">
+            ★ Favorites
+          </button>
+
+          <button class="tool-btn" id="menuTextBtn" type="button">
+            ☰ Quick Menu
+          </button>
+
         </div>
+
       </section>
 
       <aside class="sidebar">
@@ -2156,55 +2455,106 @@ body.low-power #particles{
         <div class="ch-panel">
 
           <div class="panel-head">
+
             <h3>📡 Channels</h3>
+
             <div class="panel-head-right">
-              <span class="panel-count" id="channelSummary">Waiting…</span>
-              <button class="mini-btn" id="clearSearchBtn" type="button" title="Clear">✕</button>
+
+              <span class="panel-count" id="channelSummary">
+                Waiting…
+              </span>
+
+              <button
+                class="mini-btn"
+                id="clearSearchBtn"
+                type="button"
+                title="Clear">
+                ✕
+              </button>
+
             </div>
+
           </div>
 
           <div class="search-wrap">
+
             <input
               type="text"
               id="searchChannels"
               placeholder="🔍 Search teams or leagues…"
               autocomplete="off"
               spellcheck="false">
+
             <button
               class="search-clear"
               id="clearSearchBtn2"
               type="button"
-              aria-label="Clear search">✕</button>
+              aria-label="Clear search">
+              ✕
+            </button>
+
           </div>
 
-          <div class="league-tabs" id="leagueTabs" role="tablist"></div>
-
-          <div class="recent-section" id="recentSection">
-            <span class="section-label">Recently watched</span>
-            <div class="recent-row" id="recentRow"></div>
+          <div
+            class="league-tabs"
+            id="leagueTabs"
+            role="tablist">
           </div>
 
-          <div class="ch-list" id="serverContainer" aria-live="polite"></div>
+          <div
+            class="recent-section"
+            id="recentSection">
+
+            <span class="section-label">
+              Recently watched
+            </span>
+
+            <div
+              class="recent-row"
+              id="recentRow">
+            </div>
+
+          </div>
+
+          <div
+            class="ch-list"
+            id="serverContainer"
+            aria-live="polite">
+          </div>
+
         </div>
 
-        <div class="ch-panel static-section" id="staticSectionWrap">
+        <div
+          class="ch-panel static-section"
+          id="staticSectionWrap">
+
           <div class="panel-head">
+
             <h3>📺 24/7 Channels</h3>
+
             <span class="panel-count">
               <span id="staticChannelCount">0</span> ch
             </span>
+
           </div>
 
-          <div class="static-ch-list" id="staticServerContainer"></div>
+          <div
+            class="static-ch-list"
+            id="staticServerContainer">
+          </div>
+
         </div>
 
       </aside>
 
     </div>
 
-    <footer>Made by Talha &bull; © 2020–2026</footer>
+    <footer>
+      Made by Talha &bull; © 2020–2026
+    </footer>
 
   </div>
+
 </div>
 
 <script>
@@ -2285,90 +2635,217 @@ let feedRequestToken=0;
 let searchTimer=null;
 
 const translationDict={
-  "motor sporları":"Motorsports","motor sporlari":"Motorsports",
-  "hazırlık maçı":"Friendly Match","hazirlik maci":"Friendly Match",
-  "paris basketball":"Paris Basketball",
-  "şampiyonlar ligi":"Champions League","sampiyonlar ligi":"Champions League",
-  "avrupa ligi":"Europa League","konferans ligi":"Conference League",
-  "milletler ligi":"Nations League","dünya kupası":"World Cup","dunya kupasi":"World Cup",
-  "avrupa şampiyonası":"European Championship","avrupa sampiyonasi":"European Championship",
-  "süper lig":"Super League","super lig":"Super League",
-  "1. lig":"1st Division","2. lig":"2nd Division",
-  "füchse berlin":"Fuchse Berlin","fuchse berlin":"Fuchse Berlin",
-  "as monaco":"AS Monaco","lnb pro a final":"LNB Pro A Final",
-  "masa tenisi":"Table Tennis","amerikan futbolu":"American Football",
-  "buz hokeyi":"Ice Hockey","at yarışı":"Horse Racing","at yarisi":"Horse Racing",
-  "su topu":"Water Polo","maç özeti":"Match Highlights","mac ozeti":"Match Highlights",
-  "suudi arabistan":"Saudi Arabia","güney kore":"South Korea","guney kore":"South Korea",
-  "çeyrek final":"Quarter-Final","ceyrek final":"Quarter-Final",
-  "yarı final":"Semi-Final","yari final":"Semi-Final",
-  "grup maçı":"Group Stage","grup maci":"Group Stage",
-  "hafta sonu":"Weekend","hafta içi":"Weekday","hafta ici":"Weekday",
-  "voleybol":"Volleyball","basketbol":"Basketball","futbol":"Football",
-  "hentbol":"Handball","tenis":"Tennis","dövüş":"Fighting","dovus":"Fighting",
-  "bisiklet":"Cycling","yüzme":"Swimming","yuzme":"Swimming","boks":"Boxing",
-  "güreş":"Wrestling","gures":"Wrestling","futsal":"Futsal","espor":"E-Sports",
-  "e-spor":"E-Sports","erkekler":"Men's","kadınlar":"Women's","kadinlar":"Women's",
-  "erkek":"Men","kadın":"Women","kadin":"Women","gençler":"Youth","gencler":"Youth",
-  "hazırlık":"Friendly","hazirlik":"Friendly","canlı":"LIVE","canli":"LIVE",
-  "yayın":"Broadcast","yayin":"Broadcast","yayında":"On Air","yayinda":"On Air",
-  "finali":"Final","final":"Final","kupa":"Cup","kupası":"Cup","kupasi":"Cup",
-  "eleme":"Qualifier","elemeleri":"Qualifiers","özet":"Highlights","ozet":"Highlights",
-  "maçı":"Match","maci":"Match","maç":"Match","mac":"Match",
-  "takımı":"Team","takimi":"Team","hafta":"Week","tur":"Round","etap":"Stage",
-  "devre":"Half","uzatmalar":"Extra Time","penaltılar":"Penalties","penaltilar":"Penalties",
-  "ertelendi":"Postponed","iptal":"Canceled","türkiye":"Turkey","turkiye":"Turkey",
-  "türk":"Turkish","turk":"Turkish","İngiltere":"England","ingiltere":"England",
-  "ispanya":"Spain","italya":"Italy","almanya":"Germany","fransa":"France",
-  "hollanda":"Netherlands","portekiz":"Portugal","rusya":"Russia","yunanistan":"Greece",
-  "belçika":"Belgium","belcika":"Belgium","avusturya":"Austria","danimarka":"Denmark",
-  "İsveç":"Sweden","isvec":"Sweden","İsviçre":"Switzerland","isvicre":"Switzerland",
-  "brezilya":"Brazil","arjantin":"Argentina","Çekya":"Czechia","polonya":"Poland",
-  "japonya":"Japan","çin":"China","cin":"China","avustralya":"Australia",
-  "hırvatistan":"Croatia","hirvatistan":"Croatia","sırbistan":"Serbia",
-  "sirbistan":"Serbia","romanya":"Romania","macaristan":"Hungary",
-  "ukrayna":"Ukraine","mısır":"Egypt","misir":"Egypt","fas":"Morocco",
-  "cezayir":"Algeria","kanada":"Canada","meksika":"Mexico","şili":"Chile",
-  "sili":"Chile","kolombiya":"Colombia","uruguay":"Uruguay","paraguay":"Paraguay",
-  "curaçao":"Curacao","curaca":"Curacao","galatasaray":"Galatasaray",
-  "fenerbahçe":"Fenerbahce","fenerbahce":"Fenerbahce","beşiktaş":"Besiktas",
-  "besiktas":"Besiktas","trabzonspor":"Trabzonspor","başakşehir":"Basaksehir",
-  "basaksehir":"Basaksehir","barcelona":"Barcelona","real madrid":"Real Madrid",
-  "bugün":"Today","bugun":"Today","yarın":"Tomorrow","yarin":"Tomorrow",
-  "dün":"Yesterday","dun":"Yesterday","saat":"Time","dakika":"min","saniye":"sec",
-  "bakım":"Maintenance","bakim":"Maintenance","sunucu":"Server",
-  "bağlantı":"Connection","baglanti":"Connection","yedek":"Backup"
+"motor sporları":"Motorsports",
+"motor sporlari":"Motorsports",
+"hazırlık maçı":"Friendly Match",
+"hazirlik maci":"Friendly Match",
+"paris basketball":"Paris Basketball",
+"şampiyonlar ligi":"Champions League",
+"sampiyonlar ligi":"Champions League",
+"avrupa ligi":"Europa League",
+"konferans ligi":"Conference League",
+"milletler ligi":"Nations League",
+"dünya kupası":"World Cup",
+"dunya kupasi":"World Cup",
+"avrupa şampiyonası":"European Championship",
+"avrupa sampiyonasi":"European Championship",
+"süper lig":"Super League",
+"super lig":"Super League",
+"1. lig":"1st Division",
+"2. lig":"2nd Division",
+"füchse berlin":"Fuchse Berlin",
+"fuchse berlin":"Fuchse Berlin",
+"as monaco":"AS Monaco",
+"lnb pro a final":"LNB Pro A Final",
+"masa tenisi":"Table Tennis",
+"amerikan futbolu":"American Football",
+"buz hokeyi":"Ice Hockey",
+"at yarışı":"Horse Racing",
+"at yarisi":"Horse Racing",
+"su topu":"Water Polo",
+"maç özeti":"Match Highlights",
+"mac ozeti":"Match Highlights",
+"suudi arabistan":"Saudi Arabia",
+"güney kore":"South Korea",
+"guney kore":"South Korea",
+"çeyrek final":"Quarter-Final",
+"ceyrek final":"Quarter-Final",
+"yarı final":"Semi-Final",
+"yari final":"Semi-Final",
+"grup maçı":"Group Stage",
+"grup maci":"Group Stage",
+"hafta sonu":"Weekend",
+"hafta içi":"Weekday",
+"hafta ici":"Weekday",
+"voleybol":"Volleyball",
+"basketbol":"Basketball",
+"futbol":"Football",
+"hentbol":"Handball",
+"tenis":"Tennis",
+"dövüş":"Fighting",
+"dovus":"Fighting",
+"bisiklet":"Cycling",
+"yüzme":"Swimming",
+"yuzme":"Swimming",
+"boks":"Boxing",
+"güreş":"Wrestling",
+"gures":"Wrestling",
+"futsal":"Futsal",
+"espor":"E-Sports",
+"e-spor":"E-Sports",
+"erkekler":"Men's",
+"kadınlar":"Women's",
+"kadinlar":"Women's",
+"erkek":"Men",
+"kadın":"Women",
+"kadin":"Women",
+"gençler":"Youth",
+"gencler":"Youth",
+"hazırlık":"Friendly",
+"hazirlik":"Friendly",
+"canlı":"LIVE",
+"canli":"LIVE",
+"yayın":"Broadcast",
+"yayin":"Broadcast",
+"yayında":"On Air",
+"yayinda":"On Air",
+"finali":"Final",
+"final":"Final",
+"kupa":"Cup",
+"kupası":"Cup",
+"kupasi":"Cup",
+"eleme":"Qualifier",
+"elemeleri":"Qualifiers",
+"özet":"Highlights",
+"ozet":"Highlights",
+"maçı":"Match",
+"maci":"Match",
+"maç":"Match",
+"mac":"Match",
+"takımı":"Team",
+"takimi":"Team",
+"hafta":"Week",
+"tur":"Round",
+"etap":"Stage",
+"devre":"Half",
+"uzatmalar":"Extra Time",
+"penaltılar":"Penalties",
+"penaltilar":"Penalties",
+"ertelendi":"Postponed",
+"iptal":"Canceled",
+"türkiye":"Turkey",
+"turkiye":"Turkey",
+"türk":"Turkish",
+"turk":"Turkish",
+"İngiltere":"England",
+"ingiltere":"England",
+"ispanya":"Spain",
+"italya":"Italy",
+"almanya":"Germany",
+"fransa":"France",
+"hollanda":"Netherlands",
+"portekiz":"Portugal",
+"rusya":"Russia",
+"yunanistan":"Greece",
+"belçika":"Belgium",
+"belcika":"Belgium",
+"avusturya":"Austria",
+"danimarka":"Denmark",
+"İsveç":"Sweden",
+"isvec":"Sweden",
+"İsviçre":"Switzerland",
+"isvicre":"Switzerland",
+"brezilya":"Brazil",
+"arjantin":"Argentina",
+"Çekya":"Czechia",
+"polonya":"Poland",
+"japonya":"Japan",
+"çin":"China",
+"cin":"China",
+"avustralya":"Australia",
+"hırvatistan":"Croatia",
+"hirvatistan":"Croatia",
+"sırbistan":"Serbia",
+"sirbistan":"Serbia",
+"romanya":"Romania",
+"macaristan":"Hungary",
+"ukrayna":"Ukraine",
+"mısır":"Egypt",
+"misir":"Egypt",
+"fas":"Morocco",
+"cezayir":"Algeria",
+"kanada":"Canada",
+"meksika":"Mexico",
+"şili":"Chile",
+"sili":"Chile",
+"kolombiya":"Colombia",
+"uruguay":"Uruguay",
+"paraguay":"Paraguay",
+"curaçao":"Curacao",
+"curaca":"Curacao",
+"galatasaray":"Galatasaray",
+"fenerbahçe":"Fenerbahce",
+"fenerbahce":"Fenerbahce",
+"beşiktaş":"Besiktas",
+"besiktas":"Besiktas",
+"trabzonspor":"Trabzonspor",
+"başakşehir":"Basaksehir",
+"basaksehir":"Basaksehir",
+"barcelona":"Barcelona",
+"real madrid":"Real Madrid",
+"bugün":"Today",
+"bugun":"Today",
+"yarın":"Tomorrow",
+"yarin":"Tomorrow",
+"dün":"Yesterday",
+"dun":"Yesterday",
+"saat":"Time",
+"dakika":"min",
+"saniye":"sec",
+"bakım":"Maintenance",
+"bakim":"Maintenance",
+"sunucu":"Server",
+"bağlantı":"Connection",
+"baglanti":"Connection",
+"yedek":"Backup"
 };
 
 const dictEntries=Object.keys(translationDict)
-  .sort((a,b)=>b.length-a.length)
-  .map(key=>({
-    key,
-    pattern:new RegExp(
-      `(?<=[\\s\\b\\(\\[\\{:/\\-,]|^)${key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(?=[\\s\\b\\)\\]\\}:/\\-,]|$)`,
-      'gi'
-    ),
-    replacement:translationDict[key]
-  }));
+.sort((a,b)=>b.length-a.length)
+.map(key=>({
+  key,
+  pattern:new RegExp(
+    `(?<=[\\s\\b\\(\\[\\{:/\\-,]|^)${key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(?=[\\s\\b\\)\\]\\}:/\\-,]|$)`,
+    'gi'
+  ),
+  replacement:translationDict[key]
+}));
 
 function normalizeTurkishText(str){
   if(!str)return'';
+
   return String(str)
-    .replace(/Ã¼/g,'ü').replace(/Ãœ/g,'Ü')
-    .replace(/Ã§/g,'ç').replace(/Ã‡/g,'Ç')
-    .replace(/ÅŸ/g,'ş').replace(/Åž/g,'Ş')
-    .replace(/Ä±/g,'ı').replace(/Ä°/g,'İ')
-    .replace(/Ã¶/g,'ö').replace(/Ã–/g,'Ö')
-    .replace(/â€™/g,"'")
-    .replace(/â€œ/g,'"')
-    .replace(/â€/g,'"')
-    .replace(/&amp;/g,'&')
-    .replace(/&lt;/g,'<')
-    .replace(/&gt;/g,'>');
+  .replace(/Ã¼/g,'ü')
+  .replace(/Ãœ/g,'Ü')
+  .replace(/Ã§/g,'ç')
+  .replace(/Ã‡/g,'Ç')
+  .replace(/ÅŸ/g,'ş')
+  .replace(/Åž/g,'Ş')
+  .replace(/Ä±/g,'ı')
+  .replace(/Ä°/g,'İ')
+  .replace(/Ã¶/g,'ö')
+  .replace(/Ã–/g,'Ö')
+  .replace(/â€™/g,"'")
+  .replace(/â€œ/g,'"')
+  .replace(/â€/g,'"')
+  .replace(/&amp;/g,'&')
+  .replace(/&lt;/g,'<')
+  .replace(/&gt;/g,'>');
 }
 
 function translateText(text){
   if(!text)return'';
+
   let str=normalizeTurkishText(text);
 
   for(let i=0;i<dictEntries.length;i++){
@@ -2376,22 +2853,32 @@ function translateText(text){
 
     if(e.pattern.test(str)){
       str=str.replace(e.pattern,(match)=>{
-        if(match===match.toUpperCase())return e.replacement.toUpperCase();
+        if(match===match.toUpperCase()){
+          return e.replacement.toUpperCase();
+        }
+
         if(match[0]===match[0].toUpperCase()){
           return e.replacement.charAt(0).toUpperCase()+e.replacement.slice(1);
         }
+
         return e.replacement;
       });
     }
   }
 
   return str
-    .replace(/ş/g,'s').replace(/Ş/g,'S')
-    .replace(/ı/g,'i').replace(/İ/g,'I')
-    .replace(/ğ/g,'g').replace(/Ğ/g,'G')
-    .replace(/ü/g,'u').replace(/Ü/g,'U')
-    .replace(/ö/g,'o').replace(/Ö/g,'O')
-    .replace(/ç/g,'c').replace(/Ç/g,'C');
+  .replace(/ş/g,'s')
+  .replace(/Ş/g,'S')
+  .replace(/ı/g,'i')
+  .replace(/İ/g,'I')
+  .replace(/ğ/g,'g')
+  .replace(/Ğ/g,'G')
+  .replace(/ü/g,'u')
+  .replace(/Ü/g,'U')
+  .replace(/ö/g,'o')
+  .replace(/Ö/g,'O')
+  .replace(/ç/g,'c')
+  .replace(/Ç/g,'C');
 }
 
 let isTranslatingDOM=false;
@@ -2404,38 +2891,63 @@ function translateNode(node){
 
   const tag=parent.tagName?parent.tagName.toUpperCase():'';
 
-  if(['SCRIPT','STYLE','IFRAME','INPUT','TEXTAREA','OPTION','SELECT','CODE'].includes(tag))return;
-  if(parent.closest&&parent.closest('[data-no-translate="true"]'))return;
+  if(
+    ['SCRIPT','STYLE','IFRAME','INPUT','TEXTAREA','OPTION','SELECT','CODE']
+    .includes(tag)
+  )return;
+
+  if(
+    parent.closest&&
+    parent.closest('[data-no-translate="true"]')
+  )return;
 
   const orig=node.nodeValue;
+
   if(!orig||!orig.trim())return;
 
   const normalized=normalizeTurkishText(orig);
+
   const hasTr=/[şŞıİğĞüÜöÖçÇÃÅÄ]/i.test(orig);
-  const needsTrans=hasTr||Object.keys(translationDict).some(k=>orig.toLowerCase().includes(k));
+
+  const needsTrans=
+    hasTr||
+    Object.keys(translationDict).some(
+      k=>orig.toLowerCase().includes(k)
+    );
 
   if(needsTrans||orig!==normalized){
     const translated=translateText(orig);
-    if(translated&&translated!==orig)node.nodeValue=translated;
+
+    if(translated&&translated!==orig){
+      node.nodeValue=translated;
+    }
   }
 }
 
 function autoTranslateDOM(root=document.body){
+
   if(isTranslatingDOM||!root)return;
 
   isTranslatingDOM=true;
 
   try{
+
     const walker=document.createTreeWalker(
       root,
       NodeFilter.SHOW_TEXT,
       {
         acceptNode:n=>{
-          if(!n.nodeValue||!n.nodeValue.trim())return NodeFilter.FILTER_SKIP;
+
+          if(!n.nodeValue||!n.nodeValue.trim()){
+            return NodeFilter.FILTER_SKIP;
+          }
 
           const t=n.parentNode?n.parentNode.tagName:'';
 
-          if(['SCRIPT','STYLE','IFRAME','INPUT','TEXTAREA','OPTION','SELECT','CODE'].includes(t)){
+          if(
+            ['SCRIPT','STYLE','IFRAME','INPUT','TEXTAREA','OPTION','SELECT','CODE']
+            .includes(t)
+          ){
             return NodeFilter.FILTER_SKIP;
           }
 
@@ -2449,28 +2961,45 @@ function autoTranslateDOM(root=document.body){
     while((n=walker.nextNode())){
       translateNode(n);
     }
+
   }catch(e){
+
   }finally{
+
     isTranslatingDOM=false;
+
   }
 }
 
 function initDOMTranslator(){
+
   autoTranslateDOM();
 
   const obs=new MutationObserver(muts=>{
+
     if(isTranslatingDOM)return;
 
     for(const m of muts){
+
       if(m.type==='childList'){
+
         m.addedNodes.forEach(n=>{
-          if(n.nodeType===Node.TEXT_NODE)translateNode(n);
-          else if(n.nodeType===Node.ELEMENT_NODE)autoTranslateDOM(n);
+
+          if(n.nodeType===Node.TEXT_NODE){
+            translateNode(n);
+          }else if(n.nodeType===Node.ELEMENT_NODE){
+            autoTranslateDOM(n);
+          }
+
         });
+
       }else if(m.type==='characterData'){
+
         translateNode(m.target);
+
       }
     }
+
   });
 
   obs.observe(document.body,{
@@ -2479,51 +3008,77 @@ function initDOMTranslator(){
     characterData:true
   });
 
-  setInterval(()=>autoTranslateDOM(),800);
+  setInterval(
+    ()=>autoTranslateDOM(),
+    800
+  );
 }
 
 function storageGet(key,fb=null){
+
   try{
     return localStorage.getItem(key)??fb;
   }catch(e){
     return fb;
   }
+
 }
 
 function storageSet(key,val){
+
   try{
     localStorage.setItem(key,val);
     return true;
   }catch(e){
     return false;
   }
+
 }
 
 function safeJSON(key,fb){
+
   try{
+
     const r=storageGet(key,null);
+
     if(!r)return fb;
+
     return JSON.parse(r)??fb;
+
   }catch(e){
+
     return fb;
+
   }
+
 }
 
 function normalizeIdentityPart(v){
-  return String(v??'').trim().toLowerCase().replace(/\s+/g,' ');
+
+  return String(v??'')
+  .trim()
+  .toLowerCase()
+  .replace(/\s+/g,' ');
+
 }
 
 function legacyEventKey(event,index=''){
-  const base=event&&(event.id??event.url??event.title??'');
 
-  if(base!==''&&base!==null)return String(base);
+  const base=
+    event&&
+    (event.id??event.url??event.title??'');
+
+  if(base!==''&&base!==null){
+    return String(base);
+  }
 
   return `${String(event?.title||'Live channel')}|${String(event?.league||'')}|${index}`;
 }
 
 function eventKey(event,index=''){
+
   if(!event||typeof event!=='object'){
-    return `v2:fallback|${String(index)}`;
+    return`v2:fallback|${String(index)}`;
   }
 
   const parts=[
@@ -2540,61 +3095,109 @@ function eventKey(event,index=''){
   .map(normalizeIdentityPart)
   .filter(Boolean);
 
-  if(parts.length)return`v2:${parts.join('|')}`;
+  if(parts.length){
+    return`v2:${parts.join('|')}`;
+  }
 
   return`v2:fallback|${normalizeIdentityPart(event.title||'Live channel')}|${normalizeIdentityPart(event.league||'')}|${String(index)}`;
 }
 
 function migrateStoredEventState(events){
+
   const validKeys=new Set();
   const legacyMatches=new Map();
 
   events.forEach((event,i)=>{
+
     const key=eventKey(event,i);
+
     validKeys.add(key);
 
     const leg=legacyEventKey(event,i);
 
-    if(!legacyMatches.has(leg))legacyMatches.set(leg,[]);
+    if(!legacyMatches.has(leg)){
+      legacyMatches.set(leg,[]);
+    }
+
     legacyMatches.get(leg).push(key);
+
   });
 
   const mf=[];
 
-  for(const sk of Array.isArray(favoriteKeys)?favoriteKeys:[]){
+  for(
+    const sk of Array.isArray(favoriteKeys)
+      ?favoriteKeys
+      :[]
+  ){
+
     if(validKeys.has(sk)){
+
       mf.push(sk);
+
       continue;
     }
 
-    const ms=legacyMatches.get(String(sk))||[];
+    const ms=
+      legacyMatches.get(String(sk))||[];
 
-    if(ms.length===1)mf.push(ms[0]);
+    if(ms.length===1){
+      mf.push(ms[0]);
+    }
+
   }
 
   favoriteKeys=[...new Set(mf)];
-  storageSet('talhaFavorites',JSON.stringify(favoriteKeys));
+
+  storageSet(
+    'talhaFavorites',
+    JSON.stringify(favoriteKeys)
+  );
 
   const mr=[];
 
-  for(const item of Array.isArray(recentEvents)?recentEvents:[]){
+  for(
+    const item of Array.isArray(recentEvents)
+      ?recentEvents
+      :[]
+  ){
+
     const sk=item?.key;
 
     if(validKeys.has(sk)){
-      mr.push({...item,key:sk});
+
+      mr.push({
+        ...item,
+        key:sk
+      });
+
       continue;
     }
 
-    const ms=legacyMatches.get(String(sk??''))||[];
+    const ms=
+      legacyMatches.get(String(sk??''))||[];
 
-    if(ms.length===1)mr.push({...item,key:ms[0]});
+    if(ms.length===1){
+
+      mr.push({
+        ...item,
+        key:ms[0]
+      });
+
+    }
+
   }
 
   recentEvents=mr.slice(0,5);
-  storageSet('talhaRecent',JSON.stringify(recentEvents));
+
+  storageSet(
+    'talhaRecent',
+    JSON.stringify(recentEvents)
+  );
 }
 
 function escapeHTML(v){
+
   return String(v??'').replace(
     /[&<>'"]/g,
     c=>({
@@ -2605,41 +3208,75 @@ function escapeHTML(v){
       '"':'&quot;'
     }[c])
   );
+
 }
 
 function leagueName(ev){
-  return translateText(String(ev?.league||'Other')).trim()||'Other';
+
+  return translateText(
+    String(ev?.league||'Other')
+  ).trim()||'Other';
+
 }
 
 function changeTheme(t){
+
   document.body.dataset.theme=t;
   storageSet('talhaTheme',t);
+
 }
 
 function setStatus(text,state='ready'){
-  const dot=document.getElementById('networkDot');
-  const label=document.getElementById('networkText');
 
-  if(label)label.textContent=text;
+  const dot=
+    document.getElementById('networkDot');
+
+  const label=
+    document.getElementById('networkText');
+
+  if(label){
+    label.textContent=text;
+  }
 
   if(dot){
-    dot.className='status-dot'+(
-      state==='offline'?' offline':
-      state==='busy'?' busy':''
-    );
+
+    dot.className=
+      'status-dot'+
+      (
+        state==='offline'
+          ?' offline'
+          :state==='busy'
+            ?' busy'
+            :''
+      );
+
   }
+
 }
 
 function setSync(t){
-  const el=document.getElementById('syncText');
-  if(el)el.textContent=t;
+
+  const el=
+    document.getElementById('syncText');
+
+  if(el){
+    el.textContent=t;
+  }
+
 }
 
 function showToast(title,msg){
-  const old=document.querySelector('.toast');
-  if(old)old.remove();
 
-  const el=document.createElement('div');
+  const old=
+    document.querySelector('.toast');
+
+  if(old){
+    old.remove();
+  }
+
+  const el=
+    document.createElement('div');
+
   el.className='toast';
 
   el.innerHTML=`
@@ -2649,41 +3286,72 @@ function showToast(title,msg){
 
   document.body.appendChild(el);
 
-  requestAnimationFrame(()=>el.classList.add('show'));
+  requestAnimationFrame(()=>{
+    el.classList.add('show');
+  });
 
   setTimeout(()=>{
+
     el.classList.remove('show');
-    setTimeout(()=>el.remove(),250);
+
+    setTimeout(()=>{
+      el.remove();
+    },250);
+
   },3500);
+
 }
 
 function hideLoader(reason='Ready'){
-  const loader=document.getElementById('loader');
 
-  if(!loader||loader.dataset.hidden==='1')return;
+  const loader=
+    document.getElementById('loader');
+
+  if(
+    !loader||
+    loader.dataset.hidden==='1'
+  ){
+    return;
+  }
 
   loader.dataset.hidden='1';
 
-  const s=document.getElementById('loaderStatus');
+  const s=
+    document.getElementById('loaderStatus');
 
-  if(s)s.textContent=reason;
+  if(s){
+    s.textContent=reason;
+  }
 
-  requestAnimationFrame(()=>loader.classList.add('is-hidden'));
+  requestAnimationFrame(()=>{
+    loader.classList.add('is-hidden');
+  });
 
-  setTimeout(()=>loader.remove(),420);
+  setTimeout(()=>{
+    loader.remove();
+  },420);
+
 }
 
 function bootLoader(){
+
   const started=performance.now();
   const MIN_SHOW=2200;
   const MAX_WAIT=5000;
 
-  let domReady=document.readyState!=='loading';
+  let domReady=
+    document.readyState!=='loading';
+
   let finished=false;
 
-  const progress=document.getElementById('loaderProgress');
-  const percent=document.getElementById('loaderPercent');
-  const status=document.getElementById('loaderStatus');
+  const progress=
+    document.getElementById('loaderProgress');
+
+  const percent=
+    document.getElementById('loaderPercent');
+
+  const status=
+    document.getElementById('loaderStatus');
 
   const ticks=[
     [25,'Loading visual engine…'],
@@ -2696,140 +3364,295 @@ function bootLoader(){
   let tickIndex=0;
 
   const animator=setInterval(()=>{
-    const elapsed=performance.now()-started;
-    const pct=Math.min(100,Math.round((elapsed/MIN_SHOW)*100));
 
-    if(progress)progress.style.width=pct+'%';
-    if(percent)percent.textContent=pct+'%';
+    const elapsed=
+      performance.now()-started;
 
-    while(tickIndex<ticks.length&&pct>=ticks[tickIndex][0]){
-      if(status)status.textContent=ticks[tickIndex][1];
-      tickIndex++;
+    const pct=
+      Math.min(
+        100,
+        Math.round(
+          (elapsed/MIN_SHOW)*100
+        )
+      );
+
+    if(progress){
+      progress.style.width=
+        pct+'%';
     }
+
+    if(percent){
+      percent.textContent=
+        pct+'%';
+    }
+
+    while(
+      tickIndex<ticks.length&&
+      pct>=ticks[tickIndex][0]
+    ){
+
+      if(status){
+        status.textContent=
+          ticks[tickIndex][1];
+      }
+
+      tickIndex++;
+
+    }
+
   },40);
 
   const ready=()=>{
+
     domReady=true;
 
-    const wait=Math.max(0,MIN_SHOW-(performance.now()-started));
+    const wait=Math.max(
+      0,
+      MIN_SHOW-
+      (performance.now()-started)
+    );
 
     setTimeout(()=>{
+
       if(finished)return;
 
       finished=true;
+
       clearInterval(animator);
 
-      if(progress)progress.style.width='100%';
-      if(percent)percent.textContent='100%';
+      if(progress){
+        progress.style.width='100%';
+      }
+
+      if(percent){
+        percent.textContent='100%';
+      }
 
       hideLoader('Ready');
+
     },wait);
+
   };
 
   if(!domReady){
-    document.addEventListener('DOMContentLoaded',ready,{once:true});
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      ready,
+      {once:true}
+    );
+
   }else{
+
     ready();
+
   }
 
-  window.addEventListener('load',ready,{once:true});
-  window.addEventListener('pageshow',ready,{once:true});
+  window.addEventListener(
+    'load',
+    ready,
+    {once:true}
+  );
+
+  window.addEventListener(
+    'pageshow',
+    ready,
+    {once:true}
+  );
 
   setTimeout(()=>{
+
     if(finished)return;
 
     finished=true;
+
     clearInterval(animator);
+
     hideLoader('Ready');
+
   },MAX_WAIT);
 }
 
 bootLoader();
 
 function updateClock(){
-  const t=new Intl.DateTimeFormat(undefined,{
-    hour:'2-digit',
-    minute:'2-digit',
-    second:'2-digit',
-    hour12:false
-  }).format(new Date());
 
-  const c=document.getElementById('clockText');
-  if(c)c.textContent=t;
+  const t=
+    new Intl.DateTimeFormat(
+      undefined,
+      {
+        hour:'2-digit',
+        minute:'2-digit',
+        second:'2-digit',
+        hour12:false
+      }
+    ).format(new Date());
 
-  const mc=document.getElementById('menuClock');
-  if(mc)mc.textContent=t;
+  const c=
+    document.getElementById('clockText');
+
+  if(c){
+    c.textContent=t;
+  }
+
+  const mc=
+    document.getElementById('menuClock');
+
+  if(mc){
+    mc.textContent=t;
+  }
+
 }
 
 updateClock();
-setInterval(updateClock,1000);
+
+setInterval(
+  updateClock,
+  1000
+);
 
 function updateNetwork(){
-  const on=navigator.onLine!==false;
+
+  const on=
+    navigator.onLine!==false;
 
   setStatus(
-    on?'System ready':'Offline · network unavailable',
-    on?'ready':'offline'
+    on
+      ?'System ready'
+      :'Offline · network unavailable',
+    on
+      ?'ready'
+      :'offline'
   );
+
 }
 
 function updateAnalytics(){
-  const total=liveEvents.length;
 
-  const favs=liveEvents.filter(
-    (e,i)=>favoriteKeys.includes(eventKey(e,i))
-  ).length;
+  const total=
+    liveEvents.length;
 
-  const rec=Math.min(recentEvents.length,5);
+  const favs=
+    liveEvents.filter(
+      (e,i)=>
+        favoriteKeys.includes(
+          eventKey(e,i)
+        )
+    ).length;
 
-  document.getElementById('countTotal').textContent=String(total).padStart(2,'0');
-  document.getElementById('countFavorites').textContent=String(favs).padStart(2,'0');
-  document.getElementById('countRecent').textContent=String(rec).padStart(2,'0');
+  const rec=
+    Math.min(
+      recentEvents.length,
+      5
+    );
 
-  const pl=document.getElementById('pcbLive');
-  const ps=document.getElementById('pcbStatic');
+  document.getElementById(
+    'countTotal'
+  ).textContent=
+    String(total).padStart(2,'0');
 
-  if(pl)pl.textContent=String(total).padStart(2,'0');
-  if(ps)ps.textContent=String(STATIC_CHANNELS.length).padStart(2,'0');
+  document.getElementById(
+    'countFavorites'
+  ).textContent=
+    String(favs).padStart(2,'0');
+
+  document.getElementById(
+    'countRecent'
+  ).textContent=
+    String(rec).padStart(2,'0');
+
+  const pl=
+    document.getElementById('pcbLive');
+
+  const ps=
+    document.getElementById('pcbStatic');
+
+  if(pl){
+    pl.textContent=
+      String(total).padStart(2,'0');
+  }
+
+  if(ps){
+    ps.textContent=
+      String(
+        STATIC_CHANNELS.length
+      ).padStart(2,'0');
+  }
+
 }
 
 function renderLeagueTabs(){
-  const tabs=document.getElementById('leagueTabs');
+
+  const tabs=
+    document.getElementById(
+      'leagueTabs'
+    );
 
   if(!tabs)return;
 
   const counts={};
 
   liveEvents.forEach(e=>{
-    const n=leagueName(e);
-    counts[n]=(counts[n]||0)+1;
+
+    const n=
+      leagueName(e);
+
+    counts[n]=
+      (counts[n]||0)+1;
+
   });
 
   const pri=n=>{
-    const l=n.toLowerCase();
+
+    const l=
+      n.toLowerCase();
 
     if(l.includes('la liga'))return 0;
+
     if(l.includes('uefa'))return 1;
 
     return 2;
+
   };
 
-  const leagues=Object.keys(counts).sort(
-    (a,b)=>pri(a)-pri(b)||a.localeCompare(b)
-  );
+  const leagues=
+    Object.keys(counts)
+    .sort(
+      (a,b)=>
+        pri(a)-pri(b)||
+        a.localeCompare(b)
+    );
 
   tabs.innerHTML='';
 
-  const addTab=(name,active,cb,count)=>{
-    const b=document.createElement('button');
+  const addTab=(
+    name,
+    active,
+    cb,
+    count
+  )=>{
 
-    b.className='tab-btn'+(active?' active':'');
+    const b=
+      document.createElement('button');
+
+    b.className=
+      'tab-btn'+
+      (active?' active':'');
+
     b.type='button';
-    b.setAttribute('role','tab');
-    b.textContent=`${name} (${count})`;
+
+    b.setAttribute(
+      'role',
+      'tab'
+    );
+
+    b.textContent=
+      `${name} (${count})`;
+
     b.onclick=cb;
 
     tabs.appendChild(b);
+
   };
 
   addTab(
@@ -2840,329 +3663,685 @@ function renderLeagueTabs(){
   );
 
   leagues.forEach(n=>{
+
     addTab(
       n,
       currentLeague===n,
-      ()=>setFilter('league',n),
+      ()=>setFilter(
+        'league',
+        n
+      ),
       counts[n]
     );
+
   });
+
 }
 
 function renderRecent(){
-  const section=document.getElementById('recentSection');
-  const row=document.getElementById('recentRow');
+
+  const section=
+    document.getElementById(
+      'recentSection'
+    );
+
+  const row=
+    document.getElementById(
+      'recentRow'
+    );
 
   if(!section||!row)return;
 
   if(!recentEvents.length){
+
     section.style.display='none';
+
     return;
   }
 
   section.style.display='flex';
+
   row.innerHTML='';
 
-  recentEvents.slice(0,5).forEach(item=>{
-    const chip=document.createElement('button');
+  recentEvents
+  .slice(0,5)
+  .forEach(item=>{
 
-    chip.className='recent-chip';
-    chip.type='button';
-    chip.textContent=item.title;
-    chip.title='Play '+item.title;
-
-    chip.onclick=()=>{
-      const found=liveEvents.find(
-        (e,i)=>eventKey(e,i)===item.key
+    const chip=
+      document.createElement(
+        'button'
       );
 
-      if(found){
-        setServer(found);
-      }else{
-        const sf=STATIC_CHANNELS.find(
-          (e,i)=>eventKey(e,i)===item.key
+    chip.className=
+      'recent-chip';
+
+    chip.type='button';
+
+    chip.textContent=
+      item.title;
+
+    chip.title=
+      'Play '+item.title;
+
+    chip.onclick=()=>{
+
+      const found=
+        liveEvents.find(
+          (e,i)=>
+            eventKey(e,i)===
+            item.key
         );
 
-        if(sf)setServer(sf);
+      if(found){
+
+        setServer(found);
+
+      }else{
+
+        const sf=
+          STATIC_CHANNELS.find(
+            (e,i)=>
+              eventKey(e,i)===
+              item.key
+          );
+
+        if(sf){
+          setServer(sf);
+        }
+
       }
+
     };
 
     row.appendChild(chip);
+
   });
+
 }
 
 function renderMatches(){
-  const container=document.getElementById('serverContainer');
+
+  const container=
+    document.getElementById(
+      'serverContainer'
+    );
 
   if(!container)return;
 
-  const input=document.getElementById('searchChannels');
-  const q=(input?.value||'').trim().toLowerCase();
+  const input=
+    document.getElementById(
+      'searchChannels'
+    );
+
+  const q=
+    (input?.value||'')
+    .trim()
+    .toLowerCase();
 
   container.innerHTML='';
 
   let visible=0;
   let idx=0;
 
-  liveEvents.forEach((event,index)=>{
-    const et=translateText(event?.title||'Live channel');
-    const el=translateText(event?.league||'');
+  liveEvents.forEach(
+    (event,index)=>{
 
-    if(currentLeague!=='all'&&leagueName(event)!==currentLeague)return;
+      const et=
+        translateText(
+          event?.title||
+          'Live channel'
+        );
 
-    const full=(et+' '+el).toLowerCase();
+      const el=
+        translateText(
+          event?.league||''
+        );
 
-    if(q&&!full.includes(q))return;
-
-    idx++;
-
-    const key=eventKey(event,index);
-    const isFav=favoriteKeys.includes(key);
-
-    const row=document.createElement('div');
-
-    row.className='ch-item';
-    row.tabIndex=0;
-    row.setAttribute('role','button');
-    row.setAttribute('aria-label','Play '+et);
-
-    row.innerHTML=`
-      <div class="ch-left">
-        <div class="ch-num">${String(idx).padStart(2,'0')}</div>
-        <div class="ch-info">
-          <strong>${escapeHTML(et)}</strong>
-          <small>${escapeHTML(el||'Live feed')}</small>
-        </div>
-      </div>
-
-      <div class="ch-right">
-        <div class="live-badge">
-          <div class="live-dot"></div>
-          ${escapeHTML(event?.time||'LIVE')}
-        </div>
-
-        <button
-          class="fav-btn ${isFav?'active':''}"
-          type="button"
-          aria-label="${isFav?'Remove from':'Add to'} favorites"
-          aria-pressed="${isFav}">
-          ★
-        </button>
-      </div>
-    `;
-
-    row.onclick=()=>setServer(event,row);
-
-    row.onkeydown=ev=>{
-      if(ev.key==='Enter'||ev.key===' '){
-        ev.preventDefault();
-        setServer(event,row);
+      if(
+        currentLeague!=='all'&&
+        leagueName(event)!==
+        currentLeague
+      ){
+        return;
       }
-    };
 
-    row.querySelector('.fav-btn').onclick=ev=>{
-      ev.stopPropagation();
+      const full=
+        (et+' '+el)
+        .toLowerCase();
 
-      favoriteKeys=isFav
-        ?favoriteKeys.filter(k=>k!==key)
-        :[...favoriteKeys,key];
+      if(
+        q&&
+        !full.includes(q)
+      ){
+        return;
+      }
 
-      storageSet(
-        'talhaFavorites',
-        JSON.stringify(favoriteKeys)
+      idx++;
+
+      const key=
+        eventKey(
+          event,
+          index
+        );
+
+      const isFav=
+        favoriteKeys.includes(
+          key
+        );
+
+      const row=
+        document.createElement(
+          'div'
+        );
+
+      row.className=
+        'ch-item';
+
+      row.tabIndex=0;
+
+      row.setAttribute(
+        'role',
+        'button'
       );
 
-      renderMatches();
-      updateAnalytics();
-    };
+      row.setAttribute(
+        'aria-label',
+        'Play '+et
+      );
 
-    container.appendChild(row);
-    visible++;
-  });
+      row.innerHTML=`
+        <div class="ch-left">
+          <div class="ch-num">
+            ${String(idx).padStart(2,'0')}
+          </div>
+
+          <div class="ch-info">
+            <strong>
+              ${escapeHTML(et)}
+            </strong>
+
+            <small>
+              ${escapeHTML(el||'Live feed')}
+            </small>
+          </div>
+        </div>
+
+        <div class="ch-right">
+
+          <div class="live-badge">
+            <div class="live-dot"></div>
+            ${escapeHTML(
+              event?.time||'LIVE'
+            )}
+          </div>
+
+          <button
+            class="fav-btn ${isFav?'active':''}"
+            type="button"
+            aria-label="${
+              isFav
+                ?'Remove from'
+                :'Add to'
+            } favorites"
+            aria-pressed="${isFav}">
+            ★
+          </button>
+
+        </div>
+      `;
+
+      row.onclick=
+        ()=>setServer(
+          event,
+          row
+        );
+
+      row.onkeydown=
+        ev=>{
+
+          if(
+            ev.key==='Enter'||
+            ev.key===' '
+          ){
+
+            ev.preventDefault();
+
+            setServer(
+              event,
+              row
+            );
+
+          }
+
+        };
+
+      row.querySelector(
+        '.fav-btn'
+      ).onclick=ev=>{
+
+        ev.stopPropagation();
+
+        favoriteKeys=
+          isFav
+            ?favoriteKeys.filter(
+              k=>k!==key
+            )
+            :[
+              ...favoriteKeys,
+              key
+            ];
+
+        storageSet(
+          'talhaFavorites',
+          JSON.stringify(
+            favoriteKeys
+          )
+        );
+
+        renderMatches();
+
+        updateAnalytics();
+
+      };
+
+      container.appendChild(row);
+
+      visible++;
+
+    }
+  );
 
   if(!visible){
+
     container.innerHTML=
       '<div class="empty-state">No channels match your filters.</div>';
+
   }
 
-  document.getElementById('channelSummary').textContent=
+  document.getElementById(
+    'channelSummary'
+  ).textContent=
     `${visible} shown · ${liveEvents.length} total`;
 
   updateAnalytics();
   renderRecent();
   renderStaticChannels();
+
 }
 
 function renderStaticChannels(){
-  const container=document.getElementById('staticServerContainer');
+
+  const container=
+    document.getElementById(
+      'staticServerContainer'
+    );
 
   if(!container)return;
 
   container.innerHTML='';
 
-  const countEl=document.getElementById('staticChannelCount');
+  const countEl=
+    document.getElementById(
+      'staticChannelCount'
+    );
 
   if(countEl){
-    countEl.textContent=String(STATIC_CHANNELS.length);
+
+    countEl.textContent=
+      String(
+        STATIC_CHANNELS.length
+      );
+
   }
 
-  STATIC_CHANNELS.forEach((event,index)=>{
-    const row=document.createElement('div');
+  STATIC_CHANNELS.forEach(
+    (event,index)=>{
 
-    row.className='ch-item';
-    row.tabIndex=0;
-    row.setAttribute('role','button');
-    row.setAttribute('aria-label','Play '+event.title);
+      const row=
+        document.createElement(
+          'div'
+        );
 
-    row.innerHTML=`
-      <div class="ch-left">
-        <div class="ch-num">${String(index+1).padStart(2,'0')}</div>
-        <div class="ch-info">
-          <strong>${escapeHTML(event.title)}</strong>
-          <small>24/7 Network</small>
+      row.className=
+        'ch-item';
+
+      row.tabIndex=0;
+
+      row.setAttribute(
+        'role',
+        'button'
+      );
+
+      row.setAttribute(
+        'aria-label',
+        'Play '+event.title
+      );
+
+      row.innerHTML=`
+        <div class="ch-left">
+
+          <div class="ch-num">
+            ${String(
+              index+1
+            ).padStart(2,'0')}
+          </div>
+
+          <div class="ch-info">
+            <strong>
+              ${escapeHTML(
+                event.title
+              )}
+            </strong>
+
+            <small>
+              24/7 Network
+            </small>
+          </div>
+
         </div>
-      </div>
 
-      <div class="ch-right">
-        <div class="live-badge">
-          <div class="live-dot"></div>
-          24/7
+        <div class="ch-right">
+
+          <div class="live-badge">
+            <div class="live-dot"></div>
+            24/7
+          </div>
+
         </div>
-      </div>
-    `;
+      `;
 
-    row.onclick=()=>setServer(event,row);
+      row.onclick=
+        ()=>setServer(
+          event,
+          row
+        );
 
-    row.onkeydown=ev=>{
-      if(ev.key==='Enter'||ev.key===' '){
-        ev.preventDefault();
-        setServer(event,row);
-      }
-    };
+      row.onkeydown=
+        ev=>{
 
-    container.appendChild(row);
-  });
+          if(
+            ev.key==='Enter'||
+            ev.key===' '
+          ){
+
+            ev.preventDefault();
+
+            setServer(
+              event,
+              row
+            );
+
+          }
+
+        };
+
+      container.appendChild(row);
+
+    }
+  );
+
 }
 
-function setFilter(type,name='all'){
-  currentLeague=type==='league'?name:'all';
+function setFilter(
+  type,
+  name='all'
+){
+
+  currentLeague=
+    type==='league'
+      ?name
+      :'all';
+
   renderLeagueTabs();
   renderMatches();
+
 }
 
-function rememberRecent(event,index=''){
-  const key=eventKey(event,index);
+function rememberRecent(
+  event,
+  index=''
+){
+
+  const key=
+    eventKey(
+      event,
+      index
+    );
 
   recentEvents=[
     {
       key,
-      title:translateText(event?.title||'Live channel')
+      title:
+        translateText(
+          event?.title||
+          'Live channel'
+        )
     },
-    ...recentEvents.filter(x=>x.key!==key)
+    ...recentEvents.filter(
+      x=>x.key!==key
+    )
   ].slice(0,5);
 
   storageSet(
     'talhaRecent',
-    JSON.stringify(recentEvents)
+    JSON.stringify(
+      recentEvents
+    )
   );
+
 }
 
-function setServer(event,targetBtn){
-  const frame=document.getElementById('frame');
+function setServer(
+  event,
+  targetBtn
+){
 
-  if(!frame||!event)return;
+  const frame=
+    document.getElementById(
+      'frame'
+    );
 
-  frame.classList.remove('fade');
+  if(
+    !frame||
+    !event
+  ){
+    return;
+  }
+
+  frame.classList.remove(
+    'fade'
+  );
+
   void frame.offsetWidth;
-  frame.classList.add('fade');
 
-  const BASE=window.__PLAYER_URL_FOR_SESSION||PLAYER_BASE_URL;
+  frame.classList.add(
+    'fade'
+  );
+
+  const BASE=
+    window.__PLAYER_URL_FOR_SESSION||
+    PLAYER_BASE_URL;
 
   let finalUrl='';
 
   if(event.url){
-    const raw=String(event.url);
-    const lower=raw.toLowerCase();
 
-    if(event.isIframeOnly===true){
+    const raw=
+      String(event.url);
+
+    const lower=
+      raw.toLowerCase();
+
+    if(
+      event.isIframeOnly===true
+    ){
+
       finalUrl=raw;
-    }else if(lower.includes('.m3u8')){
-      finalUrl=`${BASE}?Talha=${encodeURIComponent(raw)}`;
-    }else if(raw.includes('id=')){
+
+    }else if(
+      lower.includes('.m3u8')
+    ){
+
+      finalUrl=
+        `${BASE}?Talha=${
+          encodeURIComponent(raw)
+        }`;
+
+    }else if(
+      raw.includes('id=')
+    ){
+
       try{
-        const p=new URL(raw,location.href).searchParams;
+
+        const p=
+          new URL(
+            raw,
+            location.href
+          ).searchParams;
+
         finalUrl=
-          `${BASE}?Talha=${encodeURIComponent(
-            p.get('id')||'androstreamlivetrt1'
-          )}`;
+          `${BASE}?Talha=${
+            encodeURIComponent(
+              p.get('id')||
+              'androstreamlivetrt1'
+            )
+          }`;
+
       }catch(e){
-        finalUrl=`${BASE}?Talha=${encodeURIComponent(raw)}`;
+
+        finalUrl=
+          `${BASE}?Talha=${
+            encodeURIComponent(raw)
+          }`;
+
       }
+
     }else{
+
       finalUrl=raw;
+
     }
+
   }else{
-    finalUrl=`${BASE}?Talha=androstreamlivetrt1`;
+
+    finalUrl=
+      `${BASE}?Talha=androstreamlivetrt1`;
+
   }
 
   try{
-    frame.src='about:blank';
 
-    setTimeout(()=>{
-      frame.src=finalUrl;
-    },20);
+    frame.src=
+      'about:blank';
+
+    setTimeout(
+      ()=>{
+        frame.src=
+          finalUrl;
+      },
+      20
+    );
+
   }catch(e){
-    frame.src=finalUrl;
+
+    frame.src=
+      finalUrl;
+
   }
 
-  const ei=liveEvents.indexOf(event);
+  const ei=
+    liveEvents.indexOf(
+      event
+    );
 
-  rememberRecent(event,ei);
-  renderRecent();
-
-  document.querySelectorAll('.ch-item').forEach(
-    b=>b.classList.remove('active')
+  rememberRecent(
+    event,
+    ei
   );
 
-  if(targetBtn)targetBtn.classList.add('active');
+  renderRecent();
+
+  document
+    .querySelectorAll(
+      '.ch-item'
+    )
+    .forEach(
+      b=>
+        b.classList.remove(
+          'active'
+        )
+    );
+
+  if(targetBtn){
+    targetBtn.classList.add(
+      'active'
+    );
+  }
+
 }
 
 function triggerFirstStream(){
+
   if(
-    (!liveEvents||!liveEvents.length)&&
-    (!recentEvents||!recentEvents.length)
+    (!liveEvents||
+      !liveEvents.length)&&
+    (!recentEvents||
+      !recentEvents.length)
   ){
-    if(STATIC_CHANNELS.length>0){
-      const r=document.querySelector(
-        '#staticServerContainer .ch-item'
+
+    if(
+      STATIC_CHANNELS.length>0
+    ){
+
+      const r=
+        document.querySelector(
+          '#staticServerContainer .ch-item'
+        );
+
+      setServer(
+        STATIC_CHANNELS[0],
+        r
       );
 
-      setServer(STATIC_CHANNELS[0],r);
       return;
     }
   }
 
-  const first=document.querySelector('.ch-list .ch-item');
+  const first=
+    document.querySelector(
+      '.ch-list .ch-item'
+    );
 
-  if(first)first.click();
+  if(first){
+    first.click();
+  }
+
 }
 
 function feedError(msg){
+
   updateAnalytics();
 
-  const c=document.getElementById('serverContainer');
+  const c=
+    document.getElementById(
+      'serverContainer'
+    );
 
   c.innerHTML=`
     <div class="feed-error">
       ${escapeHTML(msg)}
       <br>
-      <button type="button" id="retryFeedBtn">
+      <button
+        type="button"
+        id="retryFeedBtn">
         Retry Feed Sync
       </button>
     </div>
   `;
 
-  document.getElementById('retryFeedBtn').onclick=
+  document.getElementById(
+    'retryFeedBtn'
+  ).onclick=
     ()=>loadTargetScript(true);
 
   setStatus(
@@ -3171,108 +4350,215 @@ function feedError(msg){
   );
 
   triggerFirstStream();
+
 }
 
-function loadTargetScript(force=false){
-  if(feedBusy&&!force)return;
+function loadTargetScript(
+  force=false
+){
 
-  const token=++feedRequestToken;
+  if(
+    feedBusy&&!force
+  ){
+    return;
+  }
+
+  const token=
+    ++feedRequestToken;
 
   feedBusy=true;
 
-  setStatus('Syncing live feeds…','busy');
-  setSync('Connecting…');
+  setStatus(
+    'Syncing live feeds…',
+    'busy'
+  );
 
-  const c=document.getElementById('serverContainer');
+  setSync(
+    'Connecting…'
+  );
+
+  const c=
+    document.getElementById(
+      'serverContainer'
+    );
 
   if(c){
+
     c.innerHTML=
       '<p style="color:rgba(255,255,255,.4);text-align:center;font-size:12px;padding:28px">Syncing satellite channels…</p>';
+
   }
 
-  const old=document.getElementById('mahsunScript');
+  const old=
+    document.getElementById(
+      'mahsunScript'
+    );
 
-  if(old)old.remove();
+  if(old){
+    old.remove();
+  }
 
   try{
+
     delete window.karsilasmalar;
+
   }catch(e){
-    window.karsilasmalar=undefined;
+
+    window.karsilasmalar=
+      undefined;
+
   }
 
-  const script=document.createElement('script');
+  const script=
+    document.createElement(
+      'script'
+    );
 
-  script.id='mahsunScript';
+  script.id=
+    'mahsunScript';
+
   script.async=true;
-  script.src=FEED_URL+'?v='+Date.now();
+
+  script.src=
+    FEED_URL+
+    '?v='+
+    Date.now();
 
   let settled=false;
 
-  const isCurrent=()=>token===feedRequestToken;
+  const isCurrent=()=>
+    token===
+    feedRequestToken;
 
-  const timeout=setTimeout(()=>{
-    if(settled||!isCurrent())return;
+  const timeout=
+    setTimeout(()=>{
 
-    settled=true;
-    feedBusy=false;
-    script.remove();
+      if(
+        settled||
+        !isCurrent()
+      ){
+        return;
+      }
 
-    feedError('Feed server did not respond in time.');
-  },FEED_TIMEOUT);
+      settled=true;
+
+      feedBusy=false;
+
+      script.remove();
+
+      feedError(
+        'Feed server did not respond in time.'
+      );
+
+    },FEED_TIMEOUT);
 
   script.onerror=()=>{
-    if(settled||!isCurrent())return;
+
+    if(
+      settled||
+      !isCurrent()
+    ){
+      return;
+    }
 
     settled=true;
-    clearTimeout(timeout);
+
+    clearTimeout(
+      timeout
+    );
+
     feedBusy=false;
+
     script.remove();
 
-    feedError('Feed server is unavailable right now.');
+    feedError(
+      'Feed server is unavailable right now.'
+    );
+
   };
 
   script.onload=()=>{
-    if(settled||!isCurrent())return;
+
+    if(
+      settled||
+      !isCurrent()
+    ){
+      return;
+    }
 
     settled=true;
-    clearTimeout(timeout);
+
+    clearTimeout(
+      timeout
+    );
+
     feedBusy=false;
 
     try{
+
       let temp=[];
 
       if(
         typeof karsilasmalar!=='undefined'&&
-        Array.isArray(karsilasmalar)
+        Array.isArray(
+          karsilasmalar
+        )
       ){
-        temp.push(...karsilasmalar);
+
+        temp.push(
+          ...karsilasmalar
+        );
+
       }
 
       if(
         typeof futbolMatches!=='undefined'&&
-        Array.isArray(futbolMatches)
+        Array.isArray(
+          futbolMatches
+        )
       ){
-        temp.push(...futbolMatches);
+
+        temp.push(
+          ...futbolMatches
+        );
+
       }
 
       if(!temp.length){
-        throw new Error('Feed Vector Missing');
+
+        throw new Error(
+          'Feed Vector Missing'
+        );
+
       }
 
-      temp.sort((a,b)=>{
-        const at=String(a?.time||'').toLowerCase();
-        const bt=String(b?.time||'').toLowerCase();
+      temp.sort(
+        (a,b)=>{
 
-        const al=
-          at.includes('live')||
-          at.includes('online');
+          const at=
+            String(
+              a?.time||''
+            ).toLowerCase();
 
-        const bl=
-          bt.includes('live')||
-          bt.includes('online');
+          const bt=
+            String(
+              b?.time||''
+            ).toLowerCase();
 
-        return al===bl?0:(al?-1:1);
-      });
+          const al=
+            at.includes('live')||
+            at.includes('online');
+
+          const bl=
+            bt.includes('live')||
+            bt.includes('online');
+
+          return al===bl
+            ?0
+            :(al?-1:1);
+
+        }
+      );
 
       const activeCustom=
         CUSTOM_TOP_FEEDS.filter(
@@ -3284,10 +4570,14 @@ function loadTargetScript(force=false){
         ...temp
       ];
 
-      migrateStoredEventState(liveEvents);
+      migrateStoredEventState(
+        liveEvents
+      );
 
       updateAnalytics();
+
       renderLeagueTabs();
+
       renderMatches();
 
       setStatus(
@@ -3299,44 +4589,86 @@ function loadTargetScript(force=false){
 
       setSync(
         `Synced ${
-          new Intl.DateTimeFormat(undefined,{
-            hour:'2-digit',
-            minute:'2-digit'
-          }).format(new Date())
+          new Intl.DateTimeFormat(
+            undefined,
+            {
+              hour:'2-digit',
+              minute:'2-digit'
+            }
+          ).format(
+            new Date()
+          )
         }`
       );
 
       triggerFirstStream();
 
     }catch(err){
-      feedError('Feed data could not be processed.');
+
+      feedError(
+        'Feed data could not be processed.'
+      );
+
     }
+
   };
 
-  document.body.appendChild(script);
+  document.body.appendChild(
+    script
+  );
+
 }
 
 function login(){
-  const input=document.getElementById('password');
-  const pass=input.value;
 
-  let chosenPlayer=PLAYER_BASE_URL;
+  const input=
+    document.getElementById(
+      'password'
+    );
 
-  if(pass===ALT_PASSWORD){
-    chosenPlayer=PLAYER_ALT_URL;
-  }else if(pass!==PASSWORD){
+  const pass=
+    input.value;
+
+  let chosenPlayer=
+    PLAYER_BASE_URL;
+
+  if(
+    pass===ALT_PASSWORD
+  ){
+
+    chosenPlayer=
+      PLAYER_ALT_URL;
+
+  }else if(
+    pass!==PASSWORD
+  ){
+
     input.select();
 
     input.animate(
       [
-        {transform:'translateX(0)'},
-        {transform:'translateX(-8px)'},
-        {transform:'translateX(8px)'},
-        {transform:'translateX(-4px)'},
-        {transform:'translateX(4px)'},
-        {transform:'translateX(0)'}
+        {
+          transform:'translateX(0)'
+        },
+        {
+          transform:'translateX(-8px)'
+        },
+        {
+          transform:'translateX(8px)'
+        },
+        {
+          transform:'translateX(-4px)'
+        },
+        {
+          transform:'translateX(4px)'
+        },
+        {
+          transform:'translateX(0)'
+        }
       ],
-      {duration:300}
+      {
+        duration:300
+      }
     );
 
     showToast(
@@ -3347,170 +4679,392 @@ function login(){
     return;
   }
 
-  window.__PLAYER_URL_FOR_SESSION=chosenPlayer;
+  window.__PLAYER_URL_FOR_SESSION=
+    chosenPlayer;
 
-  document.getElementById('authWrap')
-    .classList.remove('visible');
+  document.getElementById(
+    'authWrap'
+  )
+  .classList.remove(
+    'visible'
+  );
 
-  document.getElementById('appShell')
-    .style.display='block';
+  document.getElementById(
+    'appShell'
+  ).style.display=
+    'block';
 
   updateAnalytics();
+
   loadTargetScript();
+
 }
 
-function toggleTheatre(on){
-  document.body.classList.toggle('theatre',on);
+function toggleTheatre(
+  on
+){
 
-  const eb=document.getElementById('exitTheatre');
+  document.body.classList.toggle(
+    'theatre',
+    on
+  );
 
-  if(eb)eb.style.display=on?'block':'none';
+  const eb=
+    document.getElementById(
+      'exitTheatre'
+    );
+
+  if(eb){
+    eb.style.display=
+      on?'block':'none';
+  }
 
   if(on){
-    document.documentElement.style.overflow='hidden';
-    document.body.style.overflow='hidden';
+
+    document.documentElement
+      .style.overflow='hidden';
+
+    document.body
+      .style.overflow='hidden';
+
   }else{
-    document.documentElement.style.overflow='';
-    document.body.style.overflow='';
+
+    document.documentElement
+      .style.overflow='';
+
+    document.body
+      .style.overflow='';
+
   }
+
 }
 
 function toggleFocus(){
-  document.body.classList.toggle('focus');
+
+  document.body.classList.toggle(
+    'focus'
+  );
+
   closeMenu();
+
 }
 
 function openMenu(){
-  const m=document.getElementById('quickMenu');
-  const b=document.getElementById('menuBackdrop');
-  const btn=document.getElementById('menuBtn');
 
-  m?.classList.add('open');
-  b?.classList.add('open');
+  const m=
+    document.getElementById(
+      'quickMenu'
+    );
 
-  document.body.classList.add('menu-open');
+  const b=
+    document.getElementById(
+      'menuBackdrop'
+    );
 
-  if(m)m.setAttribute('aria-hidden','false');
-  if(btn)btn.setAttribute('aria-expanded','true');
+  const btn=
+    document.getElementById(
+      'menuBtn'
+    );
+
+  m?.classList.add(
+    'open'
+  );
+
+  b?.classList.add(
+    'open'
+  );
+
+  document.body.classList.add(
+    'menu-open'
+  );
+
+  if(m){
+
+    m.setAttribute(
+      'aria-hidden',
+      'false'
+    );
+
+  }
+
+  if(btn){
+
+    btn.setAttribute(
+      'aria-expanded',
+      'true'
+    );
+
+  }
+
 }
 
 function closeMenu(){
-  const m=document.getElementById('quickMenu');
-  const b=document.getElementById('menuBackdrop');
-  const btn=document.getElementById('menuBtn');
 
-  m?.classList.remove('open');
-  b?.classList.remove('open');
+  const m=
+    document.getElementById(
+      'quickMenu'
+    );
 
-  document.body.classList.remove('menu-open');
+  const b=
+    document.getElementById(
+      'menuBackdrop'
+    );
 
-  if(m)m.setAttribute('aria-hidden','true');
-  if(btn)btn.setAttribute('aria-expanded','false');
+  const btn=
+    document.getElementById(
+      'menuBtn'
+    );
+
+  m?.classList.remove(
+    'open'
+  );
+
+  b?.classList.remove(
+    'open'
+  );
+
+  document.body.classList.remove(
+    'menu-open'
+  );
+
+  if(m){
+
+    m.setAttribute(
+      'aria-hidden',
+      'true'
+    );
+
+  }
+
+  if(btn){
+
+    btn.setAttribute(
+      'aria-expanded',
+      'false'
+    );
+
+  }
+
 }
 
 function scrollToChannels(){
-  document.querySelector('.sidebar')?.scrollIntoView({
+
+  document.querySelector(
+    '.sidebar'
+  )?.scrollIntoView({
     behavior:'smooth',
     block:'start'
   });
+
 }
 
 function showFavorites(){
+
   closeMenu();
 
-  document.getElementById('searchChannels').value='';
+  document.getElementById(
+    'searchChannels'
+  ).value='';
+
   currentLeague='all';
 
-  const c=document.getElementById('serverContainer');
+  const c=
+    document.getElementById(
+      'serverContainer'
+    );
 
   c.innerHTML='';
 
   let shown=0;
 
-  liveEvents.forEach((event,index)=>{
-    if(!favoriteKeys.includes(eventKey(event,index)))return;
+  liveEvents.forEach(
+    (event,index)=>{
 
-    shown++;
+      if(
+        !favoriteKeys.includes(
+          eventKey(event,index)
+        )
+      ){
+        return;
+      }
 
-    const row=document.createElement('div');
+      shown++;
 
-    row.className='ch-item';
-    row.tabIndex=0;
-    row.setAttribute('role','button');
+      const row=
+        document.createElement(
+          'div'
+        );
 
-    const t=translateText(event?.title||'Live channel');
-    const l=translateText(event?.league||'');
+      row.className=
+        'ch-item';
 
-    row.innerHTML=`
-      <div class="ch-left">
-        <div class="ch-num">${String(shown).padStart(2,'0')}</div>
-        <div class="ch-info">
-          <strong>${escapeHTML(t)}</strong>
-          <small>${escapeHTML(l||'Live feed')}</small>
+      row.tabIndex=0;
+
+      row.setAttribute(
+        'role',
+        'button'
+      );
+
+      const t=
+        translateText(
+          event?.title||
+          'Live channel'
+        );
+
+      const l=
+        translateText(
+          event?.league||''
+        );
+
+      row.innerHTML=`
+        <div class="ch-left">
+
+          <div class="ch-num">
+            ${String(
+              shown
+            ).padStart(2,'0')}
+          </div>
+
+          <div class="ch-info">
+
+            <strong>
+              ${escapeHTML(t)}
+            </strong>
+
+            <small>
+              ${escapeHTML(
+                l||'Live feed'
+              )}
+            </small>
+
+          </div>
+
         </div>
-      </div>
 
-      <div class="ch-right">
-        <div class="live-badge">
-          <div class="live-dot"></div>
-          ${escapeHTML(event?.time||'LIVE')}
+        <div class="ch-right">
+
+          <div class="live-badge">
+            <div class="live-dot"></div>
+            ${escapeHTML(
+              event?.time||'LIVE'
+            )}
+          </div>
+
         </div>
-      </div>
-    `;
+      `;
 
-    row.onclick=()=>setServer(event,row);
+      row.onclick=
+        ()=>setServer(
+          event,
+          row
+        );
 
-    c.appendChild(row);
-  });
+      c.appendChild(row);
 
-  STATIC_CHANNELS.forEach((event,index)=>{
-    if(!favoriteKeys.includes(eventKey(event,index)))return;
+    }
+  );
 
-    shown++;
+  STATIC_CHANNELS.forEach(
+    (event,index)=>{
 
-    const row=document.createElement('div');
+      if(
+        !favoriteKeys.includes(
+          eventKey(
+            event,
+            index
+          )
+        )
+      ){
+        return;
+      }
 
-    row.className='ch-item';
-    row.tabIndex=0;
-    row.setAttribute('role','button');
+      shown++;
 
-    const t=translateText(event?.title||'Live channel');
+      const row=
+        document.createElement(
+          'div'
+        );
 
-    row.innerHTML=`
-      <div class="ch-left">
-        <div class="ch-num">${String(shown).padStart(2,'0')}</div>
-        <div class="ch-info">
-          <strong>${escapeHTML(t)}</strong>
-          <small>24/7 Network</small>
+      row.className=
+        'ch-item';
+
+      row.tabIndex=0;
+
+      row.setAttribute(
+        'role',
+        'button'
+      );
+
+      const t=
+        translateText(
+          event?.title||
+          'Live channel'
+        );
+
+      row.innerHTML=`
+        <div class="ch-left">
+
+          <div class="ch-num">
+            ${String(
+              shown
+            ).padStart(2,'0')}
+          </div>
+
+          <div class="ch-info">
+
+            <strong>
+              ${escapeHTML(t)}
+            </strong>
+
+            <small>
+              24/7 Network
+            </small>
+
+          </div>
+
         </div>
-      </div>
 
-      <div class="ch-right">
-        <div class="live-badge">
-          <div class="live-dot"></div>
-          24/7
+        <div class="ch-right">
+
+          <div class="live-badge">
+            <div class="live-dot"></div>
+            24/7
+          </div>
+
         </div>
-      </div>
-    `;
+      `;
 
-    row.onclick=()=>setServer(event,row);
+      row.onclick=
+        ()=>setServer(
+          event,
+          row
+        );
 
-    c.appendChild(row);
-  });
+      c.appendChild(row);
+
+    }
+  );
 
   if(!shown){
+
     c.innerHTML=
       '<div class="empty-state">No favorites yet. Tap ★ on a channel to save it.</div>';
+
   }
 
-  document.getElementById('channelSummary').textContent=
+  document.getElementById(
+    'channelSummary'
+  ).textContent=
     `${shown} favorites`;
 
   updateAnalytics();
+
   scrollToChannels();
+
 }
 
 function cycleTheme(){
+
   const themes=[
     'violet',
     'ocean',
@@ -3521,267 +5075,512 @@ function cycleTheme(){
     'carbon'
   ];
 
-  const cur=document.body.dataset.theme||'violet';
+  const cur=
+    document.body.dataset.theme||
+    'violet';
 
   const next=
-    themes[(themes.indexOf(cur)+1)%themes.length];
+    themes[
+      (themes.indexOf(cur)+1)%
+      themes.length
+    ];
 
   changeTheme(next);
 
-  const p=document.getElementById('themePicker');
+  const p=
+    document.getElementById(
+      'themePicker'
+    );
 
-  if(p)p.value=next;
+  if(p){
+    p.value=next;
+  }
 
   closeMenu();
+
 }
 
 function lockSession(){
+
   closeMenu();
+
   toggleTheatre(false);
-  document.body.classList.remove('focus');
 
-  document.getElementById('appShell')
-    .style.display='none';
+  document.body.classList.remove(
+    'focus'
+  );
 
-  const aw=document.getElementById('authWrap');
+  document.getElementById(
+    'appShell'
+  ).style.display='none';
 
-  aw.classList.add('visible');
+  const aw=
+    document.getElementById(
+      'authWrap'
+    );
 
-  document.getElementById('password').value='';
+  aw.classList.add(
+    'visible'
+  );
+
+  document.getElementById(
+    'password'
+  ).value='';
 
   setTimeout(
-    ()=>document.getElementById('password').focus(),
+    ()=>{
+      document.getElementById(
+        'password'
+      ).focus();
+    },
     100
   );
+
 }
 
-function handleMenuAction(action){
-  if(action==='home'){
+function handleMenuAction(
+  action
+){
+
+  if(
+    action==='home'
+  ){
+
     closeMenu();
+
     currentLeague='all';
+
     renderLeagueTabs();
+
     renderMatches();
+
     scrollToChannels();
 
-  }else if(action==='favorites'){
+  }else if(
+    action==='favorites'
+  ){
+
     showFavorites();
 
-  }else if(action==='recent'){
+  }else if(
+    action==='recent'
+  ){
+
     closeMenu();
 
-    document.getElementById('recentSection')
+    document
+      .getElementById(
+        'recentSection'
+      )
       ?.scrollIntoView({
         behavior:'smooth',
         block:'center'
       });
 
-  }else if(action==='cinema'){
+  }else if(
+    action==='cinema'
+  ){
+
     closeMenu();
+
     toggleTheatre(true);
 
-  }else if(action==='focus'){
+  }else if(
+    action==='focus'
+  ){
+
     toggleFocus();
 
-  }else if(action==='lock'){
+  }else if(
+    action==='lock'
+  ){
+
     lockSession();
 
-  }else if(action==='refresh'){
+  }else if(
+    action==='refresh'
+  ){
+
     closeMenu();
+
     loadTargetScript(true);
 
-  }else if(action==='theme'){
+  }else if(
+    action==='theme'
+  ){
+
     cycleTheme();
 
-  }else if(action==='shortcuts'){
+  }else if(
+    action==='shortcuts'
+  ){
+
     closeMenu();
 
     showToast(
       'Shortcuts',
       '/ or Ctrl+K: Search  ·  Ctrl+R: Sync  ·  Esc: Close'
     );
+
   }
+
 }
 
-const savedTheme=storageGet('talhaTheme','violet');
+const savedTheme=
+  storageGet(
+    'talhaTheme',
+    'violet'
+  );
 
-document.getElementById('themePicker').value=savedTheme;
-changeTheme(savedTheme);
+document.getElementById(
+  'themePicker'
+).value=
+  savedTheme;
+
+changeTheme(
+  savedTheme
+);
 
 const noticeBox=
-  document.getElementById('maintenanceNotice');
+  document.getElementById(
+    'maintenanceNotice'
+  );
 
-if(SHOW_MAINTENANCE_MSG){
-  noticeBox.style.display='flex';
+if(
+  SHOW_MAINTENANCE_MSG
+){
+
+  noticeBox.style.display=
+    'flex';
+
 }
 
 if(
-  (navigator.connection&&navigator.connection.saveData)||
-  ((navigator.deviceMemory||8)<=2)||
+  (
+    navigator.connection&&
+    navigator.connection.saveData
+  )||
+  (
+    (navigator.deviceMemory||8)<=2
+  )||
   (
     window.innerWidth<600&&
     navigator.hardwareConcurrency&&
     navigator.hardwareConcurrency<=4
   )
 ){
-  document.body.classList.add('low-power');
+
+  document.body.classList.add(
+    'low-power'
+  );
+
 }
 
 const pCount=
-  document.body.classList.contains('low-power')
+  document.body.classList.contains(
+    'low-power'
+  )
     ?0
     :(window.innerWidth<600?12:30);
 
-for(let i=0;i<pCount;i++){
-  const d=document.createElement('div');
+for(
+  let i=0;
+  i<pCount;
+  i++
+){
+
+  const d=
+    document.createElement(
+      'div'
+    );
 
   d.className='p';
-  d.style.left=Math.random()*100+'%';
-  d.style.animationDuration=(14+Math.random()*12)+'s';
 
-  document.getElementById('particles')
-    .appendChild(d);
+  d.style.left=
+    Math.random()*100+
+    '%';
+
+  d.style.animationDuration=
+    (
+      14+
+      Math.random()*12
+    )+
+    's';
+
+  document.getElementById(
+    'particles'
+  ).appendChild(d);
+
 }
 
-document.getElementById('authWrap')
-  .classList.add('visible');
+document.getElementById(
+  'authWrap'
+).classList.add(
+  'visible'
+);
 
 renderStaticChannels();
+
 updateNetwork();
+
 updateAnalytics();
 
-document.getElementById('loginBtn')
-  .addEventListener('click',login);
+document.getElementById(
+  'loginBtn'
+).addEventListener(
+  'click',
+  login
+);
 
-document.getElementById('password')
-  .addEventListener('keydown',e=>{
-    if(e.key==='Enter')login();
-  });
+document.getElementById(
+  'password'
+).addEventListener(
+  'keydown',
+  e=>{
+    if(e.key==='Enter'){
+      login();
+    }
+  }
+);
 
-document.getElementById('theatreBtn')
-  .addEventListener('click',()=>toggleTheatre(true));
+document.getElementById(
+  'theatreBtn'
+).addEventListener(
+  'click',
+  ()=>toggleTheatre(true)
+);
 
-document.getElementById('theatreTextBtn')
-  .addEventListener('click',()=>toggleTheatre(true));
+document.getElementById(
+  'theatreTextBtn'
+).addEventListener(
+  'click',
+  ()=>toggleTheatre(true)
+);
 
-document.getElementById('exitTheatre')
-  .addEventListener('click',()=>toggleTheatre(false));
+document.getElementById(
+  'exitTheatre'
+).addEventListener(
+  'click',
+  ()=>toggleTheatre(false)
+);
 
-document.getElementById('refreshFeedBtn')
-  .addEventListener('click',()=>loadTargetScript(true));
+document.getElementById(
+  'refreshFeedBtn'
+).addEventListener(
+  'click',
+  ()=>loadTargetScript(true)
+);
 
-document.getElementById('favoriteFilterBtn')
-  .addEventListener('click',showFavorites);
+document.getElementById(
+  'favoriteFilterBtn'
+).addEventListener(
+  'click',
+  showFavorites
+);
 
-document.getElementById('menuBtn')
-  .addEventListener('click',openMenu);
+document.getElementById(
+  'menuBtn'
+).addEventListener(
+  'click',
+  openMenu
+);
 
-document.getElementById('menuTextBtn')
-  .addEventListener('click',openMenu);
+document.getElementById(
+  'menuTextBtn'
+).addEventListener(
+  'click',
+  openMenu
+);
 
-document.getElementById('closeMenuBtn')
-  .addEventListener('click',closeMenu);
+document.getElementById(
+  'closeMenuBtn'
+).addEventListener(
+  'click',
+  closeMenu
+);
 
-document.getElementById('menuBackdrop')
-  .addEventListener('click',closeMenu);
+document.getElementById(
+  'menuBackdrop'
+).addEventListener(
+  'click',
+  closeMenu
+);
 
-document.querySelectorAll('.menu-item').forEach(btn=>{
-  btn.addEventListener(
-    'click',
-    ()=>handleMenuAction(btn.dataset.action)
-  );
-});
+document.querySelectorAll(
+  '.menu-item'
+).forEach(
+  btn=>{
+    btn.addEventListener(
+      'click',
+      ()=>handleMenuAction(
+        btn.dataset.action
+      )
+    );
+  }
+);
 
-document.getElementById('themePicker')
-  .addEventListener(
-    'change',
-    e=>changeTheme(e.target.value)
-  );
+document.getElementById(
+  'themePicker'
+).addEventListener(
+  'change',
+  e=>changeTheme(
+    e.target.value
+  )
+);
 
 function doClearSearch(){
-  const i=document.getElementById('searchChannels');
+
+  const i=
+    document.getElementById(
+      'searchChannels'
+    );
 
   i.value='';
+
   i.focus();
 
   currentLeague='all';
 
   renderLeagueTabs();
+
   renderMatches();
+
 }
 
-document.getElementById('clearSearchBtn')
-  .addEventListener('click',doClearSearch);
+document.getElementById(
+  'clearSearchBtn'
+).addEventListener(
+  'click',
+  doClearSearch
+);
 
-document.getElementById('clearSearchBtn2')
-  .addEventListener('click',doClearSearch);
+document.getElementById(
+  'clearSearchBtn2'
+).addEventListener(
+  'click',
+  doClearSearch
+);
 
-document.getElementById('searchChannels')
-  .addEventListener('input',()=>{
-    clearTimeout(searchTimer);
+document.getElementById(
+  'searchChannels'
+).addEventListener(
+  'input',
+  ()=>{
 
-    searchTimer=setTimeout(
-      renderMatches,
-      SEARCH_DELAY
+    clearTimeout(
+      searchTimer
     );
-  });
 
-window.addEventListener('online',()=>{
-  updateNetwork();
+    searchTimer=
+      setTimeout(
+        renderMatches,
+        SEARCH_DELAY
+      );
 
-  if(
-    document.getElementById('appShell').style.display!=='none'&&
-    !liveEvents.length
-  ){
-    loadTargetScript(true);
   }
-});
+);
 
-window.addEventListener('offline',updateNetwork);
+window.addEventListener(
+  'online',
+  ()=>{
 
-window.addEventListener('keydown',e=>{
-  const tag=document.activeElement?.tagName||'';
-
-  if(
-    e.key==='/'&&
-    tag!=='INPUT'&&
-    tag!=='TEXTAREA'
-  ){
-    e.preventDefault();
-
-    document.getElementById('searchChannels').focus();
-  }
-
-  if(
-    (e.ctrlKey||e.metaKey)&&
-    e.key.toLowerCase()==='k'
-  ){
-    e.preventDefault();
-
-    document.getElementById('searchChannels')?.focus();
-  }
-
-  if(e.key==='Escape'){
-    if(document.body.classList.contains('theatre')){
-      toggleTheatre(false);
-    }else{
-      closeMenu();
-    }
-  }
-
-  if(
-    e.key.toLowerCase()==='r'&&
-    (e.ctrlKey||e.metaKey)
-  ){
-    e.preventDefault();
+    updateNetwork();
 
     if(
-      document.getElementById('appShell')
-        .style.display!=='none'
+      document.getElementById(
+        'appShell'
+      ).style.display!=='none'&&
+      !liveEvents.length
     ){
+
       loadTargetScript(true);
+
     }
+
   }
-});
+);
+
+window.addEventListener(
+  'offline',
+  updateNetwork
+);
+
+window.addEventListener(
+  'keydown',
+  e=>{
+
+    const tag=
+      document.activeElement?.tagName||
+      '';
+
+    if(
+      e.key==='/'&&
+      tag!=='INPUT'&&
+      tag!=='TEXTAREA'
+    ){
+
+      e.preventDefault();
+
+      document.getElementById(
+        'searchChannels'
+      ).focus();
+
+    }
+
+    if(
+      (e.ctrlKey||e.metaKey)&&
+      e.key.toLowerCase()==='k'
+    ){
+
+      e.preventDefault();
+
+      document.getElementById(
+        'searchChannels'
+      )?.focus();
+
+    }
+
+    if(
+      e.key==='Escape'
+    ){
+
+      if(
+        document.body.classList.contains(
+          'theatre'
+        )
+      ){
+
+        toggleTheatre(false);
+
+      }else{
+
+        closeMenu();
+
+      }
+
+    }
+
+    if(
+      e.key.toLowerCase()==='r'&&
+      (e.ctrlKey||e.metaKey)
+    ){
+
+      e.preventDefault();
+
+      if(
+        document.getElementById(
+          'appShell'
+        ).style.display!=='none'
+      ){
+
+        loadTargetScript(true);
+
+      }
+
+    }
+
+  }
+);
 
 initDOMTranslator();
 </script>
