@@ -130,9 +130,96 @@ body{
   height:100%!important;
   object-fit:contain!important;
   transform:translateZ(0);
+  -webkit-transform:translateZ(0);
   -webkit-backface-visibility:hidden;
   backface-visibility:hidden;
-  -webkit-transform:translateZ(0);
+}
+
+#custom-poster-overlay{
+  position:absolute;
+  inset:0;
+  z-index:50;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background:#030712;
+  cursor:pointer;
+  user-select:none;
+  transition:opacity .45s ease,visibility .45s ease;
+}
+
+#custom-poster-overlay.hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+#custom-poster-overlay svg{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+#player-loading-indicator{
+  position:absolute;
+  left:50%;
+  bottom:18px;
+  z-index:3;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:154px;
+  min-height:34px;
+  padding:8px 14px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  background:rgba(0,0,0,.72);
+  color:#fff;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  white-space:nowrap;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  box-shadow:0 6px 20px rgba(0,0,0,.45),0 0 12px var(--skin-glow);
+  opacity:1;
+  visibility:visible;
+  transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1),visibility .55s ease;
+}
+
+#player-loading-indicator.hide{
+  opacity:0;
+  visibility:hidden;
+  transform:translateX(-50%) translateY(16px) scale(.96);
+  pointer-events:none;
+}
+
+#player-loading-dots{
+  display:inline-block;
+  width:18px;
+  margin-left:3px;
+  overflow:hidden;
+  text-align:left;
+  vertical-align:bottom;
+}
+
+#player-loading-dots::after{
+  content:"";
+  display:inline-block;
+  animation:loadingDots 1.15s steps(4,end) infinite;
+}
+
+@keyframes loadingDots{
+  0%{content:""}
+  25%{content:"."}
+  50%{content:".."}
+  75%{content:"..."}
+  100%{content:""}
 }
 
 #unmute-overlay-btn{
@@ -184,34 +271,6 @@ body{
   visibility:hidden;
   pointer-events:none;
   transform:translateX(-50%) translateY(-10px);
-}
-
-#custom-poster-overlay{
-  position:absolute;
-  inset:0;
-  z-index:50;
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  background:#030712;
-  cursor:pointer;
-  user-select:none;
-  transition:opacity .45s ease,visibility .45s ease;
-}
-
-#custom-poster-overlay.hidden{
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-}
-
-#custom-poster-overlay svg{
-  width:100%;
-  height:100%;
-  object-fit:cover;
 }
 
 #settings-toggle-btn{
@@ -635,7 +694,6 @@ input[type="range"]::-moz-range-thumb{
 [data-player] .media-control-button svg circle{
   fill:#fff!important;
   stroke:#fff!important;
-  transition:fill .18s ease,stroke .18s ease,filter .18s ease!important;
 }
 
 [data-player] .media-control-button:hover svg path,
@@ -721,6 +779,14 @@ input[type="range"]::-moz-range-thumb{
 }
 
 @media(max-width:480px){
+  #player-loading-indicator{
+    bottom:14px;
+    min-width:148px;
+    min-height:32px;
+    padding:7px 12px;
+    font-size:9px;
+  }
+
   #unmute-overlay-btn{
     top:10px;
     padding:5px 11px;
@@ -761,6 +827,10 @@ input[type="range"]::-moz-range-thumb{
 }
 
 @media(max-height:480px) and (orientation:landscape){
+  #player-loading-indicator{
+    bottom:10px;
+  }
+
   #settings-toggle-btn{
     top:calc(env(safe-area-inset-top,0px) + 6px);
     width:34px;
@@ -772,12 +842,7 @@ input[type="range"]::-moz-range-thumb{
     top:calc(env(safe-area-inset-top,0px) + 42px);
     right:max(8px,env(safe-area-inset-right,0px));
     width:min(300px,calc(100vw - 16px));
-    max-height:calc(
-      100dvh -
-      env(safe-area-inset-top,0px) -
-      env(safe-area-inset-bottom,0px) -
-      50px
-    );
+    max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 50px);
     padding:8px;
     gap:8px;
   }
@@ -788,12 +853,18 @@ input[type="range"]::-moz-range-thumb{
   .tab-btn,
   .preset-btn,
   .skin-btn,
-  .quality-select{
+  .quality-select,
+  #player-loading-indicator{
     transition:none;
   }
 
   #control-drawer{
     animation:none;
+  }
+
+  #player-loading-dots::after{
+    animation:none;
+    content:"...";
   }
 }
 </style>
@@ -809,20 +880,13 @@ input[type="range"]::-moz-range-thumb{
 
   <div id="player-shell">
 
-    <button id="unmute-overlay-btn" title="Click to Unmute" type="button">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
-      </svg>
-      <span>UNMUTE</span>
-    </button>
-
     <div id="custom-poster-overlay">
+
       <svg viewBox="0 0 1920 1080"
            xmlns="http://www.w3.org/2000/svg"
            preserveAspectRatio="xMidYMid slice">
 
         <defs>
-
           <radialGradient id="bgGlow" cx="50%" cy="50%" r="65%">
             <stop offset="0%" stop-color="#00F2FE" stop-opacity=".25"/>
             <stop offset="50%" stop-color="#A855F7" stop-opacity=".10"/>
@@ -832,35 +896,28 @@ input[type="range"]::-moz-range-thumb{
           <linearGradient id="textGrad"
                           x1="0%" y1="0%"
                           x2="100%" y2="100%">
-
             <stop offset="0%" stop-color="#00F2FE"/>
             <stop offset="50%" stop-color="#4FACFE"/>
             <stop offset="100%" stop-color="#FFD700"/>
-
           </linearGradient>
 
           <filter id="glow"
                   x="-20%" y="-20%"
-                  width="140%" height="140%">
-
+                  width="140%"
+                  height="140%">
             <feGaussianBlur stdDeviation="16" result="blur"/>
             <feComposite in="SourceGraphic"
                           in2="blur"
                           operator="over"/>
-
           </filter>
 
           <filter id="subtleGlow">
-
             <feGaussianBlur stdDeviation="8" result="blur"/>
-
             <feMerge>
               <feMergeNode in="blur"/>
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
-
           </filter>
-
         </defs>
 
         <rect width="100%" height="100%" fill="#030712"/>
@@ -933,11 +990,28 @@ input[type="range"]::-moz-range-thumb{
               stroke-width="2"
               opacity=".8"
               stroke-linecap="round"/>
-
       </svg>
+
+      <div id="player-loading-indicator">
+        <span>PLEASE WAIT · LOADING</span>
+        <span id="player-loading-dots"></span>
+      </div>
+
     </div>
 
+    <button id="unmute-overlay-btn"
+            title="Click to Unmute"
+            type="button">
+
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+      </svg>
+
+      <span>UNMUTE</span>
+    </button>
+
     <div id="player-container"></div>
+
   </div>
 
   <button id="settings-toggle-btn"
@@ -949,6 +1023,7 @@ input[type="range"]::-moz-range-thumb{
   <div id="control-drawer">
 
     <div class="drawer-tabs">
+
       <button class="tab-btn active"
               data-tab="tab-skins"
               type="button">
@@ -966,6 +1041,7 @@ input[type="range"]::-moz-range-thumb{
               type="button">
         Audio
       </button>
+
     </div>
 
     <div id="tab-skins"
@@ -1026,6 +1102,7 @@ input[type="range"]::-moz-range-thumb{
         </button>
 
       </div>
+
     </div>
 
     <div id="tab-video"
@@ -1039,11 +1116,27 @@ input[type="range"]::-moz-range-thumb{
 
         <select id="drawer-quality-selector"
                 class="quality-select">
-          <option value="-1">Auto</option>
-          <option value="1080p">1080p (Full HD)</option>
-          <option value="720p">720p (HD)</option>
-          <option value="480p">480p (SD)</option>
-          <option value="360p">360p</option>
+
+          <option value="-1">
+            Auto
+          </option>
+
+          <option value="1080p">
+            1080p (Full HD)
+          </option>
+
+          <option value="720p">
+            720p (HD)
+          </option>
+
+          <option value="480p">
+            480p (SD)
+          </option>
+
+          <option value="360p">
+            360p
+          </option>
+
         </select>
 
       </div>
@@ -1139,6 +1232,7 @@ input[type="range"]::-moz-range-thumb{
         </button>
 
       </div>
+
     </div>
 
     <div id="tab-audio"
@@ -1169,31 +1263,40 @@ input[type="range"]::-moz-range-thumb{
 
       <label class="switch-label">
 
-        <span>Deep Bass Booster</span>
+        <span>
+          Deep Bass Booster
+        </span>
 
         <span class="switch">
+
           <input type="checkbox"
                  id="toggle-bass">
 
           <span class="slider"></span>
+
         </span>
 
       </label>
 
       <label class="switch-label">
 
-        <span>Clear Dialogue Mode</span>
+        <span>
+          Clear Dialogue Mode
+        </span>
 
         <span class="switch">
+
           <input type="checkbox"
                  id="toggle-vocal">
 
           <span class="slider"></span>
+
         </span>
 
       </label>
 
     </div>
+
   </div>
 
   <div id="uyarikutu">
@@ -1211,9 +1314,8 @@ input[type="range"]::-moz-range-thumb{
 </div>
 
 <script>
-
 function hidePoster(){
-  const poster =
+  const poster=
     document.getElementById(
       'custom-poster-overlay'
     );
@@ -1226,10 +1328,34 @@ function hidePoster(){
   }
 }
 
+function hideLoadingIndicator(){
+  const loading=
+    document.getElementById(
+      'player-loading-indicator'
+    );
+
+  if(
+    loading &&
+    !loading.classList.contains('hide')
+  ){
+    loading.classList.add('hide');
+  }
+}
+
+function showLoadingIndicator(){
+  const loading=
+    document.getElementById(
+      'player-loading-indicator'
+    );
+
+  if(loading){
+    loading.classList.remove('hide');
+  }
+}
 
 (function initPlayerEngine(){
 
-  const VALID_THEMES =
+  const VALID_THEMES=
     new Set([
       'cyber',
       'netflix',
@@ -1239,24 +1365,24 @@ function hidePoster(){
       'amethyst'
     ]);
 
-  const urlParams =
+  const urlParams=
     new URLSearchParams(
       window.location.search
     );
 
-  const themeParam =
+  const themeParam=
     String(
       urlParams.get('theme') || ''
     ).toLowerCase();
 
-  const savedTheme =
+  const savedTheme=
     String(
       localStorage.getItem(
         'player_skin_theme'
       ) || 'gold'
     ).toLowerCase();
 
-  const activeTheme =
+  const activeTheme=
     VALID_THEMES.has(themeParam)
       ? themeParam
       : (
@@ -1270,10 +1396,9 @@ function hidePoster(){
     activeTheme
   );
 
-
   function updateThemeMeta(){
 
-    const meta =
+    const meta=
       document.querySelector(
         'meta[name="theme-color"]'
       );
@@ -1285,56 +1410,57 @@ function hidePoster(){
         getComputedStyle(
           document.documentElement
         )
-        .getPropertyValue('--skin-bg')
+        .getPropertyValue(
+          '--skin-bg'
+        )
         .trim() || '#000000'
       );
 
     }
-  }
 
+  }
 
   document.addEventListener(
     'DOMContentLoaded',
     ()=>{
 
+      showLoadingIndicator();
       updateThemeMeta();
 
-      const toggleBtn =
+      const toggleBtn=
         document.getElementById(
           'settings-toggle-btn'
         );
 
-      const drawer =
+      const drawer=
         document.getElementById(
           'control-drawer'
         );
 
-      const tabs =
+      const tabs=
         document.querySelectorAll(
           '.tab-btn'
         );
 
-      const tabContents =
+      const tabContents=
         document.querySelectorAll(
           '.tab-content'
         );
 
-      const skinButtons =
+      const skinButtons=
         document.querySelectorAll(
           '.skin-btn'
         );
 
-      const posterOverlay =
+      const posterOverlay=
         document.getElementById(
           'custom-poster-overlay'
         );
 
-
       posterOverlay?.addEventListener(
         'click',
         ()=>{
-
-          const video =
+          const video=
             document.querySelector(
               '#player-container video'
             );
@@ -1342,10 +1468,8 @@ function hidePoster(){
           if(video){
             tryVideoPlay(video);
           }
-
         }
       );
-
 
       const closeDrawer=()=>{
 
@@ -1362,7 +1486,6 @@ function hidePoster(){
 
       };
 
-
       const openDrawer=()=>{
 
         if(!drawer)return;
@@ -1378,59 +1501,58 @@ function hidePoster(){
 
       };
 
+      skinButtons.forEach(
+        btn=>{
 
-      skinButtons.forEach(btn=>{
-
-        const skin =
-          btn.getAttribute(
-            'data-skin'
-          );
-
-        if(skin===activeTheme){
-          btn.classList.add(
-            'active'
-          );
-        }
-
-
-        btn.addEventListener(
-          'click',
-          ()=>{
-
-            if(
-              !VALID_THEMES.has(
-                skin
-              )
-            ){
-              return;
-            }
-
-            document.documentElement.setAttribute(
-              'data-theme',
-              skin
+          const skin=
+            btn.getAttribute(
+              'data-skin'
             );
 
-            localStorage.setItem(
-              'player_skin_theme',
-              skin
+          if(skin===activeTheme){
+            btn.classList.add(
+              'active'
             );
-
-            updateThemeMeta();
-
-            skinButtons.forEach(
-              b=>{
-                b.classList.toggle(
-                  'active',
-                  b===btn
-                );
-              }
-            );
-
           }
-        );
 
-      });
+          btn.addEventListener(
+            'click',
+            ()=>{
 
+              if(
+                !VALID_THEMES.has(
+                  skin
+                )
+              ){
+                return;
+              }
+
+              document.documentElement.setAttribute(
+                'data-theme',
+                skin
+              );
+
+              localStorage.setItem(
+                'player_skin_theme',
+                skin
+              );
+
+              updateThemeMeta();
+
+              skinButtons.forEach(
+                b=>{
+                  b.classList.toggle(
+                    'active',
+                    b===btn
+                  );
+                }
+              );
+
+            }
+          );
+
+        }
+      );
 
       toggleBtn?.setAttribute(
         'aria-expanded',
@@ -1441,7 +1563,6 @@ function hidePoster(){
         'aria-controls',
         'control-drawer'
       );
-
 
       toggleBtn?.addEventListener(
         'click',
@@ -1457,7 +1578,6 @@ function hidePoster(){
 
         }
       );
-
 
       document.addEventListener(
         'pointerdown',
@@ -1484,7 +1604,6 @@ function hidePoster(){
         {passive:true}
       );
 
-
       document.addEventListener(
         'keydown',
         e=>{
@@ -1496,52 +1615,52 @@ function hidePoster(){
         }
       );
 
+      tabs.forEach(
+        tab=>{
 
-      tabs.forEach(tab=>{
+          tab.addEventListener(
+            'click',
+            ()=>{
 
-        tab.addEventListener(
-          'click',
-          ()=>{
+              const targetId=
+                tab.getAttribute(
+                  'data-tab'
+                );
 
-            const targetId =
-              tab.getAttribute(
-                'data-tab'
+              tabs.forEach(
+                t=>t.classList.remove(
+                  'active'
+                )
               );
 
-            tabs.forEach(
-              t=>t.classList.remove(
-                'active'
-              )
-            );
+              tabContents.forEach(
+                c=>c.classList.remove(
+                  'active'
+                )
+              );
 
-            tabContents.forEach(
-              c=>c.classList.remove(
-                'active'
-              )
-            );
-
-            tab.classList.add(
-              'active'
-            );
-
-            document
-              .getElementById(
-                targetId
-              )
-              ?.classList.add(
+              tab.classList.add(
                 'active'
               );
 
-            drawer?.scrollTo({
-              top:0,
-              behavior:'smooth'
-            });
+              document
+                .getElementById(
+                  targetId
+                )
+                ?.classList.add(
+                  'active'
+                );
 
-          }
-        );
+              drawer?.scrollTo({
+                top:0,
+                behavior:'smooth'
+              });
 
-      });
+            }
+          );
 
+        }
+      );
 
       initAudioVideoFx();
 
@@ -1550,20 +1669,17 @@ function hidePoster(){
 
 })();
 
-
 let videoSettings={
   brightness:Number(
     localStorage.getItem(
       'player_brightness'
     ) || 100
   ),
-
   contrast:Number(
     localStorage.getItem(
       'player_contrast'
     ) || 100
   ),
-
   saturate:Number(
     localStorage.getItem(
       'player_saturate'
@@ -1571,25 +1687,21 @@ let videoSettings={
   )
 };
 
-
 let audioSettings={
   gain:Number(
     localStorage.getItem(
       'player_gain'
     ) || 100
   ),
-
   bass:
     localStorage.getItem(
       'player_bass'
     )==='1',
-
   vocal:
     localStorage.getItem(
       'player_vocal'
     )==='1'
 };
-
 
 let audioCtx=null;
 let mediaSource=null;
@@ -1597,17 +1709,11 @@ let gainNode=null;
 let bassFilter=null;
 let vocalFilter=null;
 let audioVideo=null;
-
 let videoObserver=null;
 let videoEventCleanup=null;
 let boundVideo=null;
-
-
 let audioUnlocked=false;
-
-
 let autoplayTimers=[];
-
 
 function clearAutoplayTimers(){
 
@@ -1620,23 +1726,24 @@ function clearAutoplayTimers(){
   );
 
   autoplayTimers=[];
-}
 
+}
 
 function scheduleAutoplay(delay){
 
-  const timer=setTimeout(
-    ()=>{
-      forceAutoplay();
-    },
-    delay
-  );
+  const timer=
+    setTimeout(
+      ()=>{
+        forceAutoplay();
+      },
+      delay
+    );
 
   autoplayTimers.push(
     timer
   );
-}
 
+}
 
 function clampNumber(
   value,
@@ -1653,10 +1760,10 @@ function clampNumber(
         Math.max(min,n)
       )
     : fallback;
+
 }
 
-
-videoSettings.brightness =
+videoSettings.brightness=
   clampNumber(
     videoSettings.brightness,
     60,
@@ -1664,7 +1771,7 @@ videoSettings.brightness =
     100
   );
 
-videoSettings.contrast =
+videoSettings.contrast=
   clampNumber(
     videoSettings.contrast,
     60,
@@ -1672,7 +1779,7 @@ videoSettings.contrast =
     100
   );
 
-videoSettings.saturate =
+videoSettings.saturate=
   clampNumber(
     videoSettings.saturate,
     0,
@@ -1680,7 +1787,7 @@ videoSettings.saturate =
     100
   );
 
-audioSettings.gain =
+audioSettings.gain=
   clampNumber(
     audioSettings.gain,
     100,
@@ -1688,10 +1795,9 @@ audioSettings.gain =
     100
   );
 
-
 function applyVideoFilters(){
 
-  const video =
+  const video=
     document.querySelector(
       '#player-container video'
     );
@@ -1704,14 +1810,12 @@ function applyVideoFilters(){
     saturate
   }=videoSettings;
 
-
   const filter=
     brightness===100 &&
     contrast===100 &&
     saturate===100
       ? 'none'
       : `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturate}%)`;
-
 
   try{
 
@@ -1723,12 +1827,12 @@ function applyVideoFilters(){
 
   }catch(e){
 
-    video.style.filter=filter;
+    video.style.filter=
+      filter;
 
   }
 
 }
-
 
 function updateVideoUI(){
 
@@ -1750,20 +1854,18 @@ function updateVideoUI(){
     ]
   ];
 
-
   ids.forEach(
     ([inputId,labelId,value])=>{
 
-      const input =
+      const input=
         document.getElementById(
           inputId
         );
 
-      const label =
+      const label=
         document.getElementById(
           labelId
         );
-
 
       if(input){
         input.value=value;
@@ -1779,37 +1881,37 @@ function updateVideoUI(){
 
 }
 
-
 function updateAudioUI(){
 
-  const gain =
+  const gain=
     document.getElementById(
       'slider-gain'
     );
 
-  const gainLabel =
+  const gainLabel=
     document.getElementById(
       'val-gain'
     );
 
-  const bass =
+  const bass=
     document.getElementById(
       'toggle-bass'
     );
 
-  const vocal =
+  const vocal=
     document.getElementById(
       'toggle-vocal'
     );
 
-
   if(gain){
-    gain.value=audioSettings.gain;
+    gain.value=
+      audioSettings.gain;
   }
 
   if(gainLabel){
     gainLabel.textContent=
-      audioSettings.gain+'%';
+      audioSettings.gain+
+      '%';
   }
 
   if(bass){
@@ -1823,7 +1925,6 @@ function updateAudioUI(){
   }
 
 }
-
 
 function updateVideoParams(
   brightness,
@@ -1839,7 +1940,6 @@ function updateVideoParams(
         180,
         100
       ),
-
     contrast:
       clampNumber(
         contrast,
@@ -1847,7 +1947,6 @@ function updateVideoParams(
         180,
         100
       ),
-
     saturate:
       clampNumber(
         saturate,
@@ -1856,7 +1955,6 @@ function updateVideoParams(
         100
       )
   };
-
 
   localStorage.setItem(
     'player_brightness',
@@ -1873,12 +1971,10 @@ function updateVideoParams(
     videoSettings.saturate
   );
 
-
   updateVideoUI();
   applyVideoFilters();
 
 }
-
 
 function applyAudioSettings(){
 
@@ -1890,18 +1986,17 @@ function applyAudioSettings(){
     return;
   }
 
-
   try{
 
-    gainNode.gain.value =
-      audioSettings.gain / 100;
+    gainNode.gain.value=
+      audioSettings.gain/100;
 
-    bassFilter.gain.value =
+    bassFilter.gain.value=
       audioSettings.bass
         ? 10
         : 0;
 
-    vocalFilter.gain.value =
+    vocalFilter.gain.value=
       audioSettings.vocal
         ? 6
         : 0;
@@ -1909,7 +2004,6 @@ function applyAudioSettings(){
   }catch(e){}
 
 }
-
 
 async function resumeAudioContext(){
 
@@ -1919,19 +2013,13 @@ async function resumeAudioContext(){
 
   try{
 
-    if(
-      audioCtx.state===
-      'suspended'
-    ){
-
+    if(audioCtx.state==='suspended'){
       await audioCtx.resume();
-
     }
 
   }catch(e){}
 
 }
-
 
 function disconnectAudioGraph(){
 
@@ -1950,8 +2038,8 @@ function disconnectAudioGraph(){
   try{
     gainNode?.disconnect();
   }catch(e){}
-}
 
+}
 
 function setupAudioNodes(){
 
@@ -1964,12 +2052,10 @@ function setupAudioNodes(){
     return false;
   }
 
-
-  const needsEnhancer =
+  const needsEnhancer=
     audioSettings.gain!==100 ||
     audioSettings.bass ||
     audioSettings.vocal;
-
 
   if(!needsEnhancer){
 
@@ -1981,24 +2067,20 @@ function setupAudioNodes(){
 
   }
 
-
   try{
 
-    const AudioContextClass =
+    const AudioContextClass=
       window.AudioContext ||
       window.webkitAudioContext;
-
 
     if(!AudioContextClass){
       return false;
     }
 
-
     if(!audioCtx){
       audioCtx=
         new AudioContextClass();
     }
-
 
     if(
       audioVideo===video &&
@@ -2006,12 +2088,17 @@ function setupAudioNodes(){
     ){
 
       applyAudioSettings();
-      applyNativeAudioState(video);
-      resumeAudioContext();
+
+      applyNativeAudioState(
+        video
+      );
+
+      if(audioUnlocked){
+        resumeAudioContext();
+      }
 
       return true;
     }
-
 
     disconnectAudioGraph();
 
@@ -2021,29 +2108,26 @@ function setupAudioNodes(){
     vocalFilter=null;
     audioVideo=null;
 
-
-    const newSource =
+    const newSource=
       audioCtx.createMediaElementSource(
         video
       );
 
-    const newGain =
+    const newGain=
       audioCtx.createGain();
 
-    const newBass =
+    const newBass=
       audioCtx.createBiquadFilter();
 
-    const newVocal =
+    const newVocal=
       audioCtx.createBiquadFilter();
-
 
     newBass.type='lowshelf';
     newBass.frequency.value=150;
 
     newVocal.type='peaking';
     newVocal.frequency.value=2500;
-    newVocal.Q.value=1.0;
-
+    newVocal.Q.value=1;
 
     newSource.connect(
       newBass
@@ -2061,13 +2145,11 @@ function setupAudioNodes(){
       audioCtx.destination
     );
 
-
     mediaSource=newSource;
     gainNode=newGain;
     bassFilter=newBass;
     vocalFilter=newVocal;
     audioVideo=video;
-
 
     applyAudioSettings();
 
@@ -2075,22 +2157,16 @@ function setupAudioNodes(){
       video
     );
 
-    resumeAudioContext();
+    if(audioUnlocked){
+      resumeAudioContext();
+    }
 
     return true;
 
   }catch(error){
 
     try{
-      mediaSource?.disconnect();
-    }catch(e){}
-
-    try{
-      if(mediaSource){
-        mediaSource.connect(
-          audioCtx.destination
-        );
-      }
+      disconnectAudioGraph();
     }catch(e){}
 
     console.warn(
@@ -2099,17 +2175,16 @@ function setupAudioNodes(){
     );
 
     return false;
+
   }
+
 }
-
-
 
 function applyNativeAudioState(video){
 
   if(!video){
     return;
   }
-
 
   try{
 
@@ -2135,7 +2210,6 @@ function applyNativeAudioState(video){
       );
 
     }
-
 
     video.autoplay=true;
     video.playsInline=true;
@@ -2174,14 +2248,11 @@ function applyNativeAudioState(video){
 
 }
 
-
 function prepareVideoForAutoplay(
   video
 ){
 
-  if(!video){
-    return;
-  }
+  if(!video)return;
 
   applyNativeAudioState(
     video
@@ -2189,25 +2260,20 @@ function prepareVideoForAutoplay(
 
 }
 
-
-
 function tryVideoPlay(video){
 
   if(!video){
     return Promise.resolve(false);
   }
 
-
   prepareVideoForAutoplay(
     video
   );
-
 
   try{
 
     const promise=
       video.play();
-
 
     if(
       promise &&
@@ -2215,34 +2281,36 @@ function tryVideoPlay(video){
       'function'
     ){
 
-      return promise
-        .then(
-          ()=>{
-            hidePoster();
-            return true;
-          }
-        )
-        .catch(
-          ()=>{
-            return false;
-          }
-        );
+      return promise.then(
+        ()=>{
+          hidePoster();
+          hideLoadingIndicator();
+          return true;
+        }
+      ).catch(
+        ()=>{
+          return false;
+        }
+      );
 
     }
-
 
     if(!video.paused){
-      hidePoster();
-      return Promise.resolve(true);
-    }
 
+      hidePoster();
+      hideLoadingIndicator();
+
+      return Promise.resolve(
+        true
+      );
+
+    }
 
   }catch(e){}
 
-
   return Promise.resolve(false);
-}
 
+}
 
 function forceAutoplay(){
 
@@ -2251,74 +2319,60 @@ function forceAutoplay(){
       '#player-container video'
     );
 
-
   if(!video){
-
     return false;
   }
-
 
   prepareVideoForAutoplay(
     video
   );
 
-
-  tryVideoPlay(video);
+  tryVideoPlay(
+    video
+  );
 
   return true;
-}
 
+}
 
 function startAutoplayRetries(){
 
   clearAutoplayTimers();
 
-
-  scheduleAutoplay(50);
-  scheduleAutoplay(180);
-  scheduleAutoplay(500);
-  scheduleAutoplay(1000);
-  scheduleAutoplay(1800);
-  scheduleAutoplay(3000);
-
+  scheduleAutoplay(40);
+  scheduleAutoplay(150);
+  scheduleAutoplay(400);
+  scheduleAutoplay(800);
+  scheduleAutoplay(1500);
+  scheduleAutoplay(2500);
 }
-
 
 function unmuteEverything(){
 
   audioUnlocked=true;
 
-
   clearAutoplayTimers();
-
 
   const player=
     window.activeStreamPlayer?.player;
-
 
   const videos=
     document.querySelectorAll(
       '#player-container video'
     );
 
-
   try{
 
     if(player){
 
       player.unmute();
-
-      player.setVolume(
-        100
-      );
+      player.setVolume(100);
 
     }
 
   }catch(e){}
 
-
-  const playPromises=[];
-
+  const tasks=[];
 
   videos.forEach(
     video=>{
@@ -2346,7 +2400,6 @@ function unmuteEverything(){
           ''
         );
 
-
         if(
           audioSettings.gain!==100 ||
           audioSettings.bass ||
@@ -2356,17 +2409,15 @@ function unmuteEverything(){
           setupAudioNodes();
 
           if(audioCtx){
-            playPromises.push(
+            tasks.push(
               resumeAudioContext()
             );
           }
 
         }
 
-
         const promise=
           video.play();
-
 
         if(
           promise &&
@@ -2374,7 +2425,7 @@ function unmuteEverything(){
           'function'
         ){
 
-          playPromises.push(
+          tasks.push(
             promise
           );
 
@@ -2385,25 +2436,6 @@ function unmuteEverything(){
     }
   );
 
-
-  Promise.allSettled(
-    playPromises
-  ).finally(
-    ()=>{
-      hidePoster();
-
-      const btn=
-        document.getElementById(
-          'unmute-overlay-btn'
-        );
-
-      btn?.classList.add(
-        'hidden'
-      );
-    }
-  );
-
-
   try{
 
     if(player){
@@ -2412,21 +2444,34 @@ function unmuteEverything(){
 
   }catch(e){}
 
+  Promise.allSettled(
+    tasks
+  ).finally(
+    ()=>{
+
+      hidePoster();
+
+      const button=
+        document.getElementById(
+          'unmute-overlay-btn'
+        );
+
+      button?.classList.add(
+        'hidden'
+      );
+
+    }
+  );
+
 }
 
-
-function bindCurrentVideo(
-  video
-){
+function bindCurrentVideo(video){
 
   if(!video){
     return;
   }
 
-
-  if(
-    boundVideo===video
-  ){
+  if(boundVideo===video){
 
     prepareVideoForAutoplay(
       video
@@ -2447,19 +2492,15 @@ function bindCurrentVideo(
     return;
   }
 
-
   if(videoEventCleanup){
     videoEventCleanup();
   }
 
-
   boundVideo=video;
-
 
   prepareVideoForAutoplay(
     video
   );
-
 
   const reapply=()=>{
 
@@ -2469,7 +2510,6 @@ function bindCurrentVideo(
 
     applyVideoFilters();
 
-
     if(
       audioSettings.gain!==100 ||
       audioSettings.bass ||
@@ -2482,24 +2522,23 @@ function bindCurrentVideo(
 
   };
 
-
   const handlePlaying=()=>{
 
     hidePoster();
-
+    hideLoadingIndicator();
     applyVideoFilters();
 
   };
 
+  const handleCanPlay=()=>{
 
-  const handleVolumeChange=()=>{
+    reapply();
 
-    if(audioUnlocked){
-
-    }
+    tryVideoPlay(
+      video
+    );
 
   };
-
 
   video.addEventListener(
     'loadedmetadata',
@@ -2515,19 +2554,7 @@ function bindCurrentVideo(
 
   video.addEventListener(
     'canplay',
-    ()=>{
-      reapply();
-
-      tryVideoPlay(video);
-    },
-    {passive:true}
-  );
-
-  video.addEventListener(
-    'play',
-    ()=>{
-      applyVideoFilters();
-    },
+    handleCanPlay,
     {passive:true}
   );
 
@@ -2538,21 +2565,20 @@ function bindCurrentVideo(
   );
 
   video.addEventListener(
-    'volumechange',
-    handleVolumeChange,
-    {passive:true}
-  );
-
-  video.addEventListener(
     'timeupdate',
     ()=>{
-      if(video.currentTime>0){
+      if(
+        video.currentTime>0 ||
+        !video.paused
+      ){
+
         hidePoster();
+        hideLoadingIndicator();
+
       }
     },
     {passive:true}
   );
-
 
   videoEventCleanup=()=>{
 
@@ -2566,27 +2592,25 @@ function bindCurrentVideo(
       reapply
     );
 
+    video.removeEventListener(
+      'canplay',
+      handleCanPlay
+    );
 
     video.removeEventListener(
       'playing',
       handlePlaying
     );
 
-    video.removeEventListener(
-      'volumechange',
-      handleVolumeChange
-    );
-
   };
-
 
   reapply();
 
-  tryVideoPlay(video);
+  tryVideoPlay(
+    video
+  );
 
 }
-
-
 
 function observePlayerVideo(){
 
@@ -2599,9 +2623,7 @@ function observePlayerVideo(){
     return;
   }
 
-
   videoObserver?.disconnect();
-
 
   videoObserver=
     new MutationObserver(
@@ -2634,7 +2656,6 @@ function observePlayerVideo(){
       }
     );
 
-
   videoObserver.observe(
     container,
     {
@@ -2643,12 +2664,10 @@ function observePlayerVideo(){
     }
   );
 
-
   const video=
     container.querySelector(
       'video'
     );
-
 
   if(video){
 
@@ -2661,8 +2680,6 @@ function observePlayerVideo(){
   }
 
 }
-
-
 
 function initAudioVideoFx(){
 
@@ -2696,10 +2713,8 @@ function initAudioVideoFx(){
       'toggle-vocal'
     );
 
-
   updateVideoUI();
   updateAudioUI();
-
 
   brightnessSlider?.addEventListener(
     'input',
@@ -2729,7 +2744,6 @@ function initAudioVideoFx(){
     }
   );
 
-
   contrastSlider?.addEventListener(
     'input',
     e=>{
@@ -2757,7 +2771,6 @@ function initAudioVideoFx(){
 
     }
   );
-
 
   saturateSlider?.addEventListener(
     'input',
@@ -2787,7 +2800,6 @@ function initAudioVideoFx(){
     }
   );
 
-
   document.getElementById(
     'btn-vivid'
   )?.addEventListener(
@@ -2800,7 +2812,6 @@ function initAudioVideoFx(){
       );
     }
   );
-
 
   document.getElementById(
     'btn-cinema'
@@ -2815,7 +2826,6 @@ function initAudioVideoFx(){
     }
   );
 
-
   document.getElementById(
     'btn-night'
   )?.addEventListener(
@@ -2829,7 +2839,6 @@ function initAudioVideoFx(){
     }
   );
 
-
   document.getElementById(
     'btn-vreset'
   )?.addEventListener(
@@ -2842,7 +2851,6 @@ function initAudioVideoFx(){
       );
     }
   );
-
 
   gainSlider?.addEventListener(
     'input',
@@ -2867,17 +2875,13 @@ function initAudioVideoFx(){
         audioSettings.gain
       );
 
-
       const video=
         document.querySelector(
           '#player-container video'
         );
 
-
       if(video){
-
         setupAudioNodes();
-
       }
 
       applyAudioSettings();
@@ -2888,7 +2892,6 @@ function initAudioVideoFx(){
 
     }
   );
-
 
   bassToggle?.addEventListener(
     'change',
@@ -2904,7 +2907,6 @@ function initAudioVideoFx(){
           : '0'
       );
 
-
       setupAudioNodes();
       applyAudioSettings();
 
@@ -2914,7 +2916,6 @@ function initAudioVideoFx(){
 
     }
   );
-
 
   vocalToggle?.addEventListener(
     'change',
@@ -2930,7 +2931,6 @@ function initAudioVideoFx(){
           : '0'
       );
 
-
       setupAudioNodes();
       applyAudioSettings();
 
@@ -2941,14 +2941,12 @@ function initAudioVideoFx(){
     }
   );
 
-
   const unlockHandler=()=>{
 
     const video=
       document.querySelector(
         '#player-container video'
       );
-
 
     if(video){
 
@@ -2966,13 +2964,11 @@ function initAudioVideoFx(){
 
     }
 
-
     if(audioUnlocked){
       resumeAudioContext();
     }
 
   };
-
 
   document.addEventListener(
     'pointerdown',
@@ -2991,11 +2987,9 @@ function initAudioVideoFx(){
     }
   );
 
-
   observePlayerVideo();
 
 }
-
 
 const pageURL=
   new URL(
@@ -3008,18 +3002,15 @@ const inputId=
   pageURL.searchParams.get('stream') ||
   "";
 
-
 const ua=
   navigator.userAgent ||
   navigator.vendor ||
   window.opera;
 
-
 const isIOS=
   /iPhone|iPad|iPod|iOS/i.test(
     ua
   );
-
 
 function getInputValue(){
 
@@ -3028,7 +3019,6 @@ function getInputValue(){
   ).trim();
 
 }
-
 
 function normalizeInputId(value){
 
@@ -3045,7 +3035,6 @@ function normalizeInputId(value){
 
 }
 
-
 function extractIdFromUrl(value){
 
   const raw=
@@ -3056,7 +3045,6 @@ function extractIdFromUrl(value){
   if(!raw){
     return '';
   }
-
 
   try{
 
@@ -3077,12 +3065,9 @@ function extractIdFromUrl(value){
 
   }catch(e){}
 
-
   return raw;
 
 }
-
-
 
 function loadFeedScript(){
 
@@ -3102,12 +3087,10 @@ function loadFeedScript(){
         return;
       }
 
-
       const existing=
         document.getElementById(
           'dynamic-feed-script'
         );
-
 
       if(existing){
 
@@ -3135,13 +3118,11 @@ function loadFeedScript(){
 
         };
 
-
         existing.addEventListener(
           'load',
           wait,
           {once:true}
         );
-
 
         existing.addEventListener(
           'error',
@@ -3155,7 +3136,6 @@ function loadFeedScript(){
           {once:true}
         );
 
-
         setTimeout(
           wait,
           9000
@@ -3164,12 +3144,10 @@ function loadFeedScript(){
         return;
       }
 
-
       const script=
         document.createElement(
           'script'
         );
-
 
       script.id=
         'dynamic-feed-script';
@@ -3178,7 +3156,6 @@ function loadFeedScript(){
         'https://mahsunsports39.xyz/script4.js';
 
       script.async=true;
-
 
       script.onload=()=>{
 
@@ -3204,7 +3181,6 @@ function loadFeedScript(){
 
       };
 
-
       script.onerror=()=>{
 
         reject(
@@ -3215,7 +3191,6 @@ function loadFeedScript(){
 
       };
 
-
       document.head.appendChild(
         script
       );
@@ -3224,7 +3199,6 @@ function loadFeedScript(){
   );
 
 }
-
 
 function findFeedEvent(
   events,
@@ -3236,15 +3210,12 @@ function findFeedEvent(
       key
     );
 
-
   if(
     !target ||
     !Array.isArray(events)
   ){
-
     return null;
   }
-
 
   return events.find(
     event=>{
@@ -3258,19 +3229,18 @@ function findFeedEvent(
         event?.url,
         event?.streamUrl,
         event?.link
-      ]
-      .map(
+      ].map(
         x=>String(x || '')
       );
-
 
       return candidates.some(
         value=>{
 
-          if(value===target){
+          if(
+            value===target
+          ){
             return true;
           }
-
 
           try{
 
@@ -3301,7 +3271,6 @@ function findFeedEvent(
 
 }
 
-
 async function resolveFeedSource(
   value
 ){
@@ -3315,12 +3284,10 @@ async function resolveFeedSource(
     return null;
   }
 
-
   try{
 
     const events=
       await loadFeedScript();
-
 
     const event=
       findFeedEvent(
@@ -3328,11 +3295,9 @@ async function resolveFeedSource(
         key
       );
 
-
     if(!event){
       return null;
     }
-
 
     const candidates=[
       event.streamUrl,
@@ -3347,7 +3312,6 @@ async function resolveFeedSource(
     )
     .filter(Boolean);
 
-
     const m3u=
       candidates.find(
         value=>
@@ -3356,21 +3320,20 @@ async function resolveFeedSource(
           )
       );
 
-
     if(m3u){
       return m3u;
     }
 
-
     const eventId=
       extractIdFromUrl(
         candidates.find(
-          value=>/id=/i.test(value)
+          value=>/id=/i.test(
+            value
+          )
         ) ||
         event.id ||
         key
       );
-
 
     return eventId || key;
 
@@ -3387,7 +3350,6 @@ async function resolveFeedSource(
 
 }
 
-
 async function resolveCinemaSource(
   id
 ){
@@ -3396,20 +3358,16 @@ async function resolveCinemaSource(
     !id ||
     typeof id!=='string'
   ){
-
     return null;
   }
-
 
   if(
     !id.startsWith(
       'androstreamlivech'
     )
   ){
-
     return null;
   }
-
 
   const videoId=
     id.replace(
@@ -3417,11 +3375,9 @@ async function resolveCinemaSource(
       ''
     );
 
-
   if(!videoId){
     return null;
   }
-
 
   try{
 
@@ -3445,12 +3401,10 @@ async function resolveCinemaSource(
         }
       );
 
-
     if(response.ok){
 
       const data=
         await response.json();
-
 
       if(
         data &&
@@ -3474,11 +3428,9 @@ async function resolveCinemaSource(
 
   }
 
-
   return null;
 
 }
-
 
 class StreamPlayer{
 
@@ -3489,35 +3441,31 @@ class StreamPlayer{
 
   }
 
-
   async init(){
 
     window.activeStreamPlayer=
       this;
 
+    showLoadingIndicator();
 
     const hashParams=
       this.parseHashParams(
         window.location.hash
       );
 
-
     this.urlConfig={
       poster:
         this.safeDecode(
           hashParams.poster || ''
         ),
-
       watermark:
         this.safeDecode(
           hashParams.watermark || ''
         ),
-
       watermarkLink:
         this.safeDecode(
           hashParams.watermarkLink || ''
         ),
-
       watermarkPosition:
         this.safeDecode(
           hashParams.watermarkPosition ||
@@ -3525,12 +3473,10 @@ class StreamPlayer{
         )
     };
 
-
     this.input=
       normalizeInputId(
         getInputValue()
       );
-
 
     this.directSource=
       /\.m3u8(?:$|[?#])/i.test(
@@ -3539,7 +3485,6 @@ class StreamPlayer{
       ? this.input
       : null;
 
-
     this.baseurls=[
       'https://andro.evrenesoglu121.click/checklist/',
       'https://andro.evrenesoglu115.click/checklist/',
@@ -3547,12 +3492,10 @@ class StreamPlayer{
       'https://andro.evrenesoglu113.click/checklist/'
     ];
 
-
     this.currentBaseIndex=0;
     this.switchingBase=false;
     this.feedSource=null;
     this.streamPath=null;
-
 
     if(this.directSource){
 
@@ -3565,7 +3508,6 @@ class StreamPlayer{
         await resolveFeedSource(
           this.input
         );
-
 
       if(
         this.feedSource &&
@@ -3588,12 +3530,10 @@ class StreamPlayer{
             this.input
           );
 
-
         const cinema=
           await resolveCinemaSource(
             id
           );
-
 
         if(cinema){
 
@@ -3610,7 +3550,6 @@ class StreamPlayer{
               id
             );
 
-
           this.source=
             this.streamPath
               ? this.buildSource()
@@ -3622,8 +3561,9 @@ class StreamPlayer{
 
     }
 
-
     if(!this.source){
+
+      hideLoadingIndicator();
 
       const warning=
         document.getElementById(
@@ -3635,7 +3575,6 @@ class StreamPlayer{
           'uyari-mesaj'
         );
 
-
       if(message){
 
         message.innerText=
@@ -3643,29 +3582,24 @@ class StreamPlayer{
 
       }
 
-
       if(warning){
         warning.style.display=
           'flex';
       }
 
-
       return;
 
     }
-
 
     const params=
       new URLSearchParams(
         window.location.search
       );
 
-
     const title=
       params.get(
         'title'
       );
-
 
     if(title){
 
@@ -3674,7 +3608,6 @@ class StreamPlayer{
       }catch(e){}
 
     }
-
 
     if(
       this.streamPath &&
@@ -3688,7 +3621,6 @@ class StreamPlayer{
 
     }
 
-
     this.initPlayer();
 
     const container=
@@ -3696,16 +3628,13 @@ class StreamPlayer{
         'player-container'
       );
 
-
     if(!container){
       return;
     }
 
-
     this.player.attachTo(
       container
     );
-
 
     this.setupUnmuteOverlay();
 
@@ -3717,21 +3646,23 @@ class StreamPlayer{
 
   }
 
-
   safeDecode(value){
 
     try{
+
       return decodeURIComponent(
         value
       );
+
     }catch(e){
+
       return String(
         value || ''
       );
+
     }
 
   }
-
 
   async resolveWorkingBase(){
 
@@ -3742,14 +3673,12 @@ class StreamPlayer{
     ){
 
       const ok=
-        await this.checkBase(
-          i
-        );
-
+        await this.checkBase(i);
 
       if(ok){
 
-        this.currentBaseIndex=i;
+        this.currentBaseIndex=
+          i;
 
         return true;
 
@@ -3757,13 +3686,11 @@ class StreamPlayer{
 
     }
 
-
     this.currentBaseIndex=0;
 
     return false;
 
   }
-
 
   checkBase(index){
 
@@ -3771,12 +3698,10 @@ class StreamPlayer{
       this.baseurls[index] +
       this.streamPath;
 
-
     const controller=
       typeof AbortController!=='undefined'
         ? new AbortController()
         : null;
-
 
     const timer=
       controller
@@ -3790,7 +3715,6 @@ class StreamPlayer{
           )
         : null;
 
-
     const options={
       method:'GET',
       mode:'cors',
@@ -3798,12 +3722,10 @@ class StreamPlayer{
       credentials:'omit'
     };
 
-
     if(controller){
       options.signal=
         controller.signal;
     }
-
 
     return fetch(
       target,
@@ -3830,10 +3752,11 @@ class StreamPlayer{
 
   }
 
-
   initPlayer(){
 
     if(typeof Clappr==='undefined'){
+
+      hideLoadingIndicator();
 
       const warning=
         document.getElementById(
@@ -3845,32 +3768,27 @@ class StreamPlayer{
           'uyari-mesaj'
         );
 
-
       if(message){
         message.innerText=
           'Player library failed to load.\nPlease refresh the page.';
       }
-
 
       if(warning){
         warning.style.display=
           'flex';
       }
 
-
       return;
+
     }
 
-
     const plugins=[];
-
 
     if(window.LevelSelector){
       plugins.push(
         window.LevelSelector
       );
     }
-
 
     if(window.ClapprPip){
 
@@ -3884,7 +3802,6 @@ class StreamPlayer{
 
       }
 
-
       if(
         window.ClapprPip.PipButton
       ){
@@ -3897,7 +3814,6 @@ class StreamPlayer{
 
     }
 
-
     if(window.ClapprPIPPlugin){
 
       plugins.push(
@@ -3906,15 +3822,10 @@ class StreamPlayer{
 
     }
 
-
-    const source=
-      this.source;
-
-
     this.player=
       new Clappr.Player({
 
-        source:source,
+        source:this.source,
 
         autoPlay:true,
 
@@ -3929,16 +3840,13 @@ class StreamPlayer{
 
         chromeless:isIOS,
 
-
         watermark:
-          this.urlConfig.watermark || undefined,
+          this.urlConfig.watermark ||
+          undefined,
 
         watermarkLink:
-          this.urlConfig.watermarkLink || undefined,
-
-        positionWatermark:
-          this.urlConfig.watermarkPosition || undefined,
-
+          this.urlConfig.watermarkLink ||
+          undefined,
 
         levelSelectorConfig:{
 
@@ -3967,15 +3875,9 @@ class StreamPlayer{
 
               }
 
-
-              if(
-                customLabel
-              ){
-
+              if(customLabel){
                 return customLabel;
-
               }
-
 
               if(
                 playbackLevel &&
@@ -3985,7 +3887,7 @@ class StreamPlayer{
 
                 return(
                   Math.round(
-                    playbackLevel.level.bitrate /
+                    playbackLevel.level.bitrate/
                     1000
                   )+
                   ' kbps'
@@ -3993,13 +3895,11 @@ class StreamPlayer{
 
               }
 
-
               return 'Auto';
 
             }
 
         },
-
 
         hlsjsConfig:{
 
@@ -4011,7 +3911,6 @@ class StreamPlayer{
           liveDurationInfinity:true
 
         },
-
 
         playback:{
 
@@ -4030,7 +3929,6 @@ class StreamPlayer{
                   xhr.withCredentials=
                     false;
                 }catch(e){}
-
 
                 xhr.addEventListener(
                   'loadend',
@@ -4056,36 +3954,27 @@ class StreamPlayer{
 
         },
 
-
         disableErrorScreen:true,
 
-        plugins:plugins,
+        plugins,
 
         language:'en',
 
         strings:{
-
           en:{
-
             live:'LIVE',
-
             default_error_message:
               'A playback error occurred.',
-
             default_error_title:
               'Notice'
-
           }
-
         }
 
       });
 
-
     this.setupPlayerEvents();
 
   }
-
 
   setupUnmuteOverlay(){
 
@@ -4094,11 +3983,9 @@ class StreamPlayer{
         'unmute-overlay-btn'
       );
 
-
     if(!button){
       return;
     }
-
 
     button.addEventListener(
       'click',
@@ -4111,7 +3998,6 @@ class StreamPlayer{
 
       }
     );
-
 
     if(this.player){
 
@@ -4135,38 +4021,7 @@ class StreamPlayer{
 
     }
 
-
-    const checkVideoAudio=()=>{
-
-      const video=
-        document.querySelector(
-          '#player-container video'
-        );
-
-
-      if(
-        video &&
-        audioUnlocked &&
-        !video.muted &&
-        video.volume>0
-      ){
-
-        button.classList.add(
-          'hidden'
-        );
-
-      }
-
-    };
-
-
-    setInterval(
-      checkVideoAudio,
-      1000
-    );
-
   }
-
 
   bindQualitySelectorUI(){
 
@@ -4175,11 +4030,12 @@ class StreamPlayer{
         'drawer-quality-selector'
       );
 
-
-    if(!dropdown || !this.player){
+    if(
+      !dropdown ||
+      !this.player
+    ){
       return;
     }
-
 
     const populateLevels=
       (attempt=0)=>{
@@ -4189,7 +4045,6 @@ class StreamPlayer{
             'level_selector'
           );
 
-
         const levels=
           Array.isArray(
             levelPlugin?.levels
@@ -4197,30 +4052,28 @@ class StreamPlayer{
             ? levelPlugin.levels
             : [];
 
-
         if(levels.length){
 
           const current=
             dropdown.value;
 
-
           dropdown.innerHTML=
             '<option value="-1">Auto</option>';
-
 
           levels.forEach(
             (level,index)=>{
 
               const height=
                 Number(
-                  level?.height || 0
+                  level?.height ||
+                  0
                 );
 
               const bitrate=
                 Number(
-                  level?.bitrate || 0
+                  level?.bitrate ||
+                  0
                 );
-
 
               const label=
                 height
@@ -4233,7 +4086,6 @@ class StreamPlayer{
                           )} kbps`
                         : `Level ${index+1}`
                     );
-
 
               const option=
                 document.createElement(
@@ -4253,7 +4105,6 @@ class StreamPlayer{
             }
           );
 
-
           if(
             [...dropdown.options]
               .some(
@@ -4268,11 +4119,9 @@ class StreamPlayer{
 
           }
 
-
           return;
 
         }
-
 
         if(attempt<24){
 
@@ -4289,10 +4138,11 @@ class StreamPlayer{
 
       };
 
-
     this.player.on(
       Clappr.Events.PLAYER_READY,
       ()=>{
+
+        hideLoadingIndicator();
 
         setTimeout(
           ()=>{
@@ -4301,12 +4151,11 @@ class StreamPlayer{
             observePlayerVideo();
             startAutoplayRetries();
           },
-          150
+          100
         );
 
       }
     );
-
 
     dropdown.addEventListener(
       'change',
@@ -4317,17 +4166,15 @@ class StreamPlayer{
             e.target.value
           );
 
-
         const levelPlugin=
           this.player.getPlugin(
             'level_selector'
           );
 
-
         if(
           levelPlugin &&
           typeof levelPlugin.changeLevel===
-            'function'
+          'function'
         ){
 
           levelPlugin.changeLevel(
@@ -4343,7 +4190,6 @@ class StreamPlayer{
 
   }
 
-
   parseHashParams(hash){
 
     if(
@@ -4353,9 +4199,7 @@ class StreamPlayer{
       return {};
     }
 
-
     const params={};
-
 
     hash
       .substring(1)
@@ -4366,11 +4210,9 @@ class StreamPlayer{
           const index=
             item.indexOf('=');
 
-
           if(index===-1){
             return;
           }
-
 
           const key=
             item.substring(
@@ -4383,7 +4225,6 @@ class StreamPlayer{
               index+1
             );
 
-
           if(key && value){
             params[key]=value;
           }
@@ -4391,18 +4232,15 @@ class StreamPlayer{
         }
       );
 
-
     return params;
 
   }
-
 
   buildSource(){
 
     if(!this.streamPath){
       return null;
     }
-
 
     return(
       this.baseurls[
@@ -4413,7 +4251,6 @@ class StreamPlayer{
 
   }
 
-
   getStreamPath(id){
 
     const value=
@@ -4421,17 +4258,14 @@ class StreamPlayer{
         id || ''
       );
 
-
     const useRealStream=
       pageURL.searchParams.get(
         'real'
       )==='1';
 
-
     if(!value){
       return null;
     }
-
 
     if(
       (
@@ -4447,7 +4281,6 @@ class StreamPlayer{
 
     }
 
-
     if(
       value.startsWith(
         'facebooklive'
@@ -4460,7 +4293,6 @@ class StreamPlayer{
       );
 
     }
-
 
     if(
       value.startsWith(
@@ -4475,7 +4307,6 @@ class StreamPlayer{
             'androstreamlive'.length
           );
 
-
         return(
           'facebooklive'+
           suffix+
@@ -4484,7 +4315,6 @@ class StreamPlayer{
 
       }
 
-
       return(
         value+
         '.m3u8'
@@ -4492,11 +4322,9 @@ class StreamPlayer{
 
     }
 
-
     return null;
 
   }
-
 
   setupPlayerEvents(){
 
@@ -4504,10 +4332,11 @@ class StreamPlayer{
       return;
     }
 
-
     this.player.on(
       Clappr.Events.PLAYER_READY,
       ()=>{
+
+        hideLoadingIndicator();
 
         try{
 
@@ -4521,14 +4350,11 @@ class StreamPlayer{
 
         }catch(e){}
 
-
         setTimeout(
           ()=>{
-
             observePlayerVideo();
             applyVideoFilters();
             startAutoplayRetries();
-
 
             if(
               audioSettings.gain!==100 ||
@@ -4547,33 +4373,25 @@ class StreamPlayer{
       }
     );
 
-
     this.player.on(
       Clappr.Events.PLAYER_PLAY,
       ()=>{
 
+        hideLoadingIndicator();
         applyVideoFilters();
 
       }
     );
-
 
     this.player.on(
       Clappr.Events.PLAYER_PLAYING,
       ()=>{
 
         hidePoster();
+        hideLoadingIndicator();
 
       }
     );
-
-
-    this.player.on(
-      Clappr.Events.PLAYER_STOP,
-      ()=>{
-      }
-    );
-
 
     if(
       this.player.core &&
@@ -4598,7 +4416,6 @@ class StreamPlayer{
 
           }
 
-
           if(
             container &&
             Clappr.Events.CONTAINER_TIMEUPDATE
@@ -4608,6 +4425,7 @@ class StreamPlayer{
               Clappr.Events.CONTAINER_TIMEUPDATE,
               ()=>{
                 hidePoster();
+                hideLoadingIndicator();
               }
             );
 
@@ -4617,7 +4435,6 @@ class StreamPlayer{
       );
 
     }
-
 
     this.player.on(
       Clappr.Events.PLAYER_ERROR,
@@ -4630,7 +4447,6 @@ class StreamPlayer{
 
   }
 
-
   handlePlaybackError(){
 
     this.switchToNextBase(
@@ -4638,7 +4454,6 @@ class StreamPlayer{
     );
 
   }
-
 
   switchToNextBase(reason){
 
@@ -4648,8 +4463,8 @@ class StreamPlayer{
     ){
 
       return false;
-    }
 
+    }
 
     if(
       this.currentBaseIndex >=
@@ -4657,24 +4472,22 @@ class StreamPlayer{
     ){
 
       return false;
-    }
 
+    }
 
     this.switchingBase=true;
 
     this.currentBaseIndex++;
 
-
     const newSource=
       this.buildSource();
-
 
     this.source=
       newSource;
 
-
     clearAutoplayTimers();
 
+    showLoadingIndicator();
 
     try{
 
@@ -4696,7 +4509,6 @@ class StreamPlayer{
 
     }
 
-
     setTimeout(
       ()=>{
         observePlayerVideo();
@@ -4706,7 +4518,6 @@ class StreamPlayer{
       250
     );
 
-
     setTimeout(
       ()=>{
         this.switchingBase=false;
@@ -4714,14 +4525,11 @@ class StreamPlayer{
       2000
     );
 
-
     return true;
 
   }
 
 }
-
-
 
 if(
   window.ClapprPIPPlugin &&
@@ -4735,8 +4543,6 @@ if(
 
 }
 
-
-
 try{
 
   new StreamPlayer();
@@ -4748,6 +4554,7 @@ try{
     error
   );
 
+  hideLoadingIndicator();
 
   const warning=
     document.getElementById(
@@ -4759,7 +4566,6 @@ try{
       'uyari-mesaj'
     );
 
-
   if(message){
 
     message.innerText=
@@ -4767,12 +4573,9 @@ try{
 
   }
 
-
   if(warning){
-
     warning.style.display=
       'flex';
-
   }
 
 }
