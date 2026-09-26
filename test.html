@@ -19,10 +19,8 @@
   --radius-card:20px;
   --radius-inner:12px;
   --radius-pill:999px;
-  --gap:14px;
+  --gap:10px;
   --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
-  --ch-h:52px;
-  --sidebar-w:300px;
 }
 
 body[data-theme="ocean"]{
@@ -239,9 +237,9 @@ body::before{
   z-index:2;
   margin:0 auto;
   padding:
-    max(clamp(8px,2vw,16px),env(safe-area-inset-top))
-    clamp(8px,2vw,16px)
-    max(16px,env(safe-area-inset-bottom))
+    max(10px,env(safe-area-inset-top))
+    clamp(8px,1.4vw,14px)
+    max(14px,env(safe-area-inset-bottom))
 }
 
 .auth-wrap{
@@ -376,18 +374,19 @@ body::before{
 
 .main-card{
   width:100%;
+  min-width:0;
   background:var(--panel);
   backdrop-filter:blur(36px);
   -webkit-backdrop-filter:blur(36px);
   border:1px solid rgba(255,255,255,.06);
   border-radius:var(--radius-card);
-  padding:clamp(12px,2.4vw,22px);
+  padding:14px;
   box-shadow:0 30px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.1);
   position:relative;
   overflow:visible;
   display:flex;
   flex-direction:column;
-  gap:var(--gap)
+  gap:10px
 }
 
 .main-card::after{
@@ -468,8 +467,8 @@ body::before{
 }
 
 .icon-btn{
-  width:38px;
-  height:38px;
+  width:36px;
+  height:36px;
   display:grid;
   place-items:center;
   border:1px solid rgba(255,255,255,.09);
@@ -492,7 +491,7 @@ body::before{
 }
 
 .theme-select{
-  height:38px;
+  height:36px;
   padding:0 30px 0 10px;
   background:
     rgba(255,255,255,.06)
@@ -506,9 +505,8 @@ body::before{
   appearance:none;
   -webkit-appearance:none;
   outline:none;
-  min-width:0;
-  width:120px;
-  max-width:120px;
+  width:115px;
+  max-width:115px;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -525,7 +523,7 @@ body::before{
   align-items:center;
   justify-content:space-between;
   gap:8px;
-  padding:8px 12px;
+  padding:7px 11px;
   background:rgba(255,255,255,.022);
   border:1px solid rgba(255,255,255,.055);
   border-radius:var(--radius-inner);
@@ -599,7 +597,7 @@ body::before{
   background:rgba(255,165,0,.1);
   border:1px solid rgba(255,165,0,.3);
   color:#ffd175;
-  padding:10px 16px;
+  padding:9px 14px;
   border-radius:var(--radius-inner);
   font-size:12px;
   font-weight:600;
@@ -609,7 +607,7 @@ body::before{
 .stats-row{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:8px;
+  gap:7px;
   flex-shrink:0
 }
 
@@ -617,13 +615,13 @@ body::before{
   background:rgba(255,255,255,.025);
   border:1px solid rgba(255,255,255,.055);
   border-radius:var(--radius-inner);
-  padding:10px 12px;
+  padding:9px 11px;
   display:flex;
   flex-direction:column;
   gap:3px;
   position:relative;
   overflow:hidden;
-  min-height:62px;
+  min-height:58px;
   min-width:0
 }
 
@@ -652,7 +650,7 @@ body::before{
 }
 
 .stat-value{
-  font-size:17px;
+  font-size:16px;
   font-weight:900;
   color:var(--col,var(--ac2));
   font-variant-numeric:tabular-nums;
@@ -673,7 +671,7 @@ body::before{
   align-items:center;
   justify-content:center;
   gap:18px;
-  padding:8px 14px;
+  padding:7px 12px;
   background:rgba(255,255,255,.02);
   border:1px solid rgba(255,255,255,.055);
   border-radius:var(--radius-inner);
@@ -701,23 +699,19 @@ body::before{
 
 .content-grid{
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(230px,320px);
-  gap:var(--gap);
-  flex:1 1 auto;
-  align-items:stretch;
-  min-height:0;
-  min-width:0
+  grid-template-columns:minmax(0,1fr) 290px;
+  gap:10px;
+  align-items:start;
+  min-width:0;
+  width:100%
 }
 
 .player-col{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:8px;
   min-width:0;
-  min-height:0;
-  position:sticky;
-  top:12px;
-  z-index:50;
+  width:100%;
   align-self:start
 }
 
@@ -725,14 +719,12 @@ body::before{
   position:relative;
   width:100%;
   aspect-ratio:16/9;
-  padding-top:0;
   background:#000;
   border-radius:var(--radius-inner);
   overflow:hidden;
   border:1px solid rgba(255,255,255,.05);
   box-shadow:0 20px 50px rgba(0,0,0,.6);
-  min-width:0;
-  flex-shrink:0
+  min-width:0
 }
 
 .player-wrap iframe{
@@ -750,8 +742,7 @@ body::before{
   align-items:center;
   gap:8px;
   flex-wrap:wrap;
-  min-width:0;
-  flex-shrink:0
+  min-width:0
 }
 
 .tool-btn{
@@ -776,14 +767,13 @@ body::before{
 .sidebar{
   display:flex;
   flex-direction:column;
-  gap:var(--gap);
+  gap:10px;
   position:sticky;
-  top:14px;
+  top:10px;
   min-width:0;
-  max-height:calc(100dvh - 28px);
+  max-height:calc(100dvh - 20px);
   overflow-y:auto;
-  overflow-x:hidden;
-  padding-right:2px
+  overflow-x:hidden
 }
 
 .sidebar::-webkit-scrollbar{
@@ -794,10 +784,10 @@ body::before{
   background:rgba(0,0,0,.18);
   border:1px solid rgba(255,255,255,.065);
   border-radius:var(--radius-inner);
-  padding:12px;
+  padding:10px;
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:9px;
   flex-shrink:0;
   min-width:0
 }
@@ -856,7 +846,7 @@ body::before{
 
 .search-wrap input{
   width:100%;
-  height:36px;
+  height:35px;
   padding:0 32px 0 12px;
   background:rgba(255,255,255,.04);
   border:1px solid rgba(255,255,255,.06);
@@ -901,7 +891,7 @@ body::before{
   display:flex;
   gap:6px;
   overflow-x:auto;
-  padding:2px 1px 4px;
+  padding:2px 1px 3px;
   flex-shrink:0;
   min-width:0
 }
@@ -1012,7 +1002,7 @@ body::before{
   align-items:center;
   justify-content:space-between;
   gap:8px;
-  padding:9px 10px;
+  padding:8px 9px;
   background:rgba(255,255,255,.015);
   border:1px solid rgba(255,255,255,.04);
   border-radius:10px;
@@ -1087,7 +1077,7 @@ body::before{
 .ch-right{
   display:flex;
   align-items:center;
-  gap:6px;
+  gap:5px;
   flex-shrink:0;
   min-width:0
 }
@@ -1096,11 +1086,11 @@ body::before{
   display:flex;
   align-items:center;
   gap:5px;
-  font-size:9px;
+  font-size:8px;
   font-weight:700;
   color:var(--ac2);
   background:rgba(0,242,254,.06);
-  padding:3px 7px;
+  padding:3px 6px;
   border-radius:6px;
   border:1px solid rgba(0,242,254,.12);
   white-space:nowrap
@@ -1246,7 +1236,6 @@ body.theatre .content-grid{
 
 body.theatre .player-col{
   position:relative;
-  top:auto;
   height:100dvh;
   min-height:100dvh;
   justify-content:center;
@@ -1560,9 +1549,9 @@ body.focus .player-wrap{
 
 footer{
   text-align:center;
-  padding:12px 0 4px;
+  padding:7px 0 2px;
   opacity:.18;
-  font-size:10px;
+  font-size:9px;
   flex-shrink:0
 }
 
@@ -1590,141 +1579,62 @@ body.low-power #particles{
   display:none
 }
 
-/* PC / TABLET SCREEN-FIT */
-@media(min-width:761px){
+@media(min-width:1101px){
 
-  html{
-    height:100%;
-    overflow:hidden
-  }
-
+  html,
   body{
-    height:100dvh;
-    min-height:100dvh;
-    overflow:hidden
-  }
-
-  .app-shell{
-    height:100dvh;
-    min-height:0;
-    overflow:hidden
-  }
-
-  .main-card{
-    height:100%;
-    min-height:0;
-    overflow:hidden
+    min-height:100%;
+    overflow-x:hidden;
+    overflow-y:auto
   }
 
   .content-grid{
-    min-height:0;
-    height:100%;
-    overflow:hidden
-  }
-
-  .player-col{
-    position:relative;
-    top:auto;
-    height:100%;
-    min-height:0;
-    overflow:hidden;
-    align-items:center;
-    justify-content:flex-start
+    grid-template-columns:minmax(0,1fr) 290px;
+    gap:10px
   }
 
   .player-wrap{
-    width:min(100%,calc(177.7778dvh - 640px));
-    aspect-ratio:16/9;
-    flex:0 0 auto
+    width:100%;
   }
 
   .sidebar{
-    position:relative;
-    top:auto;
-    height:100%;
-    max-height:none;
-    min-height:0;
-    overflow-y:auto
+    position:sticky;
+    top:10px;
+    max-height:calc(100dvh - 20px)
   }
 }
 
-/* NORMAL DESKTOP */
-@media(min-width:1101px){
-  .main-card{
-    padding:18px;
-    gap:12px
-  }
-
-  .content-grid{
-    gap:12px;
-    grid-template-columns:minmax(0,1fr) 300px
-  }
-
-  .status-bar{
-    padding:7px 12px
-  }
-
-  .stats-row{
-    gap:7px
-  }
-
-  .stat{
-    min-height:58px;
-    padding:9px 11px
-  }
-
-  .counter-bar{
-    padding:7px 12px
-  }
-
-  .player-tools{
-    gap:7px
-  }
-
-  .sidebar{
-    gap:12px
-  }
-
-  .ch-panel{
-    padding:11px;
-    gap:9px
-  }
-}
-
-/* COMPACT TABLET / SMALL DESKTOP */
 @media(min-width:761px) and (max-width:1100px){
 
-  :root{
-    --gap:8px
-  }
-
   .app-shell{
-    padding:
-      max(8px,env(safe-area-inset-top))
-      10px
-      max(10px,env(safe-area-inset-bottom))
+    padding-left:9px;
+    padding-right:9px
   }
 
   .main-card{
-    padding:10px;
+    padding:11px;
     gap:8px;
-    border-radius:16px
+    border-radius:17px
   }
 
   .content-grid{
+    grid-template-columns:minmax(0,1fr) 245px;
     gap:8px
   }
 
-  .player-wrap{
-    width:min(100%,calc(177.7778dvh - 410px))
+  .player-col{
+    gap:7px
   }
 
-  .player-tools{
-    gap:5px
+  .sidebar{
+    gap:8px;
+    top:8px;
+    max-height:calc(100dvh - 16px)
   }
 
-  .tool-btn{
-    font-size:10px
+  .ch-panel{
+    padding:9px;
+    gap:8px
   }
 
   .brand-mark{
@@ -1738,23 +1648,22 @@ body.low-power #particles{
   }
 
   .brand-text p{
-    font-size:9px
+    display:none
   }
 
   .icon-btn{
     width:34px;
-    height:34px;
-    font-size:14px
+    height:34px
   }
 
   .theme-select{
-    height:34px;
     width:100px;
-    max-width:100px
+    max-width:100px;
+    height:34px
   }
 
   .status-bar{
-    padding:6px 10px;
+    padding:6px 9px;
     font-size:9px
   }
 
@@ -1771,64 +1680,11 @@ body.low-power #particles{
     font-size:15px
   }
 
-  .stat-hint{
-    font-size:7px
-  }
-
   .counter-bar{
-    padding:6px 10px;
-    gap:12px;
-    font-size:9px
-  }
-
-  footer{
-    padding:5px 0 2px;
-    font-size:8px
-  }
-
-  .sidebar{
-    gap:8px
-  }
-
-  .ch-panel{
-    padding:9px;
-    gap:8px
-  }
-
-  .panel-head h3{
-    font-size:12px
-  }
-
-  .search-wrap input{
-    height:34px;
-    font-size:11px
-  }
-
-  .ch-list{
-    max-height:none
-  }
-
-  .static-ch-list{
-    max-height:none
+    padding:6px 10px
   }
 }
 
-@media(max-width:900px) and (min-width:761px){
-
-  .content-grid{
-    grid-template-columns:minmax(0,1fr) 240px
-  }
-
-  .player-wrap{
-    width:min(100%,calc(177.7778dvh - 410px))
-  }
-
-  .brand-text p{
-    display:none
-  }
-}
-
-/* MOBILE */
 @media(max-width:760px){
 
   html{
@@ -1837,7 +1693,6 @@ body.low-power #particles{
   }
 
   body{
-    height:auto;
     min-height:100dvh;
     overflow-x:hidden;
     overflow-y:auto
@@ -1856,35 +1711,13 @@ body.low-power #particles{
   }
 
   .content-grid{
-    height:auto;
-    min-height:0;
-    overflow:visible
+    grid-template-columns:1fr;
+    gap:10px
   }
 
   .player-col{
     position:sticky;
     top:0;
-    height:auto;
-    min-height:0;
-    align-items:stretch;
-    overflow:visible
-  }
-
-  :root{
-    --sidebar-w:100%;
-    --gap:10px
-  }
-
-  .content-grid{
-    grid-template-columns:1fr;
-    gap:10px
-  }
-
-  .main-card{
-    padding:12px
-  }
-
-  .player-col{
     background:var(--panel);
     margin:-12px -12px 0;
     padding:10px 12px 10px;
@@ -1892,7 +1725,6 @@ body.low-power #particles{
     border-bottom:1px solid rgba(255,255,255,.06);
     backdrop-filter:blur(36px);
     -webkit-backdrop-filter:blur(36px);
-    gap:8px;
     border-radius:var(--radius-card) var(--radius-card) 0 0;
     z-index:100
   }
@@ -1903,10 +1735,6 @@ body.low-power #particles{
     border-radius:10px
   }
 
-  .player-tools{
-    gap:6px
-  }
-
   .sidebar{
     position:static;
     height:auto;
@@ -1915,35 +1743,12 @@ body.low-power #particles{
     padding-right:0
   }
 
-  .ch-list{
-    max-height:300px
-  }
-
-  .static-ch-list{
-    max-height:200px
-  }
-
   .status-center{
     display:none
   }
 
-  .status-bar{
-    min-height:34px
-  }
-
-  .theme-select{
-    width:100px;
-    max-width:100px
-  }
-
-  .top-actions{
-    gap:5px
-  }
-
-  .icon-btn{
-    width:35px;
-    height:35px;
-    font-size:14px
+  .brand-text p{
+    display:none
   }
 
   .stats-row{
@@ -1959,12 +1764,27 @@ body.low-power #particles{
     font-size:15px
   }
 
-  .brand-text h2{
-    font-size:16px
+  .top-actions{
+    gap:5px
   }
 
-  .brand-text p{
-    max-width:220px
+  .icon-btn{
+    width:35px;
+    height:35px;
+    font-size:14px
+  }
+
+  .theme-select{
+    width:100px;
+    max-width:100px
+  }
+
+  .ch-list{
+    max-height:300px
+  }
+
+  .static-ch-list{
+    max-height:200px
   }
 }
 
@@ -2001,10 +1821,6 @@ body.low-power #particles{
   .counter-bar{
     gap:12px
   }
-
-  .player-tools{
-    justify-content:flex-start
-  }
 }
 
 @media(max-width:420px){
@@ -2019,19 +1835,11 @@ body.low-power #particles{
     border-radius:16px
   }
 
-  .content-grid{
-    gap:8px
-  }
-
   .player-col{
     margin:-10px -10px 0;
     width:calc(100% + 20px);
     padding:8px 10px 10px;
     border-radius:16px 16px 0 0
-  }
-
-  .player-wrap{
-    border-radius:9px
   }
 
   .stats-row{
@@ -2051,21 +1859,10 @@ body.low-power #particles{
     font-size:14px
   }
 
-  .brand-text p{
-    display:none
-  }
-
   .theme-select{
     width:86px;
     max-width:86px;
-    font-size:10px;
-    padding-left:8px;
-    padding-right:26px
-  }
-
-  .icon-btn{
-    width:34px;
-    height:34px
+    font-size:10px
   }
 
   .status-left,
@@ -2094,27 +1891,9 @@ body.low-power #particles{
   .ch-info small{
     font-size:8px
   }
-
-  .live-badge{
-    font-size:8px;
-    padding:3px 6px
-  }
-
-  .live-badge .live-dot{
-    width:4px;
-    height:4px
-  }
-
-  .fav-btn{
-    font-size:14px
-  }
 }
 
 @media(max-width:360px){
-
-  .top-actions{
-    gap:4px
-  }
 
   .theme-select{
     width:78px;
@@ -2126,42 +1905,15 @@ body.low-power #particles{
     height:33px
   }
 
-  .player-tools{
-    gap:4px
-  }
-
   .tool-btn{
     font-size:10px
-  }
-
-  .panel-head h3{
-    font-size:12px
-  }
-
-  .panel-count{
-    font-size:9px
-  }
-
-  .mini-btn{
-    padding:4px 7px
   }
 }
 
 @media(max-width:760px) and (orientation:landscape){
 
-  .main-card{
-    padding:10px
-  }
-
-  .player-col{
-    margin:-10px -10px 0;
-    width:calc(100% + 20px);
-    padding:8px 10px 10px
-  }
-
   .player-wrap{
     width:min(100%,calc(100dvh * 1.7777778));
-    aspect-ratio:16/9;
     margin:0 auto
   }
 
@@ -2347,10 +2099,8 @@ body.low-power #particles{
           <option value="carbon">Carbon</option>
         </select>
 
-        <button class="icon-btn" id="refreshFeedBtn" type="button" aria-label="Refresh" title="Refresh feed">↻</button>
-
-        <button class="icon-btn" id="theatreBtn" type="button" aria-label="Cinema mode" title="Cinema mode">⛶</button>
-
+        <button class="icon-btn" id="refreshFeedBtn" type="button" aria-label="Refresh">↻</button>
+        <button class="icon-btn" id="theatreBtn" type="button" aria-label="Cinema mode">⛶</button>
         <button class="icon-btn" id="menuBtn" type="button" aria-label="Quick menu" aria-expanded="false">☰</button>
 
       </div>
@@ -2464,11 +2214,7 @@ body.low-power #particles{
                 Waiting…
               </span>
 
-              <button
-                class="mini-btn"
-                id="clearSearchBtn"
-                type="button"
-                title="Clear">
+              <button class="mini-btn" id="clearSearchBtn" type="button">
                 ✕
               </button>
 
@@ -2488,45 +2234,24 @@ body.low-power #particles{
             <button
               class="search-clear"
               id="clearSearchBtn2"
-              type="button"
-              aria-label="Clear search">
+              type="button">
               ✕
             </button>
 
           </div>
 
-          <div
-            class="league-tabs"
-            id="leagueTabs"
-            role="tablist">
+          <div class="league-tabs" id="leagueTabs" role="tablist"></div>
+
+          <div class="recent-section" id="recentSection">
+            <span class="section-label">Recently watched</span>
+            <div class="recent-row" id="recentRow"></div>
           </div>
 
-          <div
-            class="recent-section"
-            id="recentSection">
-
-            <span class="section-label">
-              Recently watched
-            </span>
-
-            <div
-              class="recent-row"
-              id="recentRow">
-            </div>
-
-          </div>
-
-          <div
-            class="ch-list"
-            id="serverContainer"
-            aria-live="polite">
-          </div>
+          <div class="ch-list" id="serverContainer" aria-live="polite"></div>
 
         </div>
 
-        <div
-          class="ch-panel static-section"
-          id="staticSectionWrap">
+        <div class="ch-panel static-section" id="staticSectionWrap">
 
           <div class="panel-head">
 
@@ -2538,10 +2263,7 @@ body.low-power #particles{
 
           </div>
 
-          <div
-            class="static-ch-list"
-            id="staticServerContainer">
-          </div>
+          <div class="static-ch-list" id="staticServerContainer"></div>
 
         </div>
 
@@ -2554,23 +2276,22 @@ body.low-power #particles{
     </footer>
 
   </div>
-
 </div>
 
 <script>
 'use strict';
 
-const CUSTOM_TOP_FEEDS = [];
-const SHOW_MAINTENANCE_MSG = false;
-const PASSWORD = "Talha";
-const ALT_PASSWORD = "TalhaT";
-const PLAYER_BASE_URL = "player.html";
-const PLAYER_ALT_URL = "player2.html";
-const FEED_URL = "https://mahsunsports39.xyz/script4.js";
-const FEED_TIMEOUT = 12000;
-const SEARCH_DELAY = 80;
+const CUSTOM_TOP_FEEDS=[];
+const SHOW_MAINTENANCE_MSG=false;
+const PASSWORD="Talha";
+const ALT_PASSWORD="TalhaT";
+const PLAYER_BASE_URL="player.html";
+const PLAYER_ALT_URL="player2.html";
+const FEED_URL="https://mahsunsports39.xyz/script4.js";
+const FEED_TIMEOUT=12000;
+const SEARCH_DELAY=80;
 
-const STATIC_CHANNELS = [
+const STATIC_CHANNELS=[
   {title:"BeIN Sports 1",url:"/event.html?id=androstreamlivebs1"},
   {title:"BeIN Sports 2",url:"/event.html?id=androstreamlivebs2"},
   {title:"BeIN Sports 3",url:"/event.html?id=androstreamlivebs3"},
@@ -2635,179 +2356,61 @@ let feedRequestToken=0;
 let searchTimer=null;
 
 const translationDict={
-"motor sporları":"Motorsports",
-"motor sporlari":"Motorsports",
-"hazırlık maçı":"Friendly Match",
-"hazirlik maci":"Friendly Match",
-"paris basketball":"Paris Basketball",
-"şampiyonlar ligi":"Champions League",
-"sampiyonlar ligi":"Champions League",
-"avrupa ligi":"Europa League",
-"konferans ligi":"Conference League",
-"milletler ligi":"Nations League",
-"dünya kupası":"World Cup",
-"dunya kupasi":"World Cup",
-"avrupa şampiyonası":"European Championship",
-"avrupa sampiyonasi":"European Championship",
-"süper lig":"Super League",
-"super lig":"Super League",
-"1. lig":"1st Division",
-"2. lig":"2nd Division",
-"füchse berlin":"Fuchse Berlin",
-"fuchse berlin":"Fuchse Berlin",
-"as monaco":"AS Monaco",
-"lnb pro a final":"LNB Pro A Final",
-"masa tenisi":"Table Tennis",
-"amerikan futbolu":"American Football",
-"buz hokeyi":"Ice Hockey",
-"at yarışı":"Horse Racing",
-"at yarisi":"Horse Racing",
-"su topu":"Water Polo",
-"maç özeti":"Match Highlights",
-"mac ozeti":"Match Highlights",
-"suudi arabistan":"Saudi Arabia",
-"güney kore":"South Korea",
-"guney kore":"South Korea",
-"çeyrek final":"Quarter-Final",
-"ceyrek final":"Quarter-Final",
-"yarı final":"Semi-Final",
-"yari final":"Semi-Final",
-"grup maçı":"Group Stage",
-"grup maci":"Group Stage",
-"hafta sonu":"Weekend",
-"hafta içi":"Weekday",
-"hafta ici":"Weekday",
-"voleybol":"Volleyball",
-"basketbol":"Basketball",
-"futbol":"Football",
-"hentbol":"Handball",
-"tenis":"Tennis",
-"dövüş":"Fighting",
-"dovus":"Fighting",
-"bisiklet":"Cycling",
-"yüzme":"Swimming",
-"yuzme":"Swimming",
-"boks":"Boxing",
-"güreş":"Wrestling",
-"gures":"Wrestling",
-"futsal":"Futsal",
-"espor":"E-Sports",
-"e-spor":"E-Sports",
-"erkekler":"Men's",
-"kadınlar":"Women's",
-"kadinlar":"Women's",
-"erkek":"Men",
-"kadın":"Women",
-"kadin":"Women",
-"gençler":"Youth",
-"gencler":"Youth",
-"hazırlık":"Friendly",
-"hazirlik":"Friendly",
-"canlı":"LIVE",
-"canli":"LIVE",
-"yayın":"Broadcast",
-"yayin":"Broadcast",
-"yayında":"On Air",
-"yayinda":"On Air",
-"finali":"Final",
-"final":"Final",
-"kupa":"Cup",
-"kupası":"Cup",
-"kupasi":"Cup",
-"eleme":"Qualifier",
-"elemeleri":"Qualifiers",
-"özet":"Highlights",
-"ozet":"Highlights",
-"maçı":"Match",
-"maci":"Match",
-"maç":"Match",
-"mac":"Match",
-"takımı":"Team",
-"takimi":"Team",
-"hafta":"Week",
-"tur":"Round",
-"etap":"Stage",
-"devre":"Half",
-"uzatmalar":"Extra Time",
-"penaltılar":"Penalties",
-"penaltilar":"Penalties",
-"ertelendi":"Postponed",
-"iptal":"Canceled",
-"türkiye":"Turkey",
-"turkiye":"Turkey",
-"türk":"Turkish",
-"turk":"Turkish",
-"İngiltere":"England",
-"ingiltere":"England",
-"ispanya":"Spain",
-"italya":"Italy",
-"almanya":"Germany",
-"fransa":"France",
-"hollanda":"Netherlands",
-"portekiz":"Portugal",
-"rusya":"Russia",
-"yunanistan":"Greece",
-"belçika":"Belgium",
-"belcika":"Belgium",
-"avusturya":"Austria",
-"danimarka":"Denmark",
-"İsveç":"Sweden",
-"isvec":"Sweden",
-"İsviçre":"Switzerland",
-"isvicre":"Switzerland",
-"brezilya":"Brazil",
-"arjantin":"Argentina",
-"Çekya":"Czechia",
-"polonya":"Poland",
-"japonya":"Japan",
-"çin":"China",
-"cin":"China",
-"avustralya":"Australia",
-"hırvatistan":"Croatia",
-"hirvatistan":"Croatia",
-"sırbistan":"Serbia",
-"sirbistan":"Serbia",
-"romanya":"Romania",
-"macaristan":"Hungary",
-"ukrayna":"Ukraine",
-"mısır":"Egypt",
-"misir":"Egypt",
-"fas":"Morocco",
-"cezayir":"Algeria",
-"kanada":"Canada",
-"meksika":"Mexico",
-"şili":"Chile",
-"sili":"Chile",
-"kolombiya":"Colombia",
-"uruguay":"Uruguay",
-"paraguay":"Paraguay",
-"curaçao":"Curacao",
-"curaca":"Curacao",
-"galatasaray":"Galatasaray",
-"fenerbahçe":"Fenerbahce",
-"fenerbahce":"Fenerbahce",
-"beşiktaş":"Besiktas",
-"besiktas":"Besiktas",
-"trabzonspor":"Trabzonspor",
-"başakşehir":"Basaksehir",
-"basaksehir":"Basaksehir",
-"barcelona":"Barcelona",
-"real madrid":"Real Madrid",
-"bugün":"Today",
-"bugun":"Today",
-"yarın":"Tomorrow",
-"yarin":"Tomorrow",
-"dün":"Yesterday",
-"dun":"Yesterday",
-"saat":"Time",
-"dakika":"min",
-"saniye":"sec",
-"bakım":"Maintenance",
-"bakim":"Maintenance",
-"sunucu":"Server",
-"bağlantı":"Connection",
-"baglanti":"Connection",
-"yedek":"Backup"
+  "motor sporları":"Motorsports","motor sporlari":"Motorsports",
+  "hazırlık maçı":"Friendly Match","hazirlik maci":"Friendly Match",
+  "paris basketball":"Paris Basketball","şampiyonlar ligi":"Champions League",
+  "sampiyonlar ligi":"Champions League","avrupa ligi":"Europa League",
+  "konferans ligi":"Conference League","milletler ligi":"Nations League",
+  "dünya kupası":"World Cup","dunya kupasi":"World Cup",
+  "avrupa şampiyonası":"European Championship","avrupa sampiyonasi":"European Championship",
+  "süper lig":"Super League","super lig":"Super League",
+  "1. lig":"1st Division","2. lig":"2nd Division",
+  "füchse berlin":"Fuchse Berlin","fuchse berlin":"Fuchse Berlin",
+  "as monaco":"AS Monaco","lnb pro a final":"LNB Pro A Final",
+  "masa tenisi":"Table Tennis","amerikan futbolu":"American Football",
+  "buz hokeyi":"Ice Hockey","at yarışı":"Horse Racing","at yarisi":"Horse Racing",
+  "su topu":"Water Polo","maç özeti":"Match Highlights","mac ozeti":"Match Highlights",
+  "suudi arabistan":"Saudi Arabia","güney kore":"South Korea","guney kore":"South Korea",
+  "çeyrek final":"Quarter-Final","ceyrek final":"Quarter-Final",
+  "yarı final":"Semi-Final","yari final":"Semi-Final",
+  "grup maçı":"Group Stage","grup maci":"Group Stage",
+  "hafta sonu":"Weekend","hafta içi":"Weekday","hafta ici":"Weekday",
+  "voleybol":"Volleyball","basketbol":"Basketball","futbol":"Football",
+  "hentbol":"Handball","tenis":"Tennis","dövüş":"Fighting","dovus":"Fighting",
+  "bisiklet":"Cycling","yüzme":"Swimming","yuzme":"Swimming","boks":"Boxing",
+  "güreş":"Wrestling","gures":"Wrestling","futsal":"Futsal","espor":"E-Sports",
+  "e-spor":"E-Sports","erkekler":"Men's","kadınlar":"Women's","kadinlar":"Women's",
+  "erkek":"Men","kadın":"Women","kadin":"Women","gençler":"Youth","gencler":"Youth",
+  "hazırlık":"Friendly","hazirlik":"Friendly","canlı":"LIVE","canli":"LIVE",
+  "yayın":"Broadcast","yayin":"Broadcast","yayında":"On Air","yayinda":"On Air",
+  "finali":"Final","final":"Final","kupa":"Cup","kupası":"Cup","kupasi":"Cup",
+  "eleme":"Qualifier","elemeleri":"Qualifiers","özet":"Highlights","ozet":"Highlights",
+  "maçı":"Match","maci":"Match","maç":"Match","mac":"Match",
+  "takımı":"Team","takimi":"Team","hafta":"Week","tur":"Round","etap":"Stage",
+  "devre":"Half","uzatmalar":"Extra Time","penaltılar":"Penalties",
+  "penaltilar":"Penalties","ertelendi":"Postponed","iptal":"Canceled",
+  "türkiye":"Turkey","turkiye":"Turkey","türk":"Turkish","turk":"Turkish",
+  "İngiltere":"England","ingiltere":"England","ispanya":"Spain",
+  "italya":"Italy","almanya":"Germany","fransa":"France","hollanda":"Netherlands",
+  "portekiz":"Portugal","rusya":"Russia","yunanistan":"Greece",
+  "belçika":"Belgium","belcika":"Belgium","avusturya":"Austria",
+  "danimarka":"Denmark","İsveç":"Sweden","isvec":"Sweden",
+  "İsviçre":"Switzerland","isvicre":"Switzerland","brezilya":"Brazil",
+  "arjantin":"Argentina","Çekya":"Czechia","polonya":"Poland",
+  "japonya":"Japan","çin":"China","cin":"China","avustralya":"Australia",
+  "hırvatistan":"Croatia","hirvatistan":"Croatia","sırbistan":"Serbia",
+  "sirbistan":"Serbia","romanya":"Romania","macaristan":"Hungary",
+  "ukrayna":"Ukraine","mısır":"Egypt","misir":"Egypt","fas":"Morocco",
+  "cezayir":"Algeria","kanada":"Canada","meksika":"Mexico","şili":"Chile",
+  "sili":"Chile","kolombiya":"Colombia","uruguay":"Uruguay","paraguay":"Paraguay",
+  "curaçao":"Curacao","curaca":"Curacao","galatasaray":"Galatasaray",
+  "fenerbahçe":"Fenerbahce","fenerbahce":"Fenerbahce","beşiktaş":"Besiktas",
+  "besiktas":"Besiktas","trabzonspor":"Trabzonspor","başakşehir":"Basaksehir",
+  "basaksehir":"Basaksehir","barcelona":"Barcelona","real madrid":"Real Madrid",
+  "bugün":"Today","bugun":"Today","yarın":"Tomorrow","yarin":"Tomorrow",
+  "dün":"Yesterday","dun":"Yesterday","saat":"Time","dakika":"min",
+  "saniye":"sec","bakım":"Maintenance","bakim":"Maintenance",
+  "sunucu":"Server","bağlantı":"Connection","baglanti":"Connection","yedek":"Backup"
 };
 
 const dictEntries=Object.keys(translationDict)
@@ -2823,7 +2426,6 @@ const dictEntries=Object.keys(translationDict)
 
 function normalizeTurkishText(str){
   if(!str)return'';
-
   return String(str)
   .replace(/Ã¼/g,'ü')
   .replace(/Ãœ/g,'Ü')
@@ -2845,14 +2447,13 @@ function normalizeTurkishText(str){
 
 function translateText(text){
   if(!text)return'';
-
   let str=normalizeTurkishText(text);
 
   for(let i=0;i<dictEntries.length;i++){
     const e=dictEntries[i];
 
     if(e.pattern.test(str)){
-      str=str.replace(e.pattern,(match)=>{
+      str=str.replace(e.pattern,match=>{
         if(match===match.toUpperCase()){
           return e.replacement.toUpperCase();
         }
@@ -2887,6 +2488,7 @@ function translateNode(node){
   if(!node||node.nodeType!==Node.TEXT_NODE)return;
 
   const parent=node.parentNode;
+
   if(!parent)return;
 
   const tag=parent.tagName?parent.tagName.toUpperCase():'';
@@ -2896,24 +2498,17 @@ function translateNode(node){
     .includes(tag)
   )return;
 
-  if(
-    parent.closest&&
-    parent.closest('[data-no-translate="true"]')
-  )return;
+  if(parent.closest&&parent.closest('[data-no-translate="true"]'))return;
 
   const orig=node.nodeValue;
 
   if(!orig||!orig.trim())return;
 
   const normalized=normalizeTurkishText(orig);
-
   const hasTr=/[şŞıİğĞüÜöÖçÇÃÅÄ]/i.test(orig);
-
-  const needsTrans=
-    hasTr||
-    Object.keys(translationDict).some(
-      k=>orig.toLowerCase().includes(k)
-    );
+  const needsTrans=hasTr||Object.keys(translationDict).some(
+    k=>orig.toLowerCase().includes(k)
+  );
 
   if(needsTrans||orig!==normalized){
     const translated=translateText(orig);
@@ -2937,7 +2532,6 @@ function autoTranslateDOM(root=document.body){
       NodeFilter.SHOW_TEXT,
       {
         acceptNode:n=>{
-
           if(!n.nodeValue||!n.nodeValue.trim()){
             return NodeFilter.FILTER_SKIP;
           }
@@ -2998,6 +2592,7 @@ function initDOMTranslator(){
         translateNode(m.target);
 
       }
+
     }
 
   });
@@ -3008,65 +2603,47 @@ function initDOMTranslator(){
     characterData:true
   });
 
-  setInterval(
-    ()=>autoTranslateDOM(),
-    800
-  );
+  setInterval(()=>autoTranslateDOM(),800);
 }
 
 function storageGet(key,fb=null){
-
   try{
     return localStorage.getItem(key)??fb;
   }catch(e){
     return fb;
   }
-
 }
 
 function storageSet(key,val){
-
   try{
     localStorage.setItem(key,val);
     return true;
   }catch(e){
     return false;
   }
-
 }
 
 function safeJSON(key,fb){
-
   try{
-
     const r=storageGet(key,null);
 
     if(!r)return fb;
 
     return JSON.parse(r)??fb;
-
   }catch(e){
-
     return fb;
-
   }
-
 }
 
 function normalizeIdentityPart(v){
-
   return String(v??'')
   .trim()
   .toLowerCase()
   .replace(/\s+/g,' ');
-
 }
 
 function legacyEventKey(event,index=''){
-
-  const base=
-    event&&
-    (event.id??event.url??event.title??'');
+  const base=event&&(event.id??event.url??event.title??'');
 
   if(base!==''&&base!==null){
     return String(base);
@@ -3132,14 +2709,11 @@ function migrateStoredEventState(events){
   ){
 
     if(validKeys.has(sk)){
-
       mf.push(sk);
-
       continue;
     }
 
-    const ms=
-      legacyMatches.get(String(sk))||[];
+    const ms=legacyMatches.get(String(sk))||[];
 
     if(ms.length===1){
       mf.push(ms[0]);
@@ -3174,8 +2748,7 @@ function migrateStoredEventState(events){
       continue;
     }
 
-    const ms=
-      legacyMatches.get(String(sk??''))||[];
+    const ms=legacyMatches.get(String(sk??''))||[];
 
     if(ms.length===1){
 
@@ -3197,7 +2770,6 @@ function migrateStoredEventState(events){
 }
 
 function escapeHTML(v){
-
   return String(v??'').replace(
     /[&<>'"]/g,
     c=>({
@@ -3208,74 +2780,56 @@ function escapeHTML(v){
       '"':'&quot;'
     }[c])
   );
-
 }
 
 function leagueName(ev){
-
   return translateText(
     String(ev?.league||'Other')
   ).trim()||'Other';
-
 }
 
 function changeTheme(t){
-
   document.body.dataset.theme=t;
   storageSet('talhaTheme',t);
-
 }
 
 function setStatus(text,state='ready'){
 
-  const dot=
-    document.getElementById('networkDot');
-
-  const label=
-    document.getElementById('networkText');
+  const dot=document.getElementById('networkDot');
+  const label=document.getElementById('networkText');
 
   if(label){
     label.textContent=text;
   }
 
   if(dot){
-
-    dot.className=
-      'status-dot'+
-      (
-        state==='offline'
-          ?' offline'
-          :state==='busy'
-            ?' busy'
-            :''
-      );
-
+    dot.className='status-dot'+(
+      state==='offline'
+        ?' offline'
+        :state==='busy'
+          ?' busy'
+          :''
+    );
   }
-
 }
 
 function setSync(t){
-
-  const el=
-    document.getElementById('syncText');
+  const el=document.getElementById('syncText');
 
   if(el){
     el.textContent=t;
   }
-
 }
 
 function showToast(title,msg){
 
-  const old=
-    document.querySelector('.toast');
+  const old=document.querySelector('.toast');
 
   if(old){
     old.remove();
   }
 
-  const el=
-    document.createElement('div');
+  const el=document.createElement('div');
 
   el.className='toast';
 
@@ -3299,25 +2853,19 @@ function showToast(title,msg){
     },250);
 
   },3500);
-
 }
 
 function hideLoader(reason='Ready'){
 
-  const loader=
-    document.getElementById('loader');
+  const loader=document.getElementById('loader');
 
-  if(
-    !loader||
-    loader.dataset.hidden==='1'
-  ){
+  if(!loader||loader.dataset.hidden==='1'){
     return;
   }
 
   loader.dataset.hidden='1';
 
-  const s=
-    document.getElementById('loaderStatus');
+  const s=document.getElementById('loaderStatus');
 
   if(s){
     s.textContent=reason;
@@ -3330,7 +2878,6 @@ function hideLoader(reason='Ready'){
   setTimeout(()=>{
     loader.remove();
   },420);
-
 }
 
 function bootLoader(){
@@ -3339,19 +2886,12 @@ function bootLoader(){
   const MIN_SHOW=2200;
   const MAX_WAIT=5000;
 
-  let domReady=
-    document.readyState!=='loading';
-
+  let domReady=document.readyState!=='loading';
   let finished=false;
 
-  const progress=
-    document.getElementById('loaderProgress');
-
-  const percent=
-    document.getElementById('loaderPercent');
-
-  const status=
-    document.getElementById('loaderStatus');
+  const progress=document.getElementById('loaderProgress');
+  const percent=document.getElementById('loaderPercent');
+  const status=document.getElementById('loaderStatus');
 
   const ticks=[
     [25,'Loading visual engine…'],
@@ -3365,25 +2905,19 @@ function bootLoader(){
 
   const animator=setInterval(()=>{
 
-    const elapsed=
-      performance.now()-started;
+    const elapsed=performance.now()-started;
 
-    const pct=
-      Math.min(
-        100,
-        Math.round(
-          (elapsed/MIN_SHOW)*100
-        )
-      );
+    const pct=Math.min(
+      100,
+      Math.round((elapsed/MIN_SHOW)*100)
+    );
 
     if(progress){
-      progress.style.width=
-        pct+'%';
+      progress.style.width=pct+'%';
     }
 
     if(percent){
-      percent.textContent=
-        pct+'%';
+      percent.textContent=pct+'%';
     }
 
     while(
@@ -3392,12 +2926,10 @@ function bootLoader(){
     ){
 
       if(status){
-        status.textContent=
-          ticks[tickIndex][1];
+        status.textContent=ticks[tickIndex][1];
       }
 
       tickIndex++;
-
     }
 
   },40);
@@ -3408,8 +2940,7 @@ function bootLoader(){
 
     const wait=Math.max(
       0,
-      MIN_SHOW-
-      (performance.now()-started)
+      MIN_SHOW-(performance.now()-started)
     );
 
     setTimeout(()=>{
@@ -3448,17 +2979,8 @@ function bootLoader(){
 
   }
 
-  window.addEventListener(
-    'load',
-    ready,
-    {once:true}
-  );
-
-  window.addEventListener(
-    'pageshow',
-    ready,
-    {once:true}
-  );
+  window.addEventListener('load',ready,{once:true});
+  window.addEventListener('pageshow',ready,{once:true});
 
   setTimeout(()=>{
 
@@ -3488,20 +3010,17 @@ function updateClock(){
       }
     ).format(new Date());
 
-  const c=
-    document.getElementById('clockText');
+  const c=document.getElementById('clockText');
 
   if(c){
     c.textContent=t;
   }
 
-  const mc=
-    document.getElementById('menuClock');
+  const mc=document.getElementById('menuClock');
 
   if(mc){
     mc.textContent=t;
   }
-
 }
 
 updateClock();
@@ -3513,8 +3032,7 @@ setInterval(
 
 function updateNetwork(){
 
-  const on=
-    navigator.onLine!==false;
+  const on=navigator.onLine!==false;
 
   setStatus(
     on
@@ -3524,27 +3042,22 @@ function updateNetwork(){
       ?'ready'
       :'offline'
   );
-
 }
 
 function updateAnalytics(){
 
-  const total=
-    liveEvents.length;
+  const total=liveEvents.length;
 
-  const favs=
-    liveEvents.filter(
-      (e,i)=>
-        favoriteKeys.includes(
-          eventKey(e,i)
-        )
-    ).length;
+  const favs=liveEvents.filter(
+    (e,i)=>favoriteKeys.includes(
+      eventKey(e,i)
+    )
+  ).length;
 
-  const rec=
-    Math.min(
-      recentEvents.length,
-      5
-    );
+  const rec=Math.min(
+    recentEvents.length,
+    5
+  );
 
   document.getElementById(
     'countTotal'
@@ -3561,11 +3074,8 @@ function updateAnalytics(){
   ).textContent=
     String(rec).padStart(2,'0');
 
-  const pl=
-    document.getElementById('pcbLive');
-
-  const ps=
-    document.getElementById('pcbStatic');
+  const pl=document.getElementById('pcbLive');
+  const ps=document.getElementById('pcbStatic');
 
   if(pl){
     pl.textContent=
@@ -3578,15 +3088,13 @@ function updateAnalytics(){
         STATIC_CHANNELS.length
       ).padStart(2,'0');
   }
-
 }
 
 function renderLeagueTabs(){
 
-  const tabs=
-    document.getElementById(
-      'leagueTabs'
-    );
+  const tabs=document.getElementById(
+    'leagueTabs'
+  );
 
   if(!tabs)return;
 
@@ -3594,46 +3102,32 @@ function renderLeagueTabs(){
 
   liveEvents.forEach(e=>{
 
-    const n=
-      leagueName(e);
+    const n=leagueName(e);
 
-    counts[n]=
-      (counts[n]||0)+1;
-
+    counts[n]=(counts[n]||0)+1;
   });
 
   const pri=n=>{
 
-    const l=
-      n.toLowerCase();
+    const l=n.toLowerCase();
 
     if(l.includes('la liga'))return 0;
-
     if(l.includes('uefa'))return 1;
 
     return 2;
-
   };
 
-  const leagues=
-    Object.keys(counts)
-    .sort(
-      (a,b)=>
-        pri(a)-pri(b)||
-        a.localeCompare(b)
-    );
+  const leagues=Object.keys(counts).sort(
+    (a,b)=>
+      pri(a)-pri(b)||
+      a.localeCompare(b)
+  );
 
   tabs.innerHTML='';
 
-  const addTab=(
-    name,
-    active,
-    cb,
-    count
-  )=>{
+  const addTab=(name,active,cb,count)=>{
 
-    const b=
-      document.createElement('button');
+    const b=document.createElement('button');
 
     b.className=
       'tab-btn'+
@@ -3652,7 +3146,6 @@ function renderLeagueTabs(){
     b.onclick=cb;
 
     tabs.appendChild(b);
-
   };
 
   addTab(
@@ -3675,7 +3168,6 @@ function renderLeagueTabs(){
     );
 
   });
-
 }
 
 function renderRecent(){
@@ -3748,15 +3240,11 @@ function renderRecent(){
         if(sf){
           setServer(sf);
         }
-
       }
-
     };
 
     row.appendChild(chip);
-
   });
-
 }
 
 function renderMatches(){
@@ -3834,8 +3322,7 @@ function renderMatches(){
           'div'
         );
 
-      row.className=
-        'ch-item';
+      row.className='ch-item';
 
       row.tabIndex=0;
 
@@ -3851,11 +3338,13 @@ function renderMatches(){
 
       row.innerHTML=`
         <div class="ch-left">
+
           <div class="ch-num">
             ${String(idx).padStart(2,'0')}
           </div>
 
           <div class="ch-info">
+
             <strong>
               ${escapeHTML(et)}
             </strong>
@@ -3863,7 +3352,9 @@ function renderMatches(){
             <small>
               ${escapeHTML(el||'Live feed')}
             </small>
+
           </div>
+
         </div>
 
         <div class="ch-right">
@@ -3910,9 +3401,7 @@ function renderMatches(){
               event,
               row
             );
-
           }
-
         };
 
       row.querySelector(
@@ -3941,13 +3430,11 @@ function renderMatches(){
         renderMatches();
 
         updateAnalytics();
-
       };
 
       container.appendChild(row);
 
       visible++;
-
     }
   );
 
@@ -3955,7 +3442,6 @@ function renderMatches(){
 
     container.innerHTML=
       '<div class="empty-state">No channels match your filters.</div>';
-
   }
 
   document.getElementById(
@@ -3966,7 +3452,6 @@ function renderMatches(){
   updateAnalytics();
   renderRecent();
   renderStaticChannels();
-
 }
 
 function renderStaticChannels(){
@@ -3986,12 +3471,10 @@ function renderStaticChannels(){
     );
 
   if(countEl){
-
     countEl.textContent=
       String(
         STATIC_CHANNELS.length
       );
-
   }
 
   STATIC_CHANNELS.forEach(
@@ -4002,8 +3485,7 @@ function renderStaticChannels(){
           'div'
         );
 
-      row.className=
-        'ch-item';
+      row.className='ch-item';
 
       row.tabIndex=0;
 
@@ -4027,6 +3509,7 @@ function renderStaticChannels(){
           </div>
 
           <div class="ch-info">
+
             <strong>
               ${escapeHTML(
                 event.title
@@ -4036,6 +3519,7 @@ function renderStaticChannels(){
             <small>
               24/7 Network
             </small>
+
           </div>
 
         </div>
@@ -4070,22 +3554,15 @@ function renderStaticChannels(){
               event,
               row
             );
-
           }
-
         };
 
       container.appendChild(row);
-
     }
   );
-
 }
 
-function setFilter(
-  type,
-  name='all'
-){
+function setFilter(type,name='all'){
 
   currentLeague=
     type==='league'
@@ -4094,13 +3571,9 @@ function setFilter(
 
   renderLeagueTabs();
   renderMatches();
-
 }
 
-function rememberRecent(
-  event,
-  index=''
-){
+function rememberRecent(event,index=''){
 
   const key=
     eventKey(
@@ -4128,13 +3601,9 @@ function rememberRecent(
       recentEvents
     )
   );
-
 }
 
-function setServer(
-  event,
-  targetBtn
-){
+function setServer(event,targetBtn){
 
   const frame=
     document.getElementById(
@@ -4147,16 +3616,6 @@ function setServer(
   ){
     return;
   }
-
-  frame.classList.remove(
-    'fade'
-  );
-
-  void frame.offsetWidth;
-
-  frame.classList.add(
-    'fade'
-  );
 
   const BASE=
     window.__PLAYER_URL_FOR_SESSION||
@@ -4213,46 +3672,38 @@ function setServer(
           `${BASE}?Talha=${
             encodeURIComponent(raw)
           }`;
-
       }
 
     }else{
 
       finalUrl=raw;
-
     }
 
   }else{
 
     finalUrl=
       `${BASE}?Talha=androstreamlivetrt1`;
-
   }
 
   try{
 
-    frame.src=
-      'about:blank';
+    frame.src='about:blank';
 
     setTimeout(
       ()=>{
-        frame.src=
-          finalUrl;
+        frame.src=finalUrl;
       },
       20
     );
 
   }catch(e){
 
-    frame.src=
-      finalUrl;
+    frame.src=finalUrl;
 
   }
 
   const ei=
-    liveEvents.indexOf(
-      event
-    );
+    liveEvents.indexOf(event);
 
   rememberRecent(
     event,
@@ -4262,22 +3713,21 @@ function setServer(
   renderRecent();
 
   document
-    .querySelectorAll(
-      '.ch-item'
-    )
-    .forEach(
-      b=>
-        b.classList.remove(
-          'active'
-        )
-    );
+  .querySelectorAll(
+    '.ch-item'
+  )
+  .forEach(
+    b=>
+      b.classList.remove(
+        'active'
+      )
+  );
 
   if(targetBtn){
     targetBtn.classList.add(
       'active'
     );
   }
-
 }
 
 function triggerFirstStream(){
@@ -4290,7 +3740,7 @@ function triggerFirstStream(){
   ){
 
     if(
-      STATIC_CHANNELS.length>0
+      STATIC_CHANNELS.length
     ){
 
       const r=
@@ -4315,7 +3765,6 @@ function triggerFirstStream(){
   if(first){
     first.click();
   }
-
 }
 
 function feedError(msg){
@@ -4350,16 +3799,11 @@ function feedError(msg){
   );
 
   triggerFirstStream();
-
 }
 
-function loadTargetScript(
-  force=false
-){
+function loadTargetScript(force=false){
 
-  if(
-    feedBusy&&!force
-  ){
+  if(feedBusy&&!force){
     return;
   }
 
@@ -4404,8 +3848,7 @@ function loadTargetScript(
 
   }catch(e){
 
-    window.karsilasmalar=
-      undefined;
+    window.karsilasmalar=undefined;
 
   }
 
@@ -4427,8 +3870,7 @@ function loadTargetScript(
   let settled=false;
 
   const isCurrent=()=>
-    token===
-    feedRequestToken;
+    token===feedRequestToken;
 
   const timeout=
     setTimeout(()=>{
@@ -4441,9 +3883,7 @@ function loadTargetScript(
       }
 
       settled=true;
-
       feedBusy=false;
-
       script.remove();
 
       feedError(
@@ -4463,9 +3903,7 @@ function loadTargetScript(
 
     settled=true;
 
-    clearTimeout(
-      timeout
-    );
+    clearTimeout(timeout);
 
     feedBusy=false;
 
@@ -4474,7 +3912,6 @@ function loadTargetScript(
     feedError(
       'Feed server is unavailable right now.'
     );
-
   };
 
   script.onload=()=>{
@@ -4488,9 +3925,7 @@ function loadTargetScript(
 
     settled=true;
 
-    clearTimeout(
-      timeout
-    );
+    clearTimeout(timeout);
 
     feedBusy=false;
 
@@ -4500,36 +3935,26 @@ function loadTargetScript(
 
       if(
         typeof karsilasmalar!=='undefined'&&
-        Array.isArray(
-          karsilasmalar
-        )
+        Array.isArray(karsilasmalar)
       ){
-
         temp.push(
           ...karsilasmalar
         );
-
       }
 
       if(
         typeof futbolMatches!=='undefined'&&
-        Array.isArray(
-          futbolMatches
-        )
+        Array.isArray(futbolMatches)
       ){
-
         temp.push(
           ...futbolMatches
         );
-
       }
 
       if(!temp.length){
-
         throw new Error(
           'Feed Vector Missing'
         );
-
       }
 
       temp.sort(
@@ -4556,7 +3981,6 @@ function loadTargetScript(
           return al===bl
             ?0
             :(al?-1:1);
-
         }
       );
 
@@ -4575,9 +3999,7 @@ function loadTargetScript(
       );
 
       updateAnalytics();
-
       renderLeagueTabs();
-
       renderMatches();
 
       setStatus(
@@ -4610,13 +4032,11 @@ function loadTargetScript(
       );
 
     }
-
   };
 
   document.body.appendChild(
     script
   );
-
 }
 
 function login(){
@@ -4647,24 +4067,12 @@ function login(){
 
     input.animate(
       [
-        {
-          transform:'translateX(0)'
-        },
-        {
-          transform:'translateX(-8px)'
-        },
-        {
-          transform:'translateX(8px)'
-        },
-        {
-          transform:'translateX(-4px)'
-        },
-        {
-          transform:'translateX(4px)'
-        },
-        {
-          transform:'translateX(0)'
-        }
+        {transform:'translateX(0)'},
+        {transform:'translateX(-8px)'},
+        {transform:'translateX(8px)'},
+        {transform:'translateX(-4px)'},
+        {transform:'translateX(4px)'},
+        {transform:'translateX(0)'}
       ],
       {
         duration:300
@@ -4684,8 +4092,7 @@ function login(){
 
   document.getElementById(
     'authWrap'
-  )
-  .classList.remove(
+  ).classList.remove(
     'visible'
   );
 
@@ -4697,12 +4104,9 @@ function login(){
   updateAnalytics();
 
   loadTargetScript();
-
 }
 
-function toggleTheatre(
-  on
-){
+function toggleTheatre(on){
 
   document.body.classList.toggle(
     'theatre',
@@ -4721,22 +4125,20 @@ function toggleTheatre(
 
   if(on){
 
-    document.documentElement
-      .style.overflow='hidden';
+    document.documentElement.style.overflow=
+      'hidden';
 
-    document.body
-      .style.overflow='hidden';
+    document.body.style.overflow=
+      'hidden';
 
   }else{
 
-    document.documentElement
-      .style.overflow='';
+    document.documentElement.style.overflow=
+      '';
 
-    document.body
-      .style.overflow='';
-
+    document.body.style.overflow=
+      '';
   }
-
 }
 
 function toggleFocus(){
@@ -4746,7 +4148,6 @@ function toggleFocus(){
   );
 
   closeMenu();
-
 }
 
 function openMenu(){
@@ -4784,7 +4185,6 @@ function openMenu(){
       'aria-hidden',
       'false'
     );
-
   }
 
   if(btn){
@@ -4793,9 +4193,7 @@ function openMenu(){
       'aria-expanded',
       'true'
     );
-
   }
-
 }
 
 function closeMenu(){
@@ -4833,7 +4231,6 @@ function closeMenu(){
       'aria-hidden',
       'true'
     );
-
   }
 
   if(btn){
@@ -4842,9 +4239,7 @@ function closeMenu(){
       'aria-expanded',
       'false'
     );
-
   }
-
 }
 
 function scrollToChannels(){
@@ -4855,7 +4250,6 @@ function scrollToChannels(){
     behavior:'smooth',
     block:'start'
   });
-
 }
 
 function showFavorites(){
@@ -4882,7 +4276,10 @@ function showFavorites(){
 
       if(
         !favoriteKeys.includes(
-          eventKey(event,index)
+          eventKey(
+            event,
+            index
+          )
         )
       ){
         return;
@@ -4895,8 +4292,7 @@ function showFavorites(){
           'div'
         );
 
-      row.className=
-        'ch-item';
+      row.className='ch-item';
 
       row.tabIndex=0;
 
@@ -4913,7 +4309,8 @@ function showFavorites(){
 
       const l=
         translateText(
-          event?.league||''
+          event?.league||
+          ''
         );
 
       row.innerHTML=`
@@ -4946,7 +4343,8 @@ function showFavorites(){
           <div class="live-badge">
             <div class="live-dot"></div>
             ${escapeHTML(
-              event?.time||'LIVE'
+              event?.time||
+              'LIVE'
             )}
           </div>
 
@@ -4959,8 +4357,9 @@ function showFavorites(){
           row
         );
 
-      c.appendChild(row);
-
+      c.appendChild(
+        row
+      );
     }
   );
 
@@ -4985,8 +4384,7 @@ function showFavorites(){
           'div'
         );
 
-      row.className=
-        'ch-item';
+      row.className='ch-item';
 
       row.tabIndex=0;
 
@@ -5040,8 +4438,9 @@ function showFavorites(){
           row
         );
 
-      c.appendChild(row);
-
+      c.appendChild(
+        row
+      );
     }
   );
 
@@ -5060,7 +4459,6 @@ function showFavorites(){
   updateAnalytics();
 
   scrollToChannels();
-
 }
 
 function cycleTheme(){
@@ -5097,7 +4495,6 @@ function cycleTheme(){
   }
 
   closeMenu();
-
 }
 
 function lockSession(){
@@ -5135,36 +4532,25 @@ function lockSession(){
     },
     100
   );
-
 }
 
-function handleMenuAction(
-  action
-){
+function handleMenuAction(action){
 
-  if(
-    action==='home'
-  ){
+  if(action==='home'){
 
     closeMenu();
 
     currentLeague='all';
 
     renderLeagueTabs();
-
     renderMatches();
-
     scrollToChannels();
 
-  }else if(
-    action==='favorites'
-  ){
+  }else if(action==='favorites'){
 
     showFavorites();
 
-  }else if(
-    action==='recent'
-  ){
+  }else if(action==='recent'){
 
     closeMenu();
 
@@ -5177,43 +4563,31 @@ function handleMenuAction(
         block:'center'
       });
 
-  }else if(
-    action==='cinema'
-  ){
+  }else if(action==='cinema'){
 
     closeMenu();
 
     toggleTheatre(true);
 
-  }else if(
-    action==='focus'
-  ){
+  }else if(action==='focus'){
 
     toggleFocus();
 
-  }else if(
-    action==='lock'
-  ){
+  }else if(action==='lock'){
 
     lockSession();
 
-  }else if(
-    action==='refresh'
-  ){
+  }else if(action==='refresh'){
 
     closeMenu();
 
     loadTargetScript(true);
 
-  }else if(
-    action==='theme'
-  ){
+  }else if(action==='theme'){
 
     cycleTheme();
 
-  }else if(
-    action==='shortcuts'
-  ){
+  }else if(action==='shortcuts'){
 
     closeMenu();
 
@@ -5223,7 +4597,6 @@ function handleMenuAction(
     );
 
   }
-
 }
 
 const savedTheme=
@@ -5249,10 +4622,7 @@ const noticeBox=
 if(
   SHOW_MAINTENANCE_MSG
 ){
-
-  noticeBox.style.display=
-    'flex';
-
+  noticeBox.style.display='flex';
 }
 
 if(
@@ -5269,11 +4639,9 @@ if(
     navigator.hardwareConcurrency<=4
   )
 ){
-
   document.body.classList.add(
     'low-power'
   );
-
 }
 
 const pCount=
@@ -5310,7 +4678,6 @@ for(
   document.getElementById(
     'particles'
   ).appendChild(d);
-
 }
 
 document.getElementById(
@@ -5442,9 +4809,7 @@ function doClearSearch(){
   currentLeague='all';
 
   renderLeagueTabs();
-
   renderMatches();
-
 }
 
 document.getElementById(
@@ -5476,7 +4841,6 @@ document.getElementById(
         renderMatches,
         SEARCH_DELAY
       );
-
   }
 );
 
@@ -5494,9 +4858,7 @@ window.addEventListener(
     ){
 
       loadTargetScript(true);
-
     }
-
   }
 );
 
@@ -5524,7 +4886,6 @@ window.addEventListener(
       document.getElementById(
         'searchChannels'
       ).focus();
-
     }
 
     if(
@@ -5537,7 +4898,6 @@ window.addEventListener(
       document.getElementById(
         'searchChannels'
       )?.focus();
-
     }
 
     if(
@@ -5557,7 +4917,6 @@ window.addEventListener(
         closeMenu();
 
       }
-
     }
 
     if(
@@ -5574,11 +4933,8 @@ window.addEventListener(
       ){
 
         loadTargetScript(true);
-
       }
-
     }
-
   }
 );
 
