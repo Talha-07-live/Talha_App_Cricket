@@ -1,0 +1,3790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#020206">
+<meta name="color-scheme" content="dark">
+<title>Talha's Stream</title>
+<link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png">
+
+<style>
+:root{
+  --ac:#7a3cff;
+  --ac2:#00f2fe;
+  --ac3:#e04cff;
+  --bg:#020206;
+  --panel:rgba(5,5,10,.78);
+  --muted:rgba(255,255,255,.45);
+  --radius-card:20px;
+  --radius-inner:12px;
+  --radius-pill:999px;
+  --gap:14px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --ch-h:52px;
+  --sidebar-w:300px;
+}
+
+body[data-theme="ocean"]{
+  --ac:#008cff;
+  --ac2:#00e5c5;
+  --ac3:#5ce1e6;
+  --bg:#03141d;
+  --panel:rgba(2,24,35,.80)
+}
+body[data-theme="sunset"]{
+  --ac:#ff6b35;
+  --ac2:#ffc857;
+  --ac3:#ff3d81;
+  --bg:#1b0d12;
+  --panel:rgba(32,12,20,.82)
+}
+body[data-theme="emerald"]{
+  --ac:#00b894;
+  --ac2:#8fffc0;
+  --ac3:#6c5ce7;
+  --bg:#061412;
+  --panel:rgba(5,25,20,.82)
+}
+body[data-theme="aurora"]{
+  --ac:#00d4ff;
+  --ac2:#a855f7;
+  --ac3:#36f1cd;
+  --bg:#050916;
+  --panel:rgba(8,13,33,.82)
+}
+body[data-theme="royal"]{
+  --ac:#d8a84e;
+  --ac2:#fff0a6;
+  --ac3:#8a5cff;
+  --bg:#110c1c;
+  --panel:rgba(25,16,38,.84)
+}
+body[data-theme="carbon"]{
+  --ac:#ff3d71;
+  --ac2:#ff9f43;
+  --ac3:#e9eef5;
+  --bg:#08090c;
+  --panel:rgba(17,19,24,.86)
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:var(--font);
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent
+}
+
+html{
+  width:100%;
+  min-height:100%;
+  background:var(--bg);
+  scroll-behavior:smooth
+}
+
+body{
+  width:100%;
+  min-width:0;
+  min-height:100dvh;
+  background:var(--bg);
+  overflow-x:hidden;
+  overflow-y:auto;
+  color:#fff;
+  transition:background .25s;
+  overscroll-behavior-x:none
+}
+
+body.menu-open{
+  overflow:hidden
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background:
+    radial-gradient(circle at 8% 12%,color-mix(in srgb,var(--ac) 28%,transparent),transparent 38%),
+    radial-gradient(circle at 92% 8%,color-mix(in srgb,var(--ac2) 20%,transparent),transparent 38%),
+    radial-gradient(circle at 50% 92%,color-mix(in srgb,var(--ac3) 16%,transparent),transparent 42%)
+}
+
+#particles{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:1
+}
+
+.p{
+  position:absolute;
+  width:2px;
+  height:2px;
+  background:linear-gradient(135deg,var(--ac),var(--ac2));
+  border-radius:50%;
+  opacity:.3;
+  animation:float linear infinite
+}
+
+@keyframes float{
+  from{transform:translateY(105vh) scale(.7)}
+  to{transform:translateY(-100px) scale(1.3)}
+}
+
+#loader{
+  position:fixed;
+  inset:0;
+  background:var(--bg);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:99999;
+  transition:opacity .35s ease,visibility .35s ease;
+  padding:24px;
+  text-align:center
+}
+
+#loader.is-hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none
+}
+
+#loader h1{
+  font-size:clamp(20px,5vw,30px);
+  font-weight:900;
+  letter-spacing:8px;
+  background:linear-gradient(90deg,var(--ac),var(--ac2),var(--ac3));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 2px 28px rgba(122,60,255,.65));
+  max-width:100%;
+  overflow-wrap:anywhere
+}
+
+#loader .kicker{
+  margin-top:6px;
+  font-size:9px;
+  letter-spacing:4px;
+  color:rgba(255,255,255,.3)
+}
+
+.loader-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:14px;
+  max-width:100%
+}
+
+.loader-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--ac2);
+  box-shadow:0 0 10px var(--ac2);
+  animation:blink 1s infinite alternate;
+  flex-shrink:0
+}
+
+.bar{
+  width:min(80vw,260px);
+  height:3px;
+  background:rgba(255,255,255,.06);
+  border-radius:50px;
+  overflow:hidden;
+  margin-top:18px;
+  position:relative
+}
+
+#loaderProgress{
+  display:block;
+  height:100%;
+  width:0;
+  border-radius:inherit;
+  background:linear-gradient(90deg,var(--ac),var(--ac2),var(--ac3));
+  box-shadow:0 0 18px rgba(0,242,254,.35);
+  transition:width .12s linear
+}
+
+.loader-percent{
+  margin-top:8px;
+  font-size:10px;
+  color:rgba(255,255,255,.35);
+  font-variant-numeric:tabular-nums
+}
+
+#loaderStatus{
+  margin-top:10px;
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:.5px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width:80vw
+}
+
+.app-shell{
+  width:100%;
+  max-width:1600px;
+  min-height:100dvh;
+  display:block;
+  position:relative;
+  z-index:2;
+  margin:0 auto;
+  padding:
+    max(clamp(8px,2vw,16px),env(safe-area-inset-top))
+    clamp(8px,2vw,16px)
+    max(16px,env(safe-area-inset-bottom))
+}
+
+.auth-wrap{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:100dvh;
+  width:100%;
+  padding:24px;
+  z-index:2;
+  position:relative
+}
+
+.auth-wrap.visible{
+  display:flex
+}
+
+.auth-card{
+  width:100%;
+  max-width:420px;
+  background:var(--panel);
+  backdrop-filter:blur(36px);
+  -webkit-backdrop-filter:blur(36px);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--radius-card);
+  padding:clamp(28px,6vw,44px) clamp(22px,5vw,36px);
+  box-shadow:0 40px 90px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.1);
+  position:relative;
+  overflow:hidden
+}
+
+.auth-card::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius:inherit;
+  padding:1px;
+  background:linear-gradient(
+    120deg,
+    color-mix(in srgb,var(--ac2) 70%,transparent),
+    transparent 35%,
+    color-mix(in srgb,var(--ac3) 50%,transparent),
+    transparent 70%,
+    color-mix(in srgb,var(--ac) 60%,transparent)
+  );
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  pointer-events:none;
+  opacity:.5;
+  animation:borderFlow 9s linear infinite
+}
+
+@keyframes borderFlow{
+  to{filter:hue-rotate(360deg)}
+}
+
+.auth-kicker{
+  text-align:center;
+  font-size:9px;
+  letter-spacing:3px;
+  color:color-mix(in srgb,var(--ac2) 80%,white 20%);
+  font-weight:800;
+  margin-bottom:8px
+}
+
+.auth-title{
+  text-align:center;
+  font-size:clamp(22px,5vw,30px);
+  font-weight:800;
+  letter-spacing:-.5px;
+  background:linear-gradient(180deg,#fff 30%,rgba(255,255,255,.5));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:10px
+}
+
+.auth-sub{
+  text-align:center;
+  font-size:13px;
+  color:rgba(255,255,255,.4);
+  line-height:1.6;
+  margin-bottom:28px
+}
+
+.auth-input{
+  width:100%;
+  padding:15px 20px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;
+  color:#fff;
+  font-size:16px;
+  text-align:center;
+  outline:none;
+  transition:all .25s;
+  -webkit-user-select:text;
+  user-select:text;
+  margin-bottom:14px
+}
+
+.auth-input:focus{
+  border-color:var(--ac);
+  background:rgba(255,255,255,.06);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 20%,transparent)
+}
+
+.auth-btn{
+  width:100%;
+  padding:15px;
+  background:linear-gradient(90deg,var(--ac),var(--ac2));
+  border:none;
+  border-radius:14px;
+  color:#fff;
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition:transform .18s,filter .18s,box-shadow .18s;
+  box-shadow:0 8px 28px color-mix(in srgb,var(--ac) 40%,transparent)
+}
+
+.auth-btn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.07)
+}
+
+.auth-btn:active{
+  transform:scale(.98)
+}
+
+.main-card{
+  width:100%;
+  background:var(--panel);
+  backdrop-filter:blur(36px);
+  -webkit-backdrop-filter:blur(36px);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--radius-card);
+  padding:clamp(12px,2.4vw,22px);
+  box-shadow:0 30px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.1);
+  position:relative;
+  overflow:visible;
+  display:flex;
+  flex-direction:column;
+  gap:var(--gap)
+}
+
+.main-card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--ac2) 30%,rgba(255,255,255,.06));
+  pointer-events:none;
+  z-index:0;
+  animation:borderFlow 9s linear infinite
+}
+
+.main-card.hidden{
+  display:none
+}
+
+.top-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-shrink:0;
+  min-width:0;
+  width:100%
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  flex:1 1 auto
+}
+
+.brand-mark{
+  width:36px;
+  height:36px;
+  display:grid;
+  place-items:center;
+  border-radius:11px;
+  background:linear-gradient(135deg,var(--ac),var(--ac2));
+  font-size:18px;
+  flex-shrink:0;
+  box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 25%,transparent)
+}
+
+.brand-text{
+  min-width:0
+}
+
+.brand-text h2{
+  font-size:clamp(15px,2.5vw,20px);
+  font-weight:800;
+  letter-spacing:-.3px;
+  line-height:1.1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.brand-text p{
+  font-size:10px;
+  color:var(--muted);
+  margin-top:2px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.top-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+  flex-shrink:0;
+  min-width:0
+}
+
+.icon-btn{
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.06);
+  color:#fff;
+  border-radius:var(--radius-inner);
+  cursor:pointer;
+  font-size:15px;
+  transition:background .2s,border-color .2s,transform .15s;
+  flex-shrink:0
+}
+
+.icon-btn:hover{
+  background:rgba(255,255,255,.1);
+  border-color:rgba(255,255,255,.18)
+}
+
+.icon-btn:active{
+  transform:scale(.93)
+}
+
+.theme-select{
+  height:38px;
+  padding:0 30px 0 10px;
+  background:
+    rgba(255,255,255,.06)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2300f2fe'/%3E%3C/svg%3E")
+    no-repeat right 10px center;
+  border:1px solid rgba(255,255,255,.09);
+  color:#fff;
+  border-radius:var(--radius-inner);
+  font-size:11px;
+  cursor:pointer;
+  appearance:none;
+  -webkit-appearance:none;
+  outline:none;
+  min-width:0;
+  width:120px;
+  max-width:120px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  flex-shrink:1
+}
+
+.theme-select option{
+  background:#17121d;
+  color:#fff
+}
+
+.status-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:8px 12px;
+  background:rgba(255,255,255,.022);
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:var(--radius-inner);
+  font-size:10px;
+  color:var(--muted);
+  flex-shrink:0;
+  min-width:0
+}
+
+.status-left,.status-right{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+  flex:1 1 0
+}
+
+.status-right{
+  justify-content:flex-end
+}
+
+.status-center{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0
+}
+
+.status-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--ac2);
+  box-shadow:0 0 8px var(--ac2);
+  flex-shrink:0
+}
+
+.status-dot.offline{
+  background:#ff5d7a;
+  box-shadow:0 0 8px #ff5d7a
+}
+
+.status-dot.busy{
+  background:#ffd166;
+  box-shadow:0 0 8px #ffd166
+}
+
+.status-text{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  min-width:0
+}
+
+.chip{
+  font-size:8px;
+  letter-spacing:1px;
+  color:var(--ac2);
+  background:rgba(0,242,254,.06);
+  border:1px solid rgba(0,242,254,.14);
+  padding:3px 7px;
+  border-radius:var(--radius-pill);
+  white-space:nowrap
+}
+
+.notice{
+  display:none;
+  align-items:center;
+  gap:8px;
+  background:rgba(255,165,0,.1);
+  border:1px solid rgba(255,165,0,.3);
+  color:#ffd175;
+  padding:10px 16px;
+  border-radius:var(--radius-inner);
+  font-size:12px;
+  font-weight:600;
+  flex-shrink:0
+}
+
+.stats-row{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  flex-shrink:0
+}
+
+.stat{
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:var(--radius-inner);
+  padding:10px 12px;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  position:relative;
+  overflow:hidden;
+  min-height:62px;
+  min-width:0
+}
+
+.stat::after{
+  content:"";
+  position:absolute;
+  inset:auto -15px -25px auto;
+  width:70px;
+  height:70px;
+  background:radial-gradient(circle,color-mix(in srgb,var(--col,var(--ac2)) 16%,transparent),transparent 68%);
+  pointer-events:none
+}
+
+.stat:nth-child(1){--col:var(--ac2)}
+.stat:nth-child(2){--col:#ffd166}
+.stat:nth-child(3){--col:var(--ac3)}
+
+.stat-label{
+  font-size:9px;
+  color:rgba(255,255,255,.38);
+  font-weight:700;
+  letter-spacing:.5px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.stat-value{
+  font-size:17px;
+  font-weight:900;
+  color:var(--col,var(--ac2));
+  font-variant-numeric:tabular-nums;
+  line-height:1
+}
+
+.stat-hint{
+  font-size:8px;
+  color:rgba(255,255,255,.25);
+  margin-top:auto;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.counter-bar{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  padding:8px 14px;
+  background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:var(--radius-inner);
+  font-size:10px;
+  flex-shrink:0;
+  flex-wrap:wrap
+}
+
+.cbar-item{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:rgba(255,255,255,.5);
+  font-weight:700;
+  white-space:nowrap
+}
+
+.cbar-item b{
+  font-weight:900;
+  font-variant-numeric:tabular-nums
+}
+
+.cbar-live b{color:var(--ac2)}
+.cbar-static b{color:#ffd166}
+
+.content-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(230px,320px);
+  gap:var(--gap);
+  flex:1;
+  align-items:start;
+  min-height:0;
+  min-width:0
+}
+
+.player-col{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  min-width:0;
+  position:sticky;
+  top:12px;
+  z-index:50;
+  align-self:start
+}
+
+.player-wrap{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/9;
+  padding-top:0;
+  background:#000;
+  border-radius:var(--radius-inner);
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.05);
+  box-shadow:0 20px 50px rgba(0,0,0,.6);
+  min-width:0
+}
+
+.player-wrap iframe{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  border:none;
+  background:#000
+}
+
+.player-tools{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  min-width:0
+}
+
+.tool-btn{
+  background:transparent;
+  border:none;
+  color:rgba(255,255,255,.4);
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:4px 2px;
+  transition:color .18s;
+  white-space:nowrap
+}
+
+.tool-btn:hover{
+  color:var(--ac2)
+}
+
+.sidebar{
+  display:flex;
+  flex-direction:column;
+  gap:var(--gap);
+  position:sticky;
+  top:14px;
+  min-width:0;
+  max-height:calc(100dvh - 28px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding-right:2px
+}
+
+.sidebar::-webkit-scrollbar{
+  width:0
+}
+
+.ch-panel{
+  background:rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.065);
+  border-radius:var(--radius-inner);
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  flex-shrink:0;
+  min-width:0
+}
+
+.panel-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0
+}
+
+.panel-head h3{
+  font-size:13px;
+  font-weight:700;
+  white-space:nowrap
+}
+
+.panel-head-right{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0
+}
+
+.panel-count{
+  font-size:10px;
+  color:var(--muted);
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.mini-btn{
+  padding:5px 8px;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.03);
+  color:var(--muted);
+  border-radius:8px;
+  font-size:10px;
+  cursor:pointer;
+  transition:color .18s,background .18s;
+  flex-shrink:0
+}
+
+.mini-btn:hover{
+  color:#fff;
+  background:rgba(255,255,255,.06)
+}
+
+.search-wrap{
+  position:relative;
+  min-width:0
+}
+
+.search-wrap input{
+  width:100%;
+  height:36px;
+  padding:0 32px 0 12px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;
+  color:#fff;
+  font-size:12px;
+  outline:none;
+  transition:border-color .2s,background .2s;
+  -webkit-user-select:text;
+  user-select:text;
+  min-width:0
+}
+
+.search-wrap input:focus{
+  border-color:var(--ac);
+  background:rgba(255,255,255,.07)
+}
+
+.search-wrap input::placeholder{
+  color:var(--muted)
+}
+
+.search-clear{
+  position:absolute;
+  right:8px;
+  top:50%;
+  transform:translateY(-50%);
+  background:none;
+  border:none;
+  color:var(--muted);
+  cursor:pointer;
+  font-size:13px;
+  padding:2px;
+  line-height:1
+}
+
+.search-clear:hover{
+  color:#fff
+}
+
+.league-tabs{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding:2px 1px 4px;
+  flex-shrink:0;
+  min-width:0;
+  scrollbar-width:thin
+}
+
+.league-tabs::-webkit-scrollbar{
+  height:2px
+}
+
+.league-tabs::-webkit-scrollbar-thumb{
+  background:color-mix(in srgb,var(--ac) 45%,transparent);
+  border-radius:4px
+}
+
+.tab-btn{
+  padding:5px 10px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+  color:rgba(255,255,255,.5);
+  border-radius:8px;
+  font-size:10px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .18s;
+  white-space:nowrap;
+  flex-shrink:0
+}
+
+.tab-btn.active{
+  background:color-mix(in srgb,var(--ac) 18%,transparent);
+  border-color:var(--ac);
+  color:#fff
+}
+
+.recent-section{
+  display:none;
+  flex-direction:column;
+  gap:5px;
+  min-width:0
+}
+
+.section-label{
+  font-size:9px;
+  color:var(--muted);
+  font-weight:700;
+  letter-spacing:.6px
+}
+
+.recent-row{
+  display:flex;
+  gap:5px;
+  overflow-x:auto;
+  padding-bottom:2px;
+  min-width:0
+}
+
+.recent-row::-webkit-scrollbar{
+  height:0
+}
+
+.recent-chip{
+  flex-shrink:0;
+  max-width:130px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.04);
+  color:var(--muted);
+  border-radius:var(--radius-pill);
+  padding:5px 10px;
+  font-size:10px;
+  cursor:pointer;
+  transition:color .18s,background .18s
+}
+
+.recent-chip:hover{
+  color:#fff;
+  background:rgba(255,255,255,.08)
+}
+
+.ch-list{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  max-height:380px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding-right:2px;
+  flex-shrink:0;
+  min-width:0
+}
+
+.ch-list::-webkit-scrollbar{
+  width:2px
+}
+
+.ch-list::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.06);
+  border-radius:4px
+}
+
+.ch-list::-webkit-scrollbar-thumb:hover{
+  background:var(--ac)
+}
+
+.ch-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:9px 10px;
+  background:rgba(255,255,255,.015);
+  border:1px solid rgba(255,255,255,.04);
+  border-radius:10px;
+  cursor:pointer;
+  transition:background .18s,border-color .18s,transform .1s;
+  min-width:0
+}
+
+.ch-item:hover{
+  background:rgba(255,255,255,.04);
+  border-color:rgba(255,255,255,.1)
+}
+
+.ch-item:active{
+  transform:scale(.995)
+}
+
+.ch-item.active{
+  background:linear-gradient(
+    90deg,
+    color-mix(in srgb,var(--ac) 14%,transparent),
+    rgba(0,242,254,.02)
+  );
+  border-color:color-mix(in srgb,var(--ac) 55%,transparent)
+}
+
+.ch-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  flex:1
+}
+
+.ch-num{
+  width:22px;
+  height:22px;
+  display:grid;
+  place-items:center;
+  border-radius:7px;
+  background:rgba(255,255,255,.06);
+  font-size:9px;
+  color:var(--muted);
+  flex-shrink:0;
+  font-weight:700
+}
+
+.ch-info{
+  min-width:0;
+  flex:1
+}
+
+.ch-info strong{
+  display:block;
+  font-size:11px;
+  font-weight:700;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.ch-info small{
+  display:block;
+  font-size:9px;
+  color:var(--muted);
+  margin-top:2px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.ch-right{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-shrink:0;
+  min-width:0
+}
+
+.live-badge{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:9px;
+  font-weight:700;
+  color:var(--ac2);
+  background:rgba(0,242,254,.06);
+  padding:3px 7px;
+  border-radius:6px;
+  border:1px solid rgba(0,242,254,.12);
+  white-space:nowrap
+}
+
+.live-dot{
+  width:5px;
+  height:5px;
+  background:var(--ac2);
+  border-radius:50%;
+  box-shadow:0 0 7px var(--ac2);
+  animation:blink 1s infinite alternate;
+  flex-shrink:0
+}
+
+@keyframes blink{
+  from{opacity:.2}
+  to{opacity:1}
+}
+
+.fav-btn{
+  background:transparent;
+  border:none;
+  color:rgba(255,255,255,.25);
+  font-size:15px;
+  cursor:pointer;
+  padding:2px;
+  line-height:1;
+  transition:color .18s,text-shadow .18s;
+  flex-shrink:0
+}
+
+.fav-btn.active{
+  color:#ffd166;
+  text-shadow:0 0 10px rgba(255,209,102,.4)
+}
+
+.empty-state{
+  padding:28px 10px;
+  text-align:center;
+  color:rgba(255,255,255,.35);
+  font-size:11px;
+  line-height:1.6
+}
+
+.feed-error{
+  padding:24px 10px;
+  text-align:center;
+  color:var(--ac3);
+  font-size:11px
+}
+
+.feed-error button{
+  margin-top:10px;
+  padding:8px 12px;
+  border:1px solid rgba(224,76,255,.3);
+  background:rgba(224,76,255,.08);
+  color:#fff;
+  border-radius:9px;
+  cursor:pointer;
+  font-size:11px
+}
+
+.static-section{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex-shrink:0;
+  min-width:0
+}
+
+.static-ch-list{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  max-height:240px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding-right:2px;
+  min-width:0
+}
+
+.static-ch-list::-webkit-scrollbar{
+  width:2px
+}
+
+.static-ch-list::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.06);
+  border-radius:4px
+}
+
+.theatre-exit{
+  position:fixed;
+  top:max(14px,env(safe-area-inset-top));
+  right:14px;
+  z-index:10000;
+  background:rgba(255,255,255,.1);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  padding:9px 14px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.12);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+  font-size:11px;
+  display:none
+}
+
+body.theatre .theatre-exit{
+  display:block
+}
+
+body.theatre .app-shell{
+  width:100%;
+  max-width:none;
+  padding:0
+}
+
+body.theatre .main-card{
+  border-radius:0;
+  border:none;
+  min-height:100dvh
+}
+
+body.theatre .top-bar,
+body.theatre .status-bar,
+body.theatre .stats-row,
+body.theatre .counter-bar,
+body.theatre .notice,
+body.theatre .sidebar,
+body.theatre footer{
+  display:none!important
+}
+
+body.theatre .content-grid{
+  grid-template-columns:1fr;
+  min-height:100dvh
+}
+
+body.theatre .player-col{
+  position:relative;
+  top:auto;
+  height:100dvh;
+  min-height:100dvh;
+  justify-content:center
+}
+
+body.theatre .player-wrap{
+  width:min(100%,177.78dvh);
+  aspect-ratio:16/9;
+  margin:0 auto;
+  padding-top:0
+}
+
+body.focus .status-bar,
+body.focus .stats-row,
+body.focus .counter-bar,
+body.focus .sidebar{
+  display:none!important
+}
+
+body.focus .content-grid{
+  grid-template-columns:1fr
+}
+
+body.focus .player-wrap{
+  aspect-ratio:16/9;
+  padding-top:0
+}
+
+.menu-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .22s;
+  z-index:10001
+}
+
+.menu-backdrop.open{
+  opacity:1;
+  pointer-events:auto
+}
+
+.quick-menu{
+  position:fixed;
+  z-index:10002;
+  top:0;
+  right:0;
+  width:min(360px,90vw);
+  height:100dvh;
+  background:linear-gradient(180deg,rgba(14,10,22,.97),rgba(4,5,10,.98));
+  border-left:1px solid rgba(255,255,255,.07);
+  box-shadow:-24px 0 70px rgba(0,0,0,.5);
+  padding:0 16px calc(16px + env(safe-area-inset-bottom));
+  transform:translateX(108%);
+  transition:transform .3s cubic-bezier(.22,1,.36,1);
+  overflow:auto;
+  overscroll-behavior:contain;
+  display:flex;
+  flex-direction:column;
+  gap:0
+}
+
+.quick-menu.open{
+  transform:translateX(0)
+}
+
+.menu-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:max(20px,env(safe-area-inset-top)) 0 16px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  flex-shrink:0
+}
+
+.menu-head-text{
+  min-width:0
+}
+
+.menu-head-text small{
+  font-size:8px;
+  letter-spacing:2px;
+  color:rgba(255,255,255,.3);
+  font-weight:800
+}
+
+.menu-head-text h3{
+  font-size:18px;
+  font-weight:800;
+  margin-top:4px
+}
+
+.menu-profile{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.04);
+  border-radius:14px;
+  margin:14px 0 0;
+  flex-shrink:0;
+  min-width:0
+}
+
+.menu-avatar{
+  width:36px;
+  height:36px;
+  display:grid;
+  place-items:center;
+  border-radius:11px;
+  background:linear-gradient(135deg,var(--ac),var(--ac2));
+  font-size:11px;
+  font-weight:900;
+  flex-shrink:0
+}
+
+.menu-profile-text{
+  min-width:0;
+  flex:1
+}
+
+.menu-profile-text strong{
+  display:block;
+  font-size:12px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.menu-profile-text span{
+  display:block;
+  font-size:9px;
+  color:var(--muted);
+  margin-top:2px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.pro-pill{
+  margin-left:auto;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:1px;
+  padding:4px 7px;
+  border-radius:var(--radius-pill);
+  background:rgba(255,209,102,.09);
+  border:1px solid rgba(255,209,102,.2);
+  color:#ffd166;
+  flex-shrink:0
+}
+
+.menu-section{
+  font-size:8px;
+  letter-spacing:2px;
+  color:rgba(255,255,255,.28);
+  font-weight:800;
+  margin:16px 2px 7px;
+  flex-shrink:0
+}
+
+.menu-item{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-align:left;
+  padding:10px 9px;
+  border:1px solid transparent;
+  background:transparent;
+  color:#fff;
+  border-radius:12px;
+  cursor:pointer;
+  transition:background .18s,border-color .18s,transform .15s;
+  flex-shrink:0;
+  min-width:0
+}
+
+.menu-icon{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:rgba(255,255,255,.05);
+  color:var(--ac2);
+  font-size:13px;
+  flex-shrink:0
+}
+
+.menu-item-text{
+  min-width:0;
+  flex:1
+}
+
+.menu-item-text strong{
+  display:block;
+  font-size:11px
+}
+
+.menu-item-text small{
+  display:block;
+  color:rgba(255,255,255,.33);
+  font-size:9px;
+  margin-top:2px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.menu-arrow{
+  font-size:16px;
+  color:rgba(255,255,255,.2);
+  font-weight:400;
+  flex-shrink:0
+}
+
+.menu-item:hover,
+.menu-item:active{
+  background:rgba(255,255,255,.04);
+  border-color:rgba(255,255,255,.07);
+  transform:translateX(2px)
+}
+
+.menu-danger .menu-icon{
+  color:#ff7a98
+}
+
+.menu-danger .menu-item-text strong{
+  color:#ff9aae
+}
+
+.menu-footer{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:auto;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.06);
+  flex-shrink:0
+}
+
+.menu-footer-item{
+  padding:9px 11px;
+  border:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.025);
+  border-radius:11px;
+  min-width:0
+}
+
+.menu-footer-item span{
+  display:block;
+  font-size:7px;
+  color:rgba(255,255,255,.28);
+  letter-spacing:1px;
+  font-weight:700
+}
+
+.menu-footer-item strong{
+  display:block;
+  font-size:10px;
+  margin-top:4px;
+  color:var(--ac2);
+  font-variant-numeric:tabular-nums;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:22px;
+  z-index:10050;
+  transform:translate(-50%,16px);
+  opacity:0;
+  width:min(480px,calc(100vw - 24px));
+  padding:11px 14px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(8,8,16,.93);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-radius:14px;
+  box-shadow:0 20px 50px rgba(0,0,0,.4);
+  transition:all .2s ease;
+  pointer-events:none
+}
+
+.toast.show{
+  transform:translate(-50%,0);
+  opacity:1
+}
+
+.toast strong{
+  display:block;
+  font-size:11px
+}
+
+.toast span{
+  display:block;
+  margin-top:3px;
+  color:rgba(255,255,255,.42);
+  font-size:9px;
+  line-height:1.5
+}
+
+footer{
+  text-align:center;
+  padding:12px 0 4px;
+  opacity:.18;
+  font-size:10px;
+  flex-shrink:0
+}
+
+:focus-visible{
+  outline:2px solid var(--ac2);
+  outline-offset:2px
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important
+  }
+}
+
+body.low-power::before{
+  opacity:.4
+}
+
+body.low-power #particles{
+  display:none
+}
+
+@media(max-width:1100px){
+  :root{
+    --gap:12px
+  }
+
+  .content-grid{
+    grid-template-columns:minmax(0,1fr) minmax(230px,28vw)
+  }
+}
+
+@media(max-width:900px){
+  .content-grid{
+    grid-template-columns:minmax(0,1fr) minmax(220px,250px)
+  }
+
+  .brand-text p{
+    max-width:260px
+  }
+}
+
+@media(max-width:760px){
+  :root{
+    --sidebar-w:100%;
+    --gap:10px
+  }
+
+  .main-card{
+    padding:12px
+  }
+
+  .content-grid{
+    grid-template-columns:1fr;
+    gap:10px
+  }
+
+  .player-col{
+    top:0;
+    background:var(--panel);
+    margin:-12px -12px 0;
+    padding:10px 12px 10px;
+    width:calc(100% + 24px);
+    border-bottom:1px solid rgba(255,255,255,.06);
+    backdrop-filter:blur(36px);
+    -webkit-backdrop-filter:blur(36px);
+    gap:8px;
+    border-radius:var(--radius-card) var(--radius-card) 0 0;
+    z-index:100
+  }
+
+  .player-wrap{
+    width:100%;
+    aspect-ratio:16/9;
+    border-radius:10px
+  }
+
+  .player-tools{
+    gap:6px
+  }
+
+  .sidebar{
+    position:static;
+    max-height:none;
+    overflow:visible;
+    padding-right:0
+  }
+
+  .ch-list{
+    max-height:300px
+  }
+
+  .static-ch-list{
+    max-height:200px
+  }
+
+  .status-center{
+    display:none
+  }
+
+  .status-bar{
+    min-height:34px
+  }
+
+  .theme-select{
+    width:100px;
+    max-width:100px
+  }
+
+  .top-actions{
+    gap:5px
+  }
+
+  .icon-btn{
+    width:35px;
+    height:35px;
+    font-size:14px
+  }
+
+  .stats-row{
+    gap:6px
+  }
+
+  .stat{
+    padding:9px 10px;
+    min-height:56px
+  }
+
+  .stat-value{
+    font-size:15px
+  }
+
+  .brand-text h2{
+    font-size:16px
+  }
+
+  .brand-text p{
+    max-width:220px
+  }
+}
+
+@media(max-width:560px){
+  .top-bar{
+    flex-wrap:wrap
+  }
+
+  .brand{
+    width:100%;
+    flex:1 1 100%
+  }
+
+  .top-actions{
+    width:100%;
+    justify-content:flex-end
+  }
+
+  .status-bar{
+    flex-wrap:wrap
+  }
+
+  .status-left,
+  .status-right{
+    flex:1 1 calc(50% - 4px);
+    max-width:calc(50% - 4px)
+  }
+
+  .status-right{
+    justify-content:flex-end
+  }
+
+  .counter-bar{
+    gap:12px
+  }
+
+  .player-tools{
+    justify-content:flex-start
+  }
+}
+
+@media(max-width:420px){
+  .app-shell{
+    padding-left:8px;
+    padding-right:8px
+  }
+
+  .main-card{
+    padding:10px;
+    border-radius:16px
+  }
+
+  .content-grid{
+    gap:8px
+  }
+
+  .player-col{
+    margin:-10px -10px 0;
+    width:calc(100% + 20px);
+    padding:8px 10px 10px;
+    border-radius:16px 16px 0 0
+  }
+
+  .player-wrap{
+    border-radius:9px
+  }
+
+  .stats-row{
+    grid-template-columns:1fr 1fr
+  }
+
+  .stat:first-child{
+    grid-column:span 2
+  }
+
+  .counter-bar{
+    gap:10px;
+    font-size:9px
+  }
+
+  .brand-text h2{
+    font-size:14px
+  }
+
+  .brand-text p{
+    display:none
+  }
+
+  .theme-select{
+    width:86px;
+    max-width:86px;
+    font-size:10px;
+    padding-left:8px;
+    padding-right:26px
+  }
+
+  .icon-btn{
+    width:34px;
+    height:34px
+  }
+
+  .status-left,
+  .status-right{
+    flex:1 1 100%;
+    max-width:100%
+  }
+
+  .status-right{
+    justify-content:flex-start;
+    padding-left:12px
+  }
+
+  .search-wrap input{
+    font-size:16px
+  }
+
+  .ch-item{
+    padding:8px
+  }
+
+  .ch-info strong{
+    font-size:10px
+  }
+
+  .ch-info small{
+    font-size:8px
+  }
+
+  .live-badge{
+    font-size:8px;
+    padding:3px 6px
+  }
+
+  .live-badge .live-dot{
+    width:4px;
+    height:4px
+  }
+
+  .fav-btn{
+    font-size:14px
+  }
+}
+
+@media(max-width:360px){
+  .top-actions{
+    gap:4px
+  }
+
+  .theme-select{
+    width:78px;
+    max-width:78px
+  }
+
+  .icon-btn{
+    width:33px;
+    height:33px
+  }
+
+  .player-tools{
+    gap:4px
+  }
+
+  .tool-btn{
+    font-size:10px
+  }
+
+  .panel-head h3{
+    font-size:12px
+  }
+
+  .panel-count{
+    font-size:9px
+  }
+
+  .mini-btn{
+    padding:4px 7px
+  }
+}
+
+@media(max-width:760px) and (orientation:landscape){
+  .main-card{
+    padding:10px
+  }
+
+  .player-col{
+    margin:-10px -10px 0;
+    width:calc(100% + 20px);
+    padding:8px 10px 10px
+  }
+
+  .player-wrap{
+    width:min(100%,calc(100dvh * 1.7777778));
+    margin:0 auto
+  }
+
+  .sidebar{
+    padding-bottom:10px
+  }
+}
+</style>
+</head>
+
+<body class="auth-visible">
+
+<button class="theatre-exit" id="exitTheatre" type="button">✕ Exit Cinema</button>
+
+<div id="particles"></div>
+
+<div id="loader" aria-live="polite">
+  <h1>TALHA'S STREAM</h1>
+  <div class="kicker">PREMIUM</div>
+  <div class="loader-row">
+    <span class="loader-dot"></span>
+    <span id="loaderStatus">Initializing secure interface…</span>
+  </div>
+  <div class="bar">
+    <span id="loaderProgress"></span>
+  </div>
+  <div class="loader-percent" id="loaderPercent">0%</div>
+</div>
+
+<div class="auth-wrap" id="authWrap">
+  <div class="auth-card">
+    <div class="auth-kicker">PREMIUM ACCESS</div>
+    <div class="auth-title">Welcome back</div>
+    <p class="auth-sub">Enter Your Passcode To Access Talha's stream.</p>
+    <input class="auth-input" id="password" type="password" autocomplete="current-password" placeholder="Passcode">
+    <button class="auth-btn" id="loginBtn" type="button">Enter Stream</button>
+  </div>
+</div>
+
+<div class="menu-backdrop" id="menuBackdrop"></div>
+
+<aside class="quick-menu" id="quickMenu" aria-hidden="true">
+  <div class="menu-head">
+    <div class="menu-head-text">
+      <small>CONTROL CENTER</small>
+      <h3>Quick Menu</h3>
+    </div>
+    <button class="icon-btn" id="closeMenuBtn" type="button" aria-label="Close menu">✕</button>
+  </div>
+
+  <div class="menu-profile">
+    <div class="menu-avatar">TS</div>
+    <div class="menu-profile-text">
+      <strong>Talha's Stream</strong>
+      <span>Active session</span>
+    </div>
+    <span class="pro-pill">PRO</span>
+  </div>
+
+  <div class="menu-section">PLAYBACK</div>
+
+  <button class="menu-item" type="button" data-action="home">
+    <span class="menu-icon">⌂</span>
+    <div class="menu-item-text">
+      <strong>Live Channels</strong>
+      <small>Browse the full live feed</small>
+    </div>
+    <b class="menu-arrow">›</b>
+  </button>
+
+  <button class="menu-item" type="button" data-action="favorites">
+    <span class="menu-icon">★</span>
+    <div class="menu-item-text">
+      <strong>My Favorites</strong>
+      <small>Show saved channels first</small>
+    </div>
+    <b class="menu-arrow">›</b>
+  </button>
+
+  <button class="menu-item" type="button" data-action="recent">
+    <span class="menu-icon">◷</span>
+    <div class="menu-item-text">
+      <strong>Recently Watched</strong>
+      <small>Jump to your last streams</small>
+    </div>
+    <b class="menu-arrow">›</b>
+  </button>
+
+  <button class="menu-item" type="button" data-action="cinema">
+    <span class="menu-icon">⛶</span>
+    <div class="menu-item-text">
+      <strong>Cinema Mode</strong>
+      <small>Full-screen immersive view</small>
+    </div>
+    <b class="menu-arrow">›</b>
+  </button>
+
+  <button class="menu-item" type="button" data-action="focus">
+    <span class="menu-icon">◉</span>
+    <div class="menu-item-text">
+      <strong>Focus View</strong>
+      <small>Hide distractions</small>
+    </div>
+    <b class="menu-arrow">›</b>
+  </button>
+
+  <div class="menu-section">SYSTEM</div>
+
+  <button class="menu-item" type="button" data-action="refresh">
+    <span class="menu-icon">↻</span>
+    <div class="menu-item-text">
+      <strong>Sync Live Feed</strong>
+      <small>Refresh from the source</small>
+    </div>
+    <b class="menu-arrow">›</b>
+  </button>
+
+  <button class="menu-item" type="button" data-action="theme">
+    <span class="menu-icon">◈</span>
+    <div class="menu-item-text">
+      <strong>Theme & Appearance</strong>
+      <small>Cycle saved visual themes</small>
+    </div>
+    <b class="menu-arrow">›</b>
+  </button>
+
+  <button class="menu-item" type="button" data-action="shortcuts">
+    <span class="menu-icon">⌘</span>
+    <div class="menu-item-text">
+      <strong>Keyboard Shortcuts</strong>
+      <small>/ Search · Esc Close · Ctrl+R Sync</small>
+    </div>
+    <b class="menu-arrow">›</b>
+  </button>
+
+  <button class="menu-item menu-danger" type="button" data-action="lock">
+    <span class="menu-icon">⌁</span>
+    <div class="menu-item-text">
+      <strong>Lock Session</strong>
+      <small>Return to passcode screen</small>
+    </div>
+    <b class="menu-arrow">›</b>
+  </button>
+
+  <div class="menu-footer">
+    <div class="menu-footer-item">
+      <span>SESSION</span>
+      <strong id="menuSession">ACTIVE</strong>
+    </div>
+    <div class="menu-footer-item">
+      <span>LOCAL TIME</span>
+      <strong id="menuClock">--:--</strong>
+    </div>
+  </div>
+</aside>
+
+<div class="app-shell" id="appShell" style="display:none">
+  <div class="main-card" id="mainCard">
+
+    <div class="top-bar">
+      <div class="brand">
+        <div class="brand-mark">📺</div>
+        <div class="brand-text">
+          <h2>Talha's Stream</h2>
+          <p>Live sports · organized for every screen</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <select class="theme-select" id="themePicker" aria-label="Theme">
+          <option value="violet">Violet</option>
+          <option value="ocean">Ocean</option>
+          <option value="sunset">Sunset</option>
+          <option value="emerald">Emerald</option>
+          <option value="aurora">Aurora</option>
+          <option value="royal">Royal</option>
+          <option value="carbon">Carbon</option>
+        </select>
+
+        <button class="icon-btn" id="refreshFeedBtn" type="button" aria-label="Refresh" title="Refresh feed">↻</button>
+        <button class="icon-btn" id="theatreBtn" type="button" aria-label="Cinema mode" title="Cinema mode">⛶</button>
+        <button class="icon-btn" id="menuBtn" type="button" aria-label="Quick menu" aria-expanded="false">☰</button>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-left">
+        <span class="status-dot" id="networkDot"></span>
+        <span class="status-text" id="networkText">System ready</span>
+      </div>
+
+      <div class="status-center">
+        <span class="chip">● PREMIUM</span>
+        <span class="status-text" id="clockText">00:00:00</span>
+      </div>
+
+      <div class="status-right">
+        <span class="status-text" id="syncText">Feed not synced</span>
+      </div>
+    </div>
+
+    <div class="notice" id="maintenanceNotice">
+      <span>⚠️</span>
+      <span>Server maintenance underway. Brief buffering may occur.</span>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-label">LIVE CHANNELS</span>
+        <span class="stat-value" id="countTotal">00</span>
+        <span class="stat-hint">available now</span>
+      </div>
+
+      <div class="stat">
+        <span class="stat-label">FAVORITES</span>
+        <span class="stat-value" id="countFavorites">00</span>
+        <span class="stat-hint">saved by you</span>
+      </div>
+
+      <div class="stat">
+        <span class="stat-label">RECENT</span>
+        <span class="stat-value" id="countRecent">00</span>
+        <span class="stat-hint">last watched</span>
+      </div>
+    </div>
+
+    <div class="counter-bar">
+      <span class="cbar-item cbar-live">
+        <span class="live-dot"></span>
+        Live: <b id="pcbLive">00</b>
+      </span>
+
+      <span class="cbar-item cbar-static">
+        📺 24/7: <b id="pcbStatic">00</b>
+      </span>
+    </div>
+
+    <div class="content-grid">
+
+      <section class="player-col">
+        <div class="player-wrap">
+          <iframe
+            id="frame"
+            src="about:blank"
+            loading="eager"
+            scrolling="no"
+            frameborder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen; geolocation; web-share; speaker-selection; screen-wake-lock; idle-detection"
+            allowfullscreen>
+          </iframe>
+        </div>
+
+        <div class="player-tools">
+          <button class="tool-btn" id="theatreTextBtn" type="button">🎬 Cinema Mode</button>
+          <button class="tool-btn" id="favoriteFilterBtn" type="button">★ Favorites</button>
+          <button class="tool-btn" id="menuTextBtn" type="button">☰ Quick Menu</button>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+
+        <div class="ch-panel">
+
+          <div class="panel-head">
+            <h3>📡 Channels</h3>
+            <div class="panel-head-right">
+              <span class="panel-count" id="channelSummary">Waiting…</span>
+              <button class="mini-btn" id="clearSearchBtn" type="button" title="Clear">✕</button>
+            </div>
+          </div>
+
+          <div class="search-wrap">
+            <input
+              type="text"
+              id="searchChannels"
+              placeholder="🔍 Search teams or leagues…"
+              autocomplete="off"
+              spellcheck="false">
+            <button
+              class="search-clear"
+              id="clearSearchBtn2"
+              type="button"
+              aria-label="Clear search">✕</button>
+          </div>
+
+          <div class="league-tabs" id="leagueTabs" role="tablist"></div>
+
+          <div class="recent-section" id="recentSection">
+            <span class="section-label">Recently watched</span>
+            <div class="recent-row" id="recentRow"></div>
+          </div>
+
+          <div class="ch-list" id="serverContainer" aria-live="polite"></div>
+        </div>
+
+        <div class="ch-panel static-section" id="staticSectionWrap">
+          <div class="panel-head">
+            <h3>📺 24/7 Channels</h3>
+            <span class="panel-count">
+              <span id="staticChannelCount">0</span> ch
+            </span>
+          </div>
+
+          <div class="static-ch-list" id="staticServerContainer"></div>
+        </div>
+
+      </aside>
+
+    </div>
+
+    <footer>Made by Talha &bull; © 2020–2026</footer>
+
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const CUSTOM_TOP_FEEDS = [];
+const SHOW_MAINTENANCE_MSG = false;
+const PASSWORD = "Talha";
+const ALT_PASSWORD = "TalhaT";
+const PLAYER_BASE_URL = "player.html";
+const PLAYER_ALT_URL = "player2.html";
+const FEED_URL = "https://mahsunsports39.xyz/script4.js";
+const FEED_TIMEOUT = 12000;
+const SEARCH_DELAY = 80;
+
+const STATIC_CHANNELS = [
+  {title:"BeIN Sports 1",url:"/event.html?id=androstreamlivebs1"},
+  {title:"BeIN Sports 2",url:"/event.html?id=androstreamlivebs2"},
+  {title:"BeIN Sports 3",url:"/event.html?id=androstreamlivebs3"},
+  {title:"BeIN Sports 4",url:"/event.html?id=androstreamlivebs4"},
+  {title:"BeIN Sports 5",url:"/event.html?id=androstreamlivebs5"},
+  {title:"BeIN Sports Max 1",url:"/event.html?id=androstreamlivebsm1"},
+  {title:"BeIN Sports Max 2",url:"/event.html?id=androstreamlivebsm2"},
+  {title:"S Sport",url:"/event.html?id=androstreamlivess1"},
+  {title:"S Sport 2",url:"/event.html?id=androstreamlivess2"},
+  {title:"S Sport Plus",url:"/event.html?id=androstreamlivessplus1"},
+  {title:"Tivibu Spor",url:"/event.html?id=androstreamlivets"},
+  {title:"Tivibu Spor 1",url:"/event.html?id=androstreamlivets1"},
+  {title:"Tivibu Spor 2",url:"/event.html?id=androstreamlivets2"},
+  {title:"Tivibu Spor 3",url:"/event.html?id=androstreamlivets3"},
+  {title:"Tivibu Spor 4",url:"/event.html?id=androstreamlivets4"},
+  {title:"Smart Spor 1",url:"/event.html?id=androstreamlivesm1"},
+  {title:"Smart Spor 2",url:"/event.html?id=androstreamlivesm2"},
+  {title:"Euro Sport 1",url:"/event.html?id=androstreamlivees1"},
+  {title:"Euro Sport 2",url:"/event.html?id=androstreamlivees2"},
+  {title:"iDMAN Tv",url:"/event.html?id=androstreamliveidm"},
+  {title:"Trt 1",url:"/event.html?id=androstreamlivetrt1"},
+  {title:"Trt Spor",url:"/event.html?id=androstreamlivetrts"},
+  {title:"Trt Spor Yildiz",url:"/event.html?id=androstreamlivetrtsy"},
+  {title:"Atv",url:"/event.html?id=androstreamliveatv"},
+  {title:"A Spor",url:"/event.html?id=androstreamliveas"},
+  {title:"A2",url:"/event.html?id=androstreamlivea2"},
+  {title:"Tjk Tv",url:"/event.html?id=androstreamlivetkj"},
+  {title:"Ht Spor",url:"/event.html?id=androstreamliveht"},
+  {title:"Nba Tv",url:"/event.html?id=androstreamlivenba"},
+  {title:"Tv8",url:"/event.html?id=androstreamlivetv8"},
+  {title:"Tv8.5",url:"/event.html?id=androstreamlivetv85"},
+  {title:"Tabi Spor",url:"/event.html?id=androstreamlivetb"},
+  {title:"Tabi Spor 1",url:"/event.html?id=androstreamlivetb1"},
+  {title:"Tabi Spor 2",url:"/event.html?id=androstreamlivetb2"},
+  {title:"Tabi Spor 3",url:"/event.html?id=androstreamlivetb3"},
+  {title:"Tabi Spor 4",url:"/event.html?id=androstreamlivetb4"},
+  {title:"Tabi Spor 5",url:"/event.html?id=androstreamlivetb5"},
+  {title:"Tabi Spor 6",url:"/event.html?id=androstreamlivetb6"},
+  {title:"Tabi Spor 7",url:"/event.html?id=androstreamlivetb7"},
+  {title:"Tabi Spor 8",url:"/event.html?id=androstreamlivetb8"},
+  {title:"Fb Tv",url:"/event.html?id=androstreamlivefb"},
+  {title:"Cbc Sport",url:"/event.html?id=androstreamlivecbcs"},
+  {title:"Gs Tv",url:"/event.html?id=androstreamlivegs"},
+  {title:"Sports Tv",url:"/event.html?id=androstreamlivesptstv"},
+  {title:"Exxen Tv",url:"/event.html?id=androstreamliveexn"},
+  {title:"Exxen Sports 1",url:"/event.html?id=androstreamliveexn1"},
+  {title:"Exxen Sports 2",url:"/event.html?id=androstreamliveexn2"},
+  {title:"Exxen Sports 3",url:"/event.html?id=androstreamliveexn3"},
+  {title:"Exxen Sports 4",url:"/event.html?id=androstreamliveexn4"},
+  {title:"Exxen Sports 5",url:"/event.html?id=androstreamliveexn5"},
+  {title:"Exxen Sports 6",url:"/event.html?id=androstreamliveexn6"},
+  {title:"Exxen Sports 7",url:"/event.html?id=androstreamliveexn7"},
+  {title:"Exxen Sports 8",url:"/event.html?id=androstreamliveexn8"}
+];
+
+let liveEvents=[];
+let currentLeague='all';
+let favoriteKeys=safeJSON('talhaFavorites',[]);
+let recentEvents=safeJSON('talhaRecent',[]);
+let feedBusy=false;
+let feedRequestToken=0;
+let searchTimer=null;
+
+const translationDict={
+  "motor sporları":"Motorsports","motor sporlari":"Motorsports",
+  "hazırlık maçı":"Friendly Match","hazirlik maci":"Friendly Match",
+  "paris basketball":"Paris Basketball",
+  "şampiyonlar ligi":"Champions League","sampiyonlar ligi":"Champions League",
+  "avrupa ligi":"Europa League","konferans ligi":"Conference League",
+  "milletler ligi":"Nations League","dünya kupası":"World Cup","dunya kupasi":"World Cup",
+  "avrupa şampiyonası":"European Championship","avrupa sampiyonasi":"European Championship",
+  "süper lig":"Super League","super lig":"Super League",
+  "1. lig":"1st Division","2. lig":"2nd Division",
+  "füchse berlin":"Fuchse Berlin","fuchse berlin":"Fuchse Berlin",
+  "as monaco":"AS Monaco","lnb pro a final":"LNB Pro A Final",
+  "masa tenisi":"Table Tennis","amerikan futbolu":"American Football",
+  "buz hokeyi":"Ice Hockey","at yarışı":"Horse Racing","at yarisi":"Horse Racing",
+  "su topu":"Water Polo","maç özeti":"Match Highlights","mac ozeti":"Match Highlights",
+  "suudi arabistan":"Saudi Arabia","güney kore":"South Korea","guney kore":"South Korea",
+  "çeyrek final":"Quarter-Final","ceyrek final":"Quarter-Final",
+  "yarı final":"Semi-Final","yari final":"Semi-Final",
+  "grup maçı":"Group Stage","grup maci":"Group Stage",
+  "hafta sonu":"Weekend","hafta içi":"Weekday","hafta ici":"Weekday",
+  "voleybol":"Volleyball","basketbol":"Basketball","futbol":"Football",
+  "hentbol":"Handball","tenis":"Tennis","dövüş":"Fighting","dovus":"Fighting",
+  "bisiklet":"Cycling","yüzme":"Swimming","yuzme":"Swimming","boks":"Boxing",
+  "güreş":"Wrestling","gures":"Wrestling","futsal":"Futsal","espor":"E-Sports",
+  "e-spor":"E-Sports","erkekler":"Men's","kadınlar":"Women's","kadinlar":"Women's",
+  "erkek":"Men","kadın":"Women","kadin":"Women","gençler":"Youth","gencler":"Youth",
+  "hazırlık":"Friendly","hazirlik":"Friendly","canlı":"LIVE","canli":"LIVE",
+  "yayın":"Broadcast","yayin":"Broadcast","yayında":"On Air","yayinda":"On Air",
+  "finali":"Final","final":"Final","kupa":"Cup","kupası":"Cup","kupasi":"Cup",
+  "eleme":"Qualifier","elemeleri":"Qualifiers","özet":"Highlights","ozet":"Highlights",
+  "maçı":"Match","maci":"Match","maç":"Match","mac":"Match",
+  "takımı":"Team","takimi":"Team","hafta":"Week","tur":"Round","etap":"Stage",
+  "devre":"Half","uzatmalar":"Extra Time","penaltılar":"Penalties","penaltilar":"Penalties",
+  "ertelendi":"Postponed","iptal":"Canceled","türkiye":"Turkey","turkiye":"Turkey",
+  "türk":"Turkish","turk":"Turkish","İngiltere":"England","ingiltere":"England",
+  "ispanya":"Spain","italya":"Italy","almanya":"Germany","fransa":"France",
+  "hollanda":"Netherlands","portekiz":"Portugal","rusya":"Russia","yunanistan":"Greece",
+  "belçika":"Belgium","belcika":"Belgium","avusturya":"Austria","danimarka":"Denmark",
+  "İsveç":"Sweden","isvec":"Sweden","İsviçre":"Switzerland","isvicre":"Switzerland",
+  "brezilya":"Brazil","arjantin":"Argentina","Çekya":"Czechia","polonya":"Poland",
+  "japonya":"Japan","çin":"China","cin":"China","avustralya":"Australia",
+  "hırvatistan":"Croatia","hirvatistan":"Croatia","sırbistan":"Serbia",
+  "sirbistan":"Serbia","romanya":"Romania","macaristan":"Hungary",
+  "ukrayna":"Ukraine","mısır":"Egypt","misir":"Egypt","fas":"Morocco",
+  "cezayir":"Algeria","kanada":"Canada","meksika":"Mexico","şili":"Chile",
+  "sili":"Chile","kolombiya":"Colombia","uruguay":"Uruguay","paraguay":"Paraguay",
+  "curaçao":"Curacao","curaca":"Curacao","galatasaray":"Galatasaray",
+  "fenerbahçe":"Fenerbahce","fenerbahce":"Fenerbahce","beşiktaş":"Besiktas",
+  "besiktas":"Besiktas","trabzonspor":"Trabzonspor","başakşehir":"Basaksehir",
+  "basaksehir":"Basaksehir","barcelona":"Barcelona","real madrid":"Real Madrid",
+  "bugün":"Today","bugun":"Today","yarın":"Tomorrow","yarin":"Tomorrow",
+  "dün":"Yesterday","dun":"Yesterday","saat":"Time","dakika":"min","saniye":"sec",
+  "bakım":"Maintenance","bakim":"Maintenance","sunucu":"Server",
+  "bağlantı":"Connection","baglanti":"Connection","yedek":"Backup"
+};
+
+const dictEntries=Object.keys(translationDict)
+  .sort((a,b)=>b.length-a.length)
+  .map(key=>({
+    key,
+    pattern:new RegExp(
+      `(?<=[\\s\\b\\(\\[\\{:/\\-,]|^)${key.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(?=[\\s\\b\\)\\]\\}:/\\-,]|$)`,
+      'gi'
+    ),
+    replacement:translationDict[key]
+  }));
+
+function normalizeTurkishText(str){
+  if(!str)return'';
+  return String(str)
+    .replace(/Ã¼/g,'ü').replace(/Ãœ/g,'Ü')
+    .replace(/Ã§/g,'ç').replace(/Ã‡/g,'Ç')
+    .replace(/ÅŸ/g,'ş').replace(/Åž/g,'Ş')
+    .replace(/Ä±/g,'ı').replace(/Ä°/g,'İ')
+    .replace(/Ã¶/g,'ö').replace(/Ã–/g,'Ö')
+    .replace(/â€™/g,"'")
+    .replace(/â€œ/g,'"')
+    .replace(/â€/g,'"')
+    .replace(/&amp;/g,'&')
+    .replace(/&lt;/g,'<')
+    .replace(/&gt;/g,'>');
+}
+
+function translateText(text){
+  if(!text)return'';
+  let str=normalizeTurkishText(text);
+
+  for(let i=0;i<dictEntries.length;i++){
+    const e=dictEntries[i];
+
+    if(e.pattern.test(str)){
+      str=str.replace(e.pattern,(match)=>{
+        if(match===match.toUpperCase())return e.replacement.toUpperCase();
+        if(match[0]===match[0].toUpperCase()){
+          return e.replacement.charAt(0).toUpperCase()+e.replacement.slice(1);
+        }
+        return e.replacement;
+      });
+    }
+  }
+
+  return str
+    .replace(/ş/g,'s').replace(/Ş/g,'S')
+    .replace(/ı/g,'i').replace(/İ/g,'I')
+    .replace(/ğ/g,'g').replace(/Ğ/g,'G')
+    .replace(/ü/g,'u').replace(/Ü/g,'U')
+    .replace(/ö/g,'o').replace(/Ö/g,'O')
+    .replace(/ç/g,'c').replace(/Ç/g,'C');
+}
+
+let isTranslatingDOM=false;
+
+function translateNode(node){
+  if(!node||node.nodeType!==Node.TEXT_NODE)return;
+
+  const parent=node.parentNode;
+  if(!parent)return;
+
+  const tag=parent.tagName?parent.tagName.toUpperCase():'';
+
+  if(['SCRIPT','STYLE','IFRAME','INPUT','TEXTAREA','OPTION','SELECT','CODE'].includes(tag))return;
+  if(parent.closest&&parent.closest('[data-no-translate="true"]'))return;
+
+  const orig=node.nodeValue;
+  if(!orig||!orig.trim())return;
+
+  const normalized=normalizeTurkishText(orig);
+  const hasTr=/[şŞıİğĞüÜöÖçÇÃÅÄ]/i.test(orig);
+  const needsTrans=hasTr||Object.keys(translationDict).some(k=>orig.toLowerCase().includes(k));
+
+  if(needsTrans||orig!==normalized){
+    const translated=translateText(orig);
+    if(translated&&translated!==orig)node.nodeValue=translated;
+  }
+}
+
+function autoTranslateDOM(root=document.body){
+  if(isTranslatingDOM||!root)return;
+
+  isTranslatingDOM=true;
+
+  try{
+    const walker=document.createTreeWalker(
+      root,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode:n=>{
+          if(!n.nodeValue||!n.nodeValue.trim())return NodeFilter.FILTER_SKIP;
+
+          const t=n.parentNode?n.parentNode.tagName:'';
+
+          if(['SCRIPT','STYLE','IFRAME','INPUT','TEXTAREA','OPTION','SELECT','CODE'].includes(t)){
+            return NodeFilter.FILTER_SKIP;
+          }
+
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      }
+    );
+
+    let n;
+
+    while((n=walker.nextNode())){
+      translateNode(n);
+    }
+  }catch(e){
+  }finally{
+    isTranslatingDOM=false;
+  }
+}
+
+function initDOMTranslator(){
+  autoTranslateDOM();
+
+  const obs=new MutationObserver(muts=>{
+    if(isTranslatingDOM)return;
+
+    for(const m of muts){
+      if(m.type==='childList'){
+        m.addedNodes.forEach(n=>{
+          if(n.nodeType===Node.TEXT_NODE)translateNode(n);
+          else if(n.nodeType===Node.ELEMENT_NODE)autoTranslateDOM(n);
+        });
+      }else if(m.type==='characterData'){
+        translateNode(m.target);
+      }
+    }
+  });
+
+  obs.observe(document.body,{
+    childList:true,
+    subtree:true,
+    characterData:true
+  });
+
+  setInterval(()=>autoTranslateDOM(),800);
+}
+
+function storageGet(key,fb=null){
+  try{
+    return localStorage.getItem(key)??fb;
+  }catch(e){
+    return fb;
+  }
+}
+
+function storageSet(key,val){
+  try{
+    localStorage.setItem(key,val);
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+function safeJSON(key,fb){
+  try{
+    const r=storageGet(key,null);
+    if(!r)return fb;
+    return JSON.parse(r)??fb;
+  }catch(e){
+    return fb;
+  }
+}
+
+function normalizeIdentityPart(v){
+  return String(v??'').trim().toLowerCase().replace(/\s+/g,' ');
+}
+
+function legacyEventKey(event,index=''){
+  const base=event&&(event.id??event.url??event.title??'');
+
+  if(base!==''&&base!==null)return String(base);
+
+  return `${String(event?.title||'Live channel')}|${String(event?.league||'')}|${index}`;
+}
+
+function eventKey(event,index=''){
+  if(!event||typeof event!=='object'){
+    return `v2:fallback|${String(index)}`;
+  }
+
+  const parts=[
+    event.id,
+    event.channelId,
+    event.channel,
+    event.name,
+    event.title,
+    event.url,
+    event.streamUrl,
+    event.link,
+    event.league
+  ]
+  .map(normalizeIdentityPart)
+  .filter(Boolean);
+
+  if(parts.length)return`v2:${parts.join('|')}`;
+
+  return`v2:fallback|${normalizeIdentityPart(event.title||'Live channel')}|${normalizeIdentityPart(event.league||'')}|${String(index)}`;
+}
+
+function migrateStoredEventState(events){
+  const validKeys=new Set();
+  const legacyMatches=new Map();
+
+  events.forEach((event,i)=>{
+    const key=eventKey(event,i);
+    validKeys.add(key);
+
+    const leg=legacyEventKey(event,i);
+
+    if(!legacyMatches.has(leg))legacyMatches.set(leg,[]);
+    legacyMatches.get(leg).push(key);
+  });
+
+  const mf=[];
+
+  for(const sk of Array.isArray(favoriteKeys)?favoriteKeys:[]){
+    if(validKeys.has(sk)){
+      mf.push(sk);
+      continue;
+    }
+
+    const ms=legacyMatches.get(String(sk))||[];
+
+    if(ms.length===1)mf.push(ms[0]);
+  }
+
+  favoriteKeys=[...new Set(mf)];
+  storageSet('talhaFavorites',JSON.stringify(favoriteKeys));
+
+  const mr=[];
+
+  for(const item of Array.isArray(recentEvents)?recentEvents:[]){
+    const sk=item?.key;
+
+    if(validKeys.has(sk)){
+      mr.push({...item,key:sk});
+      continue;
+    }
+
+    const ms=legacyMatches.get(String(sk??''))||[];
+
+    if(ms.length===1)mr.push({...item,key:ms[0]});
+  }
+
+  recentEvents=mr.slice(0,5);
+  storageSet('talhaRecent',JSON.stringify(recentEvents));
+}
+
+function escapeHTML(v){
+  return String(v??'').replace(
+    /[&<>'"]/g,
+    c=>({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      "'":'&#39;',
+      '"':'&quot;'
+    }[c])
+  );
+}
+
+function leagueName(ev){
+  return translateText(String(ev?.league||'Other')).trim()||'Other';
+}
+
+function changeTheme(t){
+  document.body.dataset.theme=t;
+  storageSet('talhaTheme',t);
+}
+
+function setStatus(text,state='ready'){
+  const dot=document.getElementById('networkDot');
+  const label=document.getElementById('networkText');
+
+  if(label)label.textContent=text;
+
+  if(dot){
+    dot.className='status-dot'+(
+      state==='offline'?' offline':
+      state==='busy'?' busy':''
+    );
+  }
+}
+
+function setSync(t){
+  const el=document.getElementById('syncText');
+  if(el)el.textContent=t;
+}
+
+function showToast(title,msg){
+  const old=document.querySelector('.toast');
+  if(old)old.remove();
+
+  const el=document.createElement('div');
+  el.className='toast';
+
+  el.innerHTML=`
+    <strong>${escapeHTML(title)}</strong>
+    <span>${escapeHTML(msg)}</span>
+  `;
+
+  document.body.appendChild(el);
+
+  requestAnimationFrame(()=>el.classList.add('show'));
+
+  setTimeout(()=>{
+    el.classList.remove('show');
+    setTimeout(()=>el.remove(),250);
+  },3500);
+}
+
+function hideLoader(reason='Ready'){
+  const loader=document.getElementById('loader');
+
+  if(!loader||loader.dataset.hidden==='1')return;
+
+  loader.dataset.hidden='1';
+
+  const s=document.getElementById('loaderStatus');
+
+  if(s)s.textContent=reason;
+
+  requestAnimationFrame(()=>loader.classList.add('is-hidden'));
+
+  setTimeout(()=>loader.remove(),420);
+}
+
+function bootLoader(){
+  const started=performance.now();
+  const MIN_SHOW=2200;
+  const MAX_WAIT=5000;
+
+  let domReady=document.readyState!=='loading';
+  let finished=false;
+
+  const progress=document.getElementById('loaderProgress');
+  const percent=document.getElementById('loaderPercent');
+  const status=document.getElementById('loaderStatus');
+
+  const ticks=[
+    [25,'Loading visual engine…'],
+    [50,'Preparing premium interface…'],
+    [75,'Checking local session…'],
+    [92,'Finalizing experience…'],
+    [100,'Ready']
+  ];
+
+  let tickIndex=0;
+
+  const animator=setInterval(()=>{
+    const elapsed=performance.now()-started;
+    const pct=Math.min(100,Math.round((elapsed/MIN_SHOW)*100));
+
+    if(progress)progress.style.width=pct+'%';
+    if(percent)percent.textContent=pct+'%';
+
+    while(tickIndex<ticks.length&&pct>=ticks[tickIndex][0]){
+      if(status)status.textContent=ticks[tickIndex][1];
+      tickIndex++;
+    }
+  },40);
+
+  const ready=()=>{
+    domReady=true;
+
+    const wait=Math.max(0,MIN_SHOW-(performance.now()-started));
+
+    setTimeout(()=>{
+      if(finished)return;
+
+      finished=true;
+      clearInterval(animator);
+
+      if(progress)progress.style.width='100%';
+      if(percent)percent.textContent='100%';
+
+      hideLoader('Ready');
+    },wait);
+  };
+
+  if(!domReady){
+    document.addEventListener('DOMContentLoaded',ready,{once:true});
+  }else{
+    ready();
+  }
+
+  window.addEventListener('load',ready,{once:true});
+  window.addEventListener('pageshow',ready,{once:true});
+
+  setTimeout(()=>{
+    if(finished)return;
+
+    finished=true;
+    clearInterval(animator);
+    hideLoader('Ready');
+  },MAX_WAIT);
+}
+
+bootLoader();
+
+function updateClock(){
+  const t=new Intl.DateTimeFormat(undefined,{
+    hour:'2-digit',
+    minute:'2-digit',
+    second:'2-digit',
+    hour12:false
+  }).format(new Date());
+
+  const c=document.getElementById('clockText');
+  if(c)c.textContent=t;
+
+  const mc=document.getElementById('menuClock');
+  if(mc)mc.textContent=t;
+}
+
+updateClock();
+setInterval(updateClock,1000);
+
+function updateNetwork(){
+  const on=navigator.onLine!==false;
+
+  setStatus(
+    on?'System ready':'Offline · network unavailable',
+    on?'ready':'offline'
+  );
+}
+
+function updateAnalytics(){
+  const total=liveEvents.length;
+
+  const favs=liveEvents.filter(
+    (e,i)=>favoriteKeys.includes(eventKey(e,i))
+  ).length;
+
+  const rec=Math.min(recentEvents.length,5);
+
+  document.getElementById('countTotal').textContent=String(total).padStart(2,'0');
+  document.getElementById('countFavorites').textContent=String(favs).padStart(2,'0');
+  document.getElementById('countRecent').textContent=String(rec).padStart(2,'0');
+
+  const pl=document.getElementById('pcbLive');
+  const ps=document.getElementById('pcbStatic');
+
+  if(pl)pl.textContent=String(total).padStart(2,'0');
+  if(ps)ps.textContent=String(STATIC_CHANNELS.length).padStart(2,'0');
+}
+
+function renderLeagueTabs(){
+  const tabs=document.getElementById('leagueTabs');
+
+  if(!tabs)return;
+
+  const counts={};
+
+  liveEvents.forEach(e=>{
+    const n=leagueName(e);
+    counts[n]=(counts[n]||0)+1;
+  });
+
+  const pri=n=>{
+    const l=n.toLowerCase();
+
+    if(l.includes('la liga'))return 0;
+    if(l.includes('uefa'))return 1;
+
+    return 2;
+  };
+
+  const leagues=Object.keys(counts).sort(
+    (a,b)=>pri(a)-pri(b)||a.localeCompare(b)
+  );
+
+  tabs.innerHTML='';
+
+  const addTab=(name,active,cb,count)=>{
+    const b=document.createElement('button');
+
+    b.className='tab-btn'+(active?' active':'');
+    b.type='button';
+    b.setAttribute('role','tab');
+    b.textContent=`${name} (${count})`;
+    b.onclick=cb;
+
+    tabs.appendChild(b);
+  };
+
+  addTab(
+    'All',
+    currentLeague==='all',
+    ()=>setFilter('all'),
+    liveEvents.length
+  );
+
+  leagues.forEach(n=>{
+    addTab(
+      n,
+      currentLeague===n,
+      ()=>setFilter('league',n),
+      counts[n]
+    );
+  });
+}
+
+function renderRecent(){
+  const section=document.getElementById('recentSection');
+  const row=document.getElementById('recentRow');
+
+  if(!section||!row)return;
+
+  if(!recentEvents.length){
+    section.style.display='none';
+    return;
+  }
+
+  section.style.display='flex';
+  row.innerHTML='';
+
+  recentEvents.slice(0,5).forEach(item=>{
+    const chip=document.createElement('button');
+
+    chip.className='recent-chip';
+    chip.type='button';
+    chip.textContent=item.title;
+    chip.title='Play '+item.title;
+
+    chip.onclick=()=>{
+      const found=liveEvents.find(
+        (e,i)=>eventKey(e,i)===item.key
+      );
+
+      if(found){
+        setServer(found);
+      }else{
+        const sf=STATIC_CHANNELS.find(
+          (e,i)=>eventKey(e,i)===item.key
+        );
+
+        if(sf)setServer(sf);
+      }
+    };
+
+    row.appendChild(chip);
+  });
+}
+
+function renderMatches(){
+  const container=document.getElementById('serverContainer');
+
+  if(!container)return;
+
+  const input=document.getElementById('searchChannels');
+  const q=(input?.value||'').trim().toLowerCase();
+
+  container.innerHTML='';
+
+  let visible=0;
+  let idx=0;
+
+  liveEvents.forEach((event,index)=>{
+    const et=translateText(event?.title||'Live channel');
+    const el=translateText(event?.league||'');
+
+    if(currentLeague!=='all'&&leagueName(event)!==currentLeague)return;
+
+    const full=(et+' '+el).toLowerCase();
+
+    if(q&&!full.includes(q))return;
+
+    idx++;
+
+    const key=eventKey(event,index);
+    const isFav=favoriteKeys.includes(key);
+
+    const row=document.createElement('div');
+
+    row.className='ch-item';
+    row.tabIndex=0;
+    row.setAttribute('role','button');
+    row.setAttribute('aria-label','Play '+et);
+
+    row.innerHTML=`
+      <div class="ch-left">
+        <div class="ch-num">${String(idx).padStart(2,'0')}</div>
+        <div class="ch-info">
+          <strong>${escapeHTML(et)}</strong>
+          <small>${escapeHTML(el||'Live feed')}</small>
+        </div>
+      </div>
+
+      <div class="ch-right">
+        <div class="live-badge">
+          <div class="live-dot"></div>
+          ${escapeHTML(event?.time||'LIVE')}
+        </div>
+
+        <button
+          class="fav-btn ${isFav?'active':''}"
+          type="button"
+          aria-label="${isFav?'Remove from':'Add to'} favorites"
+          aria-pressed="${isFav}">
+          ★
+        </button>
+      </div>
+    `;
+
+    row.onclick=()=>setServer(event,row);
+
+    row.onkeydown=ev=>{
+      if(ev.key==='Enter'||ev.key===' '){
+        ev.preventDefault();
+        setServer(event,row);
+      }
+    };
+
+    row.querySelector('.fav-btn').onclick=ev=>{
+      ev.stopPropagation();
+
+      favoriteKeys=isFav
+        ?favoriteKeys.filter(k=>k!==key)
+        :[...favoriteKeys,key];
+
+      storageSet(
+        'talhaFavorites',
+        JSON.stringify(favoriteKeys)
+      );
+
+      renderMatches();
+      updateAnalytics();
+    };
+
+    container.appendChild(row);
+    visible++;
+  });
+
+  if(!visible){
+    container.innerHTML=
+      '<div class="empty-state">No channels match your filters.</div>';
+  }
+
+  document.getElementById('channelSummary').textContent=
+    `${visible} shown · ${liveEvents.length} total`;
+
+  updateAnalytics();
+  renderRecent();
+  renderStaticChannels();
+}
+
+function renderStaticChannels(){
+  const container=document.getElementById('staticServerContainer');
+
+  if(!container)return;
+
+  container.innerHTML='';
+
+  const countEl=document.getElementById('staticChannelCount');
+
+  if(countEl){
+    countEl.textContent=String(STATIC_CHANNELS.length);
+  }
+
+  STATIC_CHANNELS.forEach((event,index)=>{
+    const row=document.createElement('div');
+
+    row.className='ch-item';
+    row.tabIndex=0;
+    row.setAttribute('role','button');
+    row.setAttribute('aria-label','Play '+event.title);
+
+    row.innerHTML=`
+      <div class="ch-left">
+        <div class="ch-num">${String(index+1).padStart(2,'0')}</div>
+        <div class="ch-info">
+          <strong>${escapeHTML(event.title)}</strong>
+          <small>24/7 Network</small>
+        </div>
+      </div>
+
+      <div class="ch-right">
+        <div class="live-badge">
+          <div class="live-dot"></div>
+          24/7
+        </div>
+      </div>
+    `;
+
+    row.onclick=()=>setServer(event,row);
+
+    row.onkeydown=ev=>{
+      if(ev.key==='Enter'||ev.key===' '){
+        ev.preventDefault();
+        setServer(event,row);
+      }
+    };
+
+    container.appendChild(row);
+  });
+}
+
+function setFilter(type,name='all'){
+  currentLeague=type==='league'?name:'all';
+  renderLeagueTabs();
+  renderMatches();
+}
+
+function rememberRecent(event,index=''){
+  const key=eventKey(event,index);
+
+  recentEvents=[
+    {
+      key,
+      title:translateText(event?.title||'Live channel')
+    },
+    ...recentEvents.filter(x=>x.key!==key)
+  ].slice(0,5);
+
+  storageSet(
+    'talhaRecent',
+    JSON.stringify(recentEvents)
+  );
+}
+
+function setServer(event,targetBtn){
+  const frame=document.getElementById('frame');
+
+  if(!frame||!event)return;
+
+  frame.classList.remove('fade');
+  void frame.offsetWidth;
+  frame.classList.add('fade');
+
+  const BASE=window.__PLAYER_URL_FOR_SESSION||PLAYER_BASE_URL;
+
+  let finalUrl='';
+
+  if(event.url){
+    const raw=String(event.url);
+    const lower=raw.toLowerCase();
+
+    if(event.isIframeOnly===true){
+      finalUrl=raw;
+    }else if(lower.includes('.m3u8')){
+      finalUrl=`${BASE}?Talha=${encodeURIComponent(raw)}`;
+    }else if(raw.includes('id=')){
+      try{
+        const p=new URL(raw,location.href).searchParams;
+        finalUrl=
+          `${BASE}?Talha=${encodeURIComponent(
+            p.get('id')||'androstreamlivetrt1'
+          )}`;
+      }catch(e){
+        finalUrl=`${BASE}?Talha=${encodeURIComponent(raw)}`;
+      }
+    }else{
+      finalUrl=raw;
+    }
+  }else{
+    finalUrl=`${BASE}?Talha=androstreamlivetrt1`;
+  }
+
+  try{
+    frame.src='about:blank';
+
+    setTimeout(()=>{
+      frame.src=finalUrl;
+    },20);
+  }catch(e){
+    frame.src=finalUrl;
+  }
+
+  const ei=liveEvents.indexOf(event);
+
+  rememberRecent(event,ei);
+  renderRecent();
+
+  document.querySelectorAll('.ch-item').forEach(
+    b=>b.classList.remove('active')
+  );
+
+  if(targetBtn)targetBtn.classList.add('active');
+}
+
+function triggerFirstStream(){
+  if(
+    (!liveEvents||!liveEvents.length)&&
+    (!recentEvents||!recentEvents.length)
+  ){
+    if(STATIC_CHANNELS.length>0){
+      const r=document.querySelector(
+        '#staticServerContainer .ch-item'
+      );
+
+      setServer(STATIC_CHANNELS[0],r);
+      return;
+    }
+  }
+
+  const first=document.querySelector('.ch-list .ch-item');
+
+  if(first)first.click();
+}
+
+function feedError(msg){
+  updateAnalytics();
+
+  const c=document.getElementById('serverContainer');
+
+  c.innerHTML=`
+    <div class="feed-error">
+      ${escapeHTML(msg)}
+      <br>
+      <button type="button" id="retryFeedBtn">
+        Retry Feed Sync
+      </button>
+    </div>
+  `;
+
+  document.getElementById('retryFeedBtn').onclick=
+    ()=>loadTargetScript(true);
+
+  setStatus(
+    'Feed sync failed · 24/7 available below',
+    'offline'
+  );
+
+  triggerFirstStream();
+}
+
+function loadTargetScript(force=false){
+  if(feedBusy&&!force)return;
+
+  const token=++feedRequestToken;
+
+  feedBusy=true;
+
+  setStatus('Syncing live feeds…','busy');
+  setSync('Connecting…');
+
+  const c=document.getElementById('serverContainer');
+
+  if(c){
+    c.innerHTML=
+      '<p style="color:rgba(255,255,255,.4);text-align:center;font-size:12px;padding:28px">Syncing satellite channels…</p>';
+  }
+
+  const old=document.getElementById('mahsunScript');
+
+  if(old)old.remove();
+
+  try{
+    delete window.karsilasmalar;
+  }catch(e){
+    window.karsilasmalar=undefined;
+  }
+
+  const script=document.createElement('script');
+
+  script.id='mahsunScript';
+  script.async=true;
+  script.src=FEED_URL+'?v='+Date.now();
+
+  let settled=false;
+
+  const isCurrent=()=>token===feedRequestToken;
+
+  const timeout=setTimeout(()=>{
+    if(settled||!isCurrent())return;
+
+    settled=true;
+    feedBusy=false;
+    script.remove();
+
+    feedError('Feed server did not respond in time.');
+  },FEED_TIMEOUT);
+
+  script.onerror=()=>{
+    if(settled||!isCurrent())return;
+
+    settled=true;
+    clearTimeout(timeout);
+    feedBusy=false;
+    script.remove();
+
+    feedError('Feed server is unavailable right now.');
+  };
+
+  script.onload=()=>{
+    if(settled||!isCurrent())return;
+
+    settled=true;
+    clearTimeout(timeout);
+    feedBusy=false;
+
+    try{
+      let temp=[];
+
+      if(
+        typeof karsilasmalar!=='undefined'&&
+        Array.isArray(karsilasmalar)
+      ){
+        temp.push(...karsilasmalar);
+      }
+
+      if(
+        typeof futbolMatches!=='undefined'&&
+        Array.isArray(futbolMatches)
+      ){
+        temp.push(...futbolMatches);
+      }
+
+      if(!temp.length){
+        throw new Error('Feed Vector Missing');
+      }
+
+      temp.sort((a,b)=>{
+        const at=String(a?.time||'').toLowerCase();
+        const bt=String(b?.time||'').toLowerCase();
+
+        const al=
+          at.includes('live')||
+          at.includes('online');
+
+        const bl=
+          bt.includes('live')||
+          bt.includes('online');
+
+        return al===bl?0:(al?-1:1);
+      });
+
+      const activeCustom=
+        CUSTOM_TOP_FEEDS.filter(
+          i=>i&&i.show===true
+        );
+
+      liveEvents=[
+        ...activeCustom,
+        ...temp
+      ];
+
+      migrateStoredEventState(liveEvents);
+
+      updateAnalytics();
+      renderLeagueTabs();
+      renderMatches();
+
+      setStatus(
+        navigator.onLine===false
+          ?'Offline mode · cached UI'
+          :'System ready',
+        'ready'
+      );
+
+      setSync(
+        `Synced ${
+          new Intl.DateTimeFormat(undefined,{
+            hour:'2-digit',
+            minute:'2-digit'
+          }).format(new Date())
+        }`
+      );
+
+      triggerFirstStream();
+
+    }catch(err){
+      feedError('Feed data could not be processed.');
+    }
+  };
+
+  document.body.appendChild(script);
+}
+
+function login(){
+  const input=document.getElementById('password');
+  const pass=input.value;
+
+  let chosenPlayer=PLAYER_BASE_URL;
+
+  if(pass===ALT_PASSWORD){
+    chosenPlayer=PLAYER_ALT_URL;
+  }else if(pass!==PASSWORD){
+    input.select();
+
+    input.animate(
+      [
+        {transform:'translateX(0)'},
+        {transform:'translateX(-8px)'},
+        {transform:'translateX(8px)'},
+        {transform:'translateX(-4px)'},
+        {transform:'translateX(4px)'},
+        {transform:'translateX(0)'}
+      ],
+      {duration:300}
+    );
+
+    showToast(
+      'Access Denied',
+      'Incorrect passcode. Please check and try again.'
+    );
+
+    return;
+  }
+
+  window.__PLAYER_URL_FOR_SESSION=chosenPlayer;
+
+  document.getElementById('authWrap')
+    .classList.remove('visible');
+
+  document.getElementById('appShell')
+    .style.display='block';
+
+  updateAnalytics();
+  loadTargetScript();
+}
+
+function toggleTheatre(on){
+  document.body.classList.toggle('theatre',on);
+
+  const eb=document.getElementById('exitTheatre');
+
+  if(eb)eb.style.display=on?'block':'none';
+
+  if(on){
+    document.documentElement.style.overflow='hidden';
+    document.body.style.overflow='hidden';
+  }else{
+    document.documentElement.style.overflow='';
+    document.body.style.overflow='';
+  }
+}
+
+function toggleFocus(){
+  document.body.classList.toggle('focus');
+  closeMenu();
+}
+
+function openMenu(){
+  const m=document.getElementById('quickMenu');
+  const b=document.getElementById('menuBackdrop');
+  const btn=document.getElementById('menuBtn');
+
+  m?.classList.add('open');
+  b?.classList.add('open');
+
+  document.body.classList.add('menu-open');
+
+  if(m)m.setAttribute('aria-hidden','false');
+  if(btn)btn.setAttribute('aria-expanded','true');
+}
+
+function closeMenu(){
+  const m=document.getElementById('quickMenu');
+  const b=document.getElementById('menuBackdrop');
+  const btn=document.getElementById('menuBtn');
+
+  m?.classList.remove('open');
+  b?.classList.remove('open');
+
+  document.body.classList.remove('menu-open');
+
+  if(m)m.setAttribute('aria-hidden','true');
+  if(btn)btn.setAttribute('aria-expanded','false');
+}
+
+function scrollToChannels(){
+  document.querySelector('.sidebar')?.scrollIntoView({
+    behavior:'smooth',
+    block:'start'
+  });
+}
+
+function showFavorites(){
+  closeMenu();
+
+  document.getElementById('searchChannels').value='';
+  currentLeague='all';
+
+  const c=document.getElementById('serverContainer');
+
+  c.innerHTML='';
+
+  let shown=0;
+
+  liveEvents.forEach((event,index)=>{
+    if(!favoriteKeys.includes(eventKey(event,index)))return;
+
+    shown++;
+
+    const row=document.createElement('div');
+
+    row.className='ch-item';
+    row.tabIndex=0;
+    row.setAttribute('role','button');
+
+    const t=translateText(event?.title||'Live channel');
+    const l=translateText(event?.league||'');
+
+    row.innerHTML=`
+      <div class="ch-left">
+        <div class="ch-num">${String(shown).padStart(2,'0')}</div>
+        <div class="ch-info">
+          <strong>${escapeHTML(t)}</strong>
+          <small>${escapeHTML(l||'Live feed')}</small>
+        </div>
+      </div>
+
+      <div class="ch-right">
+        <div class="live-badge">
+          <div class="live-dot"></div>
+          ${escapeHTML(event?.time||'LIVE')}
+        </div>
+      </div>
+    `;
+
+    row.onclick=()=>setServer(event,row);
+
+    c.appendChild(row);
+  });
+
+  STATIC_CHANNELS.forEach((event,index)=>{
+    if(!favoriteKeys.includes(eventKey(event,index)))return;
+
+    shown++;
+
+    const row=document.createElement('div');
+
+    row.className='ch-item';
+    row.tabIndex=0;
+    row.setAttribute('role','button');
+
+    const t=translateText(event?.title||'Live channel');
+
+    row.innerHTML=`
+      <div class="ch-left">
+        <div class="ch-num">${String(shown).padStart(2,'0')}</div>
+        <div class="ch-info">
+          <strong>${escapeHTML(t)}</strong>
+          <small>24/7 Network</small>
+        </div>
+      </div>
+
+      <div class="ch-right">
+        <div class="live-badge">
+          <div class="live-dot"></div>
+          24/7
+        </div>
+      </div>
+    `;
+
+    row.onclick=()=>setServer(event,row);
+
+    c.appendChild(row);
+  });
+
+  if(!shown){
+    c.innerHTML=
+      '<div class="empty-state">No favorites yet. Tap ★ on a channel to save it.</div>';
+  }
+
+  document.getElementById('channelSummary').textContent=
+    `${shown} favorites`;
+
+  updateAnalytics();
+  scrollToChannels();
+}
+
+function cycleTheme(){
+  const themes=[
+    'violet',
+    'ocean',
+    'sunset',
+    'emerald',
+    'aurora',
+    'royal',
+    'carbon'
+  ];
+
+  const cur=document.body.dataset.theme||'violet';
+
+  const next=
+    themes[(themes.indexOf(cur)+1)%themes.length];
+
+  changeTheme(next);
+
+  const p=document.getElementById('themePicker');
+
+  if(p)p.value=next;
+
+  closeMenu();
+}
+
+function lockSession(){
+  closeMenu();
+  toggleTheatre(false);
+  document.body.classList.remove('focus');
+
+  document.getElementById('appShell')
+    .style.display='none';
+
+  const aw=document.getElementById('authWrap');
+
+  aw.classList.add('visible');
+
+  document.getElementById('password').value='';
+
+  setTimeout(
+    ()=>document.getElementById('password').focus(),
+    100
+  );
+}
+
+function handleMenuAction(action){
+  if(action==='home'){
+    closeMenu();
+    currentLeague='all';
+    renderLeagueTabs();
+    renderMatches();
+    scrollToChannels();
+
+  }else if(action==='favorites'){
+    showFavorites();
+
+  }else if(action==='recent'){
+    closeMenu();
+
+    document.getElementById('recentSection')
+      ?.scrollIntoView({
+        behavior:'smooth',
+        block:'center'
+      });
+
+  }else if(action==='cinema'){
+    closeMenu();
+    toggleTheatre(true);
+
+  }else if(action==='focus'){
+    toggleFocus();
+
+  }else if(action==='lock'){
+    lockSession();
+
+  }else if(action==='refresh'){
+    closeMenu();
+    loadTargetScript(true);
+
+  }else if(action==='theme'){
+    cycleTheme();
+
+  }else if(action==='shortcuts'){
+    closeMenu();
+
+    showToast(
+      'Shortcuts',
+      '/ or Ctrl+K: Search  ·  Ctrl+R: Sync  ·  Esc: Close'
+    );
+  }
+}
+
+const savedTheme=storageGet('talhaTheme','violet');
+
+document.getElementById('themePicker').value=savedTheme;
+changeTheme(savedTheme);
+
+const noticeBox=
+  document.getElementById('maintenanceNotice');
+
+if(SHOW_MAINTENANCE_MSG){
+  noticeBox.style.display='flex';
+}
+
+if(
+  (navigator.connection&&navigator.connection.saveData)||
+  ((navigator.deviceMemory||8)<=2)||
+  (
+    window.innerWidth<600&&
+    navigator.hardwareConcurrency&&
+    navigator.hardwareConcurrency<=4
+  )
+){
+  document.body.classList.add('low-power');
+}
+
+const pCount=
+  document.body.classList.contains('low-power')
+    ?0
+    :(window.innerWidth<600?12:30);
+
+for(let i=0;i<pCount;i++){
+  const d=document.createElement('div');
+
+  d.className='p';
+  d.style.left=Math.random()*100+'%';
+  d.style.animationDuration=(14+Math.random()*12)+'s';
+
+  document.getElementById('particles')
+    .appendChild(d);
+}
+
+document.getElementById('authWrap')
+  .classList.add('visible');
+
+renderStaticChannels();
+updateNetwork();
+updateAnalytics();
+
+document.getElementById('loginBtn')
+  .addEventListener('click',login);
+
+document.getElementById('password')
+  .addEventListener('keydown',e=>{
+    if(e.key==='Enter')login();
+  });
+
+document.getElementById('theatreBtn')
+  .addEventListener('click',()=>toggleTheatre(true));
+
+document.getElementById('theatreTextBtn')
+  .addEventListener('click',()=>toggleTheatre(true));
+
+document.getElementById('exitTheatre')
+  .addEventListener('click',()=>toggleTheatre(false));
+
+document.getElementById('refreshFeedBtn')
+  .addEventListener('click',()=>loadTargetScript(true));
+
+document.getElementById('favoriteFilterBtn')
+  .addEventListener('click',showFavorites);
+
+document.getElementById('menuBtn')
+  .addEventListener('click',openMenu);
+
+document.getElementById('menuTextBtn')
+  .addEventListener('click',openMenu);
+
+document.getElementById('closeMenuBtn')
+  .addEventListener('click',closeMenu);
+
+document.getElementById('menuBackdrop')
+  .addEventListener('click',closeMenu);
+
+document.querySelectorAll('.menu-item').forEach(btn=>{
+  btn.addEventListener(
+    'click',
+    ()=>handleMenuAction(btn.dataset.action)
+  );
+});
+
+document.getElementById('themePicker')
+  .addEventListener(
+    'change',
+    e=>changeTheme(e.target.value)
+  );
+
+function doClearSearch(){
+  const i=document.getElementById('searchChannels');
+
+  i.value='';
+  i.focus();
+
+  currentLeague='all';
+
+  renderLeagueTabs();
+  renderMatches();
+}
+
+document.getElementById('clearSearchBtn')
+  .addEventListener('click',doClearSearch);
+
+document.getElementById('clearSearchBtn2')
+  .addEventListener('click',doClearSearch);
+
+document.getElementById('searchChannels')
+  .addEventListener('input',()=>{
+    clearTimeout(searchTimer);
+
+    searchTimer=setTimeout(
+      renderMatches,
+      SEARCH_DELAY
+    );
+  });
+
+window.addEventListener('online',()=>{
+  updateNetwork();
+
+  if(
+    document.getElementById('appShell').style.display!=='none'&&
+    !liveEvents.length
+  ){
+    loadTargetScript(true);
+  }
+});
+
+window.addEventListener('offline',updateNetwork);
+
+window.addEventListener('keydown',e=>{
+  const tag=document.activeElement?.tagName||'';
+
+  if(
+    e.key==='/'&&
+    tag!=='INPUT'&&
+    tag!=='TEXTAREA'
+  ){
+    e.preventDefault();
+
+    document.getElementById('searchChannels').focus();
+  }
+
+  if(
+    (e.ctrlKey||e.metaKey)&&
+    e.key.toLowerCase()==='k'
+  ){
+    e.preventDefault();
+
+    document.getElementById('searchChannels')?.focus();
+  }
+
+  if(e.key==='Escape'){
+    if(document.body.classList.contains('theatre')){
+      toggleTheatre(false);
+    }else{
+      closeMenu();
+    }
+  }
+
+  if(
+    e.key.toLowerCase()==='r'&&
+    (e.ctrlKey||e.metaKey)
+  ){
+    e.preventDefault();
+
+    if(
+      document.getElementById('appShell')
+        .style.display!=='none'
+    ){
+      loadTargetScript(true);
+    }
+  }
+});
+
+initDOMTranslator();
+</script>
+
+</body>
+</html>
