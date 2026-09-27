@@ -1035,51 +1035,50 @@ updateNetwork();
 updateClock();
 setInterval(updateClock,1000);
 updateAnalytics();
-    
-// 1. Prevent Right Click & Key Shortcuts
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => {
-  // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+S
-  if (
-    e.keyCode === 123 || 
-    (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
-    (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83))
-  ) {
-    e.preventDefault();
-    e.stopPropagation();
-    return false;
-  }
-});
 
-// 2. Anti-Iframe Protection (Frame-Busting)
-if (window.top !== window.self) {
-  try {
-    // Apnar main domain chara onno kothao iframe hole redirect korbe
-    if (window.top.location.host !== window.location.host) {
-      window.top.location.href = window.self.location.href;
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  // 1. Prevent Right Click & Key Shortcuts
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    if (
+      e.key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'i', 'j', 'c'].includes(e.key)) ||
+      (e.ctrlKey && ['u', 'U', 's', 'S'].includes(e.key))
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
     }
-  } catch (e) {
-    // Cross-origin iframe hole frame-ke blank kore dibe
-    document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:20%;'>Access Denied! Iframe Embedding Prohibited.</h1>";
+  });
+
+  // 2. Safe Anti-Iframe Protection
+  if (window.top !== window.self) {
+    try {
+      if (window.top.location.hostname !== window.location.hostname) {
+        window.top.location.href = window.self.location.href;
+      }
+    } catch (err) {
+      if (document.body) {
+        document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:20%;'>Access Denied! Iframe Embedding Prohibited.</h1>";
+      }
+    }
   }
-}
 
-// 3. Ultra DevTools & Extension Detector Loop
-(function() {
-  const killPage = () => {
-    document.body.innerHTML = "<div style='background:#000;color:#ff0000;height:100vh;display:flex;justify-content:center;align-items:center;font-family:sans-serif;'><h2>DevTools / Stealer Detected! Access Blocked.</h2></div>";
-  };
-
-  // Debugger trap
+  // 3. DevTools Detector Trap
   setInterval(() => {
     const start = performance.now();
     (function() {}["constructor"]("debugger")());
     const end = performance.now();
     if (end - start > 100) {
-      killPage();
+      if (document.body) {
+        document.body.innerHTML = "<div style='background:#000;color:#ff0000;height:100vh;display:flex;justify-content:center;align-items:center;font-family:sans-serif;'><h2>DevTools Detected! Access Blocked.</h2></div>";
+      }
     }
   }, 500);
-})();
+
+});
 </script>
 </body>
 </html>
