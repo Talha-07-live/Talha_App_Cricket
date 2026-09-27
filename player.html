@@ -2163,9 +2163,6 @@ function startAutoplayRetries(){
   scheduleAutoplay(900);
   scheduleAutoplay(1600);
   scheduleAutoplay(2600);
-  scheduleAutoplay(4200);
-  scheduleAutoplay(6500);
-  scheduleAutoplay(9000);
 
 }
 
@@ -2401,21 +2398,6 @@ function bindCurrentVideo(
     hidePoster();
     hideLoadingIndicator();
     applyVideoFilters();
-    clearAutoplayTimers();
-
-  };
-
-  const handleWaiting=()=>{
-
-    showLoadingIndicator();
-    scheduleAutoplay(350);
-
-  };
-
-  const handleStalled=()=>{
-
-    showLoadingIndicator();
-    scheduleAutoplay(650);
 
   };
 
@@ -2457,18 +2439,6 @@ function bindCurrentVideo(
   );
 
   video.addEventListener(
-    'waiting',
-    handleWaiting,
-    {passive:true}
-  );
-
-  video.addEventListener(
-    'stalled',
-    handleStalled,
-    {passive:true}
-  );
-
-  video.addEventListener(
     'timeupdate',
     handleTimeUpdate,
     {passive:true}
@@ -2496,16 +2466,6 @@ function bindCurrentVideo(
       video.removeEventListener(
         'playing',
         handlePlaying
-      );
-
-      video.removeEventListener(
-        'waiting',
-        handleWaiting
-      );
-
-      video.removeEventListener(
-        'stalled',
-        handleStalled
       );
 
       video.removeEventListener(
@@ -3254,23 +3214,6 @@ async function resolveCinemaSource(
     return null;
   }
 
-  const controller=
-    typeof AbortController!=='undefined'
-      ? new AbortController()
-      : null;
-
-  const timer=
-    controller
-      ? setTimeout(
-          ()=>{
-            try{
-              controller.abort();
-            }catch(e){}
-          },
-          3500
-        )
-      : null;
-
   try{
 
     const response=
@@ -3289,11 +3232,7 @@ async function resolveCinemaSource(
             Language:'en',
             Token:'',
             VideoId:videoId
-          }),
-          signal:
-            controller
-              ? controller.signal
-              : undefined
+          })
         }
       );
 
@@ -3307,16 +3246,9 @@ async function resolveCinemaSource(
         data.URL
       ){
 
-        const source=
-          String(
-            data.URL
-          ).trim();
-
-        return /\.m3u8(?:$|[?#])/i.test(
-          source
-        )
-          ? source
-          : null;
+        return String(
+          data.URL
+        ).trim();
 
       }
 
@@ -3324,23 +3256,10 @@ async function resolveCinemaSource(
 
   }catch(e){
 
-    if(
-      e &&
-      e.name!=='AbortError'
-    ){
-
-      console.warn(
-        'Cinema source request failed:',
-        e
-      );
-
-    }
-
-  }finally{
-
-    if(timer){
-      clearTimeout(timer);
-    }
+    console.error(
+      'Cinema source request failed:',
+      e
+    );
 
   }
 
@@ -3348,97 +3267,6 @@ async function resolveCinemaSource(
 
 }
 
-async function resolveFastBaseSource(
-  baseurls,
-  streamPath,
-  timeoutMs=2400
-){
-
-  if(
-    !Array.isArray(baseurls) ||
-    !streamPath
-  ){
-    return null;
-  }
-
-  const checks=
-    baseurls.map(
-      (base,index)=>{
-        const target=
-          base+
-          streamPath;
-
-        const controller=
-          typeof AbortController!=='undefined'
-            ? new AbortController()
-            : null;
-
-        const timer=
-          controller
-            ? setTimeout(
-                ()=>{
-                  try{
-                    controller.abort();
-                  }catch(e){}
-                },
-                timeoutMs
-              )
-            : null;
-
-        const request=
-          fetch(
-            target,
-            {
-              method:'GET',
-              mode:'cors',
-              cache:'no-store',
-              credentials:'omit',
-              signal:
-                controller
-                  ? controller.signal
-                  : undefined
-            }
-          )
-          .then(
-            response=>{
-              if(!response.ok){
-                throw new Error(
-                  'HTTP '+response.status
-                );
-              }
-
-              return{
-                index,
-                source:target
-              };
-
-            }
-          )
-          .finally(
-            ()=>{
-              if(timer){
-                clearTimeout(timer);
-              }
-            }
-          );
-
-        return request;
-      }
-    );
-
-  try{
-
-    return await Promise.any(
-      checks
-    );
-
-  }catch(e){
-
-    return null;
-
-  }
-
-}
 class StreamPlayer{
 
   constructor(){
@@ -3511,132 +3339,58 @@ class StreamPlayer{
 
     }else{
 
-      const inputId=
-        extractIdFromUrl(
+      this.feedSource=
+        await resolveFeedSource(
           this.input
         );
 
-      this.streamPath=
-        this.getStreamPath(
-          inputId
-        );
-
-      const feedPromise=
-        resolveFeedSource(
-          this.input
+      if(
+        this.feedSource &&
+        /\.m3u8(?:$|[?#])/i.test(
+          this.feedSource
         )
-        .then(
-          source=>{
-            this.feedSource=source;
-
-            return(
-              source &&
-              /\.m3u8(?:$|[?#])/i.test(
-                source
-              )
-            )
-              ? source
-              : null;
-          }
-        )
-        .catch(
-          ()=>null
-        );
-
-      const cinemaPromise=
-        resolveCinemaSource(
-          inputId
-        ).catch(
-          ()=>null
-        );
-
-      const basePromise=
-        resolveFastBaseSource(
-          this.baseurls,
-          this.streamPath,
-          2400
-        );
-
-      let winner=null;
-
-      const sourceRace=
-        Promise.any([
-          feedPromise,
-          cinemaPromise,
-          basePromise
-            .then(
-              result=>
-                result
-                  ? result.source
-                  : Promise.reject(
-                      new Error(
-                        'No base source'
-                      )
-                    )
-            )
-        ]).catch(
-          ()=>null
-        );
-
-      try{
-
-        winner=
-          await Promise.race([
-            sourceRace,
-            new Promise(
-              resolve=>{
-                setTimeout(
-                  ()=>{
-                    resolve(null);
-                  },
-                  4200
-                );
-              }
-            )
-          ]);
-
-      }catch(e){
-
-        winner=null;
-
-      }
-
-      if(winner){
+      ){
 
         this.source=
-          winner;
+          this.feedSource;
 
-        const baseIndex=
-          this.baseurls.findIndex(
-            base=>
-              base+
-              this.streamPath===
-              winner
-          );
-
-        if(baseIndex>=0){
-
-          this.currentBaseIndex=
-            baseIndex;
-
-          this.directSource=null;
-
-        }else{
-
-          this.currentBaseIndex=-1;
-          this.directSource=
-            winner;
-
-        }
+        this.directSource=
+          this.feedSource;
 
       }else{
 
-        this.currentBaseIndex=0;
+        const id=
+          extractIdFromUrl(
+            this.feedSource||
+            this.input
+          );
 
-        this.source=
-          this.streamPath
-            ? this.buildSource()
-            : null;
+        const cinema=
+          await resolveCinemaSource(
+            id
+          );
+
+        if(cinema){
+
+          this.source=
+            cinema;
+
+          this.directSource=
+            cinema;
+
+        }else{
+
+          this.streamPath=
+            this.getStreamPath(
+              id
+            );
+
+          this.source=
+            this.streamPath
+              ? this.buildSource()
+              : null;
+
+        }
 
       }
 
@@ -3689,8 +3443,10 @@ class StreamPlayer{
 
     if(
       this.streamPath &&
-      !this.source
+      !this.directSource
     ){
+
+      await this.resolveWorkingBase();
 
       this.source=
         this.buildSource();
@@ -3788,7 +3544,7 @@ class StreamPlayer{
                 controller.abort();
               }catch(e){}
             },
-            2400
+            5000
           )
         : null;
 
@@ -3824,59 +3580,6 @@ class StreamPlayer{
 
   }
 
-  async resolveWorkingBase(){
-
-    if(!this.streamPath){
-
-      this.currentBaseIndex=0;
-
-      return false;
-
-    }
-
-    const checks=
-      this.baseurls.map(
-        (_,index)=>
-          this.checkBase(
-            index
-          ).then(
-            ok=>({
-              ok,
-              index
-            })
-          )
-          .catch(
-            ()=>({
-              ok:false,
-              index
-            })
-          )
-      );
-
-    const results=
-      await Promise.all(
-        checks
-      );
-
-    const working=
-      results.find(
-        item=>item.ok
-      );
-
-    if(working){
-
-      this.currentBaseIndex=
-        working.index;
-
-      return true;
-
-    }
-
-    this.currentBaseIndex=0;
-
-    return false;
-
-  }
   initPlayer(){
 
     if(
@@ -4035,29 +3738,17 @@ class StreamPlayer{
 
         hlsjsConfig:{
 
-          liveSyncDurationCount:3,
+          liveSyncDurationCount:4,
 
-          liveMaxLatencyDurationCount:5,
+          maxMaxBufferLength:30,
 
-          liveDurationInfinity:true,
+          levelLoadingMaxRetry:5,
 
-          maxMaxBufferLength:24,
+          fragLoadingMaxRetry:6,
 
-          startFragPrefetch:true,
+          liveMaxLatencyDurationCount:6,
 
-          manifestLoadingMaxRetry:4,
-
-          manifestLoadingRetryDelay:500,
-
-          levelLoadingMaxRetry:4,
-
-          levelLoadingRetryDelay:500,
-
-          fragLoadingMaxRetry:5,
-
-          fragLoadingRetryDelay:500,
-
-          maxLoadingDelay:4
+          liveDurationInfinity:true
 
         },
 
@@ -4679,17 +4370,9 @@ class StreamPlayer{
 
   handlePlaybackError(){
 
-    if(
-      !this.switchToNextBase(
-        'playback error'
-      )
-    ){
-
-      scheduleAutoplay(450);
-      scheduleAutoplay(1200);
-      scheduleAutoplay(2500);
-
-    }
+    this.switchToNextBase(
+      'playback error'
+    );
 
   }
 
@@ -4733,19 +4416,7 @@ class StreamPlayer{
         newSource
       );
 
-      const restart=
-        this.player.play();
-
-      if(
-        restart &&
-        typeof restart.catch==='function'
-      ){
-
-        restart.catch(
-          ()=>{}
-        );
-
-      }
+      this.player.play();
 
     }catch(e){
 
