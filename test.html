@@ -268,6 +268,61 @@ body.menu-open{overflow:hidden}.focus-mode .channels-panel,.focus-mode .status-s
 <script>
 'use strict';
 
+/* =========================================================
+   ULTRA ADVANCED PROTECTION & SECURITY SUITE
+   ========================================================= */
+(function() {
+  // 1. Anti Right Click
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+  }, true);
+
+  // 2. Anti Keyboard Shortcuts (F12, DevTools, View Source, Save)
+  document.addEventListener('keydown', function(e) {
+    const isInput = ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+    if (
+      e.keyCode === 123 || // F12
+      (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || // Ctrl+Shift+I/J/C
+      (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83 || (e.keyCode === 65 && !isInput))) || // Ctrl+U/S/A
+      (e.metaKey && e.altKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 85)) // macOS CMD+Alt+I/J/U
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }, true);
+
+  // 3. Disable Text Selection & Dragging
+  document.addEventListener('selectstart', function(e) {
+    if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) e.preventDefault();
+  }, true);
+  document.addEventListener('dragstart', function(e) { e.preventDefault(); }, true);
+
+  // 4. Anti-DevTools Debugger Loop
+  function detectDevTools() {
+    const start = performance.now();
+    (function() {}.constructor("debugger")());
+    const end = performance.now();
+    if (end - start > 100) {
+      document.body.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100vh;background:#020206;color:#ff3d71;font-family:sans-serif;font-weight:bold;font-size:24px;'>Access Restricted: Developer Tools Detected</div>";
+    }
+  }
+  setInterval(detectDevTools, 500);
+
+  // 5. Console Cleaver & Override
+  try {
+    const noop = function() {};
+    ['log', 'warn', 'error', 'info', 'debug', 'trace', 'dir', 'table'].forEach(function(m) {
+      window.console[m] = noop;
+    });
+    setInterval(function() { console.clear(); }, 1000);
+  } catch(e) {}
+})();
+
+/* =========================================================
+   APPLICATION CORE LOGIC
+   ========================================================= */
 const CUSTOM_TOP_FEEDS = [];
 const SHOW_MAINTENANCE_MSG = false;
 const PASSWORD = "Talha";
@@ -997,7 +1052,7 @@ window.addEventListener('keydown',e=>{
   if(e.key==='/'&&tag!=='INPUT'&&tag!=='TEXTAREA'&&tag!=='SELECT'){e.preventDefault();document.getElementById('searchChannels').focus()}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();document.getElementById('searchChannels')?.focus()}
   if(e.key==='Escape'){if(document.getElementById('mainCard').classList.contains('theatre-active'))toggleTheatre(false);else closeMenu();}
-  if(e.key.toLowerCase()==='r'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(!document.body.classList.contains('auth-locked'))loadTargetScript(true)}
+  if(e.key.toLowerCase()==='r'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(!document.getElementById('body').classList?.contains('auth-locked'))loadTargetScript(true)}
 });
 
 initDOMTranslator();
@@ -1035,50 +1090,6 @@ updateNetwork();
 updateClock();
 setInterval(updateClock,1000);
 updateAnalytics();
-
-
-document.addEventListener('DOMContentLoaded', function() {
-
-  // 1. Prevent Right Click & Key Shortcuts
-  document.addEventListener('contextmenu', e => e.preventDefault());
-  document.addEventListener('keydown', e => {
-    if (
-      e.key === 'F12' ||
-      (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'i', 'j', 'c'].includes(e.key)) ||
-      (e.ctrlKey && ['u', 'U', 's', 'S'].includes(e.key))
-    ) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }
-  });
-
-  // 2. Safe Anti-Iframe Protection
-  if (window.top !== window.self) {
-    try {
-      if (window.top.location.hostname !== window.location.hostname) {
-        window.top.location.href = window.self.location.href;
-      }
-    } catch (err) {
-      if (document.body) {
-        document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:20%;'>Access Denied! Iframe Embedding Prohibited.</h1>";
-      }
-    }
-  }
-
-  // 3. DevTools Detector Trap
-  setInterval(() => {
-    const start = performance.now();
-    (function() {}["constructor"]("debugger")());
-    const end = performance.now();
-    if (end - start > 100) {
-      if (document.body) {
-        document.body.innerHTML = "<div style='background:#000;color:#ff0000;height:100vh;display:flex;justify-content:center;align-items:center;font-family:sans-serif;'><h2>DevTools Detected! Access Blocked.</h2></div>";
-      }
-    }
-  }, 500);
-
-});
 </script>
 </body>
 </html>
