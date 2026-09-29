@@ -92,47 +92,86 @@ footer{text-align:center;margin-top:20px;opacity:.2;font-size:11px}.fade{animati
 body.menu-open{overflow:hidden}.focus-mode .channels-panel,.focus-mode .status-strip,.focus-mode .analytics-panel,.focus-mode .utility-panel{display:none!important}.focus-mode .content-grid{display:block!important}.focus-mode .player-column{width:100%!important}.focus-mode .player-container{padding-top:55%!important;border-radius:18px}.focus-mode .card{max-width:1200px;width:96vw}.focus-mode .app-header{margin-bottom:10px}.menu-danger>span{color:#ff7a98}.menu-danger strong{color:#ff9aae}
 
 @media(max-width:600px){
-    body{padding:10px 8px;align-items:flex-start}
-    .card{border-radius:18px;padding:14px}
-    .app-header{align-items:flex-start}
-    .header-actions{flex-wrap:wrap;justify-content:flex-end}
-    .brand-mark{width:34px;height:34px}
-    .brand h1{font-size:17px}
-    .brand p{max-width:180px}
-    .theme-picker{max-width:100px}
-    .content-grid{display:flex;flex-direction:column;gap:12px}
+    body{padding:8px 6px;align-items:flex-start}
+    .card{border-radius:16px;padding:10px}
+    .app-header{align-items:center;gap:4px;margin-bottom:12px;min-width:0}
+    .brand{gap:7px;min-width:0;flex:1;overflow:hidden}
+    .brand-mark{width:28px;height:28px;border-radius:9px;font-size:15px}
+    .brand h1{font-size:14px;letter-spacing:-.35px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand p{display:none}
+    .header-actions{flex-wrap:nowrap!important;justify-content:flex-end;gap:4px;flex:0 0 auto;white-space:nowrap}
+    .theme-picker{width:clamp(58px,20vw,82px);min-width:58px;max-width:82px;height:32px;padding:7px 21px 7px 7px;border-radius:9px;font-size:9px;flex:0 0 auto}
+    .theme-picker{background-position:calc(100% - 10px) 50%,calc(100% - 6px) 50%,0 0;background-size:4px 4px,4px 4px,100% 100%}
+    .icon-btn{width:32px;min-width:32px;height:32px;padding:0;border-radius:9px;font-size:14px;flex:0 0 auto}
+    .content-grid{display:flex;flex-direction:column;gap:9px}
 
-    .player-column {
-        display: contents;
+    .player-column{display:contents}
+
+    .player-container{
+        position:sticky;
+        top:6px;
+        z-index:100;
+        width:100%;
+        padding-top:60%;
+        border-radius:11px;
+        box-shadow:0 14px 32px rgba(0,0,0,.8);
     }
 
-    .player-container {
-        position: sticky;
-        top: 10px;
-        z-index: 100;
-        border-radius: 12px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-    }
-
-    .channels-panel{width:100%;position:static;order:2;padding:11px}
+    .channels-panel{width:100%;position:static;order:2;padding:9px;border-radius:14px}
     .channel-tools .search-box{min-width:0}
-    .analytics-panel{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+    .search-box input{padding:9px 12px;border-radius:10px;font-size:11px}
+    .league-tabs{gap:5px;padding:6px 1px 5px}
+    .tab-btn{padding:8px 10px;border-radius:9px;font-size:10px}
+    .analytics-panel{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
     .analytics-panel .stat-card:first-child{grid-column:span 2}
-    .stat-card{flex:1;min-width:0;padding:10px;min-height:62px}
-    .stat-card span{font-size:9px}
-    .stat-card font{font-size:14px}
-    .stat-hint{font-size:7px}
-    .utility-panel{margin-top:6px}
+    .stat-card{flex:1;min-width:0;padding:8px;min-height:54px;border-radius:11px}
+    .stat-card span{font-size:8px}
+    .stat-card font{font-size:12px}
+    .stat-hint{font-size:6px;left:10px;bottom:6px}
+    .utility-panel{margin-top:5px}
     .card.theatre-active .channels-panel{display:none!important}
-    .status-strip{font-size:9px}
+    .status-strip{font-size:8px}
     .status-right{max-width:48%}
     .status-center{display:none}
-    .panel-heading h2{font-size:13px}
-    .player-tools{gap:10px}
-    .util-btn{font-size:10px}
+    .panel-heading{margin-bottom:8px}
+    .panel-heading h2{font-size:11px}
+    .panel-heading small{font-size:9px}
+    .panel-heading-actions{gap:5px}
+    .mini-btn{padding:5px 7px;font-size:9px;border-radius:8px}
+    .panel-subtitle{font-size:8px;margin-bottom:6px}
+    .recent-row{gap:5px;margin-bottom:8px}
+    .recent-chip{padding:5px 7px;font-size:8px;max-width:120px}
+    .servers{gap:5px;margin-top:8px;max-height:360px}
+    .servers .server-item{padding:8px 7px 8px 9px;border-radius:9px;font-size:10px;gap:7px}
+    .channel-main{gap:7px}
+    .channel-index{width:20px;height:20px;border-radius:6px;font-size:8px}
+    .channel-copy strong{font-size:10px}
+    .channel-copy small{font-size:8px;margin-top:2px}
+    .live-badge{gap:4px;font-size:8px;padding:3px 5px;border-radius:5px}
+    .live-dot{width:4px;height:4px}
+    .fav-toggle{font-size:14px;padding:1px}
+    .player-count-bar{gap:8px;padding:7px 8px;font-size:9px;margin-bottom:8px}
+    .pcb-item{gap:5px}
+    .player-tools{gap:8px}
+    .util-btn{font-size:9px;gap:4px}
     .quick-menu{width:94vw;padding-left:14px;padding-right:14px}
-    .menu-item{padding:10px 8px}
+    .menu-item{padding:9px 8px}
 }
+@media(max-width:360px){
+    .app-header{gap:3px}
+    .brand{gap:5px}
+    .brand-mark{width:26px;height:26px;font-size:14px}
+    .brand h1{font-size:13px}
+    .header-actions{gap:3px}
+    .theme-picker{width:58px;min-width:58px;padding-left:6px;padding-right:19px;font-size:8px}
+    .icon-btn{width:30px;min-width:30px;height:30px;font-size:13px}
+    .player-container{padding-top:62%}
+    .servers .server-item{padding:7px 6px 7px 8px}
+    .channel-copy strong{font-size:9.5px}
+    .channel-copy small{font-size:7.5px}
+    .live-badge{font-size:7.5px;padding:3px 4px}
+}
+
 </style>
 </head>
 
