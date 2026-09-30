@@ -3264,9 +3264,9 @@ async function resolveCinemaSource(id,timeout=3200){
 function getChecklistCandidates(id){
   const path=String(id||'')+'.m3u8';
   return [
-    'https://andro.evrenesoglu111.click/checklist/'+path,
     'https://andro.evrenesoglu121.click/checklist/'+path,
     'https://andro.evrenesoglu115.click/checklist/'+path,
+    'https://andro.evrenesoglu111.click/checklist/'+path,
     'https://andro.evrenesoglu113.click/checklist/'+path
   ];
 }
@@ -3390,9 +3390,9 @@ async function resolveFastDirectSource(input,id){
 function getChecklistCandidates(id){
   const path=String(id||'')+'.m3u8';
   return [
-    'https://andro.evrenesoglu111.click/checklist/'+path,
     'https://andro.evrenesoglu121.click/checklist/'+path,
     'https://andro.evrenesoglu115.click/checklist/'+path,
+    'https://andro.evrenesoglu111.click/checklist/'+path,
     'https://andro.evrenesoglu113.click/checklist/'+path
   ];
 }
@@ -3433,9 +3433,9 @@ class StreamPlayer{
     this.checklistTried=false;
     this.feedTried=false;
     this.baseurls=[
-      'https://andro.evrenesoglu111.click/checklist/',
       'https://andro.evrenesoglu121.click/checklist/',
       'https://andro.evrenesoglu115.click/checklist/',
+      'https://andro.evrenesoglu111.click/checklist/',
       'https://andro.evrenesoglu113.click/checklist/'
     ];
 
