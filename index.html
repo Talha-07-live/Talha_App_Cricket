@@ -56,6 +56,7 @@ html{
   min-height:100%;
   background:var(--page);
   scroll-behavior:smooth;
+  scrollbar-gutter:stable;
 }
 
 body{
@@ -65,6 +66,7 @@ body{
   align-items:center;
   overflow-x:hidden;
   overflow-y:auto;
+  overscroll-behavior-y:auto;
   color:#fff;
   padding:20px 10px;
   background:
@@ -435,6 +437,7 @@ body.low-power #particles{
 
 .channels-panel{
   min-width:0;
+  scroll-margin-top:16px;
   border:1px solid rgba(255,255,255,.07);
   background:rgba(0,0,0,.16);
   border-radius:18px;
@@ -787,6 +790,7 @@ input[type="password"]:focus{
 }
 
 .player-container{
+  scroll-margin-top:10px;
   position:sticky;
   top:15px;
   z-index:100;
@@ -1409,8 +1413,10 @@ footer{
   background:rgba(255,93,122,.055);
 }
 
-body.menu-open{
-  overflow:hidden;
+body.menu-open,
+html.scroll-locked,
+body.scroll-locked{
+  overflow:hidden!important;
 }
 
 .focus-mode .channels-panel,
@@ -2538,7 +2544,9 @@ Object.keys(translationDict).forEach(key=>{
   translationLookup.set(normalizeSearchText(key),translationDict[key]);
 });
 
-const translationKeys=Object.keys(translationLookup)
+const translationKeys=Object.keys(translationDict)
+  .map(key=>normalizeTurkishText(key))
+  .filter(Boolean)
   .sort((a,b)=>b.length-a.length)
   .map(escapeRegExp);
 
@@ -2550,24 +2558,37 @@ const translationRegex=translationKeys.length
   : null;
 
 function translateText(text){
-  if(!text)return "";
+  if(text===null || text===undefined)return "";
 
-  let str=normalizeTurkishText(text);
+  let str=normalizeTurkishText(String(text));
 
   if(translationRegex){
     translationRegex.lastIndex=0;
+
     str=str.replace(
       translationRegex,
       (full,prefix,match)=>{
-        const replacement=translationLookup.get(normalizeSearchText(match));
-        if(!replacement)return full;
+        const replacement=
+          translationLookup.get(
+            normalizeSearchText(match)
+          );
 
-        if(match===match.toUpperCase()){
+        if(!replacement){
+          return full;
+        }
+
+        const matchText=String(match);
+        const upper=matchText.toUpperCase();
+        const first=matchText.charAt(0);
+
+        if(matchText===upper){
           return prefix+replacement.toUpperCase();
         }
 
-        if(match[0]===match[0].toUpperCase()){
-          return prefix+replacement.charAt(0).toUpperCase()+replacement.slice(1);
+        if(first && first===first.toUpperCase()){
+          return prefix+
+            replacement.charAt(0).toUpperCase()+
+            replacement.slice(1);
         }
 
         return prefix+replacement;
@@ -4291,6 +4312,26 @@ function login(){
   );
 }
 
+let __savedScrollY=0;
+
+function setPageScrollLocked(locked){
+  const html=document.documentElement;
+  const body=document.body;
+  const scroller=document.scrollingElement||html;
+
+  if(locked){
+    __savedScrollY=scroller.scrollTop||window.scrollY||0;
+    html.classList.add("scroll-locked");
+    body.classList.add("scroll-locked");
+  }else{
+    html.classList.remove("scroll-locked");
+    body.classList.remove("scroll-locked");
+    requestAnimationFrame(()=>{
+      scroller.scrollTop=__savedScrollY;
+    });
+  }
+}
+
 function toggleTheatre(status){
   const card=
     document.getElementById(
@@ -4310,8 +4351,7 @@ function toggleTheatre(status){
     exitBtn.style.display=
       "block";
 
-    document.documentElement.style.overflow=
-      "hidden";
+    setPageScrollLocked(true);
   }else{
     card.classList.remove(
       "theatre-active"
@@ -4320,8 +4360,7 @@ function toggleTheatre(status){
     exitBtn.style.display=
       "none";
 
-    document.documentElement.style.overflow=
-      "";
+    setPageScrollLocked(false);
   }
 }
 
@@ -4430,13 +4469,61 @@ function closeMenu(){
   }
 }
 
-function scrollToChannels(){
-  document
-    .querySelector(".channels-panel")
-    ?.scrollIntoView({
-      behavior:"smooth",
-      block:"start"
+let __scrollAnimationId=0;
+
+function scrollToElementStable(element,offset=12,block="start"){
+  if(!element)return;
+
+  const scroller=document.scrollingElement||document.documentElement;
+  const currentY=scroller.scrollTop||window.scrollY||0;
+  const rect=element.getBoundingClientRect();
+
+  let targetY=currentY+rect.top-offset;
+
+  if(block==="center"){
+    targetY=currentY+rect.top-
+      Math.max(0,(window.innerHeight-rect.height)/2);
+  }
+
+  const maxY=Math.max(
+    0,
+    scroller.scrollHeight-window.innerHeight
+  );
+
+  const finalY=Math.max(0,Math.min(maxY,targetY));
+
+  cancelAnimationFrame(__scrollAnimationId);
+  __scrollAnimationId=requestAnimationFrame(()=>{
+    scroller.scrollTo({
+      top:finalY,
+      behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth"
     });
+  });
+}
+
+function scrollToChannels(){
+  const panel=document.querySelector(".channels-panel");
+
+  if(!panel)return;
+
+  requestAnimationFrame(()=>{
+    const mobile=window.innerWidth<=600;
+    const player=document.querySelector(".player-container");
+    const playerHeight=
+      mobile && player
+        ? player.getBoundingClientRect().height
+        : 0;
+
+    scrollToElementStable(
+      panel,
+      mobile
+        ? Math.min(playerHeight+14,window.innerHeight*0.7)
+        : 16,
+      "start"
+    );
+  });
 }
 
 function showFavorites(){
@@ -4680,12 +4767,12 @@ function toggleFocus(){
       "focus-mode"
     )
   ){
-    document.getElementById(
-      "mainCard"
-    )?.scrollIntoView({
-      behavior:"smooth",
-      block:"center"
-    });
+    const mainCard=document.getElementById("mainCard");
+    if(mainCard){
+      requestAnimationFrame(()=>{
+        scrollToElementStable(mainCard,0,"center");
+      });
+    }
   }
 }
 
@@ -4744,14 +4831,13 @@ function handleMenuAction(action){
   if(action==="recent"){
     closeMenu();
 
-    document
-      .getElementById(
+    scrollToElementStable(
+      document.getElementById(
         "recentSection"
-      )
-      ?.scrollIntoView({
-        behavior:"smooth",
-        block:"center"
-      });
+      ),
+      16,
+      "center"
+    );
 
     return;
   }
