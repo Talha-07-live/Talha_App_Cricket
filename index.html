@@ -390,6 +390,7 @@ let realtimeSyncTimer = null;
 let currentPlayingKey = null;
 let currentPlayingUrl = '';
 let currentPlayingTitle = '';
+let feedLoaderFrame = null;
 
 const translationDict = {"motor sporları":"Motorsports","motor sporlari":"Motorsports","hazırlık maçı":"Friendly Match","hazirlik maci":"Friendly Match","paris basketball":"Paris Basketball","şampiyonlar ligi":"Champions League","sampiyonlar ligi":"Champions League","avrupa ligi":"Europa League","konferans ligi":"Conference League","milletler ligi":"Nations League","dünya kupası":"World Cup","dunya kupasi":"World Cup","avrupa şampiyonası":"European Championship","avrupa sampiyonasi":"European Championship","süper lig":"Super League","super lig":"Super League","1. lig":"1st Division","2. lig":"2nd Division","füchse berlin":"Fuchse Berlin","fuchse berlin":"Fuchse Berlin","as monaco":"AS Monaco","lnb pro a final":"LNB Pro A Final","masa tenisi":"Table Tennis","amerikan futbolu":"American Football","buz hokeyi":"Ice Hockey","at yarışı":"Horse Racing","at yarisi":"Horse Racing","su topu":"Water Polo","maç özeti":"Match Highlights","mac ozeti":"Match Highlights","suudi arabistan":"Saudi Arabia","güney kore":"South Korea","guney kore":"South Korea","çeyrek final":"Quarter-Final","ceyrek final":"Quarter-Final","yarı final":"Semi-Final","yari final":"Semi-Final","grup maçı":"Group Stage","grup maci":"Group Stage","hafta sonu":"Weekend","hafta içi":"Weekday","hafta ici":"Weekday","voleybol":"Volleyball","basketbol":"Basketball","futbol":"Football","hentbol":"Handball","tenis":"Tennis","dövüş":"Fighting","dovus":"Fighting","bisiklet":"Cycling","yüzme":"Swimming","yuzme":"Swimming","boks":"Boxing","güreş":"Wrestling","gures":"Wrestling","futsal":"Futsal","espor":"E-Sports","e-spor":"E-Sports","erkekler":"Men's","kadınlar":"Women's","kadinlar":"Women's","erkek":"Men","kadın":"Women","kadin":"Women","gençler":"Youth","gencler":"Youth","hazırlık":"Friendly","hazirlik":"Friendly","canlı":"LIVE","canli":"LIVE","yayın":"Broadcast","yayin":"Broadcast","yayında":"On Air","yayinda":"On Air","finali":"Final","final":"Final","kupa":"Cup","kupası":"Cup","kupasi":"Cup","eleme":"Qualifier","elemeleri":"Qualifiers","özet":"Highlights","ozet":"Highlights","maçı":"Match","maci":"Match","maç":"Match","mac":"Match","takımı":"Team","takimi":"Team","hafta":"Week","tur":"Round","etap":"Stage","devre":"Half","uzatmalar":"Extra Time","penaltılar":"Penalties","penaltilar":"Penalties","ertelendi":"Postponed","iptal":"Canceled","türkiye":"Turkey","turkiye":"Turkey","türk":"Turkish","turk":"Turkish","İngiltere":"England","ingiltere":"England","ispanya":"Spain","italya":"Italy","almanya":"Germany","fransa":"France","hollanda":"Netherlands","portekiz":"Portugal","rusya":"Russia","yunanistan":"Greece","belçika":"Belgium","belcika":"Belgium","avusturya":"Austria","danimarka":"Denmark","İsveç":"Sweden","isvec":"Sweden","İsviçre":"Switzerland","isvicre":"Switzerland","brezilya":"Brazil","arjantin":"Argentina","Çekya":"Czechia","polonya":"Poland","japonya":"Japan","çin":"China","cin":"China","avustralya":"Australia","hırvatistan":"Croatia","hirvatistan":"Croatia","sırbistan":"Serbia","sirbistan":"Serbia","romanya":"Romania","macaristan":"Hungary","ukrayna":"Ukraine","mısır":"Egypt","misir":"Egypt","fas":"Morocco","cezayir":"Algeria","kanada":"Canada","meksika":"Mexico","şili":"Chile","sili":"Chile","kolombiya":"Colombia","uruguay":"Uruguay","paraguay":"Paraguay","curaçao":"Curacao","curaca":"Curacao","galatasaray":"Galatasaray","fenerbahçe":"Fenerbahce","fenerbahce":"Fenerbahce","beşiktaş":"Besiktas","besiktas":"Besiktas","trabzonspor":"Trabzonspor","başakşehir":"Basaksehir","basaksehir":"Basaksehir","barcelona":"Barcelona","real madrid":"Real Madrid","bugün":"Today","bugun":"Today","yarın":"Tomorrow","yarin":"Tomorrow","dün":"Yesterday","dun":"Yesterday","saat":"Time","dakika":"min","saniye":"sec","bakım":"Maintenance","bakim":"Maintenance","sunucu":"Server","bağlantı":"Connection","baglanti":"Connection","yedek":"Backup", "Uluslar":"National", "Ligi":"League"};
 
@@ -1270,87 +1271,69 @@ function loadTargetScript(force=false,reason='manual'){
 
   if(navigator.onLine===false){
     const cached=loadCachedFeed();
-    if(!cached){
-      feedError('You are offline and no cached feed is available yet.');
-    }else{
-      showToast('Offline mode', 'Showing the last available feed until the connection returns.');
-    }
+    if(!cached)feedError('You are offline and no cached feed is available yet.');
+    else if(reason!=='realtime'&&reason!=='visibility')showToast('Offline mode','Showing the last available feed until the connection returns.');
     return;
   }
 
   const now=Date.now();
-  if(!force && liveEvents.length && (now-lastSyncAttemptAt)<ONLINE_SYNC_COOLDOWN_MS)return;
-  lastSyncAttemptAt=now;
+  if(!force&&!liveEvents.length&&(now-lastSyncAttemptAt)<ONLINE_SYNC_COOLDOWN_MS)return;
+  if(!force&&liveEvents.length&&(now-lastSyncAttemptAt)<ONLINE_SYNC_COOLDOWN_MS)return;
 
+  lastSyncAttemptAt=now;
   const requestToken=++feedRequestToken;
   feedBusy=true;
+
   const silentBackground=reason==='realtime'||reason==='visibility';
   if(!silentBackground)setStatus(reason==='online'?'Connection restored · syncing…':'Syncing live feeds…','busy');
   if(!silentBackground)setSync('Connecting…');
 
-  const container=document.getElementById('serverContainer');
-  if(container && !liveEvents.length){
-    container.innerHTML='<p style="color:rgba(255,255,255,.4);text-align:center;font-size:13px;padding:30px">Syncing system satellite channels…</p>';
+  if(feedLoaderFrame){
+    try{feedLoaderFrame.remove()}catch(e){}
+    feedLoaderFrame=null;
   }
 
-  const old=document.getElementById('mahsunScript');
-  if(old)old.remove();
-
-  try{delete window.karsilasmalar}catch(e){window.karsilasmalar=undefined}
-
-  const script=document.createElement('script');
-  script.id='mahsunScript';
-  script.async=true;
-  script.src=FEED_URL+'?v='+Date.now();
+  const loader=document.createElement('iframe');
+  const nonce=`talha_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  loader.setAttribute('aria-hidden','true');
+  loader.setAttribute('tabindex','-1');
+  loader.style.cssText='position:fixed;left:-10000px;top:-10000px;width:1px;height:1px;border:0;opacity:0;pointer-events:none;';
+  feedLoaderFrame=loader;
 
   let settled=false;
-  const isCurrent=()=>requestToken===feedRequestToken;
+  let timeoutId=null;
+  let probeTimer=null;
 
-  const timeout=setTimeout(()=>{
-    if(settled||!isCurrent())return;
-    settled=true;
-    feedBusy=false;
-    script.remove();
-    if(reason==='realtime'||reason==='visibility'){
-      feedBusy=false;
-      setStatus(navigator.onLine===false?'Offline mode · network unavailable':'System ready',navigator.onLine===false?'offline':'ready');
-      return;
-    }
-    feedError('Feed server did not respond in time.');
-  },FEED_TIMEOUT);
-
-  script.onerror=()=>{
-    if(settled||!isCurrent())return;
-    settled=true;
-    clearTimeout(timeout);
-    feedBusy=false;
-    script.remove();
-    if(reason==='realtime'||reason==='visibility'){
-      setStatus(navigator.onLine===false?'Offline mode · network unavailable':'System ready',navigator.onLine===false?'offline':'ready');
-      return;
-    }
-    feedError('Feed server is unavailable right now.');
+  const cleanup=()=>{
+    clearTimeout(timeoutId);
+    clearTimeout(probeTimer);
+    if(feedLoaderFrame===loader)feedLoaderFrame=null;
+    try{loader.remove()}catch(e){}
   };
 
-  script.onload=()=>{
-    if(settled||!isCurrent())return;
+  const finishError=(message)=>{
+    if(settled||requestToken!==feedRequestToken)return;
     settled=true;
-    clearTimeout(timeout);
     feedBusy=false;
+    cleanup();
+    if(silentBackground){
+      setStatus(navigator.onLine===false?'Offline mode · network unavailable':'System ready',navigator.onLine===false?'offline':'ready');
+      return;
+    }
+    feedError(message);
+  };
+
+  const processFeed=(payload)=>{
+    if(settled||requestToken!==feedRequestToken)return;
+    settled=true;
+    feedBusy=false;
+    cleanup();
 
     try{
-      let tempEvents=[];
+      const received=payload&&Array.isArray(payload.events)?payload.events:[];
+      if(!received.length)throw new Error('Feed Vector Missing');
 
-      if(typeof karsilasmalar!=='undefined'&&Array.isArray(karsilasmalar)){
-        tempEvents.push(...karsilasmalar);
-      }
-
-      if(typeof futbolMatches!=='undefined'&&Array.isArray(futbolMatches)){
-        tempEvents.push(...futbolMatches);
-      }
-
-      if(!tempEvents.length)throw new Error('Feed Vector Missing');
-
+      const tempEvents=received.slice();
       tempEvents.sort((a,b)=>{
         const at=String(a?.time||'').toLowerCase();
         const bt=String(b?.time||'').toLowerCase();
@@ -1362,8 +1345,8 @@ function loadTargetScript(force=false,reason='manual'){
       const activeCustomFeeds=CUSTOM_TOP_FEEDS.filter(item=>item&&item.show===true);
       const nextEvents=[...activeCustomFeeds,...tempEvents];
       const previousEvents=Array.isArray(liveEvents)?liveEvents.slice():[];
-      const diff=diffFeedData(previousEvents,nextEvents);
       const firstFeed=previousEvents.length===0;
+      const diff=diffFeedData(previousEvents,nextEvents);
 
       liveEvents=nextEvents;
       migrateStoredEventState(liveEvents);
@@ -1379,22 +1362,67 @@ function loadTargetScript(force=false,reason='manual'){
       }
 
       cacheLiveFeed(liveEvents);
-
       setStatus('System ready','ready');
       setSync(`Synced ${formatSyncTime(lastSuccessfulFeedSync)}`);
 
       if(diff.total>0&&!firstFeed)showFeedChangePopup(diff);
       if(firstFeed&&!currentPlayingKey)triggerFirstStream();
     }catch(err){
-      if(reason==='realtime'||reason==='visibility'){
-        setStatus(navigator.onLine===false?'Offline mode · network unavailable':'System ready',navigator.onLine===false?'offline':'ready');
-        return;
+      if(silentBackground){
+        setStatus('System ready','ready');
+      }else{
+        feedError('Feed data could not be processed.');
       }
-      feedError('Feed data could not be processed.');
     }
   };
 
-  document.body.appendChild(script);
+  const handleMessage=(event)=>{
+    if(event.source!==loader.contentWindow)return;
+    const data=event.data;
+    if(!data||data.nonce!==nonce)return;
+    window.removeEventListener('message',handleMessage);
+    if(data.type==='talha-feed-error')finishError('Feed data could not be processed.');
+    else if(data.type==='talha-feed-data')processFeed(data);
+  };
+
+  window.addEventListener('message',handleMessage);
+
+  loader.onload=()=>{
+    if(settled||requestToken!==feedRequestToken)return;
+
+    probeTimer=setTimeout(()=>{
+      try{
+        const probe=loader.contentDocument.createElement('script');
+        probe.textContent=`(function(){
+          try{
+            var a=(typeof karsilasmalar!=='undefined'&&Array.isArray(karsilasmalar))?karsilasmalar:[];
+            var b=(typeof futbolMatches!=='undefined'&&Array.isArray(futbolMatches))?futbolMatches:[];
+            var all=a.concat(b);
+            parent.postMessage({type:'talha-feed-data',nonce:${JSON.stringify(nonce)},events:JSON.parse(JSON.stringify(all))},'*');
+          }catch(e){
+            parent.postMessage({type:'talha-feed-error',nonce:${JSON.stringify(nonce)},message:String(e&&e.message||e)},'*');
+          }
+        })();`;
+        loader.contentDocument.documentElement.appendChild(probe);
+        probe.remove();
+      }catch(e){
+        finishError('Feed data probe failed.');
+      }
+    },20);
+  };
+
+  loader.onerror=()=>{
+    window.removeEventListener('message',handleMessage);
+    finishError('Feed server is unavailable right now.');
+  };
+
+  timeoutId=setTimeout(()=>{
+    window.removeEventListener('message',handleMessage);
+    finishError('Feed server did not respond in time.');
+  },FEED_TIMEOUT);
+
+  loader.srcdoc=`<!doctype html><html><head><meta charset="utf-8"></head><body><script src="${FEED_URL}?_=${Date.now()}_${Math.random().toString(36).slice(2)}"><\/script></body></html>`;
+  document.body.appendChild(loader);
 }
 
 
