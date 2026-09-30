@@ -54,7 +54,7 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
 .player-column{min-width:0;}
 
 .channels-panel{min-width:0;border:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.16);border-radius:18px;padding:14px;position:sticky;top:16px}.panel-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.panel-heading h2{font-size:14px}.panel-heading small{color:var(--muted);font-size:11px}.panel-heading-actions{display:flex;align-items:center;gap:7px}.mini-btn{border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.025);color:var(--muted);border-radius:9px;padding:6px 8px;font-size:11px;cursor:pointer}.mini-btn:hover{color:#fff;border-color:color-mix(in srgb,var(--accent-2) 35%,rgba(255,255,255,.08));background:rgba(255,255,255,.05)}
-.channel-tools{display:block;margin-bottom:10px}.channel-tools .search-box{min-width:0}.league-tabs{display:flex;gap:7px;overflow-x:auto;padding:8px 1px 7px}.league-tabs::-webkit-scrollbar{height:3px}.league-tabs::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--accent) 50%,transparent);border-radius:8px}.panel-subtitle{font-size:10px;color:var(--muted);margin:0 0 8px;text-transform:uppercase;letter-spacing:.8px}.recent-row{display:flex;gap:6px;overflow:auto;margin-bottom:10px}.recent-chip{flex:0 0 auto;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);color:var(--muted);border-radius:999px;padding:6px 9px;font-size:10px;cursor:pointer}.fav-toggle{border:0;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;padding:2px;flex:0 0 auto}.fav-toggle.active{color:#ffd166;text-shadow:0 0 10px rgba(255,209,102,.3)}
+.channel-tools{display:block;margin-bottom:10px}.channel-tools .search-box{min-width:0}.league-tabs{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:8px 1px 7px;overscroll-behavior-inline:contain;scrollbar-width:thin;touch-action:pan-x;cursor:grab}.league-tabs::-webkit-scrollbar{height:3px}.league-tabs::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--accent) 50%,transparent);border-radius:8px}.panel-subtitle{font-size:10px;color:var(--muted);margin:0 0 8px;text-transform:uppercase;letter-spacing:.8px}.recent-row{display:flex;gap:6px;overflow:auto;margin-bottom:10px}.recent-chip{flex:0 0 auto;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);color:var(--muted);border-radius:999px;padding:6px 9px;font-size:10px;cursor:pointer}.fav-toggle{border:0;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;padding:2px;flex:0 0 auto}.fav-toggle.active{color:#ffd166;text-shadow:0 0 10px rgba(255,209,102,.3)}
 .channel-main{display:flex;align-items:center;gap:9px;min-width:0}.channel-index{width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:rgba(255,255,255,.06);font-size:10px;color:var(--muted);flex:0 0 auto}.channel-copy{min-width:0;text-align:left}.channel-copy strong{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.channel-copy small{display:block;color:var(--muted);font-size:10px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .card.theatre-active{max-width:100%!important;width:96vw;padding:10px;background:rgba(0,0,0,.95)}.card.theatre-active .filter-bar,.card.theatre-active .servers,.card.theatre-active .analytics-panel,.card.theatre-active footer,.card.theatre-active .utility-panel,.card.theatre-active .status-strip,.card.theatre-active .maintenance-box,.card.theatre-active .player-count-bar{display:none!important}.card.theatre-active .content-grid{display:block}.card.theatre-active .player-column{width:100%}
 
@@ -311,6 +311,11 @@ const PLAYER_ALT_URL = "player2.html";
 const FEED_URL = "https://mahsunsports39.xyz/script4.js";
 const FEED_TIMEOUT = 12000;
 const SEARCH_DELAY = 80;
+const AUTO_SYNC_STALE_MS = 5 * 60 * 1000;
+const ONLINE_SYNC_COOLDOWN_MS = 30 * 1000;
+const VISIBILITY_SYNC_DELAY = 250;
+const FEED_CACHE_KEY = 'talhaLiveFeedCacheV3';
+const FEED_LAST_SYNC_KEY = 'talhaFeedLastSyncV3';
 
 const STATIC_CHANNELS = [
     { title: "BeIN Sports 1", url: "/event.html?id=androstreamlivebs1" },
@@ -374,6 +379,9 @@ let favoriteKeys = safeJSON('talhaFavorites', []);
 let recentEvents = safeJSON('talhaRecent', []);
 let feedBusy = false;
 let feedRequestToken = 0;
+let lastSuccessfulFeedSync = Number(storageGet(FEED_LAST_SYNC_KEY, '0')) || 0;
+let lastSyncAttemptAt = 0;
+let onlineRecoveryTimer = null;
 
 const translationDict = {"motor sporları":"Motorsports","motor sporlari":"Motorsports","hazırlık maçı":"Friendly Match","hazirlik maci":"Friendly Match","paris basketball":"Paris Basketball","şampiyonlar ligi":"Champions League","sampiyonlar ligi":"Champions League","avrupa ligi":"Europa League","konferans ligi":"Conference League","milletler ligi":"Nations League","dünya kupası":"World Cup","dunya kupasi":"World Cup","avrupa şampiyonası":"European Championship","avrupa sampiyonasi":"European Championship","süper lig":"Super League","super lig":"Super League","1. lig":"1st Division","2. lig":"2nd Division","füchse berlin":"Fuchse Berlin","fuchse berlin":"Fuchse Berlin","as monaco":"AS Monaco","lnb pro a final":"LNB Pro A Final","masa tenisi":"Table Tennis","amerikan futbolu":"American Football","buz hokeyi":"Ice Hockey","at yarışı":"Horse Racing","at yarisi":"Horse Racing","su topu":"Water Polo","maç özeti":"Match Highlights","mac ozeti":"Match Highlights","suudi arabistan":"Saudi Arabia","güney kore":"South Korea","guney kore":"South Korea","çeyrek final":"Quarter-Final","ceyrek final":"Quarter-Final","yarı final":"Semi-Final","yari final":"Semi-Final","grup maçı":"Group Stage","grup maci":"Group Stage","hafta sonu":"Weekend","hafta içi":"Weekday","hafta ici":"Weekday","voleybol":"Volleyball","basketbol":"Basketball","futbol":"Football","hentbol":"Handball","tenis":"Tennis","dövüş":"Fighting","dovus":"Fighting","bisiklet":"Cycling","yüzme":"Swimming","yuzme":"Swimming","boks":"Boxing","güreş":"Wrestling","gures":"Wrestling","futsal":"Futsal","espor":"E-Sports","e-spor":"E-Sports","erkekler":"Men's","kadınlar":"Women's","kadinlar":"Women's","erkek":"Men","kadın":"Women","kadin":"Women","gençler":"Youth","gencler":"Youth","hazırlık":"Friendly","hazirlik":"Friendly","canlı":"LIVE","canli":"LIVE","yayın":"Broadcast","yayin":"Broadcast","yayında":"On Air","yayinda":"On Air","finali":"Final","final":"Final","kupa":"Cup","kupası":"Cup","kupasi":"Cup","eleme":"Qualifier","elemeleri":"Qualifiers","özet":"Highlights","ozet":"Highlights","maçı":"Match","maci":"Match","maç":"Match","mac":"Match","takımı":"Team","takimi":"Team","hafta":"Week","tur":"Round","etap":"Stage","devre":"Half","uzatmalar":"Extra Time","penaltılar":"Penalties","penaltilar":"Penalties","ertelendi":"Postponed","iptal":"Canceled","türkiye":"Turkey","turkiye":"Turkey","türk":"Turkish","turk":"Turkish","İngiltere":"England","ingiltere":"England","ispanya":"Spain","italya":"Italy","almanya":"Germany","fransa":"France","hollanda":"Netherlands","portekiz":"Portugal","rusya":"Russia","yunanistan":"Greece","belçika":"Belgium","belcika":"Belgium","avusturya":"Austria","danimarka":"Denmark","İsveç":"Sweden","isvec":"Sweden","İsviçre":"Switzerland","isvicre":"Switzerland","brezilya":"Brazil","arjantin":"Argentina","Çekya":"Czechia","polonya":"Poland","japonya":"Japan","çin":"China","cin":"China","avustralya":"Australia","hırvatistan":"Croatia","hirvatistan":"Croatia","sırbistan":"Serbia","sirbistan":"Serbia","romanya":"Romania","macaristan":"Hungary","ukrayna":"Ukraine","mısır":"Egypt","misir":"Egypt","fas":"Morocco","cezayir":"Algeria","kanada":"Canada","meksika":"Mexico","şili":"Chile","sili":"Chile","kolombiya":"Colombia","uruguay":"Uruguay","paraguay":"Paraguay","curaçao":"Curacao","curaca":"Curacao","galatasaray":"Galatasaray","fenerbahçe":"Fenerbahce","fenerbahce":"Fenerbahce","beşiktaş":"Besiktas","besiktas":"Besiktas","trabzonspor":"Trabzonspor","başakşehir":"Basaksehir","basaksehir":"Basaksehir","barcelona":"Barcelona","real madrid":"Real Madrid","bugün":"Today","bugun":"Today","yarın":"Tomorrow","yarin":"Tomorrow","dün":"Yesterday","dun":"Yesterday","saat":"Time","dakika":"min","saniye":"sec","bakım":"Maintenance","bakim":"Maintenance","sunucu":"Server","bağlantı":"Connection","baglanti":"Connection","yedek":"Backup", "Uluslar":"National", "Ligi":"League"};
 
@@ -404,7 +412,9 @@ function translateText(text) {
 
   for (let i = 0; i < dictEntries.length; i++) {
     const entry = dictEntries[i];
+    entry.pattern.lastIndex = 0;
     if (entry.pattern.test(str)) {
+      entry.pattern.lastIndex = 0;
       str = str.replace(entry.pattern, (match) => {
         if (match === match.toUpperCase()) return entry.replacement.toUpperCase();
         if (match[0] === match[0].toUpperCase()) return entry.replacement.charAt(0).toUpperCase() + entry.replacement.slice(1);
@@ -423,28 +433,51 @@ function translateText(text) {
 }
 
 let isTranslatingDOM = false;
+let translationObserver = null;
+const TRANSLATABLE_ATTRIBUTES = ['title','aria-label','placeholder','alt'];
+
+function shouldSkipTranslationElement(element){
+  if(!element || element.nodeType !== Node.ELEMENT_NODE) return true;
+  const tag = String(element.tagName || '').toUpperCase();
+  return ['SCRIPT','STYLE','IFRAME','CODE','PRE'].includes(tag) || !!element.closest?.('[data-no-translate="true"]');
+}
+
+function translateAttributeValue(value){
+  if(value === null || value === undefined || value === '') return value;
+  return translateText(String(value));
+}
+
+function translateElementAttributes(element){
+  if(shouldSkipTranslationElement(element)) return;
+  TRANSLATABLE_ATTRIBUTES.forEach(attr=>{
+    if(!element.hasAttribute(attr)) return;
+    const current = element.getAttribute(attr);
+    if(!current || !String(current).trim()) return;
+    const translated = translateAttributeValue(current);
+    if(translated && translated !== current){
+      element.setAttribute(attr, translated);
+    }
+  });
+}
 
 function translateNode(node) {
   if (!node || node.nodeType !== Node.TEXT_NODE) return;
   const parent = node.parentNode;
-  if (!parent) return;
+  if (!parent || shouldSkipTranslationElement(parent)) return;
 
   const parentTag = parent.tagName ? parent.tagName.toUpperCase() : '';
-  if (['SCRIPT', 'STYLE', 'IFRAME', 'INPUT', 'TEXTAREA', 'OPTION', 'SELECT', 'CODE'].includes(parentTag)) return;
-  if (parent.closest && parent.closest('[data-no-translate="true"]')) return;
+  if (['INPUT','TEXTAREA','OPTION','SELECT'].includes(parentTag)) return;
 
   const originalText = node.nodeValue;
   if (!originalText || !originalText.trim()) return;
 
   const normalized = normalizeTurkishText(originalText);
-  const hasTrChars = /[şŞıİğĞüÜöÖçÇÃÅÄ]/i.test(originalText);
-  const needsTrans = hasTrChars || Object.keys(translationDict).some(k => originalText.toLowerCase().includes(k));
+  const hasTranslatableContent = /[şŞıİğĞüÜöÖçÇÃÅÄ]/i.test(originalText) ||
+    Object.keys(translationDict).some(k=>normalizeSearchText(originalText).includes(normalizeSearchText(k)));
 
-  if (needsTrans || originalText !== normalized) {
+  if (hasTranslatableContent || originalText !== normalized) {
     const translated = translateText(originalText);
-    if (translated && translated !== originalText) {
-      node.nodeValue = translated;
-    }
+    if (translated && translated !== originalText) node.nodeValue = translated;
   }
 }
 
@@ -453,16 +486,18 @@ function autoTranslateDOM(rootElement = document.body) {
   isTranslatingDOM = true;
 
   try {
+    if (rootElement.nodeType === Node.ELEMENT_NODE) translateElementAttributes(rootElement);
+
     const walker = document.createTreeWalker(
       rootElement,
       NodeFilter.SHOW_TEXT,
       {
         acceptNode: function(node) {
           if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_SKIP;
-          const tag = node.parentNode ? node.parentNode.tagName : '';
-          if (['SCRIPT', 'STYLE', 'IFRAME', 'INPUT', 'TEXTAREA', 'OPTION', 'SELECT', 'CODE'].includes(tag)) {
-            return NodeFilter.FILTER_SKIP;
-          }
+          const parent = node.parentNode;
+          if (!parent || shouldSkipTranslationElement(parent)) return NodeFilter.FILTER_SKIP;
+          const tag = parent.tagName ? parent.tagName.toUpperCase() : '';
+          if (['INPUT','TEXTAREA','OPTION','SELECT'].includes(tag)) return NodeFilter.FILTER_SKIP;
           return NodeFilter.FILTER_ACCEPT;
         }
       },
@@ -470,8 +505,10 @@ function autoTranslateDOM(rootElement = document.body) {
     );
 
     let currentNode;
-    while ((currentNode = walker.nextNode())) {
-      translateNode(currentNode);
+    while ((currentNode = walker.nextNode())) translateNode(currentNode);
+
+    if (rootElement.querySelectorAll) {
+      rootElement.querySelectorAll('[title],[aria-label],[placeholder],[alt]').forEach(translateElementAttributes);
     }
   } catch (e) {
   } finally {
@@ -482,33 +519,155 @@ function autoTranslateDOM(rootElement = document.body) {
 function initDOMTranslator() {
   autoTranslateDOM(document.body);
 
-  const observer = new MutationObserver((mutations) => {
+  if (translationObserver) translationObserver.disconnect();
+
+  translationObserver = new MutationObserver((mutations) => {
     if (isTranslatingDOM) return;
-    for (let i = 0; i < mutations.length; i++) {
-      const mut = mutations[i];
+
+    let hasWork = false;
+    const roots = [];
+
+    for (const mut of mutations) {
       if (mut.type === 'childList') {
-        mut.addedNodes.forEach(node => {
+        mut.addedNodes.forEach(node=>{
           if (node.nodeType === Node.TEXT_NODE) {
             translateNode(node);
+            if (node.parentElement) translateElementAttributes(node.parentElement);
           } else if (node.nodeType === Node.ELEMENT_NODE) {
-            autoTranslateDOM(node);
+            roots.push(node);
           }
         });
+        hasWork = true;
       } else if (mut.type === 'characterData') {
         translateNode(mut.target);
+        hasWork = true;
+      } else if (mut.type === 'attributes') {
+        if (TRANSLATABLE_ATTRIBUTES.includes(mut.attributeName || '')) {
+          translateElementAttributes(mut.target);
+          hasWork = true;
+        }
       }
     }
+
+    if (hasWork && roots.length) roots.slice(0,30).forEach(autoTranslateDOM);
   });
 
-  observer.observe(document.body, {
+  translationObserver.observe(document.body, {
     childList: true,
     subtree: true,
-    characterData: true
+    characterData: true,
+    attributes: true,
+    attributeFilter: TRANSLATABLE_ATTRIBUTES
   });
 
-  setInterval(() => {
-    autoTranslateDOM(document.body);
-  }, 750);
+  setInterval(() => autoTranslateDOM(document.body), 1500);
+}
+
+function normalizeSearchText(value){
+  let s = normalizeTurkishText(String(value ?? '')).toLowerCase();
+
+  s = s
+    .replace(/ı/g,'i')
+    .replace(/ğ/g,'g')
+    .replace(/ş/g,'s')
+    .replace(/ü/g,'u')
+    .replace(/ö/g,'o')
+    .replace(/ç/g,'c')
+    .replace(/İ/g,'i');
+
+  try {
+    s = s.normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+  } catch(e) {}
+
+  return s
+    .replace(/&amp;/g,' and ')
+    .replace(/[^a-z0-9]+/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+const LEAGUE_CANONICAL_ALIASES = new Map([
+  ['la liga','la liga'],
+  ['laliga','la liga'],
+  ['la-liga','la liga'],
+  ['laligasantander','la liga'],
+  ['laligaesports','la liga'],
+  ['uefa champions league','champions league'],
+  ['champions league','champions league'],
+  ['uefachampionsleague','champions league'],
+  ['ucl','champions league'],
+  ['uefa europa league','europa league'],
+  ['europa league','europa league'],
+  ['uefaeuropaleague','europa league'],
+  ['uel','europa league'],
+  ['uefa conference league','conference league'],
+  ['conference league','conference league'],
+  ['uefaconferenceleague','conference league'],
+  ['uefa nations league','nations league'],
+  ['nations league','nations league'],
+  ['uefanationsleague','nations league'],
+  ['premier league','premier league'],
+  ['english premier league','premier league'],
+  ['epl','premier league'],
+  ['süper lig','super league'],
+  ['super lig','super league'],
+  ['super league','super league'],
+  ['turkiye kupasi','turkey cup'],
+  ['turkey cup','turkey cup'],
+  ['coppa italia','coppa italia'],
+  ['copa del rey','copa del rey'],
+  ['bundesliga','bundesliga'],
+  ['serie a','serie a'],
+  ['ligue 1','ligue 1']
+]);
+
+const LEAGUE_CANONICAL_LABELS = {
+  'la liga':'La Liga',
+  'champions league':'Champions League',
+  'europa league':'Europa League',
+  'conference league':'Conference League',
+  'nations league':'Nations League',
+  'premier league':'Premier League',
+  'super league':'Super League',
+  'turkey cup':'Turkey Cup',
+  'coppa italia':'Coppa Italia',
+  'copa del rey':'Copa del Rey',
+  'bundesliga':'Bundesliga',
+  'serie a':'Serie A',
+  'ligue 1':'Ligue 1'
+};
+
+function canonicalLeagueKey(value){
+  const translated = translateText(String(value ?? '')).trim();
+  const normalized = normalizeSearchText(translated);
+  if(!normalized) return 'other';
+
+  const compact = normalized.replace(/[^a-z0-9]+/g,'');
+  const aliases = LEAGUE_CANONICAL_ALIASES;
+  if(aliases.has(normalized)) return aliases.get(normalized);
+
+  if(aliases.has(compact)) return aliases.get(compact);
+
+  if(compact === 'uefachampionsleague' || compact.endsWith('championsleague') && compact.startsWith('uefa')){
+    return 'champions league';
+  }
+  if(compact === 'uefaeuropaleague' || compact === 'uel'){
+    return 'europa league';
+  }
+  if(compact === 'uefaconferenceleague'){
+    return 'conference league';
+  }
+
+  return normalized;
+}
+
+function canonicalLeagueLabel(value){
+  const key = canonicalLeagueKey(value);
+  return LEAGUE_CANONICAL_LABELS[key] || translateText(String(value || 'Other')).trim() || 'Other';
+}
+
+function leagueName(event){
+  return canonicalLeagueLabel(event?.league || 'Other');
 }
 
 function storageGet(key, fallback = null){
@@ -590,7 +749,7 @@ function migrateStoredEventState(events){
 }
 
 function changeTheme(theme){document.body.dataset.theme=theme;storageSet('talhaTheme',theme)}
-function leagueName(event){return translateText(String(event?.league||'Other')).trim()||'Other'}
+
 function setStatus(text,state='ready'){
   const dot=document.getElementById('networkDot'), label=document.getElementById('networkText');
   if(label)label.textContent=text;
@@ -653,14 +812,47 @@ function bootLoader(){
 bootLoader();
 
 function renderLeagueTabs(){
-  const tabs=document.getElementById('leagueTabs');if(!tabs)return;
-  const counts={};liveEvents.forEach(e=>{const name=leagueName(e);counts[name]=(counts[name]||0)+1});
-  const priority=name=>{const n=name.toLowerCase();if(n.includes('la liga'))return 0;if(n.includes('uefa'))return 1;return 2};
-  const leagues=Object.keys(counts).sort((a,b)=>priority(a)-priority(b)||a.localeCompare(b));tabs.innerHTML='';
-  const addTab=(name,active,cb,count)=>{const b=document.createElement('button');b.className='tab-btn'+(active?' active':'');b.type='button';b.setAttribute('role','tab');b.textContent=`${name} (${count})`;b.onclick=cb;tabs.appendChild(b)};
-  addTab('All',currentLeague==='all',()=>setFilter('all'),liveEvents.length);
-  leagues.forEach(name=>addTab(name,currentLeague===name,()=>setFilter('league',name),counts[name]));
+  const tabs=document.getElementById('leagueTabs');
+  if(!tabs)return;
+
+  const counts=new Map();
+  liveEvents.forEach(event=>{
+    const key=canonicalLeagueKey(event?.league||'Other');
+    const label=canonicalLeagueLabel(event?.league||'Other');
+    if(!counts.has(key)) counts.set(key,{label,count:0});
+    counts.get(key).count++;
+  });
+
+  const priority=(key)=>{
+    if(key==='la liga')return 0;
+    if(key==='champions league')return 1;
+    return 2;
+  };
+
+  const leagues=[...counts.entries()]
+    .sort((a,b)=>priority(a[0])-priority(b[0])||a[1].label.localeCompare(b[1].label));
+
+  const fragment=document.createDocumentFragment();
+
+  const addTab=(label,key,count)=>{
+    const button=document.createElement('button');
+    button.className='tab-btn'+(currentLeague===key?' active':'');
+    button.type='button';
+    button.setAttribute('role','tab');
+    button.setAttribute('aria-selected',currentLeague===key?'true':'false');
+    button.textContent=`${label} (${count})`;
+    button.title=`Filter ${label}`;
+    button.onclick=()=>setFilter(key);
+    fragment.appendChild(button);
+  };
+
+  addTab('All','all',liveEvents.length);
+  leagues.forEach(([key,meta])=>addTab(meta.label,key,meta.count));
+
+  tabs.innerHTML='';
+  tabs.appendChild(fragment);
 }
+
 
 function renderRecent(){
   const section=document.getElementById('recentSection'),row=document.getElementById('recentRow');if(!section||!row)return;
@@ -696,33 +888,92 @@ function updateAnalytics(){
 }
 
 function renderMatches(){
-  const container=document.getElementById('serverContainer');if(!container)return;
-  const input=document.getElementById('searchChannels');const searchQuery=(input?.value||'').trim().toLowerCase();
-  container.innerHTML='';let visibleCount=0;let displayIndex=0;
+  const container=document.getElementById('serverContainer');
+  if(!container)return;
+
+  const input=document.getElementById('searchChannels');
+  const rawQuery=(input?.value||'').trim();
+  const searchQuery=normalizeSearchText(rawQuery);
+
+  container.innerHTML='';
+  let visibleCount=0;
+  let displayIndex=0;
+
   liveEvents.forEach((event,index)=>{
     const englishTitle=translateText(event?.title||'Live channel');
-    const englishLeague=translateText(event?.league||'');
-    if(currentLeague!=='all'&&leagueName(event)!==currentLeague)return;
-    const full=(englishTitle+' '+englishLeague).toLowerCase();if(searchQuery&&!full.includes(searchQuery))return;
+    const englishLeague=canonicalLeagueLabel(event?.league||'');
+    const originalTitle=String(event?.title||'');
+    const originalLeague=String(event?.league||'');
+    const leagueKey=canonicalLeagueKey(originalLeague);
+
+    if(currentLeague!=='all'&&leagueKey!==currentLeague)return;
+
+    const searchable=normalizeSearchText([
+      englishTitle,
+      englishLeague,
+      originalTitle,
+      originalLeague,
+      event?.time||'',
+      event?.name||'',
+      event?.channel||'',
+      event?.channelId||''
+    ].join(' '));
+
+    if(searchQuery&&!searchable.includes(searchQuery))return;
 
     displayIndex++;
-    const key=eventKey(event,index),favorite=favoriteKeys.includes(key);
-    const row=document.createElement('div');row.className='server-item';row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label','Play '+englishTitle);
+    const key=eventKey(event,index);
+    const favorite=favoriteKeys.includes(key);
+    const row=document.createElement('div');
+
+    row.className='server-item';
+    row.tabIndex=0;
+    row.setAttribute('role','button');
+    row.setAttribute('aria-label','Play '+englishTitle);
+    row.setAttribute('title','Play '+englishTitle);
+
     const badge=`<div class="live-badge"><div class="live-dot"></div>${escapeHTML(event?.time||'ONLINE')}</div>`;
+
     row.innerHTML=`<div class="channel-main"><div class="channel-index">${String(displayIndex).padStart(2,'0')}</div><div class="channel-copy"><strong>${escapeHTML(englishTitle)}</strong><small>${escapeHTML(englishLeague||'Live feed')}</small></div></div><div style="display:flex;align-items:center;gap:7px">${badge}<button class="fav-toggle ${favorite?'active':''}" type="button" aria-label="${favorite?'Remove from':'Add to'} favorites" aria-pressed="${favorite}">★</button></div>`;
+
     row.onclick=()=>setServer(event,row);
-    row.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();setServer(event,row)}};
-    row.querySelector('.fav-toggle').onclick=ev=>{ev.stopPropagation();favoriteKeys=favorite?favoriteKeys.filter(k=>k!==key):[...favoriteKeys,key];storageSet('talhaFavorites',JSON.stringify(favoriteKeys));renderMatches();updateAnalytics()};
-    container.appendChild(row);visibleCount++;
+    row.onkeydown=ev=>{
+      if(ev.key==='Enter'||ev.key===' '){
+        ev.preventDefault();
+        setServer(event,row);
+      }
+    };
+
+    row.querySelector('.fav-toggle').onclick=ev=>{
+      ev.stopPropagation();
+      favoriteKeys=favorite
+        ? favoriteKeys.filter(k=>k!==key)
+        : [...favoriteKeys,key];
+      storageSet('talhaFavorites',JSON.stringify(favoriteKeys));
+      renderMatches();
+      updateAnalytics();
+    };
+
+    container.appendChild(row);
+    visibleCount++;
   });
+
   if(!visibleCount)container.innerHTML='<div class="empty-state">No channels match your filters.</div>';
-  document.getElementById('channelSummary').textContent=`${visibleCount} shown · ${liveEvents.length} total`;
+
+  const summary=document.getElementById('channelSummary');
+  if(summary)summary.textContent=`${visibleCount} shown · ${liveEvents.length} total`;
+
   updateAnalytics();
   renderRecent();
   renderStaticChannels();
 }
 
-function setFilter(type,name='all'){currentLeague=type==='league'?name:'all';renderLeagueTabs();renderMatches()}
+
+function setFilter(type,name='all'){
+  currentLeague = type==='league' ? canonicalLeagueKey(name) : (type==='all' ? 'all' : canonicalLeagueKey(type));
+  renderLeagueTabs();
+  renderMatches();
+}
 function filterMatches(){renderMatches()}
 function rememberRecent(event,index=''){
   const key=eventKey(event,index);
@@ -783,61 +1034,175 @@ function triggerFirstStream(){
   if(first)first.click();
 }
 
+function formatSyncTime(timestamp){
+  if(!timestamp)return 'Not synced';
+  try{
+    return new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit'}).format(new Date(timestamp));
+  }catch(e){
+    return 'Synced';
+  }
+}
+
+function cacheLiveFeed(events){
+  if(!Array.isArray(events)||!events.length)return false;
+  const payload={
+    savedAt:Date.now(),
+    events:events.slice(0,5000)
+  };
+  const ok=storageSet(FEED_CACHE_KEY,JSON.stringify(payload));
+  if(ok){
+    lastSuccessfulFeedSync=payload.savedAt;
+    storageSet(FEED_LAST_SYNC_KEY,String(lastSuccessfulFeedSync));
+  }
+  return ok;
+}
+
+function loadCachedFeed(){
+  const cached=safeJSON(FEED_CACHE_KEY,null);
+  if(!cached||!Array.isArray(cached.events)||!cached.events.length)return false;
+
+  liveEvents=cached.events;
+  migrateStoredEventState(liveEvents);
+  renderLeagueTabs();
+  renderMatches();
+  updateAnalytics();
+
+  const cacheTime=Number(cached.savedAt)||Number(storageGet(FEED_LAST_SYNC_KEY,'0'))||0;
+  lastSuccessfulFeedSync=cacheTime;
+
+  const offline=navigator.onLine===false;
+  setStatus(offline?'Offline mode · cached feed':'Cached feed ready',offline?'offline':'ready');
+  setSync(`Cached ${formatSyncTime(cacheTime)}`);
+  return true;
+}
+
+function isFeedStale(){
+  if(!lastSuccessfulFeedSync)return true;
+  return (Date.now()-lastSuccessfulFeedSync)>=AUTO_SYNC_STALE_MS;
+}
+
+function maybeSyncStaleFeed(reason='visibility'){
+  if(document.body.classList.contains('auth-locked'))return;
+  if(navigator.onLine===false)return;
+
+  const now=Date.now();
+  if((now-lastSyncAttemptAt)<ONLINE_SYNC_COOLDOWN_MS && liveEvents.length)return;
+
+  if(!liveEvents.length || isFeedStale()){
+    lastSyncAttemptAt=now;
+    loadTargetScript(true,reason);
+  }
+}
+
+function recoverOnline(){
+  updateNetwork();
+  clearTimeout(onlineRecoveryTimer);
+  onlineRecoveryTimer=setTimeout(()=>{
+    if(document.body.classList.contains('auth-locked'))return;
+    maybeSyncStaleFeed('online');
+    if(!liveEvents.length)loadCachedFeed();
+  },VISIBILITY_SYNC_DELAY);
+}
+
 function feedError(message){
   updateAnalytics();
+
+  const hadCache=loadCachedFeed();
+  if(hadCache){
+    setStatus(navigator.onLine===false?'Offline mode · cached feed':'Feed delayed · cached feed','offline');
+    setSync(`Cached ${formatSyncTime(lastSuccessfulFeedSync)}`);
+    showToast('Using cached feed', 'The live source could not be refreshed, so the last synced channels remain available.');
+    triggerFirstStream();
+    return;
+  }
+
   const container=document.getElementById('serverContainer');
-  container.innerHTML=`<div class="feed-error">${escapeHTML(message)}<br><button type="button" id="retryFeedBtn">Retry Feed Sync</button></div>`;
-  document.getElementById('retryFeedBtn').onclick=()=>loadTargetScript(true);
+  if(container){
+    container.innerHTML=`<div class="feed-error">${escapeHTML(message)}<br><button type="button" id="retryFeedBtn">Retry Feed Sync</button></div>`;
+    document.getElementById('retryFeedBtn').onclick=()=>loadTargetScript(true,'retry');
+  }
+
   setStatus('Feed sync failed · 24/7 available below','offline');
+  setSync('Sync unavailable');
   triggerFirstStream();
 }
 
-function loadTargetScript(force=false){
+
+function loadTargetScript(force=false,reason='manual'){
   if(feedBusy&&!force)return;
 
+  if(navigator.onLine===false){
+    const cached=loadCachedFeed();
+    if(!cached){
+      feedError('You are offline and no cached feed is available yet.');
+    }else{
+      showToast('Offline mode', 'Showing the last available feed until the connection returns.');
+    }
+    return;
+  }
+
+  const now=Date.now();
+  if(!force && liveEvents.length && (now-lastSyncAttemptAt)<ONLINE_SYNC_COOLDOWN_MS)return;
+  lastSyncAttemptAt=now;
+
   const requestToken=++feedRequestToken;
-  feedBusy=true;setStatus('Syncing live feeds…','busy');setSync('Connecting…');
+  feedBusy=true;
+  setStatus(reason==='online'?'Connection restored · syncing…':'Syncing live feeds…','busy');
+  setSync('Connecting…');
 
   const container=document.getElementById('serverContainer');
-  if(container)container.innerHTML='<p style="color:rgba(255,255,255,.4);text-align:center;font-size:13px;padding:30px">Syncing system satellite channels…</p>';
+  if(container && !liveEvents.length){
+    container.innerHTML='<p style="color:rgba(255,255,255,.4);text-align:center;font-size:13px;padding:30px">Syncing system satellite channels…</p>';
+  }
 
-  const old=document.getElementById('mahsunScript');if(old)old.remove();
+  const old=document.getElementById('mahsunScript');
+  if(old)old.remove();
+
   try{delete window.karsilasmalar}catch(e){window.karsilasmalar=undefined}
 
   const script=document.createElement('script');
-  script.id='mahsunScript';script.async=true;script.src=FEED_URL+'?v='+Date.now();
+  script.id='mahsunScript';
+  script.async=true;
+  script.src=FEED_URL+'?v='+Date.now();
 
   let settled=false;
   const isCurrent=()=>requestToken===feedRequestToken;
 
   const timeout=setTimeout(()=>{
     if(settled||!isCurrent())return;
-    settled=true;feedBusy=false;script.remove();feedError('Feed server did not respond in time.');
+    settled=true;
+    feedBusy=false;
+    script.remove();
+    feedError('Feed server did not respond in time.');
   },FEED_TIMEOUT);
 
   script.onerror=()=>{
     if(settled||!isCurrent())return;
-    settled=true;clearTimeout(timeout);feedBusy=false;script.remove();feedError('Feed server is unavailable right now.');
+    settled=true;
+    clearTimeout(timeout);
+    feedBusy=false;
+    script.remove();
+    feedError('Feed server is unavailable right now.');
   };
 
   script.onload=()=>{
     if(settled||!isCurrent())return;
-    settled=true;clearTimeout(timeout);feedBusy=false;
+    settled=true;
+    clearTimeout(timeout);
+    feedBusy=false;
 
     try{
-      let tempEvents = [];
+      let tempEvents=[];
 
-if(typeof karsilasmalar !== 'undefined' && Array.isArray(karsilasmalar)){
-    tempEvents.push(...karsilasmalar);
-}
+      if(typeof karsilasmalar!=='undefined'&&Array.isArray(karsilasmalar)){
+        tempEvents.push(...karsilasmalar);
+      }
 
-if(typeof futbolMatches !== 'undefined' && Array.isArray(futbolMatches)){
-    tempEvents.push(...futbolMatches);
-}
+      if(typeof futbolMatches!=='undefined'&&Array.isArray(futbolMatches)){
+        tempEvents.push(...futbolMatches);
+      }
 
-if(!tempEvents.length){
-    throw new Error('Feed Vector Missing');
-}
+      if(!tempEvents.length)throw new Error('Feed Vector Missing');
 
       tempEvents.sort((a,b)=>{
         const at=String(a?.time||'').toLowerCase();
@@ -851,10 +1216,14 @@ if(!tempEvents.length){
       liveEvents=[...activeCustomFeeds,...tempEvents];
 
       migrateStoredEventState(liveEvents);
-      updateAnalytics();renderLeagueTabs();renderMatches();
+      updateAnalytics();
+      renderLeagueTabs();
+      renderMatches();
+      cacheLiveFeed(liveEvents);
 
-      setStatus(navigator.onLine===false?'Offline mode · cached UI':'System ready','ready');
-      setSync(`Synced ${new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit'}).format(new Date())}`);
+      setStatus('System ready','ready');
+      setSync(`Synced ${formatSyncTime(lastSuccessfulFeedSync)}`);
+
       if(liveEvents.length)triggerFirstStream();
       else triggerFirstStream();
     }catch(err){
@@ -864,6 +1233,7 @@ if(!tempEvents.length){
 
   document.body.appendChild(script);
 }
+
 
 function login(){
   const input = document.getElementById('password');
@@ -895,6 +1265,13 @@ function login(){
   document.getElementById('statusStrip').style.display = 'flex';
 
   updateAnalytics();
+
+  if(navigator.onLine===false){
+    loadCachedFeed();
+  }else if(!liveEvents.length){
+    loadCachedFeed();
+  }
+
   loadTargetScript();
 }
 
@@ -999,7 +1376,27 @@ function handleMenuAction(action){
 
 function updateNetwork(){
   const online=navigator.onLine!==false;
-  setStatus(online?'System ready':'Offline mode · network unavailable',online?'ready':'offline');
+  if(online){
+    const stale=isFeedStale();
+    setStatus(stale?'Connection restored · feed may be stale':'System ready',stale?'busy':'ready');
+  }else{
+    setStatus('Offline mode · network unavailable','offline');
+  }
+}
+
+function initLeagueWheel(){
+  const tabs=document.getElementById('leagueTabs');
+  if(!tabs)return;
+
+  tabs.addEventListener('wheel',event=>{
+    if(Math.abs(event.deltaY)<=0 && Math.abs(event.deltaX)<=0)return;
+    const delta=Math.abs(event.deltaY)>Math.abs(event.deltaX)?event.deltaY:event.deltaX;
+    const max=tabs.scrollWidth-tabs.clientWidth;
+
+    if(max<=0)return;
+    event.preventDefault();
+    tabs.scrollLeft=Math.max(0,Math.min(max,tabs.scrollLeft+delta));
+  },{passive:false});
 }
 
 const noticeBox=document.getElementById('maintenanceNotice');if(SHOW_MAINTENANCE_MSG)noticeBox.style.display='flex';
@@ -1024,8 +1421,18 @@ document.querySelectorAll('.menu-item').forEach(btn=>btn.addEventListener('click
 document.getElementById('clearSearchBtn').addEventListener('click',()=>{const input=document.getElementById('searchChannels');input.value='';input.focus();currentLeague='all';renderLeagueTabs();renderMatches()});
 document.getElementById('searchChannels').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(renderMatches,SEARCH_DELAY)});
 
-window.addEventListener('online',()=>{updateNetwork();if(!document.body.classList.contains('auth-locked')&&!liveEvents.length)loadTargetScript(true)});
-window.addEventListener('offline',updateNetwork);
+window.addEventListener('online',recoverOnline);
+window.addEventListener('offline',()=>{updateNetwork();if(!document.body.classList.contains('auth-locked'))loadCachedFeed()});
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){
+    updateNetwork();
+    maybeSyncStaleFeed('visibility');
+  }
+});
+window.addEventListener('pageshow',()=>{
+  updateNetwork();
+  maybeSyncStaleFeed('pageshow');
+});
 window.addEventListener('keydown',e=>{
   const tag=document.activeElement?.tagName||'';
   if(e.key==='/'&&tag!=='INPUT'&&tag!=='TEXTAREA'&&tag!=='SELECT'){e.preventDefault();document.getElementById('searchChannels').focus()}
@@ -1035,6 +1442,7 @@ window.addEventListener('keydown',e=>{
 });
 
 initDOMTranslator();
+initLeagueWheel();
 
 function renderStaticChannels() {
     const container = document.getElementById('staticServerContainer');
