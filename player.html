@@ -1586,6 +1586,7 @@ let boundVideo=null;
 let audioUnlocked=false;
 let audioUserMuted=true;
 let audioUserVolume=100;
+let audioLastNonZeroVolume=100;
 let autoplayTimers=[];
 
 function clearAutoplayTimers(){
@@ -2098,7 +2099,46 @@ function startAutoplayRetries(){
   scheduleAutoplay(1800);
 }
 
-function syncAudioFromPlayer(volume){
+function getActiveClapprPlayer(){
+
+  const stream=window.activeStreamPlayer;
+
+  if(
+    stream &&
+    stream.player &&
+    typeof stream.player.setVolume==='function'
+  ){
+    return stream.player;
+  }
+
+  return null;
+}
+
+function setClapprVolumeSafe(volume){
+
+  const player=getActiveClapprPlayer();
+
+  if(!player){
+    return;
+  }
+
+  const value=clampNumber(
+    volume,
+    0,
+    100,
+    audioUserVolume
+  );
+
+  try{
+    player.setVolume(value);
+  }catch(e){}
+
+}
+
+function syncAudioFromPlayer(
+  volume,
+  applyToVideo=true
+){
 
   const value=clampNumber(
     volume,
@@ -2110,13 +2150,103 @@ function syncAudioFromPlayer(volume){
   audioUserVolume=value;
 
   if(value>0){
-
+    audioLastNonZeroVolume=value;
     audioUnlocked=true;
     audioUserMuted=false;
-
   }else if(audioUnlocked){
-
     audioUserMuted=true;
+  }
+
+  if(!applyToVideo){
+    return;
+  }
+
+  const video=document.querySelector(
+    '#player-container video'
+  );
+
+  if(!video){
+    return;
+  }
+
+  try{
+    const muted=value<=0;
+
+    if(
+      video.muted!==muted
+    ){
+      video.muted=muted;
+    }
+
+    if(
+      video.defaultMuted!==muted
+    ){
+      video.defaultMuted=muted;
+    }
+
+    const targetVolume=
+      muted
+        ? 0
+        : value/100;
+
+    if(
+      Math.abs(video.volume-targetVolume)>.001
+    ){
+      video.volume=targetVolume;
+    }
+
+    if(muted){
+      video.setAttribute('muted','');
+    }else{
+      video.removeAttribute('muted');
+    }
+
+  }catch(e){}
+}
+
+function syncAudioFromVideo(
+  video,
+  pushToClappr=true
+){
+
+  if(!video){
+    return;
+  }
+
+  const muted=!!video.muted;
+  const value=
+    muted
+      ? 0
+      : clampNumber(
+          Number(video.volume)*100,
+          0,
+          100,
+          audioUserVolume
+        );
+
+  if(value>0){
+    audioUserVolume=value;
+    audioLastNonZeroVolume=value;
+    audioUnlocked=true;
+    audioUserMuted=false;
+  }else if(audioUnlocked){
+    audioUserMuted=true;
+  }
+
+  if(pushToClappr){
+    setClapprVolumeSafe(value);
+  }
+
+  const button=document.getElementById(
+    'unmute-overlay-btn'
+  );
+
+  if(button){
+    if(value>0 && !muted){
+      button.classList.add('hidden');
+    }else if(audioUnlocked){
+      button.classList.remove('hidden');
+    }
   }
 }
 
@@ -2124,7 +2254,14 @@ function unmuteEverything(){
 
   audioUnlocked=true;
   audioUserMuted=false;
-  audioUserVolume=100;
+  audioUserVolume=
+    clampNumber(
+      audioLastNonZeroVolume||100,
+      1,
+      100,
+      100
+    );
+  audioLastNonZeroVolume=audioUserVolume;
 
   clearAutoplayTimers();
 
@@ -2168,7 +2305,8 @@ function unmuteEverything(){
 
     video.muted=false;
     video.defaultMuted=false;
-    video.volume=1;
+    video.volume=
+      audioUserVolume/100;
 
     video.removeAttribute(
       'muted'
@@ -2188,6 +2326,11 @@ function unmuteEverything(){
     );
 
   }catch(e){}
+
+  syncAudioFromVideo(
+    video,
+    true
+  );
 
   try{
 
@@ -2239,6 +2382,15 @@ function bindCurrentVideo(video){
   boundVideo=video;
   applyDesiredAudioState(video);
 
+  if(
+    audioUnlocked
+  ){
+    syncAudioFromVideo(
+      video,
+      true
+    );
+  }
+
   const handleMeta=()=>{
 
     applyDesiredAudioState(video);
@@ -2267,6 +2419,15 @@ function bindCurrentVideo(video){
     applyVideoFilters();
 
     window.activeStreamPlayer?.updatePipButton?.();
+  };
+
+  const handleVolumeChange=()=>{
+
+    syncAudioFromVideo(
+      video,
+      true
+    );
+
   };
 
   const handleTimeUpdate=()=>{
@@ -2321,6 +2482,12 @@ function bindCurrentVideo(video){
   );
 
   video.addEventListener(
+    'volumechange',
+    handleVolumeChange,
+    {passive:true}
+  );
+
+  video.addEventListener(
     'timeupdate',
     handleTimeUpdate,
     {passive:true}
@@ -2354,6 +2521,11 @@ function bindCurrentVideo(video){
       video.removeEventListener(
         'playing',
         handlePlaying
+      );
+
+      video.removeEventListener(
+        'volumechange',
+        handleVolumeChange
       );
 
       video.removeEventListener(
@@ -4273,24 +4445,10 @@ class StreamPlayer{
         volume=>{
 
           syncAudioFromPlayer(
-            volume
+            volume,
+            true
           );
 
-          if(Number(volume)>0){
-
-            button.classList.add(
-              'hidden'
-            );
-
-          }else{
-
-            if(audioUnlocked){
-
-              button.classList.remove(
-                'hidden'
-              );
-            }
-          }
         }
       );
     }
@@ -4783,6 +4941,20 @@ class StreamPlayer{
             observePlayerVideo();
             applyVideoFilters();
 
+            const readyVideo=document.querySelector(
+              '#player-container video'
+            );
+
+            if(
+              readyVideo &&
+              audioUnlocked
+            ){
+              syncAudioFromVideo(
+                readyVideo,
+                true
+              );
+            }
+
             if(
               audioSettings.gain!==100||
               audioSettings.bass||
@@ -4834,13 +5006,18 @@ class StreamPlayer{
           '#player-container video'
         );
 
-        if(
-          video &&
-          !audioUnlocked
-        ){
+        if(video){
 
-          video.muted=true;
-          video.volume=0;
+          if(!audioUnlocked){
+            video.muted=true;
+            video.defaultMuted=true;
+            video.volume=0;
+          }else{
+            applyDesiredAudioState(
+              video
+            );
+          }
+
         }
       }
     );
