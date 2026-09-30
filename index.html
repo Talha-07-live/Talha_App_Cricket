@@ -89,6 +89,7 @@ footer{text-align:center;margin-top:20px;opacity:.2;font-size:11px}.fade{animati
 .menu-trigger{font-size:17px}.menu-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.48);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:10001}.menu-backdrop.open{opacity:1;pointer-events:auto}
 .quick-menu{position:fixed;z-index:10002;top:0;right:0;width:min(390px,92vw);height:100dvh;background:linear-gradient(180deg,rgba(15,10,25,.97),rgba(4,5,10,.98));border-left:1px solid rgba(255,255,255,.08);box-shadow:-30px 0 80px rgba(0,0,0,.5);padding:22px 18px calc(18px + env(safe-area-inset-bottom));transform:translateX(105%);transition:transform .32s cubic-bezier(.22,1,.36,1);overflow:auto;overscroll-behavior:contain}.quick-menu.open{transform:translateX(0)}
 .menu-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:env(safe-area-inset-top);margin-bottom:20px}.menu-head small,.menu-section-title{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.32);font-weight:800}.menu-head h3{font-size:21px;margin-top:4px}.menu-profile{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid rgba(255,255,255,.07);background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border-radius:15px;margin-bottom:20px}.menu-avatar{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent-2));font-size:11px;font-weight:900;flex:0 0 auto}.menu-profile strong{display:block;font-size:12px}.menu-profile span:not(.premium-pill){display:block;font-size:9px;color:var(--muted);margin-top:3px}.premium-pill{margin-left:auto;font-size:8px;font-weight:900;letter-spacing:1px;padding:5px 7px;border-radius:999px;background:rgba(255,209,102,.09);border:1px solid rgba(255,209,102,.2);color:#ffd166}.menu-section-title{margin:17px 3px 8px}.menu-item{width:100%;display:flex;align-items:center;gap:11px;text-align:left;padding:11px 10px;margin:4px 0;border:1px solid transparent;background:transparent;color:#fff;border-radius:13px;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}.menu-item>span{width:31px;height:31px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.04);color:var(--accent-2);font-size:14px;flex:0 0 auto}.menu-item div{min-width:0;flex:1}.menu-item strong{display:block;font-size:11px}.menu-item small{display:block;color:rgba(255,255,255,.35);font-size:9px;margin-top:3px}.menu-item>b{font-size:17px;color:rgba(255,255,255,.2);font-weight:400}.menu-item:hover,.menu-item:active{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.06);transform:translateX(2px)}.menu-footer{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px}.menu-footer>div{padding:10px 11px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);border-radius:12px}.menu-footer span{display:block;font-size:8px;color:rgba(255,255,255,.28);letter-spacing:1px}.menu-footer strong{display:block;font-size:10px;margin-top:4px;color:#a8fff4;font-variant-numeric:tabular-nums}.toast{position:fixed;left:50%;bottom:24px;z-index:10050;transform:translate(-50%,18px);opacity:0;width:min(520px,calc(100vw - 28px));padding:12px 14px;border:1px solid rgba(255,255,255,.08);background:rgba(10,10,18,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.4);transition:all .22s ease}.toast.show{transform:translate(-50%,0);opacity:1}.toast strong{display:block;font-size:11px}.toast span{display:block;margin-top:4px;color:rgba(255,255,255,.45);font-size:9px;line-height:1.5}
+.feed-change-popup{position:fixed;left:50%;top:max(12px,env(safe-area-inset-top));z-index:10070;width:min(560px,calc(100vw - 24px));transform:translate(-50%,-125%);opacity:0;pointer-events:none;padding:10px 12px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,rgba(15,10,28,.96),rgba(4,8,16,.95));backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-radius:15px;box-shadow:0 18px 55px rgba(0,0,0,.45),0 0 30px color-mix(in srgb,var(--accent) 16%,transparent);transition:transform .32s cubic-bezier(.22,1,.36,1),opacity .28s ease}.feed-change-popup.show{transform:translate(-50%,0);opacity:1}.feed-change-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.feed-change-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:900;letter-spacing:.4px}.feed-change-title::before{content:'●';font-size:7px;color:var(--accent-2);text-shadow:0 0 10px var(--accent-2)}.feed-change-time{font-size:8px;color:rgba(255,255,255,.3);font-variant-numeric:tabular-nums}.feed-change-counts{display:flex;align-items:center;gap:7px;margin-top:8px;flex-wrap:wrap}.feed-change-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:9px;font-size:9px;font-weight:800;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.035)}.feed-change-pill b{font-size:11px;font-variant-numeric:tabular-nums}.feed-change-pill.new{color:#86fff3;border-color:rgba(0,242,254,.17);background:rgba(0,242,254,.055)}.feed-change-pill.updated{color:#d8b8ff;border-color:rgba(122,60,255,.2);background:rgba(122,60,255,.07)}.feed-change-pill.removed{color:#ff9eb5;border-color:rgba(255,93,122,.18);background:rgba(255,93,122,.055)}@media(max-width:600px){.feed-change-popup{width:calc(100vw - 16px);padding:9px 10px}.feed-change-counts{gap:5px}.feed-change-pill{padding:5px 7px;font-size:8px}.feed-change-pill b{font-size:10px}}
 body.menu-open{overflow:hidden}.focus-mode .channels-panel,.focus-mode .status-strip,.focus-mode .analytics-panel,.focus-mode .utility-panel{display:none!important}.focus-mode .content-grid{display:block!important}.focus-mode .player-column{width:100%!important}.focus-mode .player-container{padding-top:55%!important;border-radius:18px}.focus-mode .card{max-width:1200px;width:96vw}.focus-mode .app-header{margin-bottom:10px}.menu-danger>span{color:#ff7a98}.menu-danger strong{color:#ff9aae}
 
 @media(max-width:600px){
@@ -177,6 +178,8 @@ body.menu-open{overflow:hidden}.focus-mode .channels-panel,.focus-mode .status-s
 
 <body class="auth-locked">
 <button class="theatre-exit-btn" id="exitTheatre" type="button">Exit Cinema Mode</button>
+
+<div id="feedChangePopup" class="feed-change-popup" aria-live="polite" aria-atomic="true"><div class="feed-change-head"><div class="feed-change-title">Live Feed Updated</div><span class="feed-change-time" id="feedChangeTime">now</span></div><div class="feed-change-counts"><span class="feed-change-pill new">+New <b id="feedNewCount">0</b></span><span class="feed-change-pill updated">Updated <b id="feedUpdatedCount">0</b></span><span class="feed-change-pill removed">Removed <b id="feedRemovedCount">0</b></span></div></div>
 
 <div id="loader" aria-live="polite">
   <h1>TALHA'S STREAM</h1>
@@ -311,8 +314,9 @@ const PLAYER_ALT_URL = "player2.html";
 const FEED_URL = "https://mahsunsports39.xyz/script4.js";
 const FEED_TIMEOUT = 12000;
 const SEARCH_DELAY = 80;
-const AUTO_SYNC_STALE_MS = 5 * 60 * 1000;
-const ONLINE_SYNC_COOLDOWN_MS = 30 * 1000;
+const REALTIME_SYNC_INTERVAL_MS = 15 * 1000;
+const AUTO_SYNC_STALE_MS = REALTIME_SYNC_INTERVAL_MS;
+const ONLINE_SYNC_COOLDOWN_MS = 5 * 1000;
 const VISIBILITY_SYNC_DELAY = 250;
 const FEED_CACHE_KEY = 'talhaLiveFeedCacheV3';
 const FEED_LAST_SYNC_KEY = 'talhaFeedLastSyncV3';
@@ -382,6 +386,10 @@ let feedRequestToken = 0;
 let lastSuccessfulFeedSync = Number(storageGet(FEED_LAST_SYNC_KEY, '0')) || 0;
 let lastSyncAttemptAt = 0;
 let onlineRecoveryTimer = null;
+let realtimeSyncTimer = null;
+let currentPlayingKey = null;
+let currentPlayingUrl = '';
+let currentPlayingTitle = '';
 
 const translationDict = {"motor sporları":"Motorsports","motor sporlari":"Motorsports","hazırlık maçı":"Friendly Match","hazirlik maci":"Friendly Match","paris basketball":"Paris Basketball","şampiyonlar ligi":"Champions League","sampiyonlar ligi":"Champions League","avrupa ligi":"Europa League","konferans ligi":"Conference League","milletler ligi":"Nations League","dünya kupası":"World Cup","dunya kupasi":"World Cup","avrupa şampiyonası":"European Championship","avrupa sampiyonasi":"European Championship","süper lig":"Super League","super lig":"Super League","1. lig":"1st Division","2. lig":"2nd Division","füchse berlin":"Fuchse Berlin","fuchse berlin":"Fuchse Berlin","as monaco":"AS Monaco","lnb pro a final":"LNB Pro A Final","masa tenisi":"Table Tennis","amerikan futbolu":"American Football","buz hokeyi":"Ice Hockey","at yarışı":"Horse Racing","at yarisi":"Horse Racing","su topu":"Water Polo","maç özeti":"Match Highlights","mac ozeti":"Match Highlights","suudi arabistan":"Saudi Arabia","güney kore":"South Korea","guney kore":"South Korea","çeyrek final":"Quarter-Final","ceyrek final":"Quarter-Final","yarı final":"Semi-Final","yari final":"Semi-Final","grup maçı":"Group Stage","grup maci":"Group Stage","hafta sonu":"Weekend","hafta içi":"Weekday","hafta ici":"Weekday","voleybol":"Volleyball","basketbol":"Basketball","futbol":"Football","hentbol":"Handball","tenis":"Tennis","dövüş":"Fighting","dovus":"Fighting","bisiklet":"Cycling","yüzme":"Swimming","yuzme":"Swimming","boks":"Boxing","güreş":"Wrestling","gures":"Wrestling","futsal":"Futsal","espor":"E-Sports","e-spor":"E-Sports","erkekler":"Men's","kadınlar":"Women's","kadinlar":"Women's","erkek":"Men","kadın":"Women","kadin":"Women","gençler":"Youth","gencler":"Youth","hazırlık":"Friendly","hazirlik":"Friendly","canlı":"LIVE","canli":"LIVE","yayın":"Broadcast","yayin":"Broadcast","yayında":"On Air","yayinda":"On Air","finali":"Final","final":"Final","kupa":"Cup","kupası":"Cup","kupasi":"Cup","eleme":"Qualifier","elemeleri":"Qualifiers","özet":"Highlights","ozet":"Highlights","maçı":"Match","maci":"Match","maç":"Match","mac":"Match","takımı":"Team","takimi":"Team","hafta":"Week","tur":"Round","etap":"Stage","devre":"Half","uzatmalar":"Extra Time","penaltılar":"Penalties","penaltilar":"Penalties","ertelendi":"Postponed","iptal":"Canceled","türkiye":"Turkey","turkiye":"Turkey","türk":"Turkish","turk":"Turkish","İngiltere":"England","ingiltere":"England","ispanya":"Spain","italya":"Italy","almanya":"Germany","fransa":"France","hollanda":"Netherlands","portekiz":"Portugal","rusya":"Russia","yunanistan":"Greece","belçika":"Belgium","belcika":"Belgium","avusturya":"Austria","danimarka":"Denmark","İsveç":"Sweden","isvec":"Sweden","İsviçre":"Switzerland","isvicre":"Switzerland","brezilya":"Brazil","arjantin":"Argentina","Çekya":"Czechia","polonya":"Poland","japonya":"Japan","çin":"China","cin":"China","avustralya":"Australia","hırvatistan":"Croatia","hirvatistan":"Croatia","sırbistan":"Serbia","sirbistan":"Serbia","romanya":"Romania","macaristan":"Hungary","ukrayna":"Ukraine","mısır":"Egypt","misir":"Egypt","fas":"Morocco","cezayir":"Algeria","kanada":"Canada","meksika":"Mexico","şili":"Chile","sili":"Chile","kolombiya":"Colombia","uruguay":"Uruguay","paraguay":"Paraguay","curaçao":"Curacao","curaca":"Curacao","galatasaray":"Galatasaray","fenerbahçe":"Fenerbahce","fenerbahce":"Fenerbahce","beşiktaş":"Besiktas","besiktas":"Besiktas","trabzonspor":"Trabzonspor","başakşehir":"Basaksehir","basaksehir":"Basaksehir","barcelona":"Barcelona","real madrid":"Real Madrid","bugün":"Today","bugun":"Today","yarın":"Tomorrow","yarin":"Tomorrow","dün":"Yesterday","dun":"Yesterday","saat":"Time","dakika":"min","saniye":"sec","bakım":"Maintenance","bakim":"Maintenance","sunucu":"Server","bağlantı":"Connection","baglanti":"Connection","yedek":"Backup", "Uluslar":"National", "Ligi":"League"};
 
@@ -931,6 +939,7 @@ function renderMatches(){
     row.setAttribute('role','button');
     row.setAttribute('aria-label','Play '+englishTitle);
     row.setAttribute('title','Play '+englishTitle);
+    row.dataset.channelKey=stableChannelKey(event,index);
 
     const badge=`<div class="live-badge"><div class="live-dot"></div>${escapeHTML(event?.time||'ONLINE')}</div>`;
 
@@ -981,48 +990,167 @@ function rememberRecent(event,index=''){
   storageSet('talhaRecent',JSON.stringify(recentEvents));
 }
 
-function setServer(event,targetBtn){
-  const frame=document.getElementById('frame');if(!frame||!event)return;
-  frame.classList.remove('fade');void frame.offsetWidth;frame.classList.add('fade');
-
-  const PLAYER_BASE = window.__PLAYER_URL_FOR_SESSION || PLAYER_BASE_URL;
-
-  let finalUrl = '';
-
-  if (event.url){
-    const raw = String(event.url), urlStr = raw.toLowerCase();
-
-    if (event.isIframeOnly === true) finalUrl = raw;
-    else if (urlStr.includes('.m3u8')) finalUrl = `${PLAYER_BASE}?Talha=${encodeURIComponent(raw)}`;
-    else if (raw.includes('id=')){
-      try{
-        const urlParams = new URL(raw,location.href).searchParams;
-        const id = urlParams.get('id') || 'androstreamlivetrt1';
-        finalUrl = `${PLAYER_BASE}?Talha=${encodeURIComponent(id)}`;
-      }catch(e){
-        finalUrl = `${PLAYER_BASE}?Talha=${encodeURIComponent(raw)}`;
-      }
-    }else finalUrl = raw;
-  }else{
-    finalUrl = `${PLAYER_BASE}?Talha=androstreamlivetrt1`;
+function stableChannelKey(event,index=''){
+  if(!event||typeof event!=='object')return `fallback:${String(index)}`;
+  const directIds=[event.id,event.eventId,event.channelId,event.streamId,event.matchId,event.sourceId];
+  for(const raw of directIds){
+    const value=normalizeSearchText(raw||'');
+    if(value)return `id:${value}`;
   }
+  const urlCandidates=[event.url,event.streamUrl,event.link];
+  for(const raw of urlCandidates){
+    if(!raw)continue;
+    try{
+      const u=new URL(String(raw),location.href);
+      const q=u.searchParams.get('id')||u.searchParams.get('stream_id')||u.searchParams.get('channel')||u.searchParams.get('channel_id');
+      if(q)return `urlid:${normalizeSearchText(q)}`;
+      const clean=(u.origin+u.pathname).replace(/\/$/,'').toLowerCase();
+      if(clean)return `url:${clean}`;
+    }catch(e){
+      const plain=normalizeSearchText(raw);
+      if(plain)return `rawurl:${plain}`;
+    }
+  }
+  return `fallback:${normalizeSearchText(event?.title||'Live channel')}|${canonicalLeagueKey(event?.league||'other')}`;
+}
 
+function stableValue(value){
+  if(Array.isArray(value))return value.map(stableValue);
+  if(value&&typeof value==='object'){
+    const out={};
+    Object.keys(value).sort().forEach(k=>out[k]=stableValue(value[k]));
+    return out;
+  }
+  if(typeof value==='string')return normalizeTurkishText(value).trim();
+  return value;
+}
+
+function eventFingerprint(event){
+  try{return JSON.stringify(stableValue(event));}catch(e){return String(event);}
+}
+
+function diffFeedData(previous,next){
+  const prevMap=new Map(),nextMap=new Map();
+  (Array.isArray(previous)?previous:[]).forEach((event,index)=>prevMap.set(stableChannelKey(event,index),event));
+  (Array.isArray(next)?next:[]).forEach((event,index)=>nextMap.set(stableChannelKey(event,index),event));
+
+  let added=0,updated=0,removed=0;
+  const changedKeys=[];
+
+  nextMap.forEach((event,key)=>{
+    if(!prevMap.has(key))added++;
+    else if(eventFingerprint(prevMap.get(key))!==eventFingerprint(event)){updated++;changedKeys.push(key);}
+  });
+  prevMap.forEach((event,key)=>{if(!nextMap.has(key))removed++;});
+
+  return {added,updated,removed,total:added+updated+removed,changedKeys};
+}
+
+function showFeedChangePopup(diff){
+  if(!diff||diff.total<1)return;
+  const popup=document.getElementById('feedChangePopup');
+  if(!popup)return;
+  const newEl=document.getElementById('feedNewCount');
+  const updatedEl=document.getElementById('feedUpdatedCount');
+  const removedEl=document.getElementById('feedRemovedCount');
+  const timeEl=document.getElementById('feedChangeTime');
+  if(newEl)newEl.textContent=String(diff.added);
+  if(updatedEl)updatedEl.textContent=String(diff.updated);
+  if(removedEl)removedEl.textContent=String(diff.removed);
+  if(timeEl)timeEl.textContent=formatSyncTime(Date.now());
+  popup.classList.remove('show');
+  void popup.offsetWidth;
+  popup.classList.add('show');
+  clearTimeout(showFeedChangePopup.timer);
+  showFeedChangePopup.timer=setTimeout(()=>popup.classList.remove('show'),5000);
+}
+
+function resolvePlaybackUrl(event){
+  const PLAYER_BASE = window.__PLAYER_URL_FOR_SESSION || PLAYER_BASE_URL;
+  if(event?.url){
+    const raw=String(event.url),urlStr=raw.toLowerCase();
+    if(event.isIframeOnly===true)return raw;
+    if(urlStr.includes('.m3u8'))return `${PLAYER_BASE}?Talha=${encodeURIComponent(raw)}`;
+    if(raw.includes('id=')){
+      try{
+        const urlParams=new URL(raw,location.href).searchParams;
+        const id=urlParams.get('id')||'androstreamlivetrt1';
+        return `${PLAYER_BASE}?Talha=${encodeURIComponent(id)}`;
+      }catch(e){
+        return `${PLAYER_BASE}?Talha=${encodeURIComponent(raw)}`;
+      }
+    }
+    return raw;
+  }
+  return `${PLAYER_BASE}?Talha=androstreamlivetrt1`;
+}
+
+function markActivePlayingButton(){
+  document.querySelectorAll('.servers .server-item').forEach(btn=>btn.classList.remove('active'));
+  if(!currentPlayingKey)return;
+  document.querySelectorAll('.servers .server-item').forEach(btn=>{
+    if(btn.dataset.channelKey===currentPlayingKey)btn.classList.add('active');
+  });
+}
+
+function reloadPlayerSource(finalUrl){
+  const frame=document.getElementById('frame');
+  if(!frame)return;
+  frame.classList.remove('fade');
+  void frame.offsetWidth;
+  frame.classList.add('fade');
   try{
     frame.src='about:blank';
-    setTimeout(()=>{frame.src=finalUrl},20);
+    setTimeout(()=>{if(frame)frame.src=finalUrl;},20);
   }catch(e){
     frame.src=finalUrl;
   }
+  currentPlayingUrl=finalUrl;
+}
 
-  const eventIndex=liveEvents.indexOf(event);
-  rememberRecent(event,eventIndex);
-  renderRecent();
+function setServer(event,targetBtn,options={}){
+  const frame=document.getElementById('frame');if(!frame||!event)return;
+  const finalUrl=resolvePlaybackUrl(event);
+  const index=liveEvents.indexOf(event);
+  const key=stableChannelKey(event,index);
+  let sameSource=false;
+  try{sameSource=currentPlayingKey===key&&currentPlayingUrl===finalUrl&&frame.src===new URL(finalUrl,location.href).href;}catch(e){sameSource=currentPlayingKey===key&&currentPlayingUrl===finalUrl;}
 
-  document.querySelectorAll('.servers .server-item').forEach(btn=>btn.classList.remove('active'));
+  currentPlayingKey=key;
+  currentPlayingUrl=finalUrl;
+  currentPlayingTitle=translateText(event?.title||'Live channel');
+
+  if(!sameSource)reloadPlayerSource(finalUrl);
+
+  if(!options.skipRecent){
+    rememberRecent(event,index);
+    renderRecent();
+  }
+
+  markActivePlayingButton();
   if(targetBtn)targetBtn.classList.add('active');
 }
 
+function syncCurrentPlayerAfterFeedUpdate(nextEvents){
+  if(!currentPlayingKey)return;
+  const list=Array.isArray(nextEvents)?nextEvents:[];
+  const matchIndex=list.findIndex((event,index)=>stableChannelKey(event,index)===currentPlayingKey);
+  if(matchIndex<0){
+    markActivePlayingButton();
+    return;
+  }
+  const nextEvent=list[matchIndex];
+  const nextUrl=resolvePlaybackUrl(nextEvent);
+  if(nextUrl!==currentPlayingUrl){
+    currentPlayingUrl=nextUrl;
+    reloadPlayerSource(nextUrl);
+  }
+  currentPlayingTitle=translateText(nextEvent?.title||currentPlayingTitle||'Live channel');
+  markActivePlayingButton();
+}
+
 function triggerFirstStream(){
+  if(currentPlayingKey)return;
   if((!liveEvents||liveEvents.length===0)&&(Array.isArray(recentEvents)&&recentEvents.length===0)){
     if(STATIC_CHANNELS.length>0){
       const firstStaticRow=document.querySelector('#staticServerContainer .server-item');
@@ -1030,7 +1158,7 @@ function triggerFirstStream(){
       return;
     }
   }
-  const first=document.querySelector('.servers .server-item');
+  const first=document.querySelector('#serverContainer .servers .server-item') || document.querySelector('#serverContainer .server-item');
   if(first)first.click();
 }
 
@@ -1066,6 +1194,7 @@ function loadCachedFeed(){
   renderLeagueTabs();
   renderMatches();
   updateAnalytics();
+  markActivePlayingButton();
 
   const cacheTime=Number(cached.savedAt)||Number(storageGet(FEED_LAST_SYNC_KEY,'0'))||0;
   lastSuccessfulFeedSync=cacheTime;
@@ -1073,6 +1202,7 @@ function loadCachedFeed(){
   const offline=navigator.onLine===false;
   setStatus(offline?'Offline mode · cached feed':'Cached feed ready',offline?'offline':'ready');
   setSync(`Cached ${formatSyncTime(cacheTime)}`);
+  if(!currentPlayingKey)triggerFirstStream();
   return true;
 }
 
@@ -1082,16 +1212,23 @@ function isFeedStale(){
 }
 
 function maybeSyncStaleFeed(reason='visibility'){
-  if(document.body.classList.contains('auth-locked'))return;
-  if(navigator.onLine===false)return;
-
+  if(document.body.classList.contains('auth-locked')||navigator.onLine===false)return;
   const now=Date.now();
-  if((now-lastSyncAttemptAt)<ONLINE_SYNC_COOLDOWN_MS && liveEvents.length)return;
-
-  if(!liveEvents.length || isFeedStale()){
+  if((now-lastSyncAttemptAt)<ONLINE_SYNC_COOLDOWN_MS)return;
+  if(!liveEvents.length||isFeedStale()){
     lastSyncAttemptAt=now;
     loadTargetScript(true,reason);
   }
+}
+
+function startRealtimeAutoSync(){
+  if(realtimeSyncTimer)clearInterval(realtimeSyncTimer);
+  realtimeSyncTimer=setInterval(()=>{
+    if(document.body.classList.contains('auth-locked'))return;
+    if(navigator.onLine===false)return;
+    if(feedBusy)return;
+    loadTargetScript(true,'realtime');
+  },REALTIME_SYNC_INTERVAL_MS);
 }
 
 function recoverOnline(){
@@ -1112,7 +1249,7 @@ function feedError(message){
     setStatus(navigator.onLine===false?'Offline mode · cached feed':'Feed delayed · cached feed','offline');
     setSync(`Cached ${formatSyncTime(lastSuccessfulFeedSync)}`);
     showToast('Using cached feed', 'The live source could not be refreshed, so the last synced channels remain available.');
-    triggerFirstStream();
+    if(!currentPlayingKey)triggerFirstStream();
     return;
   }
 
@@ -1147,8 +1284,9 @@ function loadTargetScript(force=false,reason='manual'){
 
   const requestToken=++feedRequestToken;
   feedBusy=true;
-  setStatus(reason==='online'?'Connection restored · syncing…':'Syncing live feeds…','busy');
-  setSync('Connecting…');
+  const silentBackground=reason==='realtime'||reason==='visibility';
+  if(!silentBackground)setStatus(reason==='online'?'Connection restored · syncing…':'Syncing live feeds…','busy');
+  if(!silentBackground)setSync('Connecting…');
 
   const container=document.getElementById('serverContainer');
   if(container && !liveEvents.length){
@@ -1173,6 +1311,11 @@ function loadTargetScript(force=false,reason='manual'){
     settled=true;
     feedBusy=false;
     script.remove();
+    if(reason==='realtime'||reason==='visibility'){
+      feedBusy=false;
+      setStatus(navigator.onLine===false?'Offline mode · network unavailable':'System ready',navigator.onLine===false?'offline':'ready');
+      return;
+    }
     feedError('Feed server did not respond in time.');
   },FEED_TIMEOUT);
 
@@ -1182,6 +1325,10 @@ function loadTargetScript(force=false,reason='manual'){
     clearTimeout(timeout);
     feedBusy=false;
     script.remove();
+    if(reason==='realtime'||reason==='visibility'){
+      setStatus(navigator.onLine===false?'Offline mode · network unavailable':'System ready',navigator.onLine===false?'offline':'ready');
+      return;
+    }
     feedError('Feed server is unavailable right now.');
   };
 
@@ -1213,20 +1360,36 @@ function loadTargetScript(force=false,reason='manual'){
       });
 
       const activeCustomFeeds=CUSTOM_TOP_FEEDS.filter(item=>item&&item.show===true);
-      liveEvents=[...activeCustomFeeds,...tempEvents];
+      const nextEvents=[...activeCustomFeeds,...tempEvents];
+      const previousEvents=Array.isArray(liveEvents)?liveEvents.slice():[];
+      const diff=diffFeedData(previousEvents,nextEvents);
+      const firstFeed=previousEvents.length===0;
 
+      liveEvents=nextEvents;
       migrateStoredEventState(liveEvents);
-      updateAnalytics();
-      renderLeagueTabs();
-      renderMatches();
+
+      if(firstFeed||diff.total>0){
+        updateAnalytics();
+        renderLeagueTabs();
+        renderMatches();
+        syncCurrentPlayerAfterFeedUpdate(liveEvents);
+      }else{
+        updateAnalytics();
+        markActivePlayingButton();
+      }
+
       cacheLiveFeed(liveEvents);
 
       setStatus('System ready','ready');
       setSync(`Synced ${formatSyncTime(lastSuccessfulFeedSync)}`);
 
-      if(liveEvents.length)triggerFirstStream();
-      else triggerFirstStream();
+      if(diff.total>0&&!firstFeed)showFeedChangePopup(diff);
+      if(firstFeed&&!currentPlayingKey)triggerFirstStream();
     }catch(err){
+      if(reason==='realtime'||reason==='visibility'){
+        setStatus(navigator.onLine===false?'Offline mode · network unavailable':'System ready',navigator.onLine===false?'offline':'ready');
+        return;
+      }
       feedError('Feed data could not be processed.');
     }
   };
@@ -1272,7 +1435,8 @@ function login(){
     loadCachedFeed();
   }
 
-  loadTargetScript();
+  startRealtimeAutoSync();
+  loadTargetScript(true,'initial');
 }
 
 function toggleTheatre(status){
@@ -1426,7 +1590,10 @@ window.addEventListener('offline',()=>{updateNetwork();if(!document.body.classLi
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible'){
     updateNetwork();
-    maybeSyncStaleFeed('visibility');
+    if(!document.body.classList.contains('auth-locked')&&navigator.onLine!==false){
+      lastSuccessfulFeedSync=lastSuccessfulFeedSync||0;
+      maybeSyncStaleFeed('visibility');
+    }
   }
 });
 window.addEventListener('pageshow',()=>{
