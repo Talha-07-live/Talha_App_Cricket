@@ -109,6 +109,28 @@ body{
   -webkit-backface-visibility:hidden;
   backface-visibility:hidden;
 }
+#pph-fallback-layer{
+  position:absolute;
+  inset:0;
+  z-index:40;
+  width:100%;
+  height:100%;
+  display:none;
+  background:#000;
+  overflow:hidden;
+}
+#pph-fallback-layer.active{
+  display:block;
+}
+#pph-fallback-layer iframe{
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
+  margin:0;
+  padding:0;
+  background:#000;
+}
 #custom-poster-overlay{
   position:absolute;
   inset:0;
@@ -233,6 +255,51 @@ body{
   pointer-events:none;
   transform:translateX(-50%) translateY(-10px);
 }
+#pip-top-btn{
+  position:absolute;
+  top:14px;
+  left:14px;
+  z-index:120;
+  min-width:46px;
+  height:34px;
+  padding:0 11px;
+  border:1px solid var(--skin-accent);
+  border-radius:10px;
+  background:rgba(0,0,0,.82);
+  color:#fff;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.5px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 5px 18px rgba(0,0,0,.55),0 0 12px var(--skin-glow);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  transition:transform .18s ease,background .18s ease,color .18s ease,border-color .18s ease,opacity .3s ease,visibility .3s ease;
+  touch-action:manipulation;
+  user-select:none;
+}
+#pip-top-btn:hover{
+  background:var(--skin-accent);
+  color:#000;
+  transform:translateY(-1px) scale(1.03);
+}
+#pip-top-btn:active{
+  transform:scale(.96);
+}
+#pip-top-btn:focus-visible{
+  outline:2px solid #fff;
+  outline-offset:2px;
+}
+#pip-top-btn.active{
+  background:var(--skin-accent);
+  color:#000;
+}
+#pip-top-btn.unsupported{
+  opacity:.68;
+}
 #settings-toggle-btn{
   position:fixed;
   top:calc(env(safe-area-inset-top,0px) + 12px);
@@ -253,10 +320,16 @@ body{
   font-size:18px;
   line-height:1;
   box-shadow:0 4px 18px rgba(0,0,0,.6);
-  transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s ease,box-shadow .22s ease;
+  transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s ease,box-shadow .22s ease,opacity .3s ease,visibility .3s ease;
   touch-action:manipulation;
   -webkit-user-select:none;
   user-select:none;
+}
+#pip-top-btn.fade-hidden,
+#settings-toggle-btn.fade-hidden{
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
 }
 #settings-toggle-btn:hover,
 #settings-toggle-btn:focus-visible{
@@ -271,6 +344,7 @@ body{
 #control-drawer{
   position:fixed;
   top:calc(env(safe-area-inset-top,0px) + 58px);
+  bottom:auto;
   right:max(12px,env(safe-area-inset-right,0px));
   z-index:10001;
   width:min(320px,calc(100vw - 24px));
@@ -677,6 +751,33 @@ input[type="range"]::-moz-range-thumb{
   line-height:1.6;
 }
 @media(max-width:480px){
+  #pip-top-btn{
+    top:9px;
+    left:9px;
+    min-width:42px;
+    height:31px;
+    padding:0 9px;
+    font-size:10px;
+    border-radius:9px;
+  }
+  #settings-toggle-btn{
+    top:auto;
+    bottom:calc(env(safe-area-inset-bottom,0px) + 8px);
+    right:max(8px,env(safe-area-inset-right,0px));
+    width:36px;
+    height:36px;
+    font-size:16px;
+  }
+  #control-drawer{
+    top:auto;
+    bottom:calc(env(safe-area-inset-bottom,0px) + 56px);
+    right:max(8px,env(safe-area-inset-right,0px));
+    width:min(290px,calc(100vw - 16px));
+    max-height:min(70dvh,420px);
+    padding:10px;
+    gap:10px;
+    border-radius:14px;
+  }
   #player-loading-indicator{
     bottom:14px;
     min-width:148px;
@@ -688,22 +789,6 @@ input[type="range"]::-moz-range-thumb{
     top:10px;
     padding:5px 11px;
     font-size:9.5px;
-  }
-  #settings-toggle-btn{
-    top:calc(env(safe-area-inset-top,0px) + 8px);
-    right:max(8px,env(safe-area-inset-right,0px));
-    width:36px;
-    height:36px;
-    font-size:16px;
-  }
-  #control-drawer{
-    top:calc(env(safe-area-inset-top,0px) + 48px);
-    right:max(8px,env(safe-area-inset-right,0px));
-    width:min(290px,calc(100vw - 16px));
-    max-height:min(70dvh,420px);
-    padding:10px;
-    gap:10px;
-    border-radius:14px;
   }
   .tab-btn{
     min-height:32px;
@@ -719,22 +804,29 @@ input[type="range"]::-moz-range-thumb{
   }
 }
 @media(max-height:480px) and (orientation:landscape){
-  #player-loading-indicator{
-    bottom:10px;
+  #pip-top-btn{
+    top:7px;
+    left:8px;
+    height:30px;
   }
   #settings-toggle-btn{
-    top:calc(env(safe-area-inset-top,0px) + 6px);
+    top:12px;
+    bottom:8px;
     width:34px;
     height:34px;
     font-size:15px;
   }
   #control-drawer{
-    top:calc(env(safe-area-inset-top,0px) + 42px);
+    top:auto;
+    bottom:50px;
     right:max(8px,env(safe-area-inset-right,0px));
     width:min(300px,calc(100vw - 16px));
     max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 50px);
     padding:8px;
     gap:8px;
+  }
+  #player-loading-indicator{
+    bottom:10px;
   }
 }
 @media(prefers-reduced-motion:reduce){
@@ -891,7 +983,24 @@ input[type="range"]::-moz-range-thumb{
       <span>UNMUTE</span>
     </button>
 
+    <button id="pip-top-btn"
+            type="button"
+            title="Picture in Picture"
+            aria-pressed="false">
+      PiP
+    </button>
+
     <div id="player-container"></div>
+
+    <div id="pph-fallback-layer"
+         aria-hidden="true">
+      <iframe id="pph-fallback-frame"
+              title="Backup Player"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media; web-share"
+              allowfullscreen
+              frameborder="0"
+              scrolling="no"></iframe>
+    </div>
 
   </div>
 
@@ -959,27 +1068,11 @@ input[type="range"]::-moz-range-thumb{
       <div class="control-group">
         <select id="drawer-quality-selector"
                 class="quality-select">
-
-          <option value="-1">
-            Auto
-          </option>
-
-          <option value="1080p">
-            1080p (Full HD)
-          </option>
-
-          <option value="720p">
-            720p (HD)
-          </option>
-
-          <option value="480p">
-            480p (SD)
-          </option>
-
-          <option value="360p">
-            360p
-          </option>
-
+          <option value="-1">Auto</option>
+          <option value="1080p">1080p (Full HD)</option>
+          <option value="720p">720p (HD)</option>
+          <option value="480p">480p (SD)</option>
+          <option value="360p">360p</option>
         </select>
       </div>
 
@@ -989,13 +1082,9 @@ input[type="range"]::-moz-range-thumb{
       </div>
 
       <div class="control-group">
-
         <div class="control-header">
           <span>Brightness</span>
-          <span class="val"
-                id="val-brightness">
-            100%
-          </span>
+          <span class="val" id="val-brightness">100%</span>
         </div>
 
         <input type="range"
@@ -1006,13 +1095,9 @@ input[type="range"]::-moz-range-thumb{
       </div>
 
       <div class="control-group">
-
         <div class="control-header">
           <span>Contrast</span>
-          <span class="val"
-                id="val-contrast">
-            100%
-          </span>
+          <span class="val" id="val-contrast">100%</span>
         </div>
 
         <input type="range"
@@ -1023,13 +1108,9 @@ input[type="range"]::-moz-range-thumb{
       </div>
 
       <div class="control-group">
-
         <div class="control-header">
           <span>Saturation</span>
-          <span class="val"
-                id="val-saturate">
-            100%
-          </span>
+          <span class="val" id="val-saturate">100%</span>
         </div>
 
         <input type="range"
@@ -1083,8 +1164,7 @@ input[type="range"]::-moz-range-thumb{
 
         <div class="control-header">
           <span>Volume Boost</span>
-          <span class="val"
-                id="val-gain">
+          <span class="val" id="val-gain">
             100%
           </span>
         </div>
@@ -1134,11 +1214,58 @@ input[type="range"]::-moz-range-thumb{
 </div>
 
 <script>
+let autoHideTimer=null;
+
+function showOverlayButtons(){
+  const pipBtn=document.getElementById('pip-top-btn');
+  const settingsBtn=document.getElementById('settings-toggle-btn');
+
+  if(pipBtn){
+    pipBtn.classList.remove('fade-hidden');
+  }
+
+  if(settingsBtn){
+    settingsBtn.classList.remove('fade-hidden');
+  }
+}
+
+function hideOverlayButtons(){
+  const drawer=document.getElementById('control-drawer');
+
+  if(drawer && drawer.classList.contains('open')){
+    return;
+  }
+
+  const pipBtn=document.getElementById('pip-top-btn');
+  const settingsBtn=document.getElementById('settings-toggle-btn');
+
+  if(pipBtn){
+    pipBtn.classList.add('fade-hidden');
+  }
+
+  if(settingsBtn){
+    settingsBtn.classList.add('fade-hidden');
+  }
+}
+
+function resetControlsTimer(){
+  showOverlayButtons();
+
+  if(autoHideTimer){
+    clearTimeout(autoHideTimer);
+  }
+
+  autoHideTimer=setTimeout(()=>{
+    hideOverlayButtons();
+  },4000);
+}
+
+['mousemove','touchstart','pointerdown','click'].forEach(evt=>{
+  document.addEventListener(evt,resetControlsTimer,{passive:true});
+});
+
 function hidePoster(){
-  const poster=
-    document.getElementById(
-      'custom-poster-overlay'
-    );
+  const poster=document.getElementById('custom-poster-overlay');
 
   if(
     poster &&
@@ -1149,10 +1276,7 @@ function hidePoster(){
 }
 
 function hideLoadingIndicator(){
-  const loading=
-    document.getElementById(
-      'player-loading-indicator'
-    );
+  const loading=document.getElementById('player-loading-indicator');
 
   if(
     loading &&
@@ -1163,10 +1287,7 @@ function hideLoadingIndicator(){
 }
 
 function showLoadingIndicator(){
-  const loading=
-    document.getElementById(
-      'player-loading-indicator'
-    );
+  const loading=document.getElementById('player-loading-indicator');
 
   if(loading){
     loading.classList.remove('hide');
@@ -1175,32 +1296,28 @@ function showLoadingIndicator(){
 
 (function(){
 
-  const themes=
-    new Set([
-      'cyber',
-      'netflix',
-      'prime',
-      'gold',
-      'emerald',
-      'amethyst'
-    ]);
+  const themes=new Set([
+    'cyber',
+    'netflix',
+    'prime',
+    'gold',
+    'emerald',
+    'amethyst'
+  ]);
 
-  const params=
-    new URLSearchParams(
-      window.location.search
-    );
+  const params=new URLSearchParams(
+    window.location.search
+  );
 
-  const requestedTheme=
-    String(
-      params.get('theme')||''
-    ).toLowerCase();
+  const requestedTheme=String(
+    params.get('theme')||''
+  ).toLowerCase();
 
-  const storedTheme=
-    String(
-      localStorage.getItem(
-        'player_skin_theme'
-      )||'gold'
-    ).toLowerCase();
+  const storedTheme=String(
+    localStorage.getItem(
+      'player_skin_theme'
+    )||'gold'
+  ).toLowerCase();
 
   const activeTheme=
     themes.has(requestedTheme)
@@ -1220,10 +1337,9 @@ function showLoadingIndicator(){
 
       showLoadingIndicator();
 
-      const meta=
-        document.querySelector(
-          'meta[name="theme-color"]'
-        );
+      const meta=document.querySelector(
+        'meta[name="theme-color"]'
+      );
 
       if(meta){
 
@@ -1237,46 +1353,38 @@ function showLoadingIndicator(){
           )
           .trim()||'#000000'
         );
-
       }
 
-      const toggle=
-        document.getElementById(
-          'settings-toggle-btn'
-        );
+      const toggle=document.getElementById(
+        'settings-toggle-btn'
+      );
 
-      const drawer=
-        document.getElementById(
-          'control-drawer'
-        );
+      const drawer=document.getElementById(
+        'control-drawer'
+      );
 
-      const tabs=
-        document.querySelectorAll(
-          '.tab-btn'
-        );
+      const tabs=document.querySelectorAll(
+        '.tab-btn'
+      );
 
-      const contents=
-        document.querySelectorAll(
-          '.tab-content'
-        );
+      const contents=document.querySelectorAll(
+        '.tab-content'
+      );
 
-      const skins=
-        document.querySelectorAll(
-          '.skin-btn'
-        );
+      const skins=document.querySelectorAll(
+        '.skin-btn'
+      );
 
-      const poster=
-        document.getElementById(
-          'custom-poster-overlay'
-        );
+      const poster=document.getElementById(
+        'custom-poster-overlay'
+      );
 
       poster?.addEventListener(
         'click',
         ()=>{
-          const video=
-            document.querySelector(
-              '#player-container video'
-            );
+          const video=document.querySelector(
+            '#player-container video'
+          );
 
           if(video){
             tryVideoPlay(video);
@@ -1295,6 +1403,7 @@ function showLoadingIndicator(){
           'false'
         );
 
+        resetControlsTimer();
       };
 
       const openDrawer=()=>{
@@ -1308,15 +1417,19 @@ function showLoadingIndicator(){
           'true'
         );
 
+        showOverlayButtons();
+
+        if(autoHideTimer){
+          clearTimeout(autoHideTimer);
+        }
       };
 
       skins.forEach(
         button=>{
 
-          const skin=
-            button.getAttribute(
-              'data-skin'
-            );
+          const skin=button.getAttribute(
+            'data-skin'
+          );
 
           if(skin===activeTheme){
             button.classList.add(
@@ -1354,7 +1467,6 @@ function showLoadingIndicator(){
                   )
                   .trim()||'#000000'
                 );
-
               }
 
               skins.forEach(
@@ -1365,10 +1477,8 @@ function showLoadingIndicator(){
                   );
                 }
               );
-
             }
           );
-
         }
       );
 
@@ -1393,7 +1503,6 @@ function showLoadingIndicator(){
           )
             ? closeDrawer()
             : openDrawer();
-
         }
       );
 
@@ -1409,8 +1518,7 @@ function showLoadingIndicator(){
             return;
           }
 
-          const target=
-            event.target;
+          const target=event.target;
 
           if(
             target!==toggle &&
@@ -1418,7 +1526,6 @@ function showLoadingIndicator(){
           ){
             closeDrawer();
           }
-
         },
         {passive:true}
       );
@@ -1430,7 +1537,6 @@ function showLoadingIndicator(){
           if(event.key==='Escape'){
             closeDrawer();
           }
-
         }
       );
 
@@ -1441,10 +1547,9 @@ function showLoadingIndicator(){
             'click',
             ()=>{
 
-              const id=
-                tab.getAttribute(
-                  'data-tab'
-                );
+              const id=tab.getAttribute(
+                'data-tab'
+              );
 
               tabs.forEach(
                 item=>{
@@ -1476,15 +1581,12 @@ function showLoadingIndicator(){
                 top:0,
                 behavior:'smooth'
               });
-
             }
           );
-
         }
       );
 
       initAudioVideoFx();
-
     }
   );
 
@@ -1549,21 +1651,18 @@ function clearAutoplayTimers(){
   );
 
   autoplayTimers=[];
-
 }
 
 function scheduleAutoplay(delay){
 
-  const timer=
-    setTimeout(
-      forceAutoplay,
-      delay
-    );
+  const timer=setTimeout(
+    forceAutoplay,
+    delay
+  );
 
   autoplayTimers.push(
     timer
   );
-
 }
 
 function clampNumber(
@@ -1573,16 +1672,17 @@ function clampNumber(
   fallback
 ){
 
-  const n=
-    Number(value);
+  const n=Number(value);
 
   return Number.isFinite(n)
     ? Math.min(
         max,
-        Math.max(min,n)
+        Math.max(
+          min,
+          n
+        )
       )
     : fallback;
-
 }
 
 videoSettings.brightness=
@@ -1647,9 +1747,7 @@ function applyVideoFilters(){
 
     video.style.filter=
       filter;
-
   }
-
 }
 
 function updateVideoUI(){
@@ -1693,10 +1791,8 @@ function updateVideoUI(){
         label.textContent=
           value+'%';
       }
-
     }
   );
-
 }
 
 function updateAudioUI(){
@@ -1741,7 +1837,6 @@ function updateAudioUI(){
     vocal.checked=
       audioSettings.vocal;
   }
-
 }
 
 function updateVideoParams(
@@ -1791,7 +1886,6 @@ function updateVideoParams(
 
   updateVideoUI();
   applyVideoFilters();
-
 }
 
 function applyAudioSettings(){
@@ -1820,7 +1914,6 @@ function applyAudioSettings(){
         : 0;
 
   }catch(e){}
-
 }
 
 async function resumeAudioContext(){
@@ -1832,15 +1925,13 @@ async function resumeAudioContext(){
   try{
 
     if(
-      audioCtx.state==='suspended'
+      audioCtx.state===
+      'suspended'
     ){
-
       await audioCtx.resume();
-
     }
 
   }catch(e){}
-
 }
 
 function disconnectAudioGraph(){
@@ -1860,7 +1951,6 @@ function disconnectAudioGraph(){
   try{
     gainNode?.disconnect();
   }catch(e){}
-
 }
 
 function setupAudioNodes(){
@@ -1886,7 +1976,6 @@ function setupAudioNodes(){
     );
 
     return true;
-
   }
 
   try{
@@ -1916,7 +2005,6 @@ function setupAudioNodes(){
       }
 
       return true;
-
     }
 
     disconnectAudioGraph();
@@ -1951,7 +2039,9 @@ function setupAudioNodes(){
     source.connect(bass);
     bass.connect(vocal);
     vocal.connect(gain);
-    gain.connect(audioCtx.destination);
+    gain.connect(
+      audioCtx.destination
+    );
 
     mediaSource=source;
     gainNode=gain;
@@ -1975,9 +2065,7 @@ function setupAudioNodes(){
     );
 
     return false;
-
   }
-
 }
 
 function applyDesiredAudioState(
@@ -2009,6 +2097,7 @@ function applyDesiredAudioState(
 
       video.muted=muted;
       video.defaultMuted=muted;
+
       video.volume=
         muted
           ? 0
@@ -2032,9 +2121,7 @@ function applyDesiredAudioState(
         video.removeAttribute(
           'muted'
         );
-
       }
-
     }
 
     video.autoplay=true;
@@ -2061,10 +2148,11 @@ function applyDesiredAudioState(
     );
 
   }catch(e){}
-
 }
 
-function tryVideoPlay(video){
+function tryVideoPlay(
+  video
+){
 
   if(!video){
     return Promise.resolve(false);
@@ -2087,16 +2175,15 @@ function tryVideoPlay(video){
 
       return promise.then(
         ()=>{
+
           hidePoster();
           hideLoadingIndicator();
+
           return true;
         }
       ).catch(
-        ()=>{
-          return false;
-        }
+        ()=>false
       );
-
     }
 
     if(!video.paused){
@@ -2107,13 +2194,13 @@ function tryVideoPlay(video){
       return Promise.resolve(
         true
       );
-
     }
 
   }catch(e){}
 
-  return Promise.resolve(false);
-
+  return Promise.resolve(
+    false
+  );
 }
 
 function forceAutoplay(){
@@ -2138,11 +2225,11 @@ function forceAutoplay(){
     video.muted=true;
     video.defaultMuted=true;
     video.volume=0;
+
     video.setAttribute(
       'muted',
       ''
     );
-
   }
 
   tryVideoPlay(
@@ -2150,17 +2237,18 @@ function forceAutoplay(){
   );
 
   return true;
-
 }
 
 function startAutoplayRetries(){
 
   clearAutoplayTimers();
 
-  // Dense first-second retry window for WebView/mobile autoplay races.
-  [30,90,180,320,520,800,1200,1800,2600,3800,5200,7000,9000,12000]
-    .forEach(scheduleAutoplay);
-
+  scheduleAutoplay(50);
+  scheduleAutoplay(180);
+  scheduleAutoplay(450);
+  scheduleAutoplay(900);
+  scheduleAutoplay(1600);
+  scheduleAutoplay(2600);
 }
 
 function syncAudioFromPlayer(
@@ -2185,9 +2273,7 @@ function syncAudioFromPlayer(
   }else if(audioUnlocked){
 
     audioUserMuted=true;
-
   }
-
 }
 
 function unmuteEverything(){
@@ -2202,9 +2288,6 @@ function unmuteEverything(){
     document.getElementById(
       'unmute-overlay-btn'
     );
-
-  const player=
-    window.activeStreamPlayer?.player;
 
   const video=
     document.querySelector(
@@ -2222,7 +2305,6 @@ function unmuteEverything(){
   ){
 
     setupAudioNodes();
-
   }
 
   if(audioCtx){
@@ -2237,13 +2319,12 @@ function unmuteEverything(){
         typeof result.catch===
         'function'
       ){
-
-        result.catch(()=>{});
-
+        result.catch(
+          ()=>{}
+        );
       }
 
     }catch(e){}
-
   }
 
   try{
@@ -2273,19 +2354,6 @@ function unmuteEverything(){
 
   try{
 
-    if(player){
-
-      player.unmute();
-      player.setVolume(
-        100
-      );
-
-    }
-
-  }catch(e){}
-
-  try{
-
     const result=
       video.play();
 
@@ -2294,9 +2362,9 @@ function unmuteEverything(){
       typeof result.catch===
       'function'
     ){
-
-      result.catch(()=>{});
-
+      result.catch(
+        ()=>{}
+      );
     }
 
   }catch(e){}
@@ -2309,9 +2377,7 @@ function unmuteEverything(){
     button.classList.add(
       'hidden'
     );
-
   }
-
 }
 
 function bindCurrentVideo(
@@ -2337,13 +2403,10 @@ function bindCurrentVideo(
       audioSettings.bass ||
       audioSettings.vocal
     ){
-
       setupAudioNodes();
-
     }
 
     return;
-
   }
 
   if(videoEventCleanup){
@@ -2369,11 +2432,8 @@ function bindCurrentVideo(
       audioSettings.bass ||
       audioSettings.vocal
     ){
-
       setupAudioNodes();
-
     }
-
   };
 
   const handleCanPlay=()=>{
@@ -2387,7 +2447,6 @@ function bindCurrentVideo(
     tryVideoPlay(
       video
     );
-
   };
 
   const handlePlaying=()=>{
@@ -2395,22 +2454,8 @@ function bindCurrentVideo(
     hidePoster();
     hideLoadingIndicator();
     applyVideoFilters();
-    clearAutoplayTimers();
 
-  };
-
-  const handleWaiting=()=>{
-
-    showLoadingIndicator();
-    scheduleAutoplay(350);
-
-  };
-
-  const handleStalled=()=>{
-
-    showLoadingIndicator();
-    scheduleAutoplay(650);
-
+    window.activeStreamPlayer?.updatePipButton?.();
   };
 
   const handleTimeUpdate=()=>{
@@ -2421,9 +2466,25 @@ function bindCurrentVideo(
 
       hidePoster();
       hideLoadingIndicator();
-
     }
+  };
 
+  const handleVideoError=()=>{
+
+    const player=
+      window.activeStreamPlayer;
+
+    if(
+      player &&
+      player.isPphEligible() &&
+      !player.pphFallbackUsed
+    ){
+
+      player.showPphFallbackIframe();
+    }else if(player){
+
+      player.handlePlaybackError();
+    }
   };
 
   video.addEventListener(
@@ -2451,20 +2512,14 @@ function bindCurrentVideo(
   );
 
   video.addEventListener(
-    'waiting',
-    handleWaiting,
-    {passive:true}
-  );
-
-  video.addEventListener(
-    'stalled',
-    handleStalled,
-    {passive:true}
-  );
-
-  video.addEventListener(
     'timeupdate',
     handleTimeUpdate,
+    {passive:true}
+  );
+
+  video.addEventListener(
+    'error',
+    handleVideoError,
     {passive:true}
   );
 
@@ -2493,22 +2548,16 @@ function bindCurrentVideo(
       );
 
       video.removeEventListener(
-        'waiting',
-        handleWaiting
-      );
-
-      video.removeEventListener(
-        'stalled',
-        handleStalled
-      );
-
-      video.removeEventListener(
         'timeupdate',
         handleTimeUpdate
       );
 
-    }catch(e){}
+      video.removeEventListener(
+        'error',
+        handleVideoError
+      );
 
+    }catch(e){}
   };
 
   applyVideoFilters();
@@ -2524,9 +2573,7 @@ function bindCurrentVideo(
     tryVideoPlay(
       video
     );
-
   }
-
 }
 
 function observePlayerVideo(){
@@ -2545,6 +2592,7 @@ function observePlayerVideo(){
   videoObserver=
     new MutationObserver(
       ()=>{
+
         const video=
           container.querySelector(
             'video'
@@ -2568,11 +2616,8 @@ function observePlayerVideo(){
           }else{
 
             startAutoplayRetries();
-
           }
-
         }
-
       }
     );
 
@@ -2604,11 +2649,8 @@ function observePlayerVideo(){
     }else{
 
       startAutoplayRetries();
-
     }
-
   }
-
 }
 
 function initAudioVideoFx(){
@@ -2670,7 +2712,6 @@ function initAudioVideoFx(){
       );
 
       applyVideoFilters();
-
     }
   );
 
@@ -2698,7 +2739,6 @@ function initAudioVideoFx(){
       );
 
       applyVideoFilters();
-
     }
   );
 
@@ -2726,7 +2766,6 @@ function initAudioVideoFx(){
       );
 
       applyVideoFilters();
-
     }
   );
 
@@ -2811,7 +2850,6 @@ function initAudioVideoFx(){
       if(audioUnlocked){
         resumeAudioContext();
       }
-
     }
   );
 
@@ -2835,7 +2873,6 @@ function initAudioVideoFx(){
       if(audioUnlocked){
         resumeAudioContext();
       }
-
     }
   );
 
@@ -2859,7 +2896,6 @@ function initAudioVideoFx(){
       if(audioUnlocked){
         resumeAudioContext();
       }
-
     }
   );
 
@@ -2874,7 +2910,6 @@ function initAudioVideoFx(){
   );
 
   observePlayerVideo();
-
 }
 
 const pageURL=
@@ -2899,12 +2934,15 @@ const isIOS=
   );
 
 function getInputValue(){
+
   return String(
     inputId||''
   ).trim();
 }
 
-function normalizeInputId(value){
+function normalizeInputId(
+  value
+){
 
   let v=
     String(
@@ -2912,14 +2950,18 @@ function normalizeInputId(value){
     ).trim();
 
   try{
-    v=decodeURIComponent(v);
+    v=
+      decodeURIComponent(
+        v
+      );
   }catch(e){}
 
   return v;
-
 }
 
-function extractIdFromUrl(value){
+function extractIdFromUrl(
+  value
+){
 
   const raw=
     normalizeInputId(
@@ -2950,124 +2992,159 @@ function extractIdFromUrl(value){
   }catch(e){}
 
   return raw;
-
 }
+
+function isPphFallbackChannel(
+  id
+){
+
+  return /^androstreamlivech\d{8}$/i.test(
+    String(
+      id||''
+    ).trim()
+  );
+}
+
+function getEightDigitPphSource(
+  id
+){
+
+  const value=
+    String(
+      id||''
+    ).trim();
+
+  const match=
+    value.match(
+      /^androstreamlivech(\d{8})$/i
+    );
+
+  if(!match){
+    return null;
+  }
+
+  return(
+    'https://pph.player-us.xyz/tv/?stream_id='+
+    encodeURIComponent(
+      match[1]
+    )
+  );
+}
+
+let feedScriptPromise=null;
 
 function loadFeedScript(){
 
-  return new Promise(
-    (resolve,reject)=>{
+  if(
+    Array.isArray(
+      window.karsilasmalar
+    )
+  ){
 
-      if(
-        Array.isArray(
-          window.karsilasmalar
-        )
-      ){
+    return Promise.resolve(
+      window.karsilasmalar
+    );
+  }
 
-        resolve(
-          window.karsilasmalar
-        );
+  if(feedScriptPromise){
+    return feedScriptPromise;
+  }
 
-        return;
+  feedScriptPromise=
+    new Promise(
+      (resolve,reject)=>{
 
-      }
+        const existing=
+          document.getElementById(
+            'dynamic-feed-script'
+          );
 
-      const existing=
-        document.getElementById(
-          'dynamic-feed-script'
-        );
+        const finish=()=>{
 
-      if(existing){
-
-        const check=()=>{
-
-          Array.isArray(
-            window.karsilasmalar
-          )
-            ? resolve(
-                window.karsilasmalar
-              )
-            : reject(
-                new Error(
-                  'Feed Vector Missing'
-                )
-              );
-
-        };
-
-        existing.addEventListener(
-          'load',
-          check,
-          {once:true}
-        );
-
-        existing.addEventListener(
-          'error',
-          ()=>{
-            reject(
-              new Error(
-                'Feed Load Failed'
-              )
-            );
-          },
-          {once:true}
-        );
-
-        setTimeout(
-          check,
-          9000
-        );
-
-        return;
-
-      }
-
-      const script=
-        document.createElement(
-          'script'
-        );
-
-      script.id=
-        'dynamic-feed-script';
-
-      script.src=
-        'https://mahsunsports39.xyz/script4.js';
-
-      script.async=true;
-
-      script.onload=()=>{
-
-        Array.isArray(
-          window.karsilasmalar
-        )
-          ? resolve(
+          if(
+            Array.isArray(
               window.karsilasmalar
             )
-          : reject(
+          ){
+
+            resolve(
+              window.karsilasmalar
+            );
+
+          }else{
+
+            reject(
               new Error(
                 'Feed Vector Missing'
               )
             );
+          }
+        };
 
-      };
+        if(existing){
 
-      script.onerror=()=>{
+          existing.addEventListener(
+            'load',
+            finish,
+            {once:true}
+          );
 
-        reject(
-          new Error(
-            'Feed Load Failed'
-          )
+          existing.addEventListener(
+            'error',
+            ()=>{
+              reject(
+                new Error(
+                  'Feed Load Failed'
+                )
+              );
+            },
+            {once:true}
+          );
+
+          setTimeout(
+            finish,
+            3500
+          );
+
+          return;
+        }
+
+        const script=
+          document.createElement(
+            'script'
+          );
+
+        script.id=
+          'dynamic-feed-script';
+
+        script.src=
+          'https://mahsunsports39.xyz/script4.js';
+
+        script.async=true;
+
+        script.onload=
+          finish;
+
+        script.onerror=()=>{
+          reject(
+            new Error(
+              'Feed Load Failed'
+            )
+          );
+        };
+
+        document.head.appendChild(
+          script
         );
 
-      };
+        setTimeout(
+          finish,
+          3500
+        );
+      }
+    );
 
-      document.head.appendChild(
-        script
-      );
-
-    }
-  );
-
+  return feedScriptPromise;
 }
 
 function findFeedEvent(
@@ -3084,6 +3161,7 @@ function findFeedEvent(
     !target ||
     !Array.isArray(events)
   ){
+
     return null;
   }
 
@@ -3101,7 +3179,9 @@ function findFeedEvent(
         event?.link
       ].map(
         item=>
-          String(item||'')
+          String(
+            item||''
+          )
       );
 
       return candidates.some(
@@ -3130,15 +3210,11 @@ function findFeedEvent(
           }catch(e){
 
             return false;
-
           }
-
         }
       );
-
     }
   )||null;
-
 }
 
 async function resolveFeedSource(
@@ -3179,7 +3255,9 @@ async function resolveFeedSource(
     ]
     .map(
       item=>
-        String(item||'').trim()
+        String(
+          item||''
+        ).trim()
     )
     .filter(Boolean);
 
@@ -3199,11 +3277,14 @@ async function resolveFeedSource(
       extractIdFromUrl(
         candidates.find(
           value=>
-            /id=/i.test(value)
+            /id=/i.test(
+              value
+            )
         )||
         event.id||
         key
-      )||key
+      )||
+      key
     );
 
   }catch(e){
@@ -3214,34 +3295,76 @@ async function resolveFeedSource(
     );
 
     return null;
-
   }
-
 }
 
-async function resolveCinemaSource(
+function isAndroChannel(
   id
 ){
 
-  if(
-    !id ||
-    typeof id!=='string'
-  ){
-    return null;
-  }
-
-  if(
-    !id.startsWith(
-      'androstreamlivech'
+  return /^androstreamlivech/i.test(
+    String(
+      id||''
     )
-  ){
+  );
+}
+
+function getVideoId(
+  id
+){
+
+  const value=
+    String(
+      id||''
+    ).trim();
+
+  const match=
+    value.match(
+      /^androstreamlivech(\d+)$/i
+    );
+
+  return match
+    ? match[1]
+    : '';
+}
+
+function getPphSource(
+  id
+){
+
+  return getEightDigitPphSource(
+    id
+  );
+}
+
+function normalizeStreamUrl(
+  value
+){
+
+  const v=
+    String(
+      value||''
+    ).trim();
+
+  return /^https?:\/\//i.test(
+    v
+  )
+    ? v
+    : null;
+}
+
+async function resolveCinemaSource(
+  id,
+  timeout=3200
+){
+
+  if(!isAndroChannel(id)){
     return null;
   }
 
   const videoId=
-    id.replace(
-      /^androstreamlivech(stream)?/,
-      ''
+    getVideoId(
+      id
     );
 
   if(!videoId){
@@ -3261,7 +3384,7 @@ async function resolveCinemaSource(
               controller.abort();
             }catch(e){}
           },
-          3500
+          timeout
         )
       : null;
 
@@ -3284,162 +3407,406 @@ async function resolveCinemaSource(
             Token:'',
             VideoId:videoId
           }),
-          signal:
-            controller
-              ? controller.signal
-              : undefined
+          mode:'cors',
+          cache:'no-store',
+          credentials:'omit',
+          signal:controller?.signal
         }
       );
 
-    if(response.ok){
-
-      const data=
-        await response.json();
-
-      if(
-        data &&
-        data.URL
-      ){
-
-        const source=
-          String(
-            data.URL
-          ).trim();
-
-        return /\.m3u8(?:$|[?#])/i.test(
-          source
-        )
-          ? source
-          : null;
-
-      }
-
+    if(!response.ok){
+      return null;
     }
+
+    const data=
+      await response.json();
+
+    return normalizeStreamUrl(
+      data?.URL
+    );
 
   }catch(e){
 
-    if(
-      e &&
-      e.name!=='AbortError'
-    ){
-
-      console.warn(
-        'Cinema source request failed:',
-        e
-      );
-
-    }
+    return null;
 
   }finally{
 
     if(timer){
-      clearTimeout(timer);
+      clearTimeout(
+        timer
+      );
     }
-
   }
-
-  return null;
-
 }
 
-async function resolveFastBaseSource(
-  baseurls,
-  streamPath,
-  timeoutMs=2400
+function getChecklistCandidates(
+  id
 ){
 
-  if(
-    !Array.isArray(baseurls) ||
-    !streamPath
-  ){
-    return null;
-  }
+  const path=
+    String(
+      id||''
+    )+
+    '.m3u8';
 
-  const checks=
-    baseurls.map(
-      (base,index)=>{
-        const target=
-          base+
-          streamPath;
+  return[
+    'https://andro.evrenesoglu121.click/checklist/'+path,
+    'https://andro.evrenesoglu115.click/checklist/'+path,
+    'https://andro.evrenesoglu111.click/checklist/'+path,
+    'https://andro.evrenesoglu113.click/checklist/'+path
+  ];
+}
 
-        const controller=
-          typeof AbortController!=='undefined'
-            ? new AbortController()
-            : null;
+async function probeUrl(
+  url,
+  timeout=2200
+){
 
-        const timer=
-          controller
-            ? setTimeout(
-                ()=>{
-                  try{
-                    controller.abort();
-                  }catch(e){}
-                },
-                timeoutMs
-              )
-            : null;
+  const controller=
+    typeof AbortController!=='undefined'
+      ? new AbortController()
+      : null;
 
-        const request=
-          fetch(
-            target,
-            {
-              method:'GET',
-              mode:'cors',
-              cache:'no-store',
-              credentials:'omit',
-              signal:
-                controller
-                  ? controller.signal
-                  : undefined
-            }
-          )
-          .then(
-            response=>{
-              if(!response.ok){
-                throw new Error(
-                  'HTTP '+response.status
-                );
-              }
-
-              return{
-                index,
-                source:target
-              };
-
-            }
-          )
-          .finally(
-            ()=>{
-              if(timer){
-                clearTimeout(timer);
-              }
-            }
-          );
-
-        return request;
-      }
-    );
+  const timer=
+    controller
+      ? setTimeout(
+          ()=>{
+            try{
+              controller.abort();
+            }catch(e){}
+          },
+          timeout
+        )
+      : null;
 
   try{
 
-    return await Promise.any(
-      checks
-    );
+    const response=
+      await fetch(
+        url,
+        {
+          method:'GET',
+          mode:'cors',
+          cache:'no-store',
+          credentials:'omit',
+          signal:controller?.signal
+        }
+      );
+
+    return !!response.ok;
 
   }catch(e){
 
-    return null;
+    return false;
 
+  }finally{
+
+    if(timer){
+      clearTimeout(
+        timer
+      );
+    }
+  }
+}
+
+async function resolveChecklistSource(
+  id,
+  timeout=2400
+){
+
+  const candidates=
+    getChecklistCandidates(
+      id
+    );
+
+  if(!candidates.length){
+    return null;
   }
 
+  return new Promise(
+    resolve=>{
+
+      let done=false;
+      let pending=
+        candidates.length;
+
+      const finish=value=>{
+
+        if(done){
+          return;
+        }
+
+        done=true;
+
+        resolve(
+          value||
+          null
+        );
+      };
+
+      const timer=
+        setTimeout(
+          ()=>finish(null),
+          timeout
+        );
+
+      candidates.forEach(
+        (url,index)=>{
+
+          probeUrl(
+            url,
+            timeout
+          ).then(
+            ok=>{
+
+              pending--;
+
+              if(ok){
+
+                clearTimeout(
+                  timer
+                );
+
+                finish({
+                  url,
+                  index
+                });
+
+              }else if(
+                pending===0
+              ){
+
+                clearTimeout(
+                  timer
+                );
+
+                finish(null);
+              }
+            }
+          );
+        }
+      );
+    }
+  );
 }
+
+function firstUsable(
+  promises,
+  timeout=3200
+){
+
+  return new Promise(
+    resolve=>{
+
+      let done=false;
+      let pending=
+        promises.length;
+
+      if(!pending){
+
+        resolve(
+          null
+        );
+
+        return;
+      }
+
+      const timer=
+        setTimeout(
+          ()=>{
+            if(!done){
+
+              done=true;
+
+              resolve(
+                null
+              );
+            }
+          },
+          timeout
+        );
+
+      promises.forEach(
+        promise=>{
+
+          Promise.resolve(
+            promise
+          )
+          .then(
+            value=>{
+
+              if(
+                value &&
+                !done
+              ){
+
+                done=true;
+
+                clearTimeout(
+                  timer
+                );
+
+                resolve(
+                  value
+                );
+              }
+            }
+          )
+          .catch(
+            ()=>{}
+          )
+          .finally(
+            ()=>{
+
+              pending--;
+
+              if(
+                !pending &&
+                !done
+              ){
+
+                done=true;
+
+                clearTimeout(
+                  timer
+                );
+
+                resolve(
+                  null
+                );
+              }
+            }
+          );
+        }
+      );
+    }
+  );
+}
+
+async function resolveFastDirectSource(
+  input,
+  id
+){
+
+  const tasks=[];
+
+  tasks.push(
+    resolveFeedSource(
+      input
+    )
+    .then(
+      source=>{
+
+        const url=
+          normalizeStreamUrl(
+            source
+          );
+
+        return(
+          url &&
+          /\.m3u8(?:$|[?#])/i.test(
+            url
+          )
+        )
+          ? {
+              mode:'feed',
+              url
+            }
+          : null;
+      }
+    )
+    .catch(
+      ()=>null
+    )
+  );
+
+  if(
+    isAndroChannel(
+      id
+    )
+  ){
+
+    tasks.push(
+      resolveCinemaSource(
+        id,
+        3200
+      )
+      .then(
+        url=>
+          url
+            ? {
+                mode:'cinema',
+                url
+              }
+            : null
+      )
+      .catch(
+        ()=>null
+      )
+    );
+
+    tasks.push(
+      resolveChecklistSource(
+        id,
+        2400
+      )
+      .then(
+        result=>
+          result
+            ? {
+                mode:'checklist',
+                url:result.url,
+                index:result.index
+              }
+            : null
+      )
+      .catch(
+        ()=>null
+      )
+    );
+  }
+
+  return firstUsable(
+    tasks,
+    3300
+  );
+}
+
+function routeParam(){
+
+  const value=
+    String(
+      pageURL.searchParams.get(
+        'source'
+      )||''
+    ).toLowerCase();
+
+  return[
+    'auto',
+    'cinema',
+    'checklist',
+    'pph',
+    'feed'
+  ].includes(
+    value
+  )
+    ? value
+    : 'auto';
+}
+
 class StreamPlayer{
 
   constructor(){
 
     this.player=null;
+    this.pphFallbackUsed=false;
+    this.sourceErrorHandled=false;
+    this.currentBaseIndex=0;
+    this.switchingBase=false;
+    this.cinemaTried=false;
+    this.checklistTried=false;
+    this.feedTried=false;
     this.init();
-
   }
 
   async init(){
@@ -3455,23 +3822,16 @@ class StreamPlayer{
       );
 
     this.urlConfig={
-
-      watermark:
-        this.safeDecode(
-          hash.watermark||''
-        ),
-
-      watermarkLink:
-        this.safeDecode(
-          hash.watermarkLink||''
-        ),
-
-      watermarkPosition:
-        this.safeDecode(
-          hash.watermarkPosition||
-          'bottom-left'
-        )
-
+      watermark:this.safeDecode(
+        hash.watermark||''
+      ),
+      watermarkLink:this.safeDecode(
+        hash.watermarkLink||''
+      ),
+      watermarkPosition:this.safeDecode(
+        hash.watermarkPosition||
+        'bottom-left'
+      )
     };
 
     this.input=
@@ -3479,12 +3839,19 @@ class StreamPlayer{
         getInputValue()
       );
 
-    this.directSource=
-      /\.m3u8(?:$|[?#])/i.test(
+    this.channelId=
+      extractIdFromUrl(
         this.input
-      )
-        ? this.input
-        : null;
+      );
+
+    this.sourceMode='';
+    this.currentBaseIndex=0;
+    this.switchingBase=false;
+    this.cinemaTried=false;
+    this.checklistTried=false;
+    this.feedTried=false;
+    this.pphFallbackUsed=false;
+    this.sourceErrorHandled=false;
 
     this.baseurls=[
       'https://andro.evrenesoglu121.click/checklist/',
@@ -3493,82 +3860,158 @@ class StreamPlayer{
       'https://andro.evrenesoglu113.click/checklist/'
     ];
 
-    this.currentBaseIndex=0;
-    this.switchingBase=false;
+    this.directSource=
+      /\.m3u8(?:$|[?#])/i.test(
+        this.input
+      )
+        ? this.input
+        : null;
+
     this.feedSource=null;
     this.streamPath=null;
 
-    this.sourceCandidates=[];
-    this.sourceStartedAt=performance.now();
-    this.lastSourceChangeAt=this.sourceStartedAt;
-    this.lastProgressAt=this.sourceStartedAt;
-    this.lastKnownTime=0;
-    this.recoveryAttempts=[];
-    this.watchdogTimer=null;
-    this.resolutionInFlight=false;
+    const forced=
+      routeParam();
 
     if(this.directSource){
 
-      this.source=this.directSource;
-      this.sourceCandidates=[this.directSource];
+      this.source=
+        this.directSource;
+
+      this.sourceMode=
+        'direct';
+
+    }else if(
+      forced==='cinema' &&
+      isAndroChannel(
+        this.channelId
+      )
+    ){
+
+      this.cinemaTried=true;
+
+      this.source=
+        await resolveCinemaSource(
+          this.channelId,
+          3600
+        );
+
+      this.sourceMode=
+        this.source
+          ? 'cinema'
+          : '';
+
+    }else if(
+      forced==='checklist' &&
+      this.channelId
+    ){
+
+      this.checklistTried=true;
+
+      this.source=
+        this.buildSourceForBase(
+          this.channelId,
+          0
+        );
+
+      this.sourceMode=
+        this.source
+          ? 'checklist'
+          : '';
 
     }else{
 
-      const inputId=
-        extractIdFromUrl(
-          this.input
+      const fast=
+        await resolveFastDirectSource(
+          this.input,
+          this.channelId
         );
 
-      this.streamPath=
-        this.getStreamPath(
-          inputId
-        );
+      if(fast){
 
-      // Start immediately from the first deterministic base instead of
-      // waiting for any resolver/network probe to finish. This removes the
-      // common 2-4 second startup stall on slow AndroStream IDs.
-      if(this.streamPath){
-        this.sourceCandidates=this.baseurls.map(
-          (_,index)=>this.buildSourceForIndex(index)
-        ).filter(Boolean);
+        this.source=
+          fast.url;
 
-        this.currentBaseIndex=0;
-        this.source=this.sourceCandidates[0]||null;
+        this.sourceMode=
+          fast.mode;
+
+        this.currentBaseIndex=
+          Number.isFinite(
+            fast.index
+          )
+            ? fast.index
+            : 0;
+
+        this.feedTried=
+          fast.mode==='feed';
+
+        this.cinemaTried=
+          fast.mode==='cinema';
+
+        this.checklistTried=
+          fast.mode==='checklist';
+
+      }else{
+
+        this.feedSource=
+          await resolveFeedSource(
+            this.input
+          ).catch(
+            ()=>null
+          );
+
+        const id=
+          extractIdFromUrl(
+            this.feedSource||
+            this.input
+          );
+
+        this.channelId=
+          id||
+          this.channelId;
+
+        if(
+          this.feedSource &&
+          /\.m3u8(?:$|[?#])/i.test(
+            this.feedSource
+          )
+        ){
+
+          this.source=
+            this.feedSource;
+
+          this.sourceMode=
+            'feed';
+
+          this.feedTried=true;
+
+        }else if(
+          this.channelId
+        ){
+
+          this.streamPath=
+            this.getStreamPath(
+              this.channelId
+            );
+
+          this.source=
+            this.buildSource();
+
+          this.sourceMode=
+            this.streamPath
+              ? 'checklist'
+              : '';
+        }
       }
-
-      // Resolver race continues in the background and can promote a faster
-      // direct source if the current stream has not started yet.
-      this.resolveEnhancedSources(inputId);
-
     }
 
     if(!this.source){
 
-      hideLoadingIndicator();
-
-      const warning=
-        document.getElementById(
-          'uyarikutu'
-        );
-
-      const message=
-        document.getElementById(
-          'uyari-mesaj'
-        );
-
-      if(message){
-
-        message.innerText=
-          'Unable to fetch stream address.\nPlease check the channel ID or source link.';
-
-      }
-
-      if(warning){
-        warning.style.display='flex';
-      }
+      this.showFinalWarning(
+        'Unable to fetch stream address.\nPlease check the channel ID or source link.'
+      );
 
       return;
-
     }
 
     const params=
@@ -3577,24 +4020,27 @@ class StreamPlayer{
       );
 
     const title=
-      params.get('title');
+      params.get(
+        'title'
+      );
 
     if(title){
 
       try{
-        document.title=title;
+        document.title=
+          title;
       }catch(e){}
-
     }
 
     if(
-      this.streamPath &&
-      !this.source
+      this.sourceMode==='checklist' &&
+      !this.streamPath
     ){
 
-      this.source=
-        this.buildSource();
-
+      this.streamPath=
+        this.getStreamPath(
+          this.channelId
+        );
     }
 
     this.initPlayer();
@@ -3604,7 +4050,10 @@ class StreamPlayer{
         'player-container'
       );
 
-    if(!container){
+    if(
+      !container ||
+      !this.player
+    ){
       return;
     }
 
@@ -3613,336 +4062,16 @@ class StreamPlayer{
     );
 
     this.setupUnmuteOverlay();
-
     this.bindQualitySelectorUI();
+    this.setupTopPlayerControls();
 
     observePlayerVideo();
-
-    this.startPlaybackWatchdog();
-
     startAutoplayRetries();
-
   }
 
-  buildSourceForIndex(index){
-
-    if(
-      !this.streamPath ||
-      !this.baseurls[index]
-    ){
-      return null;
-    }
-
-    return this.baseurls[index]+this.streamPath;
-
-  }
-
-  async resolveEnhancedSources(inputId){
-
-    if(
-      this.resolutionInFlight ||
-      !inputId ||
-      this.directSource
-    ){
-      return;
-    }
-
-    this.resolutionInFlight=true;
-
-    const directResolvers=[];
-
-    directResolvers.push(
-      resolveCinemaSource(inputId).catch(()=>null)
-    );
-
-    directResolvers.push(
-      resolveFeedSource(this.input)
-        .then(source=>
-          source && /\.m3u8(?:$|[?#])/i.test(source)
-            ? source
-            : null
-        )
-        .catch(()=>null)
-    );
-
-    const baseChecks=this.baseurls.map(
-      (_,index)=>
-        this.checkBaseFast(index,1600)
-          .then(ok=>ok ? this.buildSourceForIndex(index) : null)
-          .catch(()=>null)
-    );
-
-    try{
-
-      const results=await Promise.all([
-        ...directResolvers,
-        ...baseChecks
-      ]);
-
-      const directSources=results
-        .slice(0,2)
-        .filter(Boolean);
-
-      const liveBaseSources=results
-        .slice(2)
-        .filter(Boolean);
-
-      const ordered=[
-        ...directSources,
-        ...liveBaseSources,
-        ...this.sourceCandidates
-      ];
-
-      const unique=[];
-      const seen=new Set();
-
-      for(const item of ordered){
-        if(item && !seen.has(item)){
-          seen.add(item);
-          unique.push(item);
-        }
-      }
-
-      this.sourceCandidates=unique;
-
-      // Promote a verified direct source only while the current attempt is
-      // still cold. Once playback has genuinely started, do not interrupt it.
-      const video=document.querySelector('#player-container video');
-      const currentPlaying=!!(
-        video &&
-        !video.paused &&
-        video.readyState>=2 &&
-        (performance.now()-this.lastProgressAt)<2200
-      );
-
-      const best=unique[0];
-
-      if(
-        best &&
-        best!==this.source &&
-        !currentPlaying &&
-        (performance.now()-this.sourceStartedAt)<7000
-      ){
-        this.loadSourceSmart(best,'resolver promotion');
-      }
-
-    }catch(e){
-      console.warn('Enhanced source resolution failed:',e);
-    }finally{
-      this.resolutionInFlight=false;
-    }
-
-  }
-
-  checkBaseFast(index,timeoutMs=1600){
-
-    const target=this.buildSourceForIndex(index);
-
-    if(!target){
-      return Promise.resolve(false);
-    }
-
-    const controller=
-      typeof AbortController!=='undefined'
-        ? new AbortController()
-        : null;
-
-    const timer=controller
-      ? setTimeout(()=>{
-          try{ controller.abort(); }catch(e){}
-        },timeoutMs)
-      : null;
-
-    const options={
-      method:'GET',
-      mode:'cors',
-      cache:'no-store',
-      credentials:'omit'
-    };
-
-    if(controller){
-      options.signal=controller.signal;
-    }
-
-    return fetch(target,options)
-      .then(response=>response.ok)
-      .catch(()=>false)
-      .finally(()=>{
-        if(timer) clearTimeout(timer);
-      });
-
-  }
-
-  loadSourceSmart(source,reason='source switch'){
-
-    if(
-      !this.player ||
-      !source ||
-      source===this.source
-    ){
-      return false;
-    }
-
-    this.source=source;
-    this.sourceStartedAt=performance.now();
-    this.lastSourceChangeAt=this.sourceStartedAt;
-    this.lastProgressAt=this.sourceStartedAt;
-    this.lastKnownTime=0;
-
-    const matchedBase=this.baseurls.findIndex(
-      base=>base+this.streamPath===source
-    );
-
-    if(matchedBase>=0){
-      this.currentBaseIndex=matchedBase;
-      this.directSource=null;
-    }else{
-      this.currentBaseIndex=-1;
-      this.directSource=source;
-    }
-
-    clearAutoplayTimers();
-    showLoadingIndicator();
-
-    try{
-      this.player.load(source);
-    }catch(e){
-      try{
-        this.player.configure({source});
-      }catch(error){}
-    }
-
-    setTimeout(()=>{
-      const video=document.querySelector('#player-container video');
-      if(video){
-        applyDesiredAudioState(video);
-        applyVideoFilters();
-        forceAutoplay();
-      }
-    },40);
-
-    setTimeout(()=>{
-      const video=document.querySelector('#player-container video');
-      if(
-        video &&
-        video.paused
-      ){
-        forceAutoplay();
-      }
-    },450);
-
-    return true;
-
-  }
-
-  startPlaybackWatchdog(){
-
-    if(this.watchdogTimer){
-      clearInterval(this.watchdogTimer);
-    }
-
-    this.watchdogTimer=setInterval(()=>{
-
-      const video=document.querySelector('#player-container video');
-      if(!video || !this.player){
-        return;
-      }
-
-      const now=performance.now();
-
-      const current=Number(video.currentTime)||0;
-      const progressed=Math.abs(current-this.lastKnownTime)>0.02;
-
-      if(progressed){
-        this.lastKnownTime=current;
-        this.lastProgressAt=now;
-      }
-
-      if(
-        !video.paused &&
-        video.readyState>=2 &&
-        progressed
-      ){
-        hidePoster();
-        hideLoadingIndicator();
-      }
-
-      // Never let a dead/stalled source sit indefinitely.
-      if(
-        now-this.sourceStartedAt>5200 &&
-        now-this.lastProgressAt>3600
-      ){
-        this.recoverPlayback('watchdog stall');
-      }
-
-      if(
-        video.error &&
-        video.error.code
-      ){
-        this.recoverPlayback('media error '+video.error.code);
-      }
-
-    },700);
-
-  }
-
-  recoverPlayback(reason='recovery'){
-
-    const now=performance.now();
-
-    this.recoveryAttempts=
-      this.recoveryAttempts.filter(
-        t=>now-t<30000
-      );
-
-    if(this.recoveryAttempts.length>=8){
-      return false;
-    }
-
-    if(now-this.lastSourceChangeAt<1200){
-      return false;
-    }
-
-    this.recoveryAttempts.push(now);
-
-    const currentIndex=this.sourceCandidates.indexOf(this.source);
-    let next=null;
-
-    for(let i=Math.max(0,currentIndex+1); i<this.sourceCandidates.length; i++){
-      const candidate=this.sourceCandidates[i];
-      if(candidate!==this.source){
-        next=candidate;
-        break;
-      }
-    }
-
-    if(!next && this.streamPath){
-      for(const candidate of this.sourceCandidates){
-        if(candidate!==this.source){
-          next=candidate;
-          break;
-        }
-      }
-    }
-
-    if(next){
-      return this.loadSourceSmart(next,reason);
-    }
-
-    const video=document.querySelector('#player-container video');
-    if(video){
-      try{
-        video.pause();
-        video.currentTime=0;
-      }catch(e){}
-      setTimeout(()=>forceAutoplay(),80);
-    }
-
-    return true;
-
-  }
-
-  safeDecode(value){
+  safeDecode(
+    value
+  ){
 
     try{
 
@@ -3955,9 +4084,389 @@ class StreamPlayer{
       return String(
         value||''
       );
+    }
+  }
 
+  isPphEligible(){
+
+    return isPphFallbackChannel(
+      this.channelId
+    );
+  }
+
+  getPphFallbackUrl(){
+
+    return getEightDigitPphSource(
+      this.channelId
+    );
+  }
+
+  showPphFallbackIframe(
+    explicitUrl=null
+  ){
+
+    if(
+      this.pphFallbackUsed
+    ){
+      return false;
     }
 
+    if(
+      !this.isPphEligible()
+    ){
+      return false;
+    }
+
+    const source=
+      explicitUrl||
+      this.getPphFallbackUrl();
+
+    if(!source){
+      return false;
+    }
+
+    this.pphFallbackUsed=true;
+    this.sourceErrorHandled=true;
+
+    clearAutoplayTimers();
+
+    try{
+
+      if(
+        this.player &&
+        typeof this.player.stop==='function'
+      ){
+        this.player.stop();
+      }
+
+    }catch(e){}
+
+    const layer=
+      document.getElementById(
+        'pph-fallback-layer'
+      );
+
+    const frame=
+      document.getElementById(
+        'pph-fallback-frame'
+      );
+
+    const playerContainer=
+      document.getElementById(
+        'player-container'
+      );
+
+    const unmute=
+      document.getElementById(
+        'unmute-overlay-btn'
+      );
+
+    const pip=
+      document.getElementById(
+        'pip-top-btn'
+      );
+
+    if(playerContainer){
+
+      playerContainer.style.visibility=
+        'hidden';
+
+      playerContainer.style.pointerEvents=
+        'none';
+    }
+
+    if(unmute){
+
+      unmute.classList.add(
+        'hidden'
+      );
+    }
+
+    if(pip){
+
+      pip.classList.add(
+        'unsupported'
+      );
+
+      pip.classList.remove(
+        'active'
+      );
+
+      pip.setAttribute(
+        'aria-pressed',
+        'false'
+      );
+
+      pip.title=
+        'Picture in Picture unavailable';
+    }
+
+    hidePoster();
+    hideLoadingIndicator();
+
+    if(
+      !layer ||
+      !frame
+    ){
+      return false;
+    }
+
+    frame.src=
+      'about:blank';
+
+    layer.classList.add(
+      'active'
+    );
+
+    layer.setAttribute(
+      'aria-hidden',
+      'false'
+    );
+
+    requestAnimationFrame(
+      ()=>{
+        frame.src=
+          source;
+      }
+    );
+
+    return true;
+  }
+
+  showFinalWarning(
+    messageText
+  ){
+
+    hideLoadingIndicator();
+
+    const warning=
+      document.getElementById(
+        'uyarikutu'
+      );
+
+    const message=
+      document.getElementById(
+        'uyari-mesaj'
+      );
+
+    if(message){
+
+      message.innerText=
+        messageText;
+    }
+
+    if(warning){
+
+      warning.style.display=
+        'flex';
+    }
+  }
+
+  async resolveWorkingBase(){
+
+    const result=
+      await resolveChecklistSource(
+        this.channelId,
+        2200
+      );
+
+    if(result){
+
+      this.currentBaseIndex=
+        result.index;
+
+      return true;
+    }
+
+    this.currentBaseIndex=
+      0;
+
+    return false;
+  }
+
+  buildSourceForBase(
+    id,
+    index
+  ){
+
+    const bases=
+      this.baseurls||
+      [];
+
+    if(
+      !bases[index] ||
+      !id
+    ){
+      return null;
+    }
+
+    const path=
+      this.getStreamPath(
+        id
+      );
+
+    return path
+      ? bases[index]+path
+      : null;
+  }
+
+  async resolveAndUseChecklist(){
+
+    if(
+      !this.channelId ||
+      !isAndroChannel(
+        this.channelId
+      )
+    ){
+      return false;
+    }
+
+    this.checklistTried=true;
+
+    const result=
+      await resolveChecklistSource(
+        this.channelId,
+        2400
+      );
+
+    if(
+      result &&
+      result.url
+    ){
+
+      this.currentBaseIndex=
+        result.index;
+
+      this.source=
+        result.url;
+
+      this.sourceMode=
+        'checklist';
+
+      this.streamPath=
+        this.getStreamPath(
+          this.channelId
+        );
+
+      return this.loadSource(
+        result.url
+      );
+    }
+
+    this.currentBaseIndex=
+      0;
+
+    this.source=
+      this.buildSourceForBase(
+        this.channelId,
+        0
+      );
+
+    this.sourceMode=
+      this.source
+        ? 'checklist'
+        : '';
+
+    this.streamPath=
+      this.getStreamPath(
+        this.channelId
+      );
+
+    return !!this.source;
+  }
+
+  async loadSource(
+    newSource
+  ){
+
+    if(
+      !this.player ||
+      !newSource ||
+      this.pphFallbackUsed
+    ){
+      return false;
+    }
+
+    this.source=
+      newSource;
+
+    this.sourceErrorHandled=false;
+
+    clearAutoplayTimers();
+
+    showLoadingIndicator();
+
+    try{
+
+      this.player.load(
+        newSource
+      );
+
+      this.player.play();
+
+    }catch(e){
+
+      try{
+
+        this.player.configure({
+          source:newSource
+        });
+
+        this.player.play();
+
+      }catch(error){}
+    }
+
+    setTimeout(
+      ()=>{
+
+        if(this.pphFallbackUsed){
+          return;
+        }
+
+        observePlayerVideo();
+        applyVideoFilters();
+
+        const video=
+          document.querySelector(
+            '#player-container video'
+          );
+
+        if(video){
+
+          if(audioUnlocked){
+
+            applyDesiredAudioState(
+              video
+            );
+
+          }else{
+
+            forceAutoplay();
+          }
+        }
+
+      },
+      120
+    );
+
+    return true;
+  }
+
+  redirectToPph(){
+
+    if(
+      this.isPphEligible()
+    ){
+
+      return this.showPphFallbackIframe();
+    }
+
+    this.showFinalWarning(
+      'Unable to fetch stream address.\nPlease check the channel ID or source link.'
+    );
+
+    return false;
   }
 
   initPlayer(){
@@ -3967,36 +4476,17 @@ class StreamPlayer{
       'undefined'
     ){
 
-      hideLoadingIndicator();
-
-      const warning=
-        document.getElementById(
-          'uyarikutu'
-        );
-
-      const message=
-        document.getElementById(
-          'uyari-mesaj'
-        );
-
-      if(message){
-
-        message.innerText=
-          'Player library failed to load.\nPlease refresh the page.';
-
-      }
-
-      if(warning){
-        warning.style.display='flex';
-      }
+      this.showFinalWarning(
+        'Player library failed to load.\nPlease refresh the page.'
+      );
 
       return;
-
     }
 
     const plugins=[];
 
     if(window.LevelSelector){
+
       plugins.push(
         window.LevelSelector
       );
@@ -4011,7 +4501,6 @@ class StreamPlayer{
         plugins.push(
           window.ClapprPip.PipPlugin
         );
-
       }
 
       if(
@@ -4021,9 +4510,7 @@ class StreamPlayer{
         plugins.push(
           window.ClapprPip.PipButton
         );
-
       }
-
     }
 
     if(window.ClapprPIPPlugin){
@@ -4031,13 +4518,13 @@ class StreamPlayer{
       plugins.push(
         window.ClapprPIPPlugin
       );
-
     }
 
     this.player=
       new Clappr.Player({
 
-        source:this.source,
+        source:
+          this.source,
 
         autoPlay:true,
 
@@ -4085,13 +4572,11 @@ class StreamPlayer{
                   playbackLevel.level.height+
                   'p'
                 );
-
               }
 
               if(customLabel){
 
                 return customLabel;
-
               }
 
               if(
@@ -4107,65 +4592,25 @@ class StreamPlayer{
                   )+
                   ' kbps'
                 );
-
               }
 
               return 'Auto';
-
             }
-
         },
 
         hlsjsConfig:{
 
-          liveSyncDurationCount:2,
-
-          liveMaxLatencyDurationCount:4,
-
+          liveSyncDurationCount:3,
+          maxMaxBufferLength:18,
+          maxBufferLength:12,
+          maxBufferSize:24*1000*1000,
+          startLevel:-1,
+          levelLoadingMaxRetry:3,
+          fragLoadingMaxRetry:4,
+          liveMaxLatencyDurationCount:5,
           liveDurationInfinity:true,
-
-          lowLatencyMode:false,
-
           enableWorker:true,
-
-          backBufferLength:0,
-
-          maxBufferLength:16,
-
-          maxMaxBufferLength:20,
-
-          maxBufferHole:0.5,
-
-          startFragPrefetch:true,
-
-          capLevelToPlayerSize:true,
-
-          manifestLoadingTimeOut:4000,
-
-          manifestLoadingMaxRetry:3,
-
-          manifestLoadingRetryDelay:350,
-
-          levelLoadingTimeOut:4000,
-
-          levelLoadingMaxRetry:4,
-
-          levelLoadingRetryDelay:350,
-
-          fragLoadingTimeOut:6000,
-
-          fragLoadingMaxRetry:5,
-
-          fragLoadingRetryDelay:350,
-
-          maxLoadingDelay:2,
-
-          nudgeOffset:0.2,
-
-          nudgeMaxRetry:5,
-
-          appendErrorMaxRetry:5
-
+          lowLatencyMode:true
         },
 
         playback:{
@@ -4178,35 +4623,41 @@ class StreamPlayer{
 
           hlsjsConfig:{
 
-            xhrSetup:
-              (xhr)=>{
+            xhrSetup:(xhr)=>{
 
-                try{
-                  xhr.withCredentials=false;
-                }catch(e){}
+              try{
 
-                xhr.addEventListener(
-                  'loadend',
-                  ()=>{
+                xhr.withCredentials=false;
+
+              }catch(e){}
+
+              xhr.addEventListener(
+                'loadend',
+                ()=>{
+
+                  if(
+                    this.streamPath &&
+                    xhr.status===403
+                  ){
 
                     if(
-                      this.streamPath &&
-                      (xhr.status===403 || xhr.status===404 || xhr.status===410 || xhr.status===429 || xhr.status>=500)
+                      this.isPphEligible() &&
+                      !this.pphFallbackUsed
                     ){
 
+                      this.showPphFallbackIframe();
+
+                    }else{
+
                       this.switchToNextBase(
-                        'HTTP '+xhr.status
+                        '403'
                       );
-
                     }
-
                   }
-                );
-
-              }
-
+                }
+              );
+            }
           }
-
         },
 
         disableErrorScreen:true,
@@ -4226,15 +4677,11 @@ class StreamPlayer{
 
             default_error_title:
               'Notice'
-
           }
-
         }
-
       });
 
     this.setupPlayerEvents();
-
   }
 
   setupUnmuteOverlay(){
@@ -4256,7 +4703,6 @@ class StreamPlayer{
         event.stopPropagation();
 
         unmuteEverything();
-
       }
     );
 
@@ -4271,7 +4717,9 @@ class StreamPlayer{
           );
 
           if(
-            Number(volume)>0
+            Number(
+              volume
+            )>0
           ){
 
             button.classList.add(
@@ -4285,16 +4733,11 @@ class StreamPlayer{
               button.classList.remove(
                 'hidden'
               );
-
             }
-
           }
-
         }
       );
-
     }
-
   }
 
   bindQualitySelectorUI(){
@@ -4308,111 +4751,110 @@ class StreamPlayer{
       !dropdown ||
       !this.player
     ){
-
       return;
-
     }
 
-    const populate=
-      (attempt=0)=>{
+    const populate=(attempt=0)=>{
 
-        const plugin=
-          this.player.getPlugin(
-            'level_selector'
-          );
+      if(this.pphFallbackUsed){
+        return;
+      }
 
-        const levels=
-          Array.isArray(
-            plugin?.levels
-          )
-            ? plugin.levels
-            : [];
+      const plugin=
+        this.player.getPlugin(
+          'level_selector'
+        );
 
-        if(levels.length){
+      const levels=
+        Array.isArray(
+          plugin?.levels
+        )
+          ? plugin.levels
+          : [];
 
-          const current=
-            dropdown.value;
+      if(levels.length){
 
-          dropdown.innerHTML=
-            '<option value="-1">Auto</option>';
+        const current=
+          dropdown.value;
 
-          levels.forEach(
-            (level,index)=>{
+        dropdown.innerHTML=
+          '<option value="-1">Auto</option>';
 
-              const height=
-                Number(
-                  level?.height||0
-                );
+        levels.forEach(
+          (level,index)=>{
 
-              const bitrate=
-                Number(
-                  level?.bitrate||0
-                );
-
-              const label=
-                height
-                  ? `${height}p`
-                  : bitrate
-                    ? `${Math.round(
-                        bitrate/1000
-                      )} kbps`
-                    : `Level ${index+1}`;
-
-              const option=
-                document.createElement(
-                  'option'
-                );
-
-              option.value=
-                String(index);
-
-              option.textContent=
-                label;
-
-              dropdown.appendChild(
-                option
+            const height=
+              Number(
+                level?.height||0
               );
 
-            }
-          );
+            const bitrate=
+              Number(
+                level?.bitrate||0
+              );
 
-          if(
-            [...dropdown.options].some(
-              option=>
-                option.value===current
-            )
-          ){
+            const label=
+              height
+                ? `${height}p`
+                : bitrate
+                  ? `${Math.round(
+                      bitrate/1000
+                    )} kbps`
+                  : `Level ${index+1}`;
 
-            dropdown.value=
-              current;
+            const option=
+              document.createElement(
+                'option'
+              );
 
+            option.value=
+              String(index);
+
+            option.textContent=
+              label;
+
+            dropdown.appendChild(
+              option
+            );
           }
+        );
 
-          return;
+        if(
+          [...dropdown.options].some(
+            option=>
+              option.value===current
+          )
+        ){
 
+          dropdown.value=
+            current;
         }
 
-        if(attempt<24){
+        return;
+      }
 
-          setTimeout(
-            ()=>{
-              populate(
-                attempt+1
-              );
-            },
-            500
-          );
+      if(attempt<24){
 
-        }
-
-      };
+        setTimeout(
+          ()=>{
+            populate(
+              attempt+1
+            );
+          },
+          500
+        );
+      }
+    };
 
     this.player.on(
       Clappr.Events.PLAYER_READY,
       ()=>{
 
+        resetControlsTimer();
+
         setTimeout(
           ()=>{
+
             populate();
             observePlayerVideo();
             applyVideoFilters();
@@ -4429,25 +4871,26 @@ class StreamPlayer{
                 applyDesiredAudioState(
                   video
                 );
-
               }
 
             }else{
 
               startAutoplayRetries();
-
             }
 
           },
           100
         );
-
       }
     );
 
     dropdown.addEventListener(
       'change',
       event=>{
+
+        if(this.pphFallbackUsed){
+          return;
+        }
 
         const value=
           Number(
@@ -4465,20 +4908,231 @@ class StreamPlayer{
           'function'
         ){
 
-          plugin.changeLevel(
-            Number.isFinite(value)
+          const selected=
+            Number.isFinite(
+              value
+            )
               ? value
-              : -1
+              : -1;
+
+          plugin.changeLevel(
+            selected
           );
-
         }
-
       }
     );
-
   }
 
-  parseHashParams(hash){
+  setupTopPlayerControls(){
+
+    const pip=
+      document.getElementById(
+        'pip-top-btn'
+      );
+
+    if(pip){
+
+      pip.addEventListener(
+        'click',
+        event=>{
+
+          event.preventDefault();
+          event.stopPropagation();
+
+          this.togglePictureInPicture();
+        }
+      );
+
+      this.updatePipButton();
+
+      const video=
+        this.getCurrentVideo();
+
+      video?.addEventListener(
+        'click',
+        ()=>{
+
+          setTimeout(
+            ()=>{
+              this.updatePipButton();
+            },
+            50
+          );
+
+        },
+        {passive:true}
+      );
+
+      document.addEventListener(
+        'enterpictureinpicture',
+        ()=>{
+          this.updatePipButton();
+        },
+        {passive:true}
+      );
+
+      document.addEventListener(
+        'leavepictureinpicture',
+        ()=>{
+          this.updatePipButton();
+        },
+        {passive:true}
+      );
+    }
+
+    this.player?.on?.(
+      Clappr.Events.PLAYER_READY,
+      ()=>{
+
+        this.updatePipButton();
+        resetControlsTimer();
+      }
+    );
+  }
+
+  getCurrentVideo(){
+
+    return document.querySelector(
+      '#player-container video'
+    );
+  }
+
+  async togglePictureInPicture(){
+
+    if(
+      this.pphFallbackUsed
+    ){
+      return;
+    }
+
+    const video=
+      this.getCurrentVideo();
+
+    if(!video){
+      return;
+    }
+
+    try{
+
+      if(
+        document.pictureInPictureElement
+      ){
+
+        await document.exitPictureInPicture();
+
+        this.updatePipButton();
+
+        return;
+      }
+
+      if(
+        video.webkitSetPresentationMode
+      ){
+
+        video.webkitSetPresentationMode(
+          video.webkitPresentationMode===
+          'picture-in-picture'
+            ? 'inline'
+            : 'picture-in-picture'
+        );
+
+        this.updatePipButton();
+
+        return;
+      }
+
+      if(
+        video.requestPictureInPicture
+      ){
+
+        await video.requestPictureInPicture();
+
+        this.updatePipButton();
+
+        return;
+      }
+
+    }catch(e){}
+
+    this.updatePipButton();
+  }
+
+  updatePipButton(){
+
+    const button=
+      document.getElementById(
+        'pip-top-btn'
+      );
+
+    const video=
+      this.getCurrentVideo();
+
+    if(!button){
+      return;
+    }
+
+    if(
+      this.pphFallbackUsed
+    ){
+
+      button.classList.add(
+        'unsupported'
+      );
+
+      button.classList.remove(
+        'active'
+      );
+
+      button.setAttribute(
+        'aria-pressed',
+        'false'
+      );
+
+      button.title=
+        'Picture in Picture unavailable';
+
+      return;
+    }
+
+    const supported=
+      !!(
+        video?.requestPictureInPicture||
+        video?.webkitSetPresentationMode
+      );
+
+    button.classList.toggle(
+      'unsupported',
+      !supported
+    );
+
+    button.title=
+      supported
+        ? 'Picture in Picture'
+        : 'Picture in Picture unavailable';
+
+    const active=
+      !!(
+        document.pictureInPictureElement||
+        video?.webkitPresentationMode===
+        'picture-in-picture'
+      );
+
+    button.classList.toggle(
+      'active',
+      active
+    );
+
+    button.setAttribute(
+      'aria-pressed',
+      active
+        ? 'true'
+        : 'false'
+    );
+  }
+
+  parseHashParams(
+    hash
+  ){
 
     if(
       !hash ||
@@ -4486,7 +5140,6 @@ class StreamPlayer{
     ){
 
       return {};
-
     }
 
     const result={};
@@ -4516,14 +5169,14 @@ class StreamPlayer{
             );
 
           if(key){
-            result[key]=value;
-          }
 
+            result[key]=
+              value;
+          }
         }
       );
 
     return result;
-
   }
 
   buildSource(){
@@ -4532,13 +5185,17 @@ class StreamPlayer{
       return null;
     }
 
-    return this.buildSourceForIndex(
-      this.currentBaseIndex
+    return(
+      this.baseurls[
+        this.currentBaseIndex
+      ]+
+      this.streamPath
     );
-
   }
 
-  getStreamPath(id){
+  getStreamPath(
+    id
+  ){
 
     const value=
       String(
@@ -4557,7 +5214,7 @@ class StreamPlayer{
     if(
       (
         value===
-          'androstreamlivebs1' ||
+          'androstreamlivebs1'||
         value===
           'facebooklivebs1'
       ) &&
@@ -4565,7 +5222,6 @@ class StreamPlayer{
     ){
 
       return 'batutest.m3u8';
-
     }
 
     if(
@@ -4578,7 +5234,6 @@ class StreamPlayer{
         value+
         '.m3u8'
       );
-
     }
 
     if(
@@ -4599,18 +5254,15 @@ class StreamPlayer{
           suffix+
           '.m3u8'
         );
-
       }
 
       return(
         value+
         '.m3u8'
       );
-
     }
 
     return null;
-
   }
 
   setupPlayerEvents(){
@@ -4623,11 +5275,17 @@ class StreamPlayer{
       Clappr.Events.PLAYER_READY,
       ()=>{
 
+        resetControlsTimer();
+
         try{
 
           $('.clappr-watermark a')
-            .removeAttr('target')
-            .removeAttr('href')
+            .removeAttr(
+              'target'
+            )
+            .removeAttr(
+              'href'
+            )
             .css(
               'cursor',
               'initial'
@@ -4639,17 +5297,15 @@ class StreamPlayer{
           ()=>{
 
             observePlayerVideo();
-            bindNativeRecovery();
             applyVideoFilters();
 
             if(
-              audioSettings.gain!==100 ||
-              audioSettings.bass ||
+              audioSettings.gain!==100||
+              audioSettings.bass||
               audioSettings.vocal
             ){
 
               setupAudioNodes();
-
             }
 
             if(audioUnlocked){
@@ -4664,19 +5320,16 @@ class StreamPlayer{
                 applyDesiredAudioState(
                   video
                 );
-
               }
 
             }else{
 
               startAutoplayRetries();
-
             }
 
           },
           100
         );
-
       }
     );
 
@@ -4686,7 +5339,6 @@ class StreamPlayer{
 
         hidePoster();
         applyVideoFilters();
-
       }
     );
 
@@ -4709,46 +5361,18 @@ class StreamPlayer{
 
           video.muted=true;
           video.volume=0;
-
         }
-
       }
     );
 
-    const bindNativeRecovery=()=>{
-
-      const video=document.querySelector('#player-container video');
-
-      if(!video || video===this.boundRecoveryVideo){
-        return;
+    this.player.on(
+      Clappr.Events.PLAYER_BUFFER,
+      ()=>{
+        if(!this.pphFallbackUsed){
+          applyVideoFilters();
+        }
       }
-
-      this.boundRecoveryVideo=video;
-
-      ['playing','canplay','timeupdate'].forEach(type=>
-        video.addEventListener(type,()=>{
-          this.lastProgressAt=performance.now();
-          if(type!=='timeupdate') hideLoadingIndicator();
-        },{passive:true})
-      );
-
-      ['waiting','stalled','suspend'].forEach(type=>
-        video.addEventListener(type,()=>{
-          if(
-            performance.now()-this.lastSourceChangeAt>1800
-          ){
-            setTimeout(()=>this.recoverPlayback(type),650);
-          }
-        },{passive:true})
-      );
-
-      video.addEventListener('error',()=>{
-        setTimeout(()=>this.recoverPlayback('native video error'),80);
-      },{passive:true});
-
-    };
-
-    bindNativeRecovery();
+    );
 
     if(
       this.player.core &&
@@ -4767,13 +5391,21 @@ class StreamPlayer{
             container.on(
               Clappr.Events.CONTAINER_ERROR,
               ()=>{
-                this.handlePlaybackError();
+
+                if(
+                  this.isPphEligible() &&
+                  !this.pphFallbackUsed
+                ){
+
+                  this.showPphFallbackIframe();
+
+                }else{
+
+                  this.handlePlaybackError();
+                }
               }
             );
-
           }
-
-          bindNativeRecovery();
 
           if(
             container &&
@@ -4797,81 +5429,176 @@ class StreamPlayer{
                 ){
 
                   hideLoadingIndicator();
-
                 }
-
               }
             );
-
           }
-
         }
       );
-
     }
 
     this.player.on(
       Clappr.Events.PLAYER_ERROR,
       ()=>{
-        this.handlePlaybackError();
+
+        if(
+          this.isPphEligible() &&
+          !this.pphFallbackUsed
+        ){
+
+          this.showPphFallbackIframe();
+
+        }else{
+
+          this.handlePlaybackError();
+        }
       }
     );
-
   }
 
   handlePlaybackError(){
 
     if(
-      !this.switchToNextBase(
-        'playback error'
-      )
+      this.isPphEligible() &&
+      !this.pphFallbackUsed
     ){
 
-      scheduleAutoplay(120);
-      scheduleAutoplay(360);
-      scheduleAutoplay(800);
-      scheduleAutoplay(1500);
-      scheduleAutoplay(2600);
-      setTimeout(()=>this.recoverPlayback('playback retry'),3100);
+      this.showPphFallbackIframe();
 
+      return;
     }
 
+    this.switchToNextBase(
+      'playback error'
+    );
   }
 
-  switchToNextBase(reason){
+  async switchToNextBase(
+    reason
+  ){
 
-    if(!this.streamPath){
+    if(
+      this.isPphEligible() &&
+      !this.pphFallbackUsed
+    ){
+
+      this.showPphFallbackIframe();
+
+      return true;
+    }
+
+    if(this.switchingBase){
       return false;
     }
 
-    if(
-      !Array.isArray(this.sourceCandidates) ||
-      !this.sourceCandidates.length
-    ){
-      this.sourceCandidates=this.baseurls
-        .map((_,index)=>this.buildSourceForIndex(index))
-        .filter(Boolean);
-    }
+    this.switchingBase=true;
 
-    // Prefer the next deterministic base first; if unavailable, let the
-    // broader smart recovery path rotate through every known candidate.
-    const nextIndex=this.currentBaseIndex+1;
+    showLoadingIndicator();
+    clearAutoplayTimers();
 
-    if(
-      nextIndex>=0 &&
-      nextIndex<this.baseurls.length
-    ){
-      const next=this.buildSourceForIndex(nextIndex);
+    try{
 
-      if(next && next!==this.source){
-        return this.loadSourceSmart(next,reason);
+      if(
+        this.sourceMode==='feed' &&
+        !this.cinemaTried &&
+        isAndroChannel(
+          this.channelId
+        )
+      ){
+
+        this.cinemaTried=true;
+
+        const cinema=
+          await resolveCinemaSource(
+            this.channelId,
+            2600
+          );
+
+        if(cinema){
+
+          this.source=
+            cinema;
+
+          this.sourceMode=
+            'cinema';
+
+          await this.loadSource(
+            cinema
+          );
+
+          return true;
+        }
       }
+
+      if(
+        this.sourceMode!=='checklist' &&
+        isAndroChannel(
+          this.channelId
+        ) &&
+        !this.checklistTried
+      ){
+
+        const ok=
+          await this.resolveAndUseChecklist();
+
+        if(ok){
+
+          await this.loadSource(
+            this.source
+          );
+
+          return true;
+        }
+      }
+
+      if(
+        this.sourceMode===
+        'checklist'
+      ){
+
+        if(
+          this.currentBaseIndex<
+          this.baseurls.length-1
+        ){
+
+          this.currentBaseIndex++;
+
+          const next=
+            this.buildSourceForBase(
+              this.channelId,
+              this.currentBaseIndex
+            );
+
+          if(next){
+
+            this.source=
+              next;
+
+            await this.loadSource(
+              next
+            );
+
+            return true;
+          }
+        }
+      }
+
+      this.showFinalWarning(
+        'Playback failed.\nThe stream is currently unavailable.'
+      );
+
+      return false;
+
+    }finally{
+
+      setTimeout(
+        ()=>{
+          this.switchingBase=false;
+        },
+        900
+      );
     }
-
-    return this.recoverPlayback(reason);
-
   }
-
 }
 
 if(
@@ -4883,7 +5610,6 @@ if(
     PipPlugin:
       window.ClapprPIPPlugin
   };
-
 }
 
 try{
@@ -4913,16 +5639,13 @@ try{
 
     message.innerText=
       'Player startup failed.\nPlease refresh the page.';
-
   }
 
   if(warning){
 
     warning.style.display=
       'flex';
-
   }
-
 }
 </script>
 
