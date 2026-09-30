@@ -256,7 +256,7 @@ body{
   box-shadow:0 5px 18px rgba(0,0,0,.55),0 0 12px var(--skin-glow);
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
-  transition:transform .18s ease,background .18s ease,color .18s ease,border-color .18s ease,opacity .18s ease;
+  transition:transform .18s ease,background .18s ease,color .18s ease,border-color .18s ease,opacity .3s ease,visibility .3s ease;
   touch-action:manipulation;
   user-select:none;
 }
@@ -299,11 +299,20 @@ body{
   font-size:18px;
   line-height:1;
   box-shadow:0 4px 18px rgba(0,0,0,.6);
-  transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s ease,box-shadow .22s ease;
+  transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s ease,box-shadow .22s ease,opacity .3s ease,visibility .3s ease;
   touch-action:manipulation;
   -webkit-user-select:none;
   user-select:none;
 }
+
+/* Auto-hide transition classes */
+#pip-top-btn.fade-hidden,
+#settings-toggle-btn.fade-hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 #settings-toggle-btn:hover,
 #settings-toggle-btn:focus-visible{
   transform:rotate(45deg) scale(1.06);
@@ -1229,6 +1238,41 @@ input[type="range"]::-moz-range-thumb{
 </div>
 
 <script>
+// Auto-hide buttons timer logic
+let autoHideTimer = null;
+
+function showOverlayButtons() {
+  const pipBtn = document.getElementById('pip-top-btn');
+  const settingsBtn = document.getElementById('settings-toggle-btn');
+  if (pipBtn) pipBtn.classList.remove('fade-hidden');
+  if (settingsBtn) settingsBtn.classList.remove('fade-hidden');
+}
+
+function hideOverlayButtons() {
+  const drawer = document.getElementById('control-drawer');
+  // If settings drawer is open, keep settings button visible
+  if (drawer && drawer.classList.contains('open')) {
+    return;
+  }
+  const pipBtn = document.getElementById('pip-top-btn');
+  const settingsBtn = document.getElementById('settings-toggle-btn');
+  if (pipBtn) pipBtn.classList.add('fade-hidden');
+  if (settingsBtn) settingsBtn.classList.add('fade-hidden');
+}
+
+function resetControlsTimer() {
+  showOverlayButtons();
+  if (autoHideTimer) clearTimeout(autoHideTimer);
+  autoHideTimer = setTimeout(() => {
+    hideOverlayButtons();
+  }, 4000);
+}
+
+// Add user interaction listeners for auto-hide reset
+['mousemove', 'touchstart', 'pointerdown', 'click'].forEach(evt => {
+  document.addEventListener(evt, resetControlsTimer, { passive: true });
+});
+
 function hidePoster(){
   const poster=
     document.getElementById(
@@ -1390,6 +1434,8 @@ function showLoadingIndicator(){
           'false'
         );
 
+        resetControlsTimer();
+
       };
 
       const openDrawer=()=>{
@@ -1402,6 +1448,9 @@ function showLoadingIndicator(){
           'aria-expanded',
           'true'
         );
+
+        showOverlayButtons();
+        if (autoHideTimer) clearTimeout(autoHideTimer);
 
       };
 
@@ -3387,16 +3436,6 @@ async function resolveFastDirectSource(input,id){
   return firstUsable(tasks,3300);
 }
 
-function getChecklistCandidates(id){
-  const path=String(id||'')+'.m3u8';
-  return [
-    'https://andro.evrenesoglu121.click/checklist/'+path,
-    'https://andro.evrenesoglu115.click/checklist/'+path,
-    'https://andro.evrenesoglu111.click/checklist/'+path,
-    'https://andro.evrenesoglu113.click/checklist/'+path
-  ];
-}
-
 function routeParam(){
   const value=String(pageURL.searchParams.get('source')||'').toLowerCase();
   return ['auto','cinema','checklist','pph','feed'].includes(value) ? value : 'auto';
@@ -4043,6 +4082,9 @@ class StreamPlayer{
       Clappr.Events.PLAYER_READY,
       ()=>{
 
+        // Start auto-hide timer when player is ready
+        resetControlsTimer();
+
         setTimeout(
           ()=>{
             populate();
@@ -4128,6 +4170,7 @@ class StreamPlayer{
 
     this.player?.on?.(Clappr.Events.PLAYER_READY,()=>{
       this.updatePipButton();
+      resetControlsTimer();
     });
   }
 
@@ -4332,6 +4375,8 @@ class StreamPlayer{
     this.player.on(
       Clappr.Events.PLAYER_READY,
       ()=>{
+
+        resetControlsTimer();
 
         try{
 
