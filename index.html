@@ -17,29 +17,53 @@
   --panel:rgba(5,5,10,.84);
   --muted:rgba(255,255,255,.5);
 }
+
 body[data-theme="ocean"]{
-  --accent:#008cff;--accent-2:#00e5c5;--accent-3:#5ce1e6;
-  --page:#03141d;--panel:rgba(2,24,35,.86);
+  --accent:#008cff;
+  --accent-2:#00e5c5;
+  --accent-3:#5ce1e6;
+  --page:#03141d;
+  --panel:rgba(2,24,35,.86);
 }
+
 body[data-theme="sunset"]{
-  --accent:#ff6b35;--accent-2:#ffc857;--accent-3:#ff3d81;
-  --page:#1b0d12;--panel:rgba(32,12,20,.88);
+  --accent:#ff6b35;
+  --accent-2:#ffc857;
+  --accent-3:#ff3d81;
+  --page:#1b0d12;
+  --panel:rgba(32,12,20,.88);
 }
+
 body[data-theme="emerald"]{
-  --accent:#00b894;--accent-2:#8fffc0;--accent-3:#6c5ce7;
-  --page:#061412;--panel:rgba(5,25,20,.88);
+  --accent:#00b894;
+  --accent-2:#8fffc0;
+  --accent-3:#6c5ce7;
+  --page:#061412;
+  --panel:rgba(5,25,20,.88);
 }
+
 body[data-theme="aurora"]{
-  --accent:#00d4ff;--accent-2:#a855f7;--accent-3:#36f1cd;
-  --page:#050916;--panel:rgba(8,13,33,.88);
+  --accent:#00d4ff;
+  --accent-2:#a855f7;
+  --accent-3:#36f1cd;
+  --page:#050916;
+  --panel:rgba(8,13,33,.88);
 }
+
 body[data-theme="royal"]{
-  --accent:#d8a84e;--accent-2:#fff0a6;--accent-3:#8a5cff;
-  --page:#110c1c;--panel:rgba(25,16,38,.9);
+  --accent:#d8a84e;
+  --accent-2:#fff0a6;
+  --accent-3:#8a5cff;
+  --page:#110c1c;
+  --panel:rgba(25,16,38,.9);
 }
+
 body[data-theme="carbon"]{
-  --accent:#ff3d71;--accent-2:#ff9f43;--accent-3:#e9eef5;
-  --page:#08090c;--panel:rgba(17,19,24,.9);
+  --accent:#ff3d71;
+  --accent-2:#ff9f43;
+  --accent-3:#e9eef5;
+  --page:#08090c;
+  --panel:rgba(17,19,24,.9);
 }
 
 *{
@@ -445,6 +469,8 @@ body.low-power #particles{
   position:sticky;
   top:16px;
   contain:layout paint style;
+  overflow:visible;
+  overscroll-behavior:auto;
 }
 
 .panel-heading{
@@ -502,8 +528,9 @@ body.low-power #particles{
   overflow-y:hidden;
   padding:8px 1px 7px;
   overscroll-behavior-inline:contain;
+  overscroll-behavior-block:auto;
   scroll-snap-type:x proximity;
-  touch-action:pan-x;
+  touch-action:pan-x pan-y;
   scrollbar-width:thin;
   cursor:grab;
 }
@@ -531,6 +558,9 @@ body.low-power #particles{
   overflow:auto;
   margin-bottom:10px;
   scrollbar-width:none;
+  overscroll-behavior-inline:contain;
+  overscroll-behavior-block:auto;
+  touch-action:pan-x pan-y;
 }
 
 .recent-row::-webkit-scrollbar{
@@ -919,34 +949,24 @@ iframe{
   color:#fff;
 }
 
+/* FIXED: no nested vertical scroll inside channel lists */
 .servers{
   display:flex;
   gap:8px;
   flex-direction:column;
   margin-top:12px;
-  max-height:420px;
-  overflow-y:auto;
-  padding-right:2px;
+  max-height:none;
+  height:auto;
+  overflow:visible;
+  padding-right:0;
   contain:layout paint style;
-  overscroll-behavior:contain;
-  scrollbar-width:thin;
+  overscroll-behavior:auto;
+  touch-action:pan-y;
+  scrollbar-width:none;
 }
 
 .servers::-webkit-scrollbar{
-  width:3px;
-}
-
-.servers::-webkit-scrollbar-track{
-  background:transparent;
-}
-
-.servers::-webkit-scrollbar-thumb{
-  background:rgba(255,255,255,.05);
-  border-radius:10px;
-}
-
-.servers::-webkit-scrollbar-thumb:hover{
-  background:#7a3cff;
+  display:none;
 }
 
 .servers .server-item{
@@ -967,6 +987,7 @@ iframe{
   gap:10px;
   contain:layout paint style;
   contain-intrinsic-size:48px;
+  touch-action:manipulation;
 }
 
 .servers .server-item:hover{
@@ -1474,6 +1495,15 @@ body.scroll-locked{
 
   .channels-panel{
     position:static;
+    overflow:visible;
+  }
+
+  .servers{
+    max-height:none;
+    overflow:visible;
+    height:auto;
+    overscroll-behavior:auto;
+    touch-action:pan-y;
   }
 
   .card.theatre-active{
@@ -1595,6 +1625,8 @@ body.scroll-locked{
     order:2;
     padding:9px;
     border-radius:14px;
+    overflow:visible;
+    overscroll-behavior:auto;
   }
 
   .channel-tools .search-box{
@@ -1610,6 +1642,7 @@ body.scroll-locked{
   .league-tabs{
     gap:5px;
     padding:6px 1px 5px;
+    touch-action:pan-x pan-y;
   }
 
   .tab-btn{
@@ -1709,10 +1742,21 @@ body.scroll-locked{
     max-width:120px;
   }
 
+  /* IMPORTANT MOBILE FIX */
   .servers{
     gap:5px;
     margin-top:8px;
-    max-height:360px;
+    max-height:none;
+    height:auto;
+    overflow:visible;
+    padding-right:0;
+    overscroll-behavior:auto;
+    touch-action:pan-y;
+    scrollbar-width:none;
+  }
+
+  .servers::-webkit-scrollbar{
+    display:none;
   }
 
   .servers .server-item{
@@ -1720,6 +1764,7 @@ body.scroll-locked{
     border-radius:9px;
     font-size:10px;
     gap:7px;
+    touch-action:manipulation;
   }
 
   .channel-main{
@@ -1848,6 +1893,11 @@ body.scroll-locked{
 
   .player-container{
     padding-top:62%;
+  }
+
+  .servers{
+    max-height:none;
+    overflow:visible;
   }
 
   .servers .server-item{
@@ -2491,6 +2541,7 @@ function safeJSON(key,fallback){
 
 function normalizeTurkishText(str){
   if(!str)return "";
+
   return String(str)
     .replace(/Ã¼/g,"ü")
     .replace(/Ãœ/g,"Ü")
@@ -2541,7 +2592,10 @@ function escapeRegExp(value){
 const translationLookup=new Map();
 
 Object.keys(translationDict).forEach(key=>{
-  translationLookup.set(normalizeSearchText(key),translationDict[key]);
+  translationLookup.set(
+    normalizeSearchText(key),
+    translationDict[key]
+  );
 });
 
 const translationKeys=Object.keys(translationDict)
@@ -2698,6 +2752,7 @@ function canonicalLeagueKey(value){
 
 function canonicalLeagueLabel(value){
   const key=canonicalLeagueKey(value);
+
   return LEAGUE_CANONICAL_LABELS[key] ||
     translateText(String(value || "Other")).trim() ||
     "Other";
@@ -2730,7 +2785,10 @@ function stableChannelKey(event,index=""){
 
   for(const raw of directIds){
     const value=normalizeSearchText(raw || "");
-    if(value)return `id:${value}`;
+
+    if(value){
+      return `id:${value}`;
+    }
   }
 
   const urlCandidates=[
@@ -2744,6 +2802,7 @@ function stableChannelKey(event,index=""){
 
     try{
       const u=new URL(String(raw),location.href);
+
       const q=
         u.searchParams.get("id") ||
         u.searchParams.get("stream_id") ||
@@ -2754,14 +2813,19 @@ function stableChannelKey(event,index=""){
         return `urlid:${normalizeSearchText(q)}`;
       }
 
-      const clean=(u.origin+u.pathname).replace(/\/$/,"").toLowerCase();
+      const clean=(u.origin+u.pathname)
+        .replace(/\/$/,"")
+        .toLowerCase();
 
       if(clean){
         return `url:${clean}`;
       }
     }catch(e){
       const plain=normalizeSearchText(raw);
-      if(plain)return `rawurl:${plain}`;
+
+      if(plain){
+        return `rawurl:${plain}`;
+      }
     }
   }
 
@@ -2773,9 +2837,18 @@ function getEventMeta(event,index=""){
 
   if(meta)return meta;
 
-  const title=translateText(event?.title || "Live channel");
-  const league=canonicalLeagueLabel(event?.league || "");
-  const key=stableChannelKey(event,index);
+  const title=translateText(
+    event?.title || "Live channel"
+  );
+
+  const league=canonicalLeagueLabel(
+    event?.league || ""
+  );
+
+  const key=stableChannelKey(
+    event,
+    index
+  );
 
   const search=normalizeSearchText([
     title,
@@ -2790,14 +2863,23 @@ function getEventMeta(event,index=""){
     event?.streamId || ""
   ].join(" "));
 
-  meta={title,league,key,search};
+  meta={
+    title,
+    league,
+    key,
+    search
+  };
 
   eventMetaCache.set(event,meta);
+
   return meta;
 }
 
 function eventKey(event,index=""){
-  return getEventMeta(event,index).key;
+  return getEventMeta(
+    event,
+    index
+  ).key;
 }
 
 function legacyEventKey(event,index=""){
@@ -2820,14 +2902,23 @@ function migrateStoredEventState(events){
   const legacyMatches=new Map();
 
   events.forEach((event,index)=>{
-    const key=eventKey(event,index);
+    const key=eventKey(
+      event,
+      index
+    );
 
     validKeys.add(key);
 
-    const legacy=legacyEventKey(event,index);
+    const legacy=legacyEventKey(
+      event,
+      index
+    );
 
     if(!legacyMatches.has(legacy)){
-      legacyMatches.set(legacy,[]);
+      legacyMatches.set(
+        legacy,
+        []
+      );
     }
 
     legacyMatches.get(legacy).push(key);
@@ -2835,20 +2926,31 @@ function migrateStoredEventState(events){
 
   const migratedFavorites=[];
 
-  for(const savedKey of Array.isArray(favoriteKeys) ? favoriteKeys : []){
+  for(
+    const savedKey of Array.isArray(favoriteKeys)
+      ? favoriteKeys
+      : []
+  ){
     if(validKeys.has(savedKey)){
       migratedFavorites.push(savedKey);
       continue;
     }
 
-    const matches=legacyMatches.get(String(savedKey)) || [];
+    const matches=
+      legacyMatches.get(
+        String(savedKey)
+      ) || [];
 
     if(matches.length===1){
-      migratedFavorites.push(matches[0]);
+      migratedFavorites.push(
+        matches[0]
+      );
     }
   }
 
-  favoriteKeys=[...new Set(migratedFavorites)];
+  favoriteKeys=[
+    ...new Set(migratedFavorites)
+  ];
 
   storageSet(
     "talhaFavorites",
@@ -2857,7 +2959,11 @@ function migrateStoredEventState(events){
 
   const migratedRecent=[];
 
-  for(const item of Array.isArray(recentEvents) ? recentEvents : []){
+  for(
+    const item of Array.isArray(recentEvents)
+      ? recentEvents
+      : []
+  ){
     const savedKey=item?.key;
 
     if(validKeys.has(savedKey)){
@@ -2868,7 +2974,10 @@ function migrateStoredEventState(events){
       continue;
     }
 
-    const matches=legacyMatches.get(String(savedKey ?? "")) || [];
+    const matches=
+      legacyMatches.get(
+        String(savedKey ?? "")
+      ) || [];
 
     if(matches.length===1){
       migratedRecent.push({
@@ -2878,7 +2987,11 @@ function migrateStoredEventState(events){
     }
   }
 
-  recentEvents=migratedRecent.slice(0,5);
+  recentEvents=
+    migratedRecent.slice(
+      0,
+      5
+    );
 
   storageSet(
     "talhaRecent",
@@ -2888,26 +3001,46 @@ function migrateStoredEventState(events){
 
 function changeTheme(theme){
   document.body.dataset.theme=theme;
-  storageSet("talhaTheme",theme);
+  storageSet(
+    "talhaTheme",
+    theme
+  );
 }
 
 function setStatus(text,state="ready"){
-  const dot=document.getElementById("networkDot");
-  const label=document.getElementById("networkText");
+  const dot=
+    document.getElementById(
+      "networkDot"
+    );
+
+  const label=
+    document.getElementById(
+      "networkText"
+    );
 
   if(label){
     label.textContent=text;
   }
 
   if(dot){
-    dot.className="status-dot " +
-      (state==="offline" ? "offline" :
-       state==="busy" ? "busy" : "");
+    dot.className=
+      "status-dot " +
+      (
+        state==="offline"
+          ? "offline"
+          : state==="busy"
+            ? "busy"
+            : ""
+      );
   }
 }
 
 function setSync(text){
-  const el=document.getElementById("syncText");
+  const el=
+    document.getElementById(
+      "syncText"
+    );
+
   if(el){
     el.textContent=text;
   }
@@ -2927,15 +3060,22 @@ function escapeHTML(value){
 }
 
 function showToast(title,message){
-  const existing=document.querySelector(".toast");
+  const existing=
+    document.querySelector(
+      ".toast"
+    );
 
   if(existing){
     existing.remove();
   }
 
-  const msg=document.createElement("div");
+  const msg=
+    document.createElement(
+      "div"
+    );
 
   msg.className="toast";
+
   msg.innerHTML=
     `<strong>${escapeHTML(title)}</strong>`+
     `<span>${escapeHTML(message)}</span>`;
@@ -2956,22 +3096,33 @@ function showToast(title,message){
 }
 
 function hideLoader(reason="Ready"){
-  const loader=document.getElementById("loader");
+  const loader=
+    document.getElementById(
+      "loader"
+    );
 
-  if(!loader || loader.dataset.hidden==="1"){
+  if(
+    !loader ||
+    loader.dataset.hidden==="1"
+  ){
     return;
   }
 
   loader.dataset.hidden="1";
 
-  const status=document.getElementById("loaderStatus");
+  const status=
+    document.getElementById(
+      "loaderStatus"
+    );
 
   if(status){
     status.textContent=reason;
   }
 
   requestAnimationFrame(()=>{
-    loader.classList.add("is-hidden");
+    loader.classList.add(
+      "is-hidden"
+    );
   });
 
   setTimeout(()=>{
@@ -2986,9 +3137,20 @@ function bootLoader(){
 
   let finished=false;
 
-  const progress=document.getElementById("loaderProgress");
-  const percent=document.getElementById("loaderPercent");
-  const status=document.getElementById("loaderStatus");
+  const progress=
+    document.getElementById(
+      "loaderProgress"
+    );
+
+  const percent=
+    document.getElementById(
+      "loaderPercent"
+    );
+
+  const status=
+    document.getElementById(
+      "loaderStatus"
+    );
 
   const ticks=[
     [22,"Loading visual engine…"],
@@ -3001,15 +3163,26 @@ function bootLoader(){
   let tickIndex=0;
 
   const animator=setInterval(()=>{
-    const elapsed=performance.now()-started;
-    const pct=Math.min(100,Math.round((elapsed/MIN_SHOW)*100));
+    const elapsed=
+      performance.now()-
+      started;
+
+    const pct=
+      Math.min(
+        100,
+        Math.round(
+          (elapsed/MIN_SHOW)*100
+        )
+      );
 
     if(progress){
-      progress.style.width=pct+"%";
+      progress.style.width=
+        pct+"%";
     }
 
     if(percent){
-      percent.textContent=pct+"%";
+      percent.textContent=
+        pct+"%";
     }
 
     while(
@@ -3017,7 +3190,8 @@ function bootLoader(){
       pct>=ticks[tickIndex][0]
     ){
       if(status){
-        status.textContent=ticks[tickIndex][1];
+        status.textContent=
+          ticks[tickIndex][1];
       }
 
       tickIndex++;
@@ -3029,14 +3203,21 @@ function bootLoader(){
 
     const wait=Math.max(
       0,
-      MIN_SHOW-(performance.now()-started)
+      MIN_SHOW-
+      (
+        performance.now()-
+        started
+      )
     );
 
     setTimeout(()=>{
       if(finished)return;
 
       finished=true;
-      clearInterval(animator);
+
+      clearInterval(
+        animator
+      );
 
       if(progress){
         progress.style.width="100%";
@@ -3056,34 +3237,65 @@ function bootLoader(){
   ){
     finish();
   }else{
-    document.addEventListener("DOMContentLoaded",finish,{once:true});
+    document.addEventListener(
+      "DOMContentLoaded",
+      finish,
+      {once:true}
+    );
   }
 
-  window.addEventListener("load",finish,{once:true});
-  window.addEventListener("pageshow",finish,{once:true});
+  window.addEventListener(
+    "load",
+    finish,
+    {once:true}
+  );
+
+  window.addEventListener(
+    "pageshow",
+    finish,
+    {once:true}
+  );
 
   setTimeout(()=>{
     if(finished)return;
 
     finished=true;
-    clearInterval(animator);
+
+    clearInterval(
+      animator
+    );
 
     hideLoader("Ready");
   },MAX_WAIT);
 }
 
 function renderLeagueTabs(){
-  const tabs=document.getElementById("leagueTabs");
+  const tabs=
+    document.getElementById(
+      "leagueTabs"
+    );
 
   if(!tabs)return;
 
   const counts=new Map();
 
-  for(const event of liveEvents){
-    const key=canonicalLeagueKey(event?.league || "Other");
-    const label=canonicalLeagueLabel(event?.league || "Other");
+  for(
+    const event of liveEvents
+  ){
+    const key=
+      canonicalLeagueKey(
+        event?.league ||
+        "Other"
+      );
 
-    let meta=counts.get(key);
+    const label=
+      canonicalLeagueLabel(
+        event?.league ||
+        "Other"
+      );
+
+    let meta=
+      counts.get(key);
 
     if(!meta){
       meta={
@@ -3091,7 +3303,10 @@ function renderLeagueTabs(){
         count:0
       };
 
-      counts.set(key,meta);
+      counts.set(
+        key,
+        meta
+      );
     }
 
     meta.count++;
@@ -3103,47 +3318,98 @@ function renderLeagueTabs(){
     return 2;
   };
 
-  const leagues=[...counts.entries()].sort(
+  const leagues=[
+    ...counts.entries()
+  ].sort(
     (a,b)=>
-      priority(a[0])-priority(b[0]) ||
-      a[1].label.localeCompare(b[1].label)
+      priority(a[0])-
+      priority(b[0]) ||
+      a[1].label.localeCompare(
+        b[1].label
+      )
   );
 
-  const fragment=document.createDocumentFragment();
+  const fragment=
+    document.createDocumentFragment();
 
-  const addTab=(label,key,count)=>{
-    const button=document.createElement("button");
+  const addTab=(
+    label,
+    key,
+    count
+  )=>{
+    const button=
+      document.createElement(
+        "button"
+      );
 
     button.className=
       "tab-btn" +
-      (currentLeague===key ? " active" : "");
+      (
+        currentLeague===key
+          ? " active"
+          : ""
+      );
 
     button.type="button";
-    button.setAttribute("role","tab");
+
     button.setAttribute(
-      "aria-selected",
-      currentLeague===key ? "true" : "false"
+      "role",
+      "tab"
     );
 
-    button.textContent=`${label} (${count})`;
-    button.title=`Filter ${label}`;
-    button.onclick=()=>setFilter(key);
+    button.setAttribute(
+      "aria-selected",
+      currentLeague===key
+        ? "true"
+        : "false"
+    );
 
-    fragment.appendChild(button);
+    button.textContent=
+      `${label} (${count})`;
+
+    button.title=
+      `Filter ${label}`;
+
+    button.onclick=()=>{
+      setFilter(key);
+    };
+
+    fragment.appendChild(
+      button
+    );
   };
 
-  addTab("All","all",liveEvents.length);
+  addTab(
+    "All",
+    "all",
+    liveEvents.length
+  );
 
-  for(const [key,meta] of leagues){
-    addTab(meta.label,key,meta.count);
+  for(
+    const [key,meta] of leagues
+  ){
+    addTab(
+      meta.label,
+      key,
+      meta.count
+    );
   }
 
-  tabs.replaceChildren(fragment);
+  tabs.replaceChildren(
+    fragment
+  );
 }
 
 function renderRecent(){
-  const section=document.getElementById("recentSection");
-  const row=document.getElementById("recentRow");
+  const section=
+    document.getElementById(
+      "recentSection"
+    );
+
+  const row=
+    document.getElementById(
+      "recentRow"
+    );
 
   if(!section || !row)return;
 
@@ -3155,101 +3421,184 @@ function renderRecent(){
   section.style.display="block";
   row.replaceChildren();
 
-  recentEvents.slice(0,5).forEach(item=>{
-    const chip=document.createElement("button");
+  recentEvents
+    .slice(0,5)
+    .forEach(item=>{
+      const chip=
+        document.createElement(
+          "button"
+        );
 
-    chip.className="recent-chip";
-    chip.type="button";
-    chip.textContent=item.title;
-    chip.title="Play "+item.title;
+      chip.className="recent-chip";
+      chip.type="button";
+      chip.textContent=item.title;
+      chip.title=
+        "Play "+item.title;
 
-    chip.onclick=()=>{
-      const liveFound=liveEvents.find(
-        (event,index)=>
-          eventKey(event,index)===item.key
+      chip.onclick=()=>{
+        const liveFound=
+          liveEvents.find(
+            (event,index)=>
+              eventKey(
+                event,
+                index
+              )===item.key
+          );
+
+        if(liveFound){
+          setServer(liveFound);
+          return;
+        }
+
+        const staticFound=
+          STATIC_CHANNELS.find(
+            (event,index)=>
+              eventKey(
+                event,
+                index
+              )===item.key
+          );
+
+        if(staticFound){
+          setServer(
+            staticFound
+          );
+        }
+      };
+
+      row.appendChild(
+        chip
       );
-
-      if(liveFound){
-        setServer(liveFound);
-        return;
-      }
-
-      const staticFound=STATIC_CHANNELS.find(
-        (event,index)=>
-          eventKey(event,index)===item.key
-      );
-
-      if(staticFound){
-        setServer(staticFound);
-      }
-    };
-
-    row.appendChild(chip);
-  });
+    });
 }
 
 function updateAnalytics(){
-  const total=liveEvents.length;
+  const total=
+    liveEvents.length;
 
   let favorites=0;
 
-  for(let i=0;i<liveEvents.length;i++){
+  for(
+    let i=0;
+    i<liveEvents.length;
+    i++
+  ){
     if(
       favoriteKeys.includes(
-        eventKey(liveEvents[i],i)
+        eventKey(
+          liveEvents[i],
+          i
+        )
       )
     ){
       favorites++;
     }
   }
 
-  const recentCount=Math.min(recentEvents.length,5);
+  const recentCount=
+    Math.min(
+      recentEvents.length,
+      5
+    );
 
-  document.getElementById("countTotal").textContent=
-    String(total).padStart(2,"0");
+  document.getElementById(
+    "countTotal"
+  ).textContent=
+    String(total).padStart(
+      2,
+      "0"
+    );
 
-  document.getElementById("countFavorites").textContent=
-    String(favorites).padStart(2,"0");
+  document.getElementById(
+    "countFavorites"
+  ).textContent=
+    String(favorites).padStart(
+      2,
+      "0"
+    );
 
-  document.getElementById("countRecent").textContent=
-    String(recentCount).padStart(2,"0");
+  document.getElementById(
+    "countRecent"
+  ).textContent=
+    String(recentCount).padStart(
+      2,
+      "0"
+    );
 
-  const pcbLive=document.getElementById("pcbLive");
-  const pcbStatic=document.getElementById("pcbStatic");
+  const pcbLive=
+    document.getElementById(
+      "pcbLive"
+    );
+
+  const pcbStatic=
+    document.getElementById(
+      "pcbStatic"
+    );
 
   if(pcbLive){
     pcbLive.textContent=
-      String(total).padStart(2,"0");
+      String(total).padStart(
+        2,
+        "0"
+      );
   }
 
   if(pcbStatic){
     pcbStatic.textContent=
-      String(STATIC_CHANNELS.length).padStart(2,"0");
+      String(
+        STATIC_CHANNELS.length
+      ).padStart(
+        2,
+        "0"
+      );
   }
 }
 
 function renderMatches(){
-  const container=document.getElementById("serverContainer");
+  const container=
+    document.getElementById(
+      "serverContainer"
+    );
 
   if(!container)return;
 
-  const input=document.getElementById("searchChannels");
+  const input=
+    document.getElementById(
+      "searchChannels"
+    );
 
-  const rawQuery=(input?.value || "").trim();
-  const searchQuery=normalizeSearchText(rawQuery);
+  const rawQuery=
+    (input?.value || "").trim();
 
-  const fragment=document.createDocumentFragment();
+  const searchQuery=
+    normalizeSearchText(
+      rawQuery
+    );
+
+  const fragment=
+    document.createDocumentFragment();
 
   let visibleCount=0;
   let displayIndex=0;
 
-  for(let index=0;index<liveEvents.length;index++){
-    const event=liveEvents[index];
-    const meta=getEventMeta(event,index);
+  for(
+    let index=0;
+    index<liveEvents.length;
+    index++
+  ){
+    const event=
+      liveEvents[index];
 
-    const leagueKey=canonicalLeagueKey(
-      event?.league || ""
-    );
+    const meta=
+      getEventMeta(
+        event,
+        index
+      );
+
+    const leagueKey=
+      canonicalLeagueKey(
+        event?.league || ""
+      );
 
     if(
       currentLeague!=="all" &&
@@ -3260,30 +3609,47 @@ function renderMatches(){
 
     if(
       searchQuery &&
-      !meta.search.includes(searchQuery)
+      !meta.search.includes(
+        searchQuery
+      )
     ){
       continue;
     }
 
     displayIndex++;
 
-    const favorite=favoriteKeys.includes(meta.key);
+    const favorite=
+      favoriteKeys.includes(
+        meta.key
+      );
 
-    const row=document.createElement("div");
+    const row=
+      document.createElement(
+        "div"
+      );
 
-    row.className="server-item";
+    row.className=
+      "server-item";
+
     row.tabIndex=0;
-    row.setAttribute("role","button");
+
+    row.setAttribute(
+      "role",
+      "button"
+    );
+
     row.setAttribute(
       "aria-label",
       "Play "+meta.title
     );
+
     row.setAttribute(
       "title",
       "Play "+meta.title
     );
 
-    row.dataset.channelKey=meta.key;
+    row.dataset.channelKey=
+      meta.key;
 
     row.innerHTML=
       `<div class="channel-main">`+
@@ -3302,17 +3668,30 @@ function renderMatches(){
       `</div>`;
 
     row.onclick=()=>{
-      setServer(event,row);
+      setServer(
+        event,
+        row
+      );
     };
 
     row.onkeydown=ev=>{
-      if(ev.key==="Enter" || ev.key===" "){
+      if(
+        ev.key==="Enter" ||
+        ev.key===" "
+      ){
         ev.preventDefault();
-        setServer(event,row);
+
+        setServer(
+          event,
+          row
+        );
       }
     };
 
-    const favButton=row.querySelector(".fav-toggle");
+    const favButton=
+      row.querySelector(
+        ".fav-toggle"
+      );
 
     favButton.onclick=ev=>{
       ev.stopPropagation();
@@ -3331,36 +3710,59 @@ function renderMatches(){
 
       storageSet(
         "talhaFavorites",
-        JSON.stringify(favoriteKeys)
+        JSON.stringify(
+          favoriteKeys
+        )
       );
 
       renderMatches();
       updateAnalytics();
     };
 
-    fragment.appendChild(row);
+    fragment.appendChild(
+      row
+    );
+
     visibleCount++;
   }
 
   if(!visibleCount){
-    const empty=document.createElement("div");
-    empty.className="empty-state";
-    empty.textContent="No channels match your filters.";
-    fragment.appendChild(empty);
+    const empty=
+      document.createElement(
+        "div"
+      );
+
+    empty.className=
+      "empty-state";
+
+    empty.textContent=
+      "No channels match your filters.";
+
+    fragment.appendChild(
+      empty
+    );
   }
 
-  container.replaceChildren(fragment);
+  container.replaceChildren(
+    fragment
+  );
 
-  const summary=document.getElementById("channelSummary");
+  const summary=
+    document.getElementById(
+      "channelSummary"
+    );
 
   if(summary){
     summary.textContent=
       `${visibleCount} shown · ${liveEvents.length} total`;
   }
 
-  if(lastStaticStart!==liveEvents.length){
+  if(
+    lastStaticStart!==liveEvents.length
+  ){
     renderStaticChannels();
-    lastStaticStart=liveEvents.length;
+    lastStaticStart=
+      liveEvents.length;
   }
 
   updateAnalytics();
@@ -3368,7 +3770,10 @@ function renderMatches(){
   markActivePlayingButton();
 }
 
-function setFilter(type,name="all"){
+function setFilter(
+  type,
+  name="all"
+){
   currentLeague=
     type==="league"
       ? canonicalLeagueKey(name)
@@ -3380,24 +3785,37 @@ function setFilter(type,name="all"){
   renderMatches();
 }
 
-function rememberRecent(event,index=""){
-  const key=eventKey(event,index);
+function rememberRecent(
+  event,
+  index=""
+){
+  const key=
+    eventKey(
+      event,
+      index
+    );
 
   recentEvents=[
     {
       key,
       title:translateText(
-        event?.title || "Live channel"
+        event?.title ||
+        "Live channel"
       )
     },
     ...recentEvents.filter(
       x=>x.key!==key
     )
-  ].slice(0,5);
+  ].slice(
+    0,
+    5
+  );
 
   storageSet(
     "talhaRecent",
-    JSON.stringify(recentEvents)
+    JSON.stringify(
+      recentEvents
+    )
   );
 }
 
@@ -3415,26 +3833,56 @@ function eventFingerprint(event){
     event?.link,
     event?.isIframeOnly
   ]
-    .map(value=>normalizeTurkishText(String(value ?? "")))
+    .map(value=>
+      normalizeTurkishText(
+        String(
+          value ?? ""
+        )
+      )
+    )
     .join("\u001F");
 }
 
-function diffFeedData(previous,next){
-  const prevMap=new Map();
-  const nextMap=new Map();
+function diffFeedData(
+  previous,
+  next
+){
+  const prevMap=
+    new Map();
 
-  for(let i=0;i<previous.length;i++){
-    const event=previous[i];
+  const nextMap=
+    new Map();
+
+  for(
+    let i=0;
+    i<previous.length;
+    i++
+  ){
+    const event=
+      previous[i];
+
     prevMap.set(
-      stableChannelKey(event,i),
+      stableChannelKey(
+        event,
+        i
+      ),
       event
     );
   }
 
-  for(let i=0;i<next.length;i++){
-    const event=next[i];
+  for(
+    let i=0;
+    i<next.length;
+    i++
+  ){
+    const event=
+      next[i];
+
     nextMap.set(
-      stableChannelKey(event,i),
+      stableChannelKey(
+        event,
+        i
+      ),
       event
     );
   }
@@ -3443,66 +3891,107 @@ function diffFeedData(previous,next){
   let updated=0;
   let removed=0;
 
-  nextMap.forEach((event,key)=>{
-    const previousEvent=prevMap.get(key);
+  nextMap.forEach(
+    (event,key)=>{
+      const previousEvent=
+        prevMap.get(key);
 
-    if(!previousEvent){
-      added++;
-      return;
-    }
+      if(!previousEvent){
+        added++;
+        return;
+      }
 
-    if(
-      eventFingerprint(previousEvent)!==
-      eventFingerprint(event)
-    ){
-      updated++;
+      if(
+        eventFingerprint(
+          previousEvent
+        )!==
+        eventFingerprint(
+          event
+        )
+      ){
+        updated++;
+      }
     }
-  });
+  );
 
-  prevMap.forEach((event,key)=>{
-    if(!nextMap.has(key)){
-      removed++;
+  prevMap.forEach(
+    (event,key)=>{
+      if(!nextMap.has(key)){
+        removed++;
+      }
     }
-  });
+  );
 
   return {
     added,
     updated,
     removed,
-    total:added+updated+removed
+    total:
+      added+
+      updated+
+      removed
   };
 }
 
-function showFeedChangePopup(diff){
-  if(!diff || diff.total<1)return;
+function showFeedChangePopup(
+  diff
+){
+  if(
+    !diff ||
+    diff.total<1
+  ){
+    return;
+  }
 
-  const popup=document.getElementById("feedChangePopup");
+  const popup=
+    document.getElementById(
+      "feedChangePopup"
+    );
 
   if(!popup)return;
 
-  document.getElementById("feedNewCount").textContent=
+  document.getElementById(
+    "feedNewCount"
+  ).textContent=
     String(diff.added);
 
-  document.getElementById("feedUpdatedCount").textContent=
+  document.getElementById(
+    "feedUpdatedCount"
+  ).textContent=
     String(diff.updated);
 
-  document.getElementById("feedRemovedCount").textContent=
+  document.getElementById(
+    "feedRemovedCount"
+  ).textContent=
     String(diff.removed);
 
-  document.getElementById("feedChangeTime").textContent=
-    formatSyncTime(Date.now());
+  document.getElementById(
+    "feedChangeTime"
+  ).textContent=
+    formatSyncTime(
+      Date.now()
+    );
 
-  popup.classList.remove("show");
+  popup.classList.remove(
+    "show"
+  );
 
   void popup.offsetWidth;
 
-  popup.classList.add("show");
+  popup.classList.add(
+    "show"
+  );
 
-  clearTimeout(showFeedChangePopup.timer);
+  clearTimeout(
+    showFeedChangePopup.timer
+  );
 
-  showFeedChangePopup.timer=setTimeout(()=>{
-    popup.classList.remove("show");
-  },4500);
+  showFeedChangePopup.timer=
+    setTimeout(()=>{
+      popup.classList.remove(
+        "show"
+      );
+    },4500);
 }
 
 function resolvePlaybackUrl(event){
@@ -3511,8 +4000,11 @@ function resolvePlaybackUrl(event){
     PLAYER_BASE_URL;
 
   if(event?.url){
-    const raw=String(event.url);
-    const lower=raw.toLowerCase();
+    const raw=
+      String(event.url);
+
+    const lower=
+      raw.toLowerCase();
 
     if(event.isIframeOnly===true){
       return raw;
@@ -3525,7 +4017,10 @@ function resolvePlaybackUrl(event){
     if(raw.includes("id=")){
       try{
         const params=
-          new URL(raw,location.href).searchParams;
+          new URL(
+            raw,
+            location.href
+          ).searchParams;
 
         const id=
           params.get("id") ||
@@ -3544,48 +4039,77 @@ function resolvePlaybackUrl(event){
 }
 
 function markActivePlayingButton(){
-  const rows=document.querySelectorAll(
-    ".servers .server-item"
-  );
+  const rows=
+    document.querySelectorAll(
+      ".servers .server-item"
+    );
 
-  for(const row of rows){
+  for(
+    const row of rows
+  ){
     row.classList.toggle(
       "active",
       !!currentPlayingKey &&
-      row.dataset.channelKey===currentPlayingKey
+      row.dataset.channelKey===
+        currentPlayingKey
     );
   }
 }
 
-function reloadPlayerSource(finalUrl){
-  const frame=document.getElementById("frame");
+function reloadPlayerSource(
+  finalUrl
+){
+  const frame=
+    document.getElementById(
+      "frame"
+    );
 
   if(!frame)return;
 
-  frame.classList.remove("fade");
+  frame.classList.remove(
+    "fade"
+  );
 
   void frame.offsetWidth;
 
-  frame.classList.add("fade");
+  frame.classList.add(
+    "fade"
+  );
 
-  frame.src=finalUrl;
+  frame.src=
+    finalUrl;
 
-  currentPlayingUrl=finalUrl;
+  currentPlayingUrl=
+    finalUrl;
 }
 
-function setServer(event,targetBtn=null,options={}){
-  const frame=document.getElementById("frame");
+function setServer(
+  event,
+  targetBtn=null,
+  options={}
+){
+  const frame=
+    document.getElementById(
+      "frame"
+    );
 
   if(!frame || !event)return;
 
-  const finalUrl=resolvePlaybackUrl(event);
+  const finalUrl=
+    resolvePlaybackUrl(
+      event
+    );
 
-  const index=liveEvents.indexOf(event);
+  const index=
+    liveEvents.indexOf(
+      event
+    );
 
-  const key=eventKey(
-    event,
-    index>=0 ? index : ""
-  );
+  const key=
+    eventKey(
+      event,
+      index>=0 ? index : ""
+    );
 
   let sameSource=false;
 
@@ -3594,28 +4118,40 @@ function setServer(event,targetBtn=null,options={}){
       currentPlayingKey===key &&
       currentPlayingUrl===finalUrl &&
       frame.src===
-        new URL(finalUrl,location.href).href;
+        new URL(
+          finalUrl,
+          location.href
+        ).href;
   }catch(e){
     sameSource=
       currentPlayingKey===key &&
       currentPlayingUrl===finalUrl;
   }
 
-  currentPlayingKey=key;
-  currentPlayingUrl=finalUrl;
+  currentPlayingKey=
+    key;
+
+  currentPlayingUrl=
+    finalUrl;
+
   currentPlayingTitle=
     translateText(
-      event?.title || "Live channel"
+      event?.title ||
+      "Live channel"
     );
 
   if(!sameSource){
-    reloadPlayerSource(finalUrl);
+    reloadPlayerSource(
+      finalUrl
+    );
   }
 
   if(!options.skipRecent){
     rememberRecent(
       event,
-      index>=0 ? index : ""
+      index>=0
+        ? index
+        : ""
     );
 
     renderRecent();
@@ -3624,11 +4160,15 @@ function setServer(event,targetBtn=null,options={}){
   markActivePlayingButton();
 
   if(targetBtn){
-    targetBtn.classList.add("active");
+    targetBtn.classList.add(
+      "active"
+    );
   }
 }
 
-function syncCurrentPlayerAfterFeedUpdate(nextEvents){
+function syncCurrentPlayerAfterFeedUpdate(
+  nextEvents
+){
   if(!currentPlayingKey)return;
 
   const list=
@@ -3638,9 +4178,16 @@ function syncCurrentPlayerAfterFeedUpdate(nextEvents){
 
   let matchIndex=-1;
 
-  for(let i=0;i<list.length;i++){
+  for(
+    let i=0;
+    i<list.length;
+    i++
+  ){
     if(
-      stableChannelKey(list[i],i)===
+      stableChannelKey(
+        list[i],
+        i
+      )===
       currentPlayingKey
     ){
       matchIndex=i;
@@ -3653,14 +4200,25 @@ function syncCurrentPlayerAfterFeedUpdate(nextEvents){
     return;
   }
 
-  const nextEvent=list[matchIndex];
-  const nextUrl=resolvePlaybackUrl(nextEvent);
+  const nextEvent=
+    list[matchIndex];
 
-  if(nextUrl!==currentPlayingUrl){
-    reloadPlayerSource(nextUrl);
+  const nextUrl=
+    resolvePlaybackUrl(
+      nextEvent
+    );
+
+  if(
+    nextUrl!==
+    currentPlayingUrl
+  ){
+    reloadPlayerSource(
+      nextUrl
+    );
   }
 
-  currentPlayingUrl=nextUrl;
+  currentPlayingUrl=
+    nextUrl;
 
   currentPlayingTitle=
     translateText(
@@ -3698,39 +4256,60 @@ function triggerFirstStream(){
   }
 }
 
-function formatSyncTime(timestamp){
-  if(!timestamp)return "Not synced";
+function formatSyncTime(
+  timestamp
+){
+  if(!timestamp){
+    return "Not synced";
+  }
 
   try{
     return timeFormatter.format(
-      new Date(timestamp)
+      new Date(
+        timestamp
+      )
     );
   }catch(e){
     return "Synced";
   }
 }
 
-function cacheLiveFeed(events){
-  if(!Array.isArray(events) || !events.length){
+function cacheLiveFeed(
+  events
+){
+  if(
+    !Array.isArray(events) ||
+    !events.length
+  ){
     return false;
   }
 
   const payload={
     savedAt:Date.now(),
-    events:events.slice(0,5000)
+    events:
+      events.slice(
+        0,
+        5000
+      )
   };
 
-  const ok=storageSet(
-    FEED_CACHE_KEY,
-    JSON.stringify(payload)
-  );
+  const ok=
+    storageSet(
+      FEED_CACHE_KEY,
+      JSON.stringify(
+        payload
+      )
+    );
 
   if(ok){
-    lastSuccessfulFeedSync=payload.savedAt;
+    lastSuccessfulFeedSync=
+      payload.savedAt;
 
     storageSet(
       FEED_LAST_SYNC_KEY,
-      String(lastSuccessfulFeedSync)
+      String(
+        lastSuccessfulFeedSync
+      )
     );
   }
 
@@ -3738,22 +4317,28 @@ function cacheLiveFeed(events){
 }
 
 function loadCachedFeed(){
-  const cached=safeJSON(
-    FEED_CACHE_KEY,
-    null
-  );
+  const cached=
+    safeJSON(
+      FEED_CACHE_KEY,
+      null
+    );
 
   if(
     !cached ||
-    !Array.isArray(cached.events) ||
+    !Array.isArray(
+      cached.events
+    ) ||
     !cached.events.length
   ){
     return false;
   }
 
-  liveEvents=cached.events;
+  liveEvents=
+    cached.events;
 
-  migrateStoredEventState(liveEvents);
+  migrateStoredEventState(
+    liveEvents
+  );
 
   renderLeagueTabs();
   renderMatches();
@@ -3761,11 +4346,19 @@ function loadCachedFeed(){
   markActivePlayingButton();
 
   const cacheTime=
-    Number(cached.savedAt) ||
-    Number(storageGet(FEED_LAST_SYNC_KEY,"0")) ||
+    Number(
+      cached.savedAt
+    ) ||
+    Number(
+      storageGet(
+        FEED_LAST_SYNC_KEY,
+        "0"
+      )
+    ) ||
     0;
 
-  lastSuccessfulFeedSync=cacheTime;
+  lastSuccessfulFeedSync=
+    cacheTime;
 
   const offline=
     navigator.onLine===false;
@@ -3774,7 +4367,9 @@ function loadCachedFeed(){
     offline
       ? "Offline mode · cached feed"
       : "Cached feed ready",
-    offline ? "offline" : "ready"
+    offline
+      ? "offline"
+      : "ready"
   );
 
   setSync(
@@ -3799,9 +4394,13 @@ function isFeedStale(){
   )>=AUTO_SYNC_STALE_MS;
 }
 
-function maybeSyncStaleFeed(reason="visibility"){
+function maybeSyncStaleFeed(
+  reason="visibility"
+){
   if(
-    document.body.classList.contains("auth-locked") ||
+    document.body.classList.contains(
+      "auth-locked"
+    ) ||
     navigator.onLine===false ||
     document.visibilityState!=="visible"
   ){
@@ -3817,56 +4416,80 @@ function maybeSyncStaleFeed(reason="visibility"){
     return;
   }
 
-  if(!liveEvents.length || isFeedStale()){
-    loadTargetScript(true,reason);
+  if(
+    !liveEvents.length ||
+    isFeedStale()
+  ){
+    loadTargetScript(
+      true,
+      reason
+    );
   }
 }
 
 function startRealtimeAutoSync(){
   if(realtimeSyncTimer){
-    clearInterval(realtimeSyncTimer);
+    clearInterval(
+      realtimeSyncTimer
+    );
   }
 
-  realtimeSyncTimer=setInterval(()=>{
-    if(
-      document.body.classList.contains("auth-locked") ||
-      navigator.onLine===false ||
-      document.visibilityState!=="visible" ||
-      feedBusy
-    ){
-      return;
-    }
+  realtimeSyncTimer=
+    setInterval(()=>{
+      if(
+        document.body.classList.contains(
+          "auth-locked"
+        ) ||
+        navigator.onLine===false ||
+        document.visibilityState!=="visible" ||
+        feedBusy
+      ){
+        return;
+      }
 
-    if(isFeedStale()){
-      loadTargetScript(true,"realtime");
-    }
-  },REALTIME_SYNC_INTERVAL_MS);
+      if(isFeedStale()){
+        loadTargetScript(
+          true,
+          "realtime"
+        );
+      }
+    },REALTIME_SYNC_INTERVAL_MS);
 }
 
 function recoverOnline(){
   updateNetwork();
 
-  clearTimeout(onlineRecoveryTimer);
+  clearTimeout(
+    onlineRecoveryTimer
+  );
 
-  onlineRecoveryTimer=setTimeout(()=>{
-    if(
-      document.body.classList.contains("auth-locked")
-    ){
-      return;
-    }
+  onlineRecoveryTimer=
+    setTimeout(()=>{
+      if(
+        document.body.classList.contains(
+          "auth-locked"
+        )
+      ){
+        return;
+      }
 
-    if(!liveEvents.length){
-      loadCachedFeed();
-    }
+      if(!liveEvents.length){
+        loadCachedFeed();
+      }
 
-    maybeSyncStaleFeed("online");
-  },VISIBILITY_SYNC_DELAY);
+      maybeSyncStaleFeed(
+        "online"
+      );
+    },VISIBILITY_SYNC_DELAY);
 }
 
-function feedError(message){
+function feedError(
+  message
+){
   updateAnalytics();
 
-  const hadCache=loadCachedFeed();
+  const hadCache=
+    loadCachedFeed();
 
   if(hadCache){
     setStatus(
@@ -3904,11 +4527,17 @@ function feedError(message){
       `<button type="button" id="retryFeedBtn">Retry Feed Sync</button>`+
       `</div>`;
 
-    const retry=document.getElementById("retryFeedBtn");
+    const retry=
+      document.getElementById(
+        "retryFeedBtn"
+      );
 
     if(retry){
       retry.onclick=()=>{
-        loadTargetScript(true,"retry");
+        loadTargetScript(
+          true,
+          "retry"
+        );
       };
     }
   }
@@ -3918,24 +4547,33 @@ function feedError(message){
     "offline"
   );
 
-  setSync("Sync unavailable");
+  setSync(
+    "Sync unavailable"
+  );
 
   triggerFirstStream();
 }
 
-function loadTargetScript(force=false,reason="manual"){
+function loadTargetScript(
+  force=false,
+  reason="manual"
+){
   if(feedBusy){
     return;
   }
 
   if(navigator.onLine===false){
-    const cached=loadCachedFeed();
+    const cached=
+      loadCachedFeed();
 
     if(!cached){
       feedError(
         "You are offline and no cached feed is available yet."
       );
-    }else if(reason!=="realtime" && reason!=="visibility"){
+    }else if(
+      reason!=="realtime" &&
+      reason!=="visibility"
+    ){
       showToast(
         "Offline mode",
         "Showing the last available feed until the connection returns."
@@ -3955,9 +4593,11 @@ function loadTargetScript(force=false,reason="manual"){
     return;
   }
 
-  lastSyncAttemptAt=now;
+  lastSyncAttemptAt=
+    now;
 
-  const requestToken=++feedRequestToken;
+  const requestToken=
+    ++feedRequestToken;
 
   feedBusy=true;
 
@@ -3973,10 +4613,15 @@ function loadTargetScript(force=false,reason="manual"){
       "busy"
     );
 
-    setSync("Connecting…");
+    setSync(
+      "Connecting…"
+    );
   }
 
-  const loader=document.createElement("iframe");
+  const loader=
+    document.createElement(
+      "iframe"
+    );
 
   const nonce=
     `talha_${Date.now()}_${Math.random().toString(36).slice(2)}`;
@@ -3986,7 +4631,10 @@ function loadTargetScript(force=false,reason="manual"){
     "true"
   );
 
-  loader.setAttribute("tabindex","-1");
+  loader.setAttribute(
+    "tabindex",
+    "-1"
+  );
 
   loader.style.cssText=
     "position:fixed;left:-10000px;top:-10000px;width:1px;height:1px;border:0;opacity:0;pointer-events:none;";
@@ -3995,191 +4643,221 @@ function loadTargetScript(force=false,reason="manual"){
   let timeoutId=null;
 
   const cleanup=()=>{
-    clearTimeout(timeoutId);
+    clearTimeout(
+      timeoutId
+    );
 
     try{
       loader.remove();
     }catch(e){}
   };
 
-  const finishError=message=>{
-    if(
-      settled ||
-      requestToken!==feedRequestToken
-    ){
-      return;
-    }
-
-    settled=true;
-    feedBusy=false;
-
-    window.removeEventListener(
-      "message",
-      handleMessage
-    );
-
-    cleanup();
-
-    if(silentBackground){
-      setStatus(
-        navigator.onLine===false
-          ? "Offline mode · network unavailable"
-          : "System ready",
-        navigator.onLine===false
-          ? "offline"
-          : "ready"
-      );
-
-      return;
-    }
-
-    feedError(message);
-  };
-
-  const processFeed=payload=>{
-    if(
-      settled ||
-      requestToken!==feedRequestToken
-    ){
-      return;
-    }
-
-    settled=true;
-    feedBusy=false;
-
-    window.removeEventListener(
-      "message",
-      handleMessage
-    );
-
-    cleanup();
-
-    try{
-      const received=
-        payload &&
-        Array.isArray(payload.events)
-          ? payload.events
-          : [];
-
-      if(!received.length){
-        throw new Error(
-          "Feed Vector Missing"
-        );
+  const finishError=
+    message=>{
+      if(
+        settled ||
+        requestToken!==feedRequestToken
+      ){
+        return;
       }
 
-      const tempEvents=received.slice();
+      settled=true;
+      feedBusy=false;
 
-      tempEvents.sort((a,b)=>{
-        const at=String(
-          a?.time || ""
-        ).toLowerCase();
-
-        const bt=String(
-          b?.time || ""
-        ).toLowerCase();
-
-        const al=
-          at.includes("live") ||
-          at.includes("online");
-
-        const bl=
-          bt.includes("live") ||
-          bt.includes("online");
-
-        if(al===bl)return 0;
-
-        return al ? -1 : 1;
-      });
-
-      const activeCustomFeeds=
-        CUSTOM_TOP_FEEDS.filter(
-          item=>item && item.show===true
-        );
-
-      const nextEvents=[
-        ...activeCustomFeeds,
-        ...tempEvents
-      ];
-
-      const previousEvents=
-        Array.isArray(liveEvents)
-          ? liveEvents.slice()
-          : [];
-
-      const firstFeed=
-        previousEvents.length===0;
-
-      const diff=
-        diffFeedData(
-          previousEvents,
-          nextEvents
-        );
-
-      liveEvents=nextEvents;
-
-      migrateStoredEventState(
-        liveEvents
+      window.removeEventListener(
+        "message",
+        handleMessage
       );
 
-      if(firstFeed || diff.total>0){
-        renderLeagueTabs();
-        renderMatches();
-        updateAnalytics();
-        syncCurrentPlayerAfterFeedUpdate(
+      cleanup();
+
+      if(silentBackground){
+        setStatus(
+          navigator.onLine===false
+            ? "Offline mode · network unavailable"
+            : "System ready",
+          navigator.onLine===false
+            ? "offline"
+            : "ready"
+        );
+
+        return;
+      }
+
+      feedError(
+        message
+      );
+    };
+
+  const processFeed=
+    payload=>{
+      if(
+        settled ||
+        requestToken!==feedRequestToken
+      ){
+        return;
+      }
+
+      settled=true;
+      feedBusy=false;
+
+      window.removeEventListener(
+        "message",
+        handleMessage
+      );
+
+      cleanup();
+
+      try{
+        const received=
+          payload &&
+          Array.isArray(
+            payload.events
+          )
+            ? payload.events
+            : [];
+
+        if(!received.length){
+          throw new Error(
+            "Feed Vector Missing"
+          );
+        }
+
+        const tempEvents=
+          received.slice();
+
+        tempEvents.sort(
+          (a,b)=>{
+            const at=
+              String(
+                a?.time || ""
+              ).toLowerCase();
+
+            const bt=
+              String(
+                b?.time || ""
+              ).toLowerCase();
+
+            const al=
+              at.includes("live") ||
+              at.includes("online");
+
+            const bl=
+              bt.includes("live") ||
+              bt.includes("online");
+
+            if(al===bl){
+              return 0;
+            }
+
+            return al ? -1 : 1;
+          }
+        );
+
+        const activeCustomFeeds=
+          CUSTOM_TOP_FEEDS.filter(
+            item=>
+              item &&
+              item.show===true
+          );
+
+        const nextEvents=[
+          ...activeCustomFeeds,
+          ...tempEvents
+        ];
+
+        const previousEvents=
+          Array.isArray(
+            liveEvents
+          )
+            ? liveEvents.slice()
+            : [];
+
+        const firstFeed=
+          previousEvents.length===0;
+
+        const diff=
+          diffFeedData(
+            previousEvents,
+            nextEvents
+          );
+
+        liveEvents=
+          nextEvents;
+
+        migrateStoredEventState(
           liveEvents
         );
-      }else{
-        updateAnalytics();
-        markActivePlayingButton();
-      }
 
-      cacheLiveFeed(liveEvents);
+        if(
+          firstFeed ||
+          diff.total>0
+        ){
+          renderLeagueTabs();
+          renderMatches();
+          updateAnalytics();
 
-      setStatus(
-        "System ready",
-        "ready"
-      );
+          syncCurrentPlayerAfterFeedUpdate(
+            liveEvents
+          );
+        }else{
+          updateAnalytics();
+          markActivePlayingButton();
+        }
 
-      setSync(
-        `Synced ${formatSyncTime(lastSuccessfulFeedSync)}`
-      );
+        cacheLiveFeed(
+          liveEvents
+        );
 
-      if(
-        diff.total>0 &&
-        !firstFeed
-      ){
-        showFeedChangePopup(diff);
-      }
-
-      if(
-        firstFeed &&
-        !currentPlayingKey
-      ){
-        triggerFirstStream();
-      }
-
-    }catch(err){
-      if(silentBackground){
         setStatus(
           "System ready",
           "ready"
         );
-      }else{
-        feedError(
-          "Feed data could not be processed."
+
+        setSync(
+          `Synced ${formatSyncTime(lastSuccessfulFeedSync)}`
         );
+
+        if(
+          diff.total>0 &&
+          !firstFeed
+        ){
+          showFeedChangePopup(
+            diff
+          );
+        }
+
+        if(
+          firstFeed &&
+          !currentPlayingKey
+        ){
+          triggerFirstStream();
+        }
+
+      }catch(err){
+        if(silentBackground){
+          setStatus(
+            "System ready",
+            "ready"
+          );
+        }else{
+          feedError(
+            "Feed data could not be processed."
+          );
+        }
       }
-    }
-  };
+    };
 
   function handleMessage(event){
     if(
-      event.source!==loader.contentWindow
+      event.source!==
+      loader.contentWindow
     ){
       return;
     }
 
-    const data=event.data;
+    const data=
+      event.data;
 
     if(
       !data ||
@@ -4188,15 +4866,23 @@ function loadTargetScript(force=false,reason="manual"){
       return;
     }
 
-    if(data.type==="talha-feed-error"){
+    if(
+      data.type===
+      "talha-feed-error"
+    ){
       finishError(
         "Feed data could not be processed."
       );
       return;
     }
 
-    if(data.type==="talha-feed-data"){
-      processFeed(data);
+    if(
+      data.type===
+      "talha-feed-data"
+    ){
+      processFeed(
+        data
+      );
     }
   }
 
@@ -4205,11 +4891,12 @@ function loadTargetScript(force=false,reason="manual"){
     handleMessage
   );
 
-  timeoutId=setTimeout(()=>{
-    finishError(
-      "Feed server did not respond in time."
-    );
-  },FEED_TIMEOUT);
+  timeoutId=
+    setTimeout(()=>{
+      finishError(
+        "Feed server did not respond in time."
+      );
+    },FEED_TIMEOUT);
 
   const feedUrl=
     `${FEED_URL}?_=${Date.now()}`;
@@ -4233,14 +4920,19 @@ function loadTargetScript(force=false,reason="manual"){
     `<\/script>`+
     `</body></html>`;
 
-  document.body.appendChild(loader);
+  document.body.appendChild(
+    loader
+  );
 }
 
 function login(){
   const input=
-    document.getElementById("password");
+    document.getElementById(
+      "password"
+    );
 
-  const pass=input.value;
+  const pass=
+    input.value;
 
   let chosenPlayer=
     PLAYER_BASE_URL;
@@ -4314,25 +5006,51 @@ function login(){
 
 let __savedScrollY=0;
 
-function setPageScrollLocked(locked){
-  const html=document.documentElement;
-  const body=document.body;
-  const scroller=document.scrollingElement||html;
+function setPageScrollLocked(
+  locked
+){
+  const html=
+    document.documentElement;
+
+  const body=
+    document.body;
+
+  const scroller=
+    document.scrollingElement ||
+    html;
 
   if(locked){
-    __savedScrollY=scroller.scrollTop||window.scrollY||0;
-    html.classList.add("scroll-locked");
-    body.classList.add("scroll-locked");
+    __savedScrollY=
+      scroller.scrollTop ||
+      window.scrollY ||
+      0;
+
+    html.classList.add(
+      "scroll-locked"
+    );
+
+    body.classList.add(
+      "scroll-locked"
+    );
   }else{
-    html.classList.remove("scroll-locked");
-    body.classList.remove("scroll-locked");
+    html.classList.remove(
+      "scroll-locked"
+    );
+
+    body.classList.remove(
+      "scroll-locked"
+    );
+
     requestAnimationFrame(()=>{
-      scroller.scrollTop=__savedScrollY;
+      scroller.scrollTop=
+        __savedScrollY;
     });
   }
 }
 
-function toggleTheatre(status){
+function toggleTheatre(
+  status
+){
   const card=
     document.getElementById(
       "mainCard"
@@ -4351,7 +5069,9 @@ function toggleTheatre(status){
     exitBtn.style.display=
       "block";
 
-    setPageScrollLocked(true);
+    setPageScrollLocked(
+      true
+    );
   }else{
     card.classList.remove(
       "theatre-active"
@@ -4360,7 +5080,9 @@ function toggleTheatre(status){
     exitBtn.style.display=
       "none";
 
-    setPageScrollLocked(false);
+    setPageScrollLocked(
+      false
+    );
   }
 }
 
@@ -4381,11 +5103,13 @@ function updateClock(){
     );
 
   if(clock){
-    clock.textContent=time;
+    clock.textContent=
+      time;
   }
 
   if(menuClock){
-    menuClock.textContent=time;
+    menuClock.textContent=
+      time;
   }
 }
 
@@ -4406,7 +5130,10 @@ function openMenu(){
     );
 
   if(menu){
-    menu.classList.add("open");
+    menu.classList.add(
+      "open"
+    );
+
     menu.setAttribute(
       "aria-hidden",
       "false"
@@ -4414,7 +5141,9 @@ function openMenu(){
   }
 
   if(backdrop){
-    backdrop.classList.add("open");
+    backdrop.classList.add(
+      "open"
+    );
   }
 
   document.body.classList.add(
@@ -4446,7 +5175,10 @@ function closeMenu(){
     );
 
   if(menu){
-    menu.classList.remove("open");
+    menu.classList.remove(
+      "open"
+    );
+
     menu.setAttribute(
       "aria-hidden",
       "true"
@@ -4454,7 +5186,9 @@ function closeMenu(){
   }
 
   if(backdrop){
-    backdrop.classList.remove("open");
+    backdrop.classList.remove(
+      "open"
+    );
   }
 
   document.body.classList.remove(
@@ -4471,46 +5205,92 @@ function closeMenu(){
 
 let __scrollAnimationId=0;
 
-function scrollToElementStable(element,offset=12,block="start"){
+function scrollToElementStable(
+  element,
+  offset=12,
+  block="start"
+){
   if(!element)return;
 
-  const scroller=document.scrollingElement||document.documentElement;
-  const currentY=scroller.scrollTop||window.scrollY||0;
-  const rect=element.getBoundingClientRect();
+  const scroller=
+    document.scrollingElement ||
+    document.documentElement;
 
-  let targetY=currentY+rect.top-offset;
+  const currentY=
+    scroller.scrollTop ||
+    window.scrollY ||
+    0;
+
+  const rect=
+    element.getBoundingClientRect();
+
+  let targetY=
+    currentY+
+    rect.top-
+    offset;
 
   if(block==="center"){
-    targetY=currentY+rect.top-
-      Math.max(0,(window.innerHeight-rect.height)/2);
+    targetY=
+      currentY+
+      rect.top-
+      Math.max(
+        0,
+        (window.innerHeight-
+          rect.height)/2
+      );
   }
 
-  const maxY=Math.max(
-    0,
-    scroller.scrollHeight-window.innerHeight
+  const maxY=
+    Math.max(
+      0,
+      scroller.scrollHeight-
+      window.innerHeight
+    );
+
+  const finalY=
+    Math.max(
+      0,
+      Math.min(
+        maxY,
+        targetY
+      )
+    );
+
+  cancelAnimationFrame(
+    __scrollAnimationId
   );
 
-  const finalY=Math.max(0,Math.min(maxY,targetY));
-
-  cancelAnimationFrame(__scrollAnimationId);
-  __scrollAnimationId=requestAnimationFrame(()=>{
-    scroller.scrollTo({
-      top:finalY,
-      behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "auto"
-        : "smooth"
+  __scrollAnimationId=
+    requestAnimationFrame(()=>{
+      scroller.scrollTo({
+        top:finalY,
+        behavior:
+          window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+          ).matches
+            ? "auto"
+            : "smooth"
+      });
     });
-  });
 }
 
 function scrollToChannels(){
-  const panel=document.querySelector(".channels-panel");
+  const panel=
+    document.querySelector(
+      ".channels-panel"
+    );
 
   if(!panel)return;
 
   requestAnimationFrame(()=>{
-    const mobile=window.innerWidth<=600;
-    const player=document.querySelector(".player-container");
+    const mobile=
+      window.innerWidth<=600;
+
+    const player=
+      document.querySelector(
+        ".player-container"
+      );
+
     const playerHeight=
       mobile && player
         ? player.getBoundingClientRect().height
@@ -4519,7 +5299,10 @@ function scrollToChannels(){
     scrollToElementStable(
       panel,
       mobile
-        ? Math.min(playerHeight+14,window.innerHeight*0.7)
+        ? Math.min(
+            playerHeight+14,
+            window.innerHeight*.7
+          )
         : 16,
       "start"
     );
@@ -4548,14 +5331,25 @@ function showFavorites(){
 
   let shown=0;
 
-  for(let index=0;index<liveEvents.length;index++){
-    const event=liveEvents[index];
-    const meta=getEventMeta(
-      event,
-      index
-    );
+  for(
+    let index=0;
+    index<liveEvents.length;
+    index++
+  ){
+    const event=
+      liveEvents[index];
 
-    if(!favoriteKeys.includes(meta.key)){
+    const meta=
+      getEventMeta(
+        event,
+        index
+      );
+
+    if(
+      !favoriteKeys.includes(
+        meta.key
+      )
+    ){
       continue;
     }
 
@@ -4566,8 +5360,11 @@ function showFavorites(){
         "div"
       );
 
-    row.className="server-item";
+    row.className=
+      "server-item";
+
     row.tabIndex=0;
+
     row.setAttribute(
       "role",
       "button"
@@ -4610,10 +5407,16 @@ function showFavorites(){
       }
     };
 
-    fragment.appendChild(row);
+    fragment.appendChild(
+      row
+    );
   }
 
-  for(let index=0;index<STATIC_CHANNELS.length;index++){
+  for(
+    let index=0;
+    index<STATIC_CHANNELS.length;
+    index++
+  ){
     const event=
       STATIC_CHANNELS[index];
 
@@ -4623,7 +5426,11 @@ function showFavorites(){
         index
       );
 
-    if(!favoriteKeys.includes(key)){
+    if(
+      !favoriteKeys.includes(
+        key
+      )
+    ){
       continue;
     }
 
@@ -4634,14 +5441,18 @@ function showFavorites(){
         "div"
       );
 
-    row.className="server-item";
+    row.className=
+      "server-item";
+
     row.tabIndex=0;
+
     row.setAttribute(
       "role",
       "button"
     );
 
-    row.dataset.channelKey=key;
+    row.dataset.channelKey=
+      key;
 
     row.innerHTML=
       `<div class="channel-main">`+
@@ -4677,7 +5488,9 @@ function showFavorites(){
       }
     };
 
-    fragment.appendChild(row);
+    fragment.appendChild(
+      row
+    );
   }
 
   if(!shown){
@@ -4692,7 +5505,9 @@ function showFavorites(){
     empty.textContent=
       "No favorites saved yet. Tap ★ on a channel to save it.";
 
-    fragment.appendChild(empty);
+    fragment.appendChild(
+      empty
+    );
   }
 
   container.replaceChildren(
@@ -4705,6 +5520,7 @@ function showFavorites(){
     `${shown} favorites`;
 
   updateAnalytics();
+
   scrollToChannels();
 }
 
@@ -4724,15 +5540,22 @@ function cycleTheme(){
     "violet";
 
   const index=
-    themes.indexOf(current);
+    themes.indexOf(
+      current
+    );
 
   const next=
     themes[
-      (index+1+themes.length)%
+      (
+        index+1+
+        themes.length
+      )%
       themes.length
     ];
 
-  changeTheme(next);
+  changeTheme(
+    next
+  );
 
   const picker=
     document.getElementById(
@@ -4740,7 +5563,8 @@ function cycleTheme(){
     );
 
   if(picker){
-    picker.value=next;
+    picker.value=
+      next;
   }
 
   closeMenu();
@@ -4767,10 +5591,18 @@ function toggleFocus(){
       "focus-mode"
     )
   ){
-    const mainCard=document.getElementById("mainCard");
+    const mainCard=
+      document.getElementById(
+        "mainCard"
+      );
+
     if(mainCard){
       requestAnimationFrame(()=>{
-        scrollToElementStable(mainCard,0,"center");
+        scrollToElementStable(
+          mainCard,
+          0,
+          "center"
+        );
       });
     }
   }
@@ -4779,7 +5611,9 @@ function toggleFocus(){
 function lockSession(){
   closeMenu();
 
-  toggleTheatre(false);
+  toggleTheatre(
+    false
+  );
 
   document.body.classList.add(
     "auth-locked"
@@ -4810,7 +5644,9 @@ function lockSession(){
   password.focus();
 }
 
-function handleMenuAction(action){
+function handleMenuAction(
+  action
+){
   if(action==="home"){
     closeMenu();
 
@@ -4820,6 +5656,7 @@ function handleMenuAction(action){
     renderMatches();
 
     scrollToChannels();
+
     return;
   }
 
@@ -4844,7 +5681,9 @@ function handleMenuAction(action){
 
   if(action==="cinema"){
     closeMenu();
-    toggleTheatre(true);
+    toggleTheatre(
+      true
+    );
     return;
   }
 
@@ -4860,10 +5699,12 @@ function handleMenuAction(action){
 
   if(action==="refresh"){
     closeMenu();
+
     loadTargetScript(
       true,
       "manual"
     );
+
     return;
   }
 
@@ -4882,13 +5723,16 @@ function updateNetwork(){
     navigator.onLine!==false;
 
   if(online){
-    const stale=isFeedStale();
+    const stale=
+      isFeedStale();
 
     setStatus(
       stale
         ? "Connection ready · feed may be stale"
         : "System ready",
-      stale ? "busy" : "ready"
+      stale
+        ? "busy"
+        : "ready"
     );
 
     return;
@@ -4937,7 +5781,8 @@ function initLeagueWheel(){
           0,
           Math.min(
             max,
-            tabs.scrollLeft+delta
+            tabs.scrollLeft+
+            delta
           )
         );
     },
@@ -4955,7 +5800,10 @@ function renderStaticChannels(){
 
   if(!container)return;
 
-  if(lastStaticStart===liveEvents.length){
+  if(
+    lastStaticStart===
+    liveEvents.length
+  ){
     return;
   }
 
@@ -5004,8 +5852,11 @@ function renderStaticChannels(){
         index
       );
 
-    row.className="server-item";
+    row.className=
+      "server-item";
+
     row.tabIndex=0;
+
     row.setAttribute(
       "role",
       "button"
@@ -5053,7 +5904,9 @@ function renderStaticChannels(){
       }
     };
 
-    fragment.appendChild(row);
+    fragment.appendChild(
+      row
+    );
   }
 
   container.replaceChildren(
@@ -5122,7 +5975,9 @@ const themePicker=
 themePicker.value=
   savedTheme;
 
-changeTheme(savedTheme);
+changeTheme(
+  savedTheme
+);
 
 const connectionSaveData=
   !!(
@@ -5162,7 +6017,11 @@ const particles=
     "particles"
   );
 
-for(let i=0;i<particleCount;i++){
+for(
+  let i=0;
+  i<particleCount;
+  i++
+){
   const d=
     document.createElement(
       "div"
@@ -5171,24 +6030,31 @@ for(let i=0;i<particleCount;i++){
   d.className="p";
 
   d.style.left=
-    Math.random()*100+"%";
+    Math.random()*100+
+    "%";
 
   d.style.animationDuration=
-    (16+Math.random()*14)+"s";
+    (16+
+      Math.random()*14)+
+    "s";
 
   d.style.animationDelay=
-    (-Math.random()*20)+"s";
+    (-Math.random()*20)+
+    "s";
 
-  particles.appendChild(d);
+  particles.appendChild(
+    d
+  );
 }
 
 document.getElementById(
   "themePicker"
 ).addEventListener(
   "change",
-  e=>changeTheme(
-    e.target.value
-  )
+  e=>
+    changeTheme(
+      e.target.value
+    )
 );
 
 document.getElementById(
@@ -5214,7 +6080,9 @@ document.getElementById(
 ).addEventListener(
   "click",
   ()=>{
-    toggleTheatre(true);
+    toggleTheatre(
+      true
+    );
   }
 );
 
@@ -5223,7 +6091,9 @@ document.getElementById(
 ).addEventListener(
   "click",
   ()=>{
-    toggleTheatre(true);
+    toggleTheatre(
+      true
+    );
   }
 );
 
@@ -5232,7 +6102,9 @@ document.getElementById(
 ).addEventListener(
   "click",
   ()=>{
-    toggleTheatre(false);
+    toggleTheatre(
+      false
+    );
   }
 );
 
@@ -5285,16 +6157,18 @@ document.getElementById(
 
 document.querySelectorAll(
   ".menu-item"
-).forEach(btn=>{
-  btn.addEventListener(
-    "click",
-    ()=>{
-      handleMenuAction(
-        btn.dataset.action
-      );
-    }
-  );
-});
+).forEach(
+  btn=>{
+    btn.addEventListener(
+      "click",
+      ()=>{
+        handleMenuAction(
+          btn.dataset.action
+        );
+      }
+    );
+  }
+);
 
 document.getElementById(
   "clearSearchBtn"
@@ -5433,7 +6307,9 @@ window.addEventListener(
           "theatre-active"
         )
       ){
-        toggleTheatre(false);
+        toggleTheatre(
+          false
+        );
       }else{
         closeMenu();
       }
