@@ -160,9 +160,14 @@ body.low-power #particles{
   justify-content:center;
   align-items:center;
   z-index:99999;
-  transition:opacity .25s ease,visibility .25s ease;
+  opacity:1;
+  visibility:visible;
+  transition:
+    opacity .42s cubic-bezier(.22,1,.36,1),
+    visibility .42s ease;
   padding:20px;
   text-align:center;
+  will-change:opacity,visibility;
 }
 
 #loader.is-hidden{
@@ -188,6 +193,9 @@ body.low-power #particles{
   font-size:11px;
   letter-spacing:.5px;
   min-height:16px;
+  transition:
+    opacity .2s ease,
+    transform .2s ease;
 }
 
 .loader-row{
@@ -203,6 +211,7 @@ body.low-power #particles{
   background:#00f2fe;
   box-shadow:0 0 10px #00f2fe;
   animation:blink 1.1s infinite alternate;
+  will-change:opacity;
 }
 
 .bar{
@@ -212,15 +221,18 @@ body.low-power #particles{
   border-radius:50px;
   overflow:hidden;
   margin-top:20px;
+  position:relative;
 }
 
 #loaderProgress{
   display:block;
   height:100%;
-  width:0;
+  width:100%;
   border-radius:inherit;
   background:linear-gradient(90deg,#7a3cff,#00f2fe,#e04cff);
-  transition:width .08s linear;
+  transform:scaleX(0);
+  transform-origin:left center;
+  will-change:transform;
 }
 
 .loader-percent{
@@ -228,6 +240,7 @@ body.low-power #particles{
   font-size:10px;
   color:rgba(255,255,255,.38);
   font-variant-numeric:tabular-nums;
+  min-width:30px;
 }
 
 .loader-kicker{
@@ -470,7 +483,6 @@ body.low-power #particles{
   top:16px;
   contain:layout paint style;
   overflow:visible;
-  overscroll-behavior:auto;
 }
 
 .panel-heading{
@@ -949,7 +961,6 @@ iframe{
   color:#fff;
 }
 
-/* FIXED: no nested vertical scroll inside channel lists */
 .servers{
   display:flex;
   gap:8px;
@@ -1610,14 +1621,16 @@ body.scroll-locked{
   }
 
   .player-container{
-    position:sticky;
-    top:6px;
-    z-index:100;
-    width:100%;
-    padding-top:60%;
-    border-radius:11px;
-    box-shadow:0 14px 32px rgba(0,0,0,.72);
-  }
+  position:sticky;
+  top:0;
+  z-index:100;
+  width:100%;
+  padding-top:60%;
+  border-radius:0 0 11px 11px;
+  background:#000;
+  box-shadow:0 14px 32px rgba(0,0,0,.72);
+  isolation:isolate;
+}
 
   .channels-panel{
     width:100%;
@@ -1742,7 +1755,6 @@ body.scroll-locked{
     max-width:120px;
   }
 
-  /* IMPORTANT MOBILE FIX */
   .servers{
     gap:5px;
     margin-top:8px;
@@ -2870,7 +2882,10 @@ function getEventMeta(event,index=""){
     search
   };
 
-  eventMetaCache.set(event,meta);
+  eventMetaCache.set(
+    event,
+    meta
+  );
 
   return meta;
 }
@@ -2954,7 +2969,9 @@ function migrateStoredEventState(events){
 
   storageSet(
     "talhaFavorites",
-    JSON.stringify(favoriteKeys)
+    JSON.stringify(
+      favoriteKeys
+    )
   );
 
   const migratedRecent=[];
@@ -2995,12 +3012,16 @@ function migrateStoredEventState(events){
 
   storageSet(
     "talhaRecent",
-    JSON.stringify(recentEvents)
+    JSON.stringify(
+      recentEvents
+    )
   );
 }
 
 function changeTheme(theme){
-  document.body.dataset.theme=theme;
+  document.body.dataset.theme=
+    theme;
+
   storageSet(
     "talhaTheme",
     theme
@@ -3019,7 +3040,8 @@ function setStatus(text,state="ready"){
     );
 
   if(label){
-    label.textContent=text;
+    label.textContent=
+      text;
   }
 
   if(dot){
@@ -3042,7 +3064,8 @@ function setSync(text){
     );
 
   if(el){
-    el.textContent=text;
+    el.textContent=
+      text;
   }
 }
 
@@ -3074,20 +3097,27 @@ function showToast(title,message){
       "div"
     );
 
-  msg.className="toast";
+  msg.className=
+    "toast";
 
   msg.innerHTML=
     `<strong>${escapeHTML(title)}</strong>`+
     `<span>${escapeHTML(message)}</span>`;
 
-  document.body.appendChild(msg);
+  document.body.appendChild(
+    msg
+  );
 
   requestAnimationFrame(()=>{
-    msg.classList.add("show");
+    msg.classList.add(
+      "show"
+    );
   });
 
   setTimeout(()=>{
-    msg.classList.remove("show");
+    msg.classList.remove(
+      "show"
+    );
 
     setTimeout(()=>{
       msg.remove();
@@ -3108,7 +3138,8 @@ function hideLoader(reason="Ready"){
     return;
   }
 
-  loader.dataset.hidden="1";
+  loader.dataset.hidden=
+    "1";
 
   const status=
     document.getElementById(
@@ -3116,7 +3147,24 @@ function hideLoader(reason="Ready"){
     );
 
   if(status){
-    status.textContent=reason;
+    status.style.opacity=
+      "0";
+
+    status.style.transform=
+      "translateY(-2px)";
+
+    setTimeout(()=>{
+      if(loader.dataset.hidden==="1"){
+        status.textContent=
+          reason;
+
+        status.style.transform=
+          "translateY(0)";
+
+        status.style.opacity=
+          "1";
+      }
+    },120);
   }
 
   requestAnimationFrame(()=>{
@@ -3127,15 +3175,18 @@ function hideLoader(reason="Ready"){
 
   setTimeout(()=>{
     loader.remove();
-  },300);
+  },500);
 }
 
 function bootLoader(){
-  const started=performance.now();
-  const MIN_SHOW=800;
-  const MAX_WAIT=2500;
+  const loader=
+    document.getElementById(
+      "loader"
+    );
 
-  let finished=false;
+  if(!loader){
+    return;
+  }
 
   const progress=
     document.getElementById(
@@ -3152,121 +3203,304 @@ function bootLoader(){
       "loaderStatus"
     );
 
-  const ticks=[
-    [22,"Loading visual engine…"],
-    [48,"Preparing premium interface…"],
-    [72,"Checking local session…"],
-    [92,"Finalizing experience…"],
-    [100,"Ready"]
+  const started=
+    performance.now();
+
+  const MIN_SHOW=1500;
+  const MAX_SHOW=4500;
+
+  let ready=false;
+  let finished=false;
+  let visualProgress=0;
+
+  const stages=[
+    {
+      at:0,
+      pct:3,
+      text:"Initializing secure interface…"
+    },
+    {
+      at:220,
+      pct:12,
+      text:"Loading visual engine…"
+    },
+    {
+      at:470,
+      pct:27,
+      text:"Preparing premium interface…"
+    },
+    {
+      at:760,
+      pct:46,
+      text:"Checking local session…"
+    },
+    {
+      at:1050,
+      pct:66,
+      text:"Preparing stream controls…"
+    },
+    {
+      at:1320,
+      pct:82,
+      text:"Finalizing experience…"
+    },
+    {
+      at:1520,
+      pct:92,
+      text:"Almost ready…"
+    },
+    {
+      at:1900,
+      pct:94,
+      text:"Waiting for page readiness…"
+    }
   ];
 
-  let tickIndex=0;
+  let stageIndex=0;
 
-  const animator=setInterval(()=>{
-    const elapsed=
-      performance.now()-
-      started;
-
-    const pct=
+  const clamp=(value,min,max)=>{
+    return Math.max(
+      min,
       Math.min(
-        100,
-        Math.round(
-          (elapsed/MIN_SHOW)*100
-        )
+        max,
+        value
+      )
+    );
+  };
+
+  const easeOutCubic=t=>{
+    const x=clamp(t,0,1);
+    return 1-Math.pow(
+      1-x,
+      3
+    );
+  };
+
+  const setVisualProgress=value=>{
+    visualProgress=
+      clamp(
+        value,
+        0,
+        100
       );
 
     if(progress){
-      progress.style.width=
-        pct+"%";
+      progress.style.transform=
+        `scaleX(${visualProgress/100})`;
     }
 
     if(percent){
       percent.textContent=
-        pct+"%";
+        `${Math.round(visualProgress)}%`;
     }
+  };
 
-    while(
-      tickIndex<ticks.length &&
-      pct>=ticks[tickIndex][0]
-    ){
-      if(status){
-        status.textContent=
-          ticks[tickIndex][1];
-      }
-
-      tickIndex++;
-    }
-  },50);
-
-  const finish=()=>{
-    if(finished)return;
-
-    const wait=Math.max(
-      0,
-      MIN_SHOW-
-      (
-        performance.now()-
-        started
-      )
-    );
-
-    setTimeout(()=>{
-      if(finished)return;
-
-      finished=true;
-
-      clearInterval(
-        animator
-      );
-
-      if(progress){
-        progress.style.width="100%";
-      }
-
-      if(percent){
-        percent.textContent="100%";
-      }
-
-      hideLoader("Ready");
-    },wait);
+  const markReady=()=>{
+    ready=true;
   };
 
   if(
-    document.readyState==="interactive" ||
-    document.readyState==="complete"
+    document.readyState!=="loading"
   ){
-    finish();
+    markReady();
   }else{
     document.addEventListener(
       "DOMContentLoaded",
-      finish,
+      markReady,
       {once:true}
     );
   }
 
   window.addEventListener(
     "load",
-    finish,
+    markReady,
     {once:true}
   );
 
   window.addEventListener(
     "pageshow",
-    finish,
+    markReady,
     {once:true}
   );
 
-  setTimeout(()=>{
-    if(finished)return;
+  setVisualProgress(1);
 
-    finished=true;
+  const animate=now=>{
+    if(finished){
+      return;
+    }
 
-    clearInterval(
-      animator
+    const elapsed=
+      now-started;
+
+    while(
+      stageIndex<
+      stages.length &&
+      elapsed>=
+      stages[stageIndex].at
+    ){
+      const stage=
+        stages[stageIndex];
+
+      if(status){
+        status.textContent=
+          stage.text;
+      }
+
+      stageIndex++;
+    }
+
+    let target=94;
+
+    for(
+      let i=0;
+      i<stages.length;
+      i++
+    ){
+      if(elapsed>=stages[i].at){
+        target=
+          stages[i].pct;
+      }else{
+        break;
+      }
+    }
+
+    if(ready){
+      const readyProgress=
+        elapsed<
+        MIN_SHOW
+          ? target
+          : 94;
+
+      target=
+        Math.max(
+          target,
+          readyProgress
+        );
+
+      if(
+        elapsed>=MIN_SHOW
+      ){
+        const finalPhase=
+          clamp(
+            (
+              elapsed-MIN_SHOW
+            )/420,
+            0,
+            1
+          );
+
+        target=
+          94+
+          easeOutCubic(
+            finalPhase
+          )*
+          6;
+
+        if(status){
+          status.textContent=
+            finalPhase>=.45
+              ? "Ready"
+              : "Opening secure session…";
+        }
+      }
+    }else if(
+      elapsed>=MAX_SHOW
+    ){
+      ready=true;
+      target=100;
+
+      if(status){
+        status.textContent=
+          "Ready";
+      }
+    }
+
+    const smoothing=
+      ready && elapsed>=MIN_SHOW
+        ? .16
+        : .085;
+
+    visualProgress +=
+      (
+        target-
+        visualProgress
+      )*
+      smoothing;
+
+    if(
+      Math.abs(
+        target-
+        visualProgress
+      )<
+      .05
+    ){
+      visualProgress=
+        target;
+    }
+
+    setVisualProgress(
+      visualProgress
     );
 
-    hideLoader("Ready");
-  },MAX_WAIT);
+    const canFinish=
+      ready &&
+      elapsed>=MIN_SHOW &&
+      visualProgress>=99.85;
+
+    if(canFinish){
+      setVisualProgress(
+        100
+      );
+
+      finished=true;
+
+      if(status){
+        status.textContent=
+          "Ready";
+      }
+
+      setTimeout(()=>{
+        hideLoader(
+          "Ready"
+        );
+      },90);
+
+      return;
+    }
+
+    if(
+      !ready &&
+      elapsed>=MAX_SHOW
+    ){
+      finished=true;
+
+      setVisualProgress(
+        100
+      );
+
+      if(status){
+        status.textContent=
+          "Ready";
+      }
+
+      setTimeout(()=>{
+        hideLoader(
+          "Ready"
+        );
+      },90);
+
+      return;
+    }
+
+    requestAnimationFrame(
+      animate
+    );
+  };
+
+  requestAnimationFrame(
+    animate
+  );
 }
 
 function renderLeagueTabs(){
@@ -3277,7 +3511,8 @@ function renderLeagueTabs(){
 
   if(!tabs)return;
 
-  const counts=new Map();
+  const counts=
+    new Map();
 
   for(
     const event of liveEvents
@@ -3343,14 +3578,15 @@ function renderLeagueTabs(){
       );
 
     button.className=
-      "tab-btn" +
+      "tab-btn"+
       (
         currentLeague===key
           ? " active"
           : ""
       );
 
-    button.type="button";
+    button.type=
+      "button";
 
     button.setAttribute(
       "role",
@@ -3370,9 +3606,12 @@ function renderLeagueTabs(){
     button.title=
       `Filter ${label}`;
 
-    button.onclick=()=>{
-      setFilter(key);
-    };
+    button.onclick=
+      ()=>{
+        setFilter(
+          key
+        );
+      };
 
     fragment.appendChild(
       button
@@ -3414,62 +3653,78 @@ function renderRecent(){
   if(!section || !row)return;
 
   if(!recentEvents.length){
-    section.style.display="none";
+    section.style.display=
+      "none";
     return;
   }
 
-  section.style.display="block";
+  section.style.display=
+    "block";
+
   row.replaceChildren();
 
   recentEvents
     .slice(0,5)
-    .forEach(item=>{
-      const chip=
-        document.createElement(
-          "button"
+    .forEach(
+      item=>{
+        const chip=
+          document.createElement(
+            "button"
+          );
+
+        chip.className=
+          "recent-chip";
+
+        chip.type=
+          "button";
+
+        chip.textContent=
+          item.title;
+
+        chip.title=
+          "Play "+item.title;
+
+        chip.onclick=
+          ()=>{
+            const liveFound=
+              liveEvents.find(
+                (event,index)=>
+                  eventKey(
+                    event,
+                    index
+                  )===
+                  item.key
+              );
+
+            if(liveFound){
+              setServer(
+                liveFound
+              );
+              return;
+            }
+
+            const staticFound=
+              STATIC_CHANNELS.find(
+                (event,index)=>
+                  eventKey(
+                    event,
+                    index
+                  )===
+                  item.key
+              );
+
+            if(staticFound){
+              setServer(
+                staticFound
+              );
+            }
+          };
+
+        row.appendChild(
+          chip
         );
-
-      chip.className="recent-chip";
-      chip.type="button";
-      chip.textContent=item.title;
-      chip.title=
-        "Play "+item.title;
-
-      chip.onclick=()=>{
-        const liveFound=
-          liveEvents.find(
-            (event,index)=>
-              eventKey(
-                event,
-                index
-              )===item.key
-          );
-
-        if(liveFound){
-          setServer(liveFound);
-          return;
-        }
-
-        const staticFound=
-          STATIC_CHANNELS.find(
-            (event,index)=>
-              eventKey(
-                event,
-                index
-              )===item.key
-          );
-
-        if(staticFound){
-          setServer(
-            staticFound
-          );
-        }
-      };
-
-      row.appendChild(
-        chip
-      );
-    });
+      }
+    );
 }
 
 function updateAnalytics(){
@@ -3520,7 +3775,9 @@ function updateAnalytics(){
   document.getElementById(
     "countRecent"
   ).textContent=
-    String(recentCount).padStart(
+    String(
+      recentCount
+    ).padStart(
       2,
       "0"
     );
@@ -3537,7 +3794,9 @@ function updateAnalytics(){
 
   if(pcbLive){
     pcbLive.textContent=
-      String(total).padStart(
+      String(
+        total
+      ).padStart(
         2,
         "0"
       );
@@ -3568,7 +3827,10 @@ function renderMatches(){
     );
 
   const rawQuery=
-    (input?.value || "").trim();
+    (
+      input?.value ||
+      ""
+    ).trim();
 
   const searchQuery=
     normalizeSearchText(
@@ -3597,7 +3859,8 @@ function renderMatches(){
 
     const leagueKey=
       canonicalLeagueKey(
-        event?.league || ""
+        event?.league ||
+        ""
       );
 
     if(
@@ -3631,7 +3894,8 @@ function renderMatches(){
     row.className=
       "server-item";
 
-    row.tabIndex=0;
+    row.tabIndex=
+      0;
 
     row.setAttribute(
       "role",
@@ -3667,57 +3931,61 @@ function renderMatches(){
         `<button class="fav-toggle ${favorite ? "active" : ""}" type="button" aria-label="${favorite ? "Remove from" : "Add to"} favorites" aria-pressed="${favorite}">★</button>`+
       `</div>`;
 
-    row.onclick=()=>{
-      setServer(
-        event,
-        row
-      );
-    };
-
-    row.onkeydown=ev=>{
-      if(
-        ev.key==="Enter" ||
-        ev.key===" "
-      ){
-        ev.preventDefault();
-
+    row.onclick=
+      ()=>{
         setServer(
           event,
           row
         );
-      }
-    };
+      };
+
+    row.onkeydown=
+      ev=>{
+        if(
+          ev.key==="Enter" ||
+          ev.key===" "
+        ){
+          ev.preventDefault();
+
+          setServer(
+            event,
+            row
+          );
+        }
+      };
 
     const favButton=
       row.querySelector(
         ".fav-toggle"
       );
 
-    favButton.onclick=ev=>{
-      ev.stopPropagation();
+    favButton.onclick=
+      ev=>{
+        ev.stopPropagation();
 
-      if(favorite){
-        favoriteKeys=
-          favoriteKeys.filter(
-            key=>key!==meta.key
-          );
-      }else{
-        favoriteKeys=[
-          ...favoriteKeys,
-          meta.key
-        ];
-      }
+        if(favorite){
+          favoriteKeys=
+            favoriteKeys.filter(
+              key=>
+                key!==meta.key
+            );
+        }else{
+          favoriteKeys=[
+            ...favoriteKeys,
+            meta.key
+          ];
+        }
 
-      storageSet(
-        "talhaFavorites",
-        JSON.stringify(
-          favoriteKeys
-        )
-      );
+        storageSet(
+          "talhaFavorites",
+          JSON.stringify(
+            favoriteKeys
+          )
+        );
 
-      renderMatches();
-      updateAnalytics();
-    };
+        renderMatches();
+        updateAnalytics();
+      };
 
     fragment.appendChild(
       row
@@ -3758,9 +4026,11 @@ function renderMatches(){
   }
 
   if(
-    lastStaticStart!==liveEvents.length
+    lastStaticStart!==
+    liveEvents.length
   ){
     renderStaticChannels();
+
     lastStaticStart=
       liveEvents.length;
   }
@@ -3776,10 +4046,14 @@ function setFilter(
 ){
   currentLeague=
     type==="league"
-      ? canonicalLeagueKey(name)
+      ? canonicalLeagueKey(
+          name
+        )
       : type==="all"
         ? "all"
-        : canonicalLeagueKey(type);
+        : canonicalLeagueKey(
+            type
+          );
 
   renderLeagueTabs();
   renderMatches();
@@ -3804,7 +4078,8 @@ function rememberRecent(
       )
     },
     ...recentEvents.filter(
-      x=>x.key!==key
+      x=>
+        x.key!==key
     )
   ].slice(
     0,
@@ -3833,14 +4108,17 @@ function eventFingerprint(event){
     event?.link,
     event?.isIframeOnly
   ]
-    .map(value=>
-      normalizeTurkishText(
-        String(
-          value ?? ""
+    .map(
+      value=>
+        normalizeTurkishText(
+          String(
+            value ?? ""
+          )
         )
-      )
     )
-    .join("\u001F");
+    .join(
+      "\u001F"
+    );
 }
 
 function diffFeedData(
@@ -3894,7 +4172,9 @@ function diffFeedData(
   nextMap.forEach(
     (event,key)=>{
       const previousEvent=
-        prevMap.get(key);
+        prevMap.get(
+          key
+        );
 
       if(!previousEvent){
         added++;
@@ -3953,17 +4233,23 @@ function showFeedChangePopup(
   document.getElementById(
     "feedNewCount"
   ).textContent=
-    String(diff.added);
+    String(
+      diff.added
+    );
 
   document.getElementById(
     "feedUpdatedCount"
   ).textContent=
-    String(diff.updated);
+    String(
+      diff.updated
+    );
 
   document.getElementById(
     "feedRemovedCount"
   ).textContent=
-    String(diff.removed);
+    String(
+      diff.removed
+    );
 
   document.getElementById(
     "feedChangeTime"
@@ -4001,20 +4287,32 @@ function resolvePlaybackUrl(event){
 
   if(event?.url){
     const raw=
-      String(event.url);
+      String(
+        event.url
+      );
 
     const lower=
       raw.toLowerCase();
 
-    if(event.isIframeOnly===true){
+    if(
+      event.isIframeOnly===true
+    ){
       return raw;
     }
 
-    if(lower.includes(".m3u8")){
+    if(
+      lower.includes(
+        ".m3u8"
+      )
+    ){
       return `${PLAYER_BASE}?Talha=${encodeURIComponent(raw)}`;
     }
 
-    if(raw.includes("id=")){
+    if(
+      raw.includes(
+        "id="
+      )
+    ){
       try{
         const params=
           new URL(
@@ -4023,7 +4321,9 @@ function resolvePlaybackUrl(event){
           ).searchParams;
 
         const id=
-          params.get("id") ||
+          params.get(
+            "id"
+          ) ||
           "androstreamlivetrt1";
 
         return `${PLAYER_BASE}?Talha=${encodeURIComponent(id)}`;
@@ -4093,7 +4393,9 @@ function setServer(
       "frame"
     );
 
-  if(!frame || !event)return;
+  if(!frame || !event){
+    return;
+  }
 
   const finalUrl=
     resolvePlaybackUrl(
@@ -4108,15 +4410,20 @@ function setServer(
   const key=
     eventKey(
       event,
-      index>=0 ? index : ""
+      index>=0
+        ? index
+        : ""
     );
 
-  let sameSource=false;
+  let sameSource=
+    false;
 
   try{
     sameSource=
-      currentPlayingKey===key &&
-      currentPlayingUrl===finalUrl &&
+      currentPlayingKey===
+        key &&
+      currentPlayingUrl===
+        finalUrl &&
       frame.src===
         new URL(
           finalUrl,
@@ -4124,8 +4431,10 @@ function setServer(
         ).href;
   }catch(e){
     sameSource=
-      currentPlayingKey===key &&
-      currentPlayingUrl===finalUrl;
+      currentPlayingKey===
+        key &&
+      currentPlayingUrl===
+        finalUrl;
   }
 
   currentPlayingKey=
@@ -4169,14 +4478,19 @@ function setServer(
 function syncCurrentPlayerAfterFeedUpdate(
   nextEvents
 ){
-  if(!currentPlayingKey)return;
+  if(!currentPlayingKey){
+    return;
+  }
 
   const list=
-    Array.isArray(nextEvents)
+    Array.isArray(
+      nextEvents
+    )
       ? nextEvents
       : [];
 
-  let matchIndex=-1;
+  let matchIndex=
+    -1;
 
   for(
     let i=0;
@@ -4190,7 +4504,9 @@ function syncCurrentPlayerAfterFeedUpdate(
       )===
       currentPlayingKey
     ){
-      matchIndex=i;
+      matchIndex=
+        i;
+
       break;
     }
   }
@@ -4201,7 +4517,9 @@ function syncCurrentPlayerAfterFeedUpdate(
   }
 
   const nextEvent=
-    list[matchIndex];
+    list[
+      matchIndex
+    ];
 
   const nextUrl=
     resolvePlaybackUrl(
@@ -4231,7 +4549,9 @@ function syncCurrentPlayerAfterFeedUpdate(
 }
 
 function triggerFirstStream(){
-  if(currentPlayingKey)return;
+  if(currentPlayingKey){
+    return;
+  }
 
   const firstLive=
     document.querySelector(
@@ -4402,12 +4722,14 @@ function maybeSyncStaleFeed(
       "auth-locked"
     ) ||
     navigator.onLine===false ||
-    document.visibilityState!=="visible"
+    document.visibilityState!==
+      "visible"
   ){
     return;
   }
 
-  const now=Date.now();
+  const now=
+    Date.now();
 
   if(
     now-lastSyncAttemptAt<
@@ -4441,13 +4763,16 @@ function startRealtimeAutoSync(){
           "auth-locked"
         ) ||
         navigator.onLine===false ||
-        document.visibilityState!=="visible" ||
+        document.visibilityState!==
+          "visible" ||
         feedBusy
       ){
         return;
       }
 
-      if(isFeedStale()){
+      if(
+        isFeedStale()
+      ){
         loadTargetScript(
           true,
           "realtime"
@@ -4533,12 +4858,13 @@ function feedError(
       );
 
     if(retry){
-      retry.onclick=()=>{
-        loadTargetScript(
-          true,
-          "retry"
-        );
-      };
+      retry.onclick=
+        ()=>{
+          loadTargetScript(
+            true,
+            "retry"
+          );
+        };
     }
   }
 
@@ -4562,7 +4888,9 @@ function loadTargetScript(
     return;
   }
 
-  if(navigator.onLine===false){
+  if(
+    navigator.onLine===false
+  ){
     const cached=
       loadCachedFeed();
 
@@ -4583,7 +4911,8 @@ function loadTargetScript(
     return;
   }
 
-  const now=Date.now();
+  const now=
+    Date.now();
 
   if(
     !force &&
@@ -4599,7 +4928,8 @@ function loadTargetScript(
   const requestToken=
     ++feedRequestToken;
 
-  feedBusy=true;
+  feedBusy=
+    true;
 
   const silentBackground=
     reason==="realtime" ||
@@ -4639,8 +4969,11 @@ function loadTargetScript(
   loader.style.cssText=
     "position:fixed;left:-10000px;top:-10000px;width:1px;height:1px;border:0;opacity:0;pointer-events:none;";
 
-  let settled=false;
-  let timeoutId=null;
+  let settled=
+    false;
+
+  let timeoutId=
+    null;
 
   const cleanup=()=>{
     clearTimeout(
@@ -4656,13 +4989,17 @@ function loadTargetScript(
     message=>{
       if(
         settled ||
-        requestToken!==feedRequestToken
+        requestToken!==
+          feedRequestToken
       ){
         return;
       }
 
-      settled=true;
-      feedBusy=false;
+      settled=
+        true;
+
+      feedBusy=
+        false;
 
       window.removeEventListener(
         "message",
@@ -4693,13 +5030,17 @@ function loadTargetScript(
     payload=>{
       if(
         settled ||
-        requestToken!==feedRequestToken
+        requestToken!==
+          feedRequestToken
       ){
         return;
       }
 
-      settled=true;
-      feedBusy=false;
+      settled=
+        true;
+
+      feedBusy=
+        false;
 
       window.removeEventListener(
         "message",
@@ -4730,27 +5071,39 @@ function loadTargetScript(
           (a,b)=>{
             const at=
               String(
-                a?.time || ""
+                a?.time ||
+                ""
               ).toLowerCase();
 
             const bt=
               String(
-                b?.time || ""
+                b?.time ||
+                ""
               ).toLowerCase();
 
             const al=
-              at.includes("live") ||
-              at.includes("online");
+              at.includes(
+                "live"
+              ) ||
+              at.includes(
+                "online"
+              );
 
             const bl=
-              bt.includes("live") ||
-              bt.includes("online");
+              bt.includes(
+                "live"
+              ) ||
+              bt.includes(
+                "online"
+              );
 
             if(al===bl){
               return 0;
             }
 
-            return al ? -1 : 1;
+            return al
+              ? -1
+              : 1;
           }
         );
 
@@ -4848,7 +5201,9 @@ function loadTargetScript(
       }
     };
 
-  function handleMessage(event){
+  function handleMessage(
+    event
+  ){
     if(
       event.source!==
       loader.contentWindow
@@ -4861,7 +5216,8 @@ function loadTargetScript(
 
     if(
       !data ||
-      data.nonce!==nonce
+      data.nonce!==
+        nonce
     ){
       return;
     }
@@ -4873,6 +5229,7 @@ function loadTargetScript(
       finishError(
         "Feed data could not be processed."
       );
+
       return;
     }
 
@@ -4937,10 +5294,16 @@ function login(){
   let chosenPlayer=
     PLAYER_BASE_URL;
 
-  if(pass===ALT_PASSWORD){
+  if(
+    pass===
+    ALT_PASSWORD
+  ){
     chosenPlayer=
       PLAYER_ALT_URL;
-  }else if(pass!==PASSWORD){
+  }else if(
+    pass!==
+    PASSWORD
+  ){
     input.select();
 
     input.animate(
@@ -4974,25 +5337,33 @@ function login(){
 
   document.getElementById(
     "login"
-  ).style.display="none";
+  ).style.display=
+    "none";
 
   document.getElementById(
     "playerWrap"
-  ).style.display="block";
+  ).style.display=
+    "block";
 
   document.getElementById(
     "appHeader"
-  ).style.display="flex";
+  ).style.display=
+    "flex";
 
   document.getElementById(
     "statusStrip"
-  ).style.display="flex";
+  ).style.display=
+    "flex";
 
   updateAnalytics();
 
-  if(navigator.onLine===false){
+  if(
+    navigator.onLine===false
+  ){
     loadCachedFeed();
-  }else if(!liveEvents.length){
+  }else if(
+    !liveEvents.length
+  ){
     loadCachedFeed();
   }
 
@@ -5004,7 +5375,8 @@ function login(){
   );
 }
 
-let __savedScrollY=0;
+let __savedScrollY=
+  0;
 
 function setPageScrollLocked(
   locked
@@ -5203,7 +5575,8 @@ function closeMenu(){
   }
 }
 
-let __scrollAnimationId=0;
+let __scrollAnimationId=
+  0;
 
 function scrollToElementStable(
   element,
@@ -5317,9 +5690,11 @@ function showFavorites(){
       "searchChannels"
     );
 
-  search.value="";
+  search.value=
+    "";
 
-  currentLeague="all";
+  currentLeague=
+    "all";
 
   const container=
     document.getElementById(
@@ -5329,7 +5704,8 @@ function showFavorites(){
   const fragment=
     document.createDocumentFragment();
 
-  let shown=0;
+  let shown=
+    0;
 
   for(
     let index=0;
@@ -5363,7 +5739,8 @@ function showFavorites(){
     row.className=
       "server-item";
 
-    row.tabIndex=0;
+    row.tabIndex=
+      0;
 
     row.setAttribute(
       "role",
@@ -5386,26 +5763,28 @@ function showFavorites(){
         `${escapeHTML(event?.time || "ONLINE")}`+
       `</div>`;
 
-    row.onclick=()=>{
-      setServer(
-        event,
-        row
-      );
-    };
-
-    row.onkeydown=ev=>{
-      if(
-        ev.key==="Enter" ||
-        ev.key===" "
-      ){
-        ev.preventDefault();
-
+    row.onclick=
+      ()=>{
         setServer(
           event,
           row
         );
-      }
-    };
+      };
+
+    row.onkeydown=
+      ev=>{
+        if(
+          ev.key==="Enter" ||
+          ev.key===" "
+        ){
+          ev.preventDefault();
+
+          setServer(
+            event,
+            row
+          );
+        }
+      };
 
     fragment.appendChild(
       row
@@ -5444,7 +5823,8 @@ function showFavorites(){
     row.className=
       "server-item";
 
-    row.tabIndex=0;
+    row.tabIndex=
+      0;
 
     row.setAttribute(
       "role",
@@ -5467,26 +5847,28 @@ function showFavorites(){
         `24/7`+
       `</div>`;
 
-    row.onclick=()=>{
-      setServer(
-        event,
-        row
-      );
-    };
-
-    row.onkeydown=ev=>{
-      if(
-        ev.key==="Enter" ||
-        ev.key===" "
-      ){
-        ev.preventDefault();
-
+    row.onclick=
+      ()=>{
         setServer(
           event,
           row
         );
-      }
-    };
+      };
+
+    row.onkeydown=
+      ev=>{
+        if(
+          ev.key==="Enter" ||
+          ev.key===" "
+        ){
+          ev.preventDefault();
+
+          setServer(
+            event,
+            row
+          );
+        }
+      };
 
     fragment.appendChild(
       row
@@ -5621,36 +6003,45 @@ function lockSession(){
 
   document.getElementById(
     "appHeader"
-  ).style.display="none";
+  ).style.display=
+    "none";
 
   document.getElementById(
     "statusStrip"
-  ).style.display="none";
+  ).style.display=
+    "none";
 
   document.getElementById(
     "playerWrap"
-  ).style.display="none";
+  ).style.display=
+    "none";
 
   document.getElementById(
     "login"
-  ).style.display="flex";
+  ).style.display=
+    "flex";
 
   const password=
     document.getElementById(
       "password"
     );
 
-  password.value="";
+  password.value=
+    "";
+
   password.focus();
 }
 
 function handleMenuAction(
   action
 ){
-  if(action==="home"){
+  if(
+    action==="home"
+  ){
     closeMenu();
 
-    currentLeague="all";
+    currentLeague=
+      "all";
 
     renderLeagueTabs();
     renderMatches();
@@ -5660,12 +6051,16 @@ function handleMenuAction(
     return;
   }
 
-  if(action==="favorites"){
+  if(
+    action==="favorites"
+  ){
     showFavorites();
     return;
   }
 
-  if(action==="recent"){
+  if(
+    action==="recent"
+  ){
     closeMenu();
 
     scrollToElementStable(
@@ -5679,25 +6074,35 @@ function handleMenuAction(
     return;
   }
 
-  if(action==="cinema"){
+  if(
+    action==="cinema"
+  ){
     closeMenu();
+
     toggleTheatre(
       true
     );
+
     return;
   }
 
-  if(action==="focus"){
+  if(
+    action==="focus"
+  ){
     toggleFocus();
     return;
   }
 
-  if(action==="lock"){
+  if(
+    action==="lock"
+  ){
     lockSession();
     return;
   }
 
-  if(action==="refresh"){
+  if(
+    action==="refresh"
+  ){
     closeMenu();
 
     loadTargetScript(
@@ -5708,12 +6113,16 @@ function handleMenuAction(
     return;
   }
 
-  if(action==="theme"){
+  if(
+    action==="theme"
+  ){
     cycleTheme();
     return;
   }
 
-  if(action==="shortcuts"){
+  if(
+    action==="shortcuts"
+  ){
     showShortcutToast();
   }
 }
@@ -5763,8 +6172,12 @@ function initLeagueWheel(){
       }
 
       const delta=
-        Math.abs(event.deltaY)>
-        Math.abs(event.deltaX)
+        Math.abs(
+          event.deltaY
+        )>
+        Math.abs(
+          event.deltaX
+        )
           ? event.deltaY
           : event.deltaX;
 
@@ -5855,7 +6268,8 @@ function renderStaticChannels(){
     row.className=
       "server-item";
 
-    row.tabIndex=0;
+    row.tabIndex=
+      0;
 
     row.setAttribute(
       "role",
@@ -5883,26 +6297,28 @@ function renderStaticChannels(){
         `24/7`+
       `</div>`;
 
-    row.onclick=()=>{
-      setServer(
-        event,
-        row
-      );
-    };
-
-    row.onkeydown=ev=>{
-      if(
-        ev.key==="Enter" ||
-        ev.key===" "
-      ){
-        ev.preventDefault();
-
+    row.onclick=
+      ()=>{
         setServer(
           event,
           row
         );
-      }
-    };
+      };
+
+    row.onkeydown=
+      ev=>{
+        if(
+          ev.key==="Enter" ||
+          ev.key===" "
+        ){
+          ev.preventDefault();
+
+          setServer(
+            event,
+            row
+          );
+        }
+      };
 
     fragment.appendChild(
       row
@@ -5939,7 +6355,9 @@ const noticeBox=
     "maintenanceNotice"
   );
 
-if(SHOW_MAINTENANCE_MSG){
+if(
+  SHOW_MAINTENANCE_MSG
+){
   noticeBox.style.display=
     "flex";
 }
@@ -6027,19 +6445,24 @@ for(
       "div"
     );
 
-  d.className="p";
+  d.className=
+    "p";
 
   d.style.left=
     Math.random()*100+
     "%";
 
   d.style.animationDuration=
-    (16+
-      Math.random()*14)+
+    (
+      16+
+      Math.random()*14
+    )+
     "s";
 
   d.style.animationDelay=
-    (-Math.random()*20)+
+    (
+      -Math.random()*20
+    )+
     "s";
 
   particles.appendChild(
@@ -6069,7 +6492,9 @@ document.getElementById(
 ).addEventListener(
   "keydown",
   e=>{
-    if(e.key==="Enter"){
+    if(
+      e.key==="Enter"
+    ){
       login();
     }
   }
@@ -6180,10 +6605,13 @@ document.getElementById(
         "searchChannels"
       );
 
-    input.value="";
+    input.value=
+      "";
+
     input.focus();
 
-    currentLeague="all";
+    currentLeague=
+      "all";
 
     renderLeagueTabs();
     renderMatches();
@@ -6231,7 +6659,8 @@ document.addEventListener(
   "visibilitychange",
   ()=>{
     if(
-      document.visibilityState!=="visible"
+      document.visibilityState!==
+      "visible"
     ){
       return;
     }
@@ -6289,7 +6718,10 @@ window.addEventListener(
     }
 
     if(
-      (e.ctrlKey || e.metaKey) &&
+      (
+        e.ctrlKey ||
+        e.metaKey
+      ) &&
       e.key.toLowerCase()==="k"
     ){
       e.preventDefault();
@@ -6299,7 +6731,9 @@ window.addEventListener(
       )?.focus();
     }
 
-    if(e.key==="Escape"){
+    if(
+      e.key==="Escape"
+    ){
       if(
         document.getElementById(
           "mainCard"
@@ -6317,7 +6751,10 @@ window.addEventListener(
 
     if(
       e.key.toLowerCase()==="r" &&
-      (e.ctrlKey || e.metaKey)
+      (
+        e.ctrlKey ||
+        e.metaKey
+      )
     ){
       e.preventDefault();
 
