@@ -961,6 +961,15 @@ iframe{
   color:#fff;
 }
 
+.tab-btn.major-league{
+  font-weight:850;
+  border-color:color-mix(in srgb,var(--accent-2) 18%,rgba(255,255,255,.05));
+}
+
+.tab-btn.major-league:not(.active){
+  background:color-mix(in srgb,var(--accent-2) 4%,rgba(255,255,255,.02));
+}
+
 .servers{
   display:flex;
   gap:8px;
@@ -2291,7 +2300,7 @@ const STATIC_CHANNELS = [
   {title:"iDMAN Tv",url:"/event.html?id=androstreamliveidm"},
   {title:"Trt 1",url:"/event.html?id=androstreamlivetrt1"},
   {title:"Trt Spor",url:"/event.html?id=androstreamlivetrts"},
-  {title:"Trt Spor Yıldız",url:"/event.html?id=androstreamlivetrtsy"},
+  {title:"TRT Sports Star",url:"/event.html?id=androstreamlivetrtsy"},
   {title:"Atv",url:"/event.html?id=androstreamliveatv"},
   {title:"A Spor",url:"/event.html?id=androstreamliveas"},
   {title:"A2",url:"/event.html?id=androstreamlivea2"},
@@ -2504,6 +2513,41 @@ const translationDict = {
   "basaksehir":"Basaksehir",
   "barcelona":"Barcelona",
   "real madrid":"Real Madrid",
+  "spor":"Sports",
+  "sporu":"Sports",
+  "sporları":"Sports",
+  "sporlari":"Sports",
+  "spor haberleri":"Sports News",
+  "haber":"News",
+  "haberler":"News",
+  "haberleri":"News",
+  "kanal":"Channel",
+  "kanallar":"Channels",
+  "yayın akışı":"TV Schedule",
+  "yayin akisi":"TV Schedule",
+  "yayını":"Broadcast",
+  "yayini":"Broadcast",
+  "yayınları":"Broadcasts",
+  "yayinlari":"Broadcasts",
+  "yıldız":"Star",
+  "yildiz":"Star",
+  "merkez":"Center",
+  "programı":"Program",
+  "programi":"Program",
+  "şimdi":"Now",
+  "simdi":"Now",
+  "son dakika":"Breaking News",
+  "ekstra":"Extra",
+  "özel":"Special",
+  "ozel":"Special",
+  "ücretsiz":"Free",
+  "ucretsiz":"Free",
+  "canlı tv":"Live TV",
+  "canli tv":"Live TV",
+  "futbol maçı":"Football Match",
+  "futbol maci":"Football Match",
+  "lig maçı":"League Match",
+  "lig maci":"League Match",
   "bugün":"Today",
   "bugun":"Today",
   "yarın":"Tomorrow",
@@ -2623,6 +2667,15 @@ const translationRegex=translationKeys.length
     )
   : null;
 
+const TRANSLATION_ENDPOINT="https://translate.googleapis.com/translate_a/single";
+const TRANSLATION_CACHE_KEY="talhaTurkishEnglishCacheV2";
+const translationRemoteCache=new Map();
+const translationRemotePending=new Map();
+const translationRemoteQueue=[];
+let translationRemoteActive=0;
+const TRANSLATION_MAX_CONCURRENCY=3;
+const TRANSLATION_TIMEOUT=3500;
+
 function translateText(text){
   if(text===null || text===undefined)return "";
 
@@ -2677,39 +2730,184 @@ function translateText(text){
     .replace(/Ç/g,"C");
 }
 
+function looksTurkishText(value){
+  const raw=normalizeTurkishText(String(value ?? "")).trim();
+
+  if(!raw)return false;
+  if(/[şŞıİğĞüÜöÖçÇ]/.test(raw))return true;
+
+  const normalized=normalizeSearchText(raw);
+  const cues=new Set([
+    "spor","sporu","sporları","sporlari","haber","haberler","haberleri",
+    "kanal","kanallar","yayin","yayın","yayinda","yayında","yayinlari","yayınları",
+    "canli","canlı","mac","maç","maci","maçı","lig","ligi","ligler",
+    "kupa","kupasi","kupası","takim","takımı","takimi","şampiyonlar",
+    "sampiyonlar","avrupa","turkiye","türkiye","ingiltere","ispanya","italya",
+    "almanya","fransa","hollanda","portekiz","bugun","bugün","yarin","yarın",
+    "dun","dün","simdi","şimdi","erkek","erkekler","kadin","kadın","kadınlar",
+    "gencler","gençler","hazirlik","hazırlık","eleme","elemeleri","ozet","özet",
+    "penalti","penaltı","devre","uzatmalar","hafta","tur","etap","merkez","özel","ozel"
+  ]);
+
+  return normalized.split(" ").some(word=>cues.has(word));
+}
+
+function loadTranslationCache(){
+  try{
+    const raw=localStorage.getItem(TRANSLATION_CACHE_KEY);
+    if(!raw)return;
+    const saved=JSON.parse(raw);
+    if(!saved || typeof saved!=="object")return;
+    Object.entries(saved).forEach(([key,value])=>{
+      if(typeof value==="string" && value.trim()){
+        translationRemoteCache.set(key,value);
+      }
+    });
+  }catch(e){}
+}
+
+function saveTranslationCache(){
+  try{
+    const obj={};
+    let count=0;
+
+    translationRemoteCache.forEach((value,key)=>{
+      if(count>=400)return;
+      obj[key]=value;
+      count++;
+    });
+
+    localStorage.setItem(
+      TRANSLATION_CACHE_KEY,
+      JSON.stringify(obj)
+    );
+  }catch(e){}
+}
+
+function enqueueRemoteTranslation(sourceText){
+  const source=normalizeTurkishText(String(sourceText ?? "")).trim();
+  const key=normalizeSearchText(source);
+
+  if(!source || !key || !looksTurkishText(source)){
+    return Promise.resolve(translateText(source));
+  }
+
+  if(translationRemoteCache.has(key)){
+    return Promise.resolve(translationRemoteCache.get(key));
+  }
+
+  if(translationRemotePending.has(key)){
+    return translationRemotePending.get(key);
+  }
+
+  const promise=new Promise(resolve=>{
+    translationRemoteQueue.push({source,key,resolve});
+    pumpRemoteTranslationQueue();
+  });
+
+  translationRemotePending.set(key,promise);
+  return promise;
+}
+
+function pumpRemoteTranslationQueue(){
+  while(
+    translationRemoteActive<TRANSLATION_MAX_CONCURRENCY &&
+    translationRemoteQueue.length
+  ){
+    const job=translationRemoteQueue.shift();
+    translationRemoteActive++;
+
+    translateFromGoogle(job.source)
+      .then(result=>{
+        const finalText=
+          result && result.trim()
+            ? result.trim()
+            : translateText(job.source);
+
+        translationRemoteCache.set(job.key,finalText);
+        saveTranslationCache();
+        job.resolve(finalText);
+      })
+      .catch(()=>job.resolve(translateText(job.source)))
+      .finally(()=>{
+        translationRemotePending.delete(job.key);
+        translationRemoteActive--;
+        pumpRemoteTranslationQueue();
+      });
+  }
+}
+
+async function translateFromGoogle(sourceText){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),TRANSLATION_TIMEOUT);
+
+  try{
+    const url=
+      TRANSLATION_ENDPOINT+
+      "?client=gtx&sl=tr&tl=en&dt=t&q="+
+      encodeURIComponent(sourceText.slice(0,700));
+
+    const response=await fetch(
+      url,
+      {
+        method:"GET",
+        mode:"cors",
+        cache:"force-cache",
+        signal:controller.signal
+      }
+    );
+
+    if(!response.ok)throw new Error("Translation request failed");
+
+    const data=await response.json();
+    if(!Array.isArray(data?.[0]))throw new Error("Invalid translation response");
+
+    return data[0]
+      .map(part=>part?.[0] || "")
+      .join("")
+      .trim();
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+async function translateTextAdvanced(text){
+  const local=translateText(text);
+
+  if(!looksTurkishText(text)){
+    return local;
+  }
+
+  const remote=await enqueueRemoteTranslation(text);
+  return remote || local;
+}
+
+loadTranslationCache();
+
 const LEAGUE_CANONICAL_ALIASES=new Map([
-  ["la liga","la liga"],
-  ["laliga","la liga"],
-  ["la-liga","la liga"],
-  ["laligasantander","la liga"],
-  ["laligaesports","la liga"],
-  ["uefa champions league","champions league"],
-  ["champions league","champions league"],
-  ["uefachampionsleague","champions league"],
-  ["ucl","champions league"],
-  ["uefa europa league","europa league"],
-  ["europa league","europa league"],
-  ["uefaeuropaleague","europa league"],
-  ["uel","europa league"],
-  ["uefa conference league","conference league"],
-  ["conference league","conference league"],
-  ["uefaconferenceleague","conference league"],
-  ["uefa nations league","nations league"],
-  ["nations league","nations league"],
-  ["uefanationsleague","nations league"],
-  ["premier league","premier league"],
-  ["english premier league","premier league"],
-  ["epl","premier league"],
-  ["süper lig","super league"],
-  ["super lig","super league"],
-  ["super league","super league"],
-  ["turkiye kupasi","turkey cup"],
-  ["turkey cup","turkey cup"],
-  ["coppa italia","coppa italia"],
-  ["copa del rey","copa del rey"],
-  ["bundesliga","bundesliga"],
-  ["serie a","serie a"],
-  ["ligue 1","ligue 1"]
+  ["la liga","la liga"],["laliga","la liga"],["la-liga","la liga"],
+  ["laligasantander","la liga"],["laligaesports","la liga"],["laligaeasports","la liga"],
+  ["primera division","la liga"],["spanish la liga","la liga"],["spanish premier league","la liga"],
+  ["uefa champions league","champions league"],["champions league","champions league"],
+  ["uefachampionsleague","champions league"],["ucl","champions league"],
+  ["sampiyonlar ligi","champions league"],["şampiyonlar ligi","champions league"],
+  ["avrupa sampiyonlar ligi","champions league"],
+  ["uefa europa league","europa league"],["europa league","europa league"],
+  ["uefaeuropaleague","europa league"],["uel","europa league"],["avrupa ligi","europa league"],
+  ["uefa conference league","conference league"],["conference league","conference league"],
+  ["uefaconferenceleague","conference league"],["konferans ligi","conference league"],
+  ["uefa nations league","nations league"],["nations league","nations league"],
+  ["uefanationsleague","nations league"],["milletler ligi","nations league"],
+  ["premier league","premier league"],["english premier league","premier league"],
+  ["england premier league","premier league"],["premier ligi","premier league"],
+  ["ingiltere premier ligi","premier league"],["ingiltere premier league","premier league"],["epl","premier league"],
+  ["süper lig","super league"],["super lig","super league"],["super league","super league"],
+  ["turkish super league","super league"],["turkiye super lig","super league"],
+  ["turkiye super league","super league"],["turkey super league","super league"],
+  ["turkiye kupasi","turkey cup"],["turkiye kupası","turkey cup"],
+  ["turkey cup","turkey cup"],["turkish cup","turkey cup"],
+  ["coppa italia","coppa italia"],["copa del rey","copa del rey"],
+  ["bundesliga","bundesliga"],["serie a","serie a"],["ligue 1","ligue 1"]
 ]);
 
 const LEAGUE_CANONICAL_LABELS={
@@ -2728,43 +2926,56 @@ const LEAGUE_CANONICAL_LABELS={
   "ligue 1":"Ligue 1"
 };
 
-function canonicalLeagueKey(value){
-  const translated=translateText(String(value ?? "")).trim();
-  const normalized=normalizeSearchText(translated);
+const LEAGUE_PRIORITY={
+  "premier league":0,
+  "la liga":1,
+  "champions league":2,
+  "europa league":3,
+  "serie a":4,
+  "bundesliga":5,
+  "ligue 1":6,
+  "copa del rey":7,
+  "coppa italia":8,
+  "conference league":9,
+  "nations league":10,
+  "super league":11,
+  "turkey cup":12
+};
 
+function canonicalLeagueKey(value){
+  const raw=normalizeTurkishText(String(value ?? "")).trim();
+  const translated=translateText(raw).trim();
+  const normalized=normalizeSearchText(translated);
   if(!normalized)return "other";
 
   const compact=normalized.replace(/[^a-z0-9]+/g,"");
+  const aliases=[normalized,compact];
 
-  if(LEAGUE_CANONICAL_ALIASES.has(normalized)){
-    return LEAGUE_CANONICAL_ALIASES.get(normalized);
+  for(const alias of aliases){
+    if(LEAGUE_CANONICAL_ALIASES.has(alias)){
+      return LEAGUE_CANONICAL_ALIASES.get(alias);
+    }
   }
 
-  if(LEAGUE_CANONICAL_ALIASES.has(compact)){
-    return LEAGUE_CANONICAL_ALIASES.get(compact);
-  }
-
-  if(
-    compact==="uefachampionsleague" ||
-    (compact.endsWith("championsleague") && compact.startsWith("uefa"))
-  ){
-    return "champions league";
-  }
-
-  if(compact==="uefaeuropaleague" || compact==="uel"){
-    return "europa league";
-  }
-
-  if(compact==="uefaconferenceleague"){
-    return "conference league";
-  }
+  if(compact.includes("laliga"))return "la liga";
+  if(compact.includes("uefachampionsleague") || compact.includes("championsleague"))return "champions league";
+  if(compact.includes("uefaeuropaleague") || compact.includes("europaleague"))return "europa league";
+  if(compact.includes("uefaconferenceleague") || compact.includes("conferenceleague"))return "conference league";
+  if(compact.includes("uefanationsleague") || compact.includes("nationsleague"))return "nations league";
+  if(compact.includes("premierleague") || compact.includes("ingilterepremierligi"))return "premier league";
+  if(compact.includes("superlig") || compact.includes("superleague") || compact.includes("turkiyesuperlig"))return "super league";
+  if(compact.includes("turkeycup") || compact.includes("turkishcup") || compact.includes("turkiyekupasi"))return "turkey cup";
+  if(compact.includes("bundesliga"))return "bundesliga";
+  if(compact.includes("seriea"))return "serie a";
+  if(compact.includes("ligue1"))return "ligue 1";
+  if(compact.includes("coppaitalia"))return "coppa italia";
+  if(compact.includes("copadelrey"))return "copa del rey";
 
   return normalized;
 }
 
 function canonicalLeagueLabel(value){
   const key=canonicalLeagueKey(value);
-
   return LEAGUE_CANONICAL_LABELS[key] ||
     translateText(String(value || "Other")).trim() ||
     "Other";
@@ -2865,6 +3076,7 @@ function getEventMeta(event,index=""){
   const search=normalizeSearchText([
     title,
     league,
+    translateText(event?.time || "ONLINE"),
     event?.title || "",
     event?.league || "",
     event?.time || "",
@@ -2878,6 +3090,7 @@ function getEventMeta(event,index=""){
   meta={
     title,
     league,
+    time:translateText(event?.time || "ONLINE"),
     key,
     search
   };
@@ -3504,139 +3717,61 @@ function bootLoader(){
 }
 
 function renderLeagueTabs(){
-  const tabs=
-    document.getElementById(
-      "leagueTabs"
-    );
-
+  const tabs=document.getElementById("leagueTabs");
   if(!tabs)return;
 
-  const counts=
-    new Map();
+  const counts=new Map();
 
-  for(
-    const event of liveEvents
-  ){
-    const key=
-      canonicalLeagueKey(
-        event?.league ||
-        "Other"
-      );
-
-    const label=
-      canonicalLeagueLabel(
-        event?.league ||
-        "Other"
-      );
-
-    let meta=
-      counts.get(key);
-
-    if(!meta){
-      meta={
-        label,
-        count:0
-      };
-
-      counts.set(
-        key,
-        meta
-      );
-    }
-
+  for(const event of liveEvents){
+    const key=canonicalLeagueKey(event?.league || "Other");
+    const label=LEAGUE_CANONICAL_LABELS[key] || canonicalLeagueLabel(event?.league || "Other");
+    const meta=counts.get(key) || {label,count:0};
     meta.count++;
+    counts.set(key,meta);
   }
 
-  const priority=key=>{
-    if(key==="la liga")return 0;
-    if(key==="champions league")return 1;
-    return 2;
-  };
+  if(currentLeague!=="all" && !counts.has(currentLeague)){
+    currentLeague="all";
+  }
 
-  const leagues=[
-    ...counts.entries()
-  ].sort(
-    (a,b)=>
-      priority(a[0])-
-      priority(b[0]) ||
-      a[1].label.localeCompare(
-        b[1].label
-      )
-  );
+  const leagues=[...counts.entries()].sort((a,b)=>{
+    const pa=Object.prototype.hasOwnProperty.call(LEAGUE_PRIORITY,a[0]) ? LEAGUE_PRIORITY[a[0]] : 1000;
+    const pb=Object.prototype.hasOwnProperty.call(LEAGUE_PRIORITY,b[0]) ? LEAGUE_PRIORITY[b[0]] : 1000;
+    if(pa!==pb)return pa-pb;
+    if(b[1].count!==a[1].count)return b[1].count-a[1].count;
+    return a[1].label.localeCompare(b[1].label,"en",{sensitivity:"base",numeric:true});
+  });
 
-  const fragment=
-    document.createDocumentFragment();
+  const fragment=document.createDocumentFragment();
 
-  const addTab=(
-    label,
-    key,
-    count
-  )=>{
-    const button=
-      document.createElement(
-        "button"
-      );
-
+  const addTab=(label,key,count,major=false)=>{
+    const button=document.createElement("button");
     button.className=
       "tab-btn"+
-      (
-        currentLeague===key
-          ? " active"
-          : ""
-      );
-
-    button.type=
-      "button";
-
-    button.setAttribute(
-      "role",
-      "tab"
-    );
-
-    button.setAttribute(
-      "aria-selected",
-      currentLeague===key
-        ? "true"
-        : "false"
-    );
-
-    button.textContent=
-      `${label} (${count})`;
-
-    button.title=
-      `Filter ${label}`;
-
-    button.onclick=
-      ()=>{
-        setFilter(
-          key
-        );
-      };
-
-    fragment.appendChild(
-      button
-    );
+      (currentLeague===key ? " active" : "")+
+      (major ? " major-league" : "");
+    button.type="button";
+    button.dataset.leagueKey=key;
+    button.setAttribute("role","tab");
+    button.setAttribute("aria-selected",currentLeague===key ? "true" : "false");
+    button.textContent=`${label} (${count})`;
+    button.title=`Filter ${label}`;
+    button.onclick=()=>setFilter("league",key);
+    fragment.appendChild(button);
   };
 
-  addTab(
-    "All",
-    "all",
-    liveEvents.length
-  );
+  addTab("All","all",liveEvents.length,true);
 
-  for(
-    const [key,meta] of leagues
-  ){
+  for(const [key,meta] of leagues){
     addTab(
       meta.label,
       key,
-      meta.count
+      meta.count,
+      Object.prototype.hasOwnProperty.call(LEAGUE_PRIORITY,key)
     );
   }
 
-  tabs.replaceChildren(
-    fragment
-  );
+  tabs.replaceChildren(fragment);
 }
 
 function renderRecent(){
@@ -3813,6 +3948,71 @@ function updateAnalytics(){
   }
 }
 
+
+function refreshMetaSearch(meta,event){
+  meta.search=normalizeSearchText([
+    meta.title,
+    meta.league,
+    meta.time,
+    event?.title || "",
+    event?.league || "",
+    event?.time || "",
+    event?.name || "",
+    event?.channel || "",
+    event?.channelId || "",
+    event?.eventId || "",
+    event?.streamId || ""
+  ].join(" "));
+}
+
+let translationRenderTimer=0;
+
+function scheduleTranslationRender(){
+  clearTimeout(translationRenderTimer);
+  translationRenderTimer=setTimeout(()=>{
+    if(document.visibilityState!=="hidden"){
+      renderMatches();
+      renderLeagueTabs();
+    }
+  },120);
+}
+
+function hydrateEventMeta(event,index,meta){
+  if(!meta || meta.translationStarted)return;
+  meta.translationStarted=true;
+
+  const titleSource=String(event?.title || "Live channel");
+  const leagueSource=String(event?.league || "Live feed");
+  const timeSource=String(event?.time || "ONLINE");
+
+  Promise.all([
+    translateTextAdvanced(titleSource),
+    translateTextAdvanced(leagueSource),
+    translateTextAdvanced(timeSource)
+  ])
+    .then(([title,league,time])=>{
+      const nextTitle=title || translateText(titleSource) || "Live channel";
+      const nextLeague=canonicalLeagueLabel(league || translateText(leagueSource) || "Other");
+      const nextTime=time || translateText(timeSource) || "ONLINE";
+      const changed=meta.title!==nextTitle || meta.league!==nextLeague || meta.time!==nextTime;
+
+      meta.title=nextTitle;
+      meta.league=nextLeague;
+      meta.time=nextTime;
+      refreshMetaSearch(meta,event);
+
+      if(changed){
+        scheduleTranslationRender();
+      }
+    })
+    .catch(()=>{
+      meta.title=translateText(titleSource) || "Live channel";
+      meta.league=canonicalLeagueLabel(leagueSource);
+      meta.time=translateText(timeSource) || "ONLINE";
+      refreshMetaSearch(meta,event);
+    });
+}
+
 function renderMatches(){
   const container=
     document.getElementById(
@@ -3857,6 +4057,12 @@ function renderMatches(){
         index
       );
 
+    hydrateEventMeta(
+      event,
+      index,
+      meta
+    );
+
     const leagueKey=
       canonicalLeagueKey(
         event?.league ||
@@ -3872,9 +4078,10 @@ function renderMatches(){
 
     if(
       searchQuery &&
-      !meta.search.includes(
-        searchQuery
-      )
+      !meta.search.includes(searchQuery) &&
+      !normalizeSearchText(
+        canonicalLeagueLabel(leagueKey)
+      ).includes(searchQuery)
     ){
       continue;
     }
@@ -3926,7 +4133,7 @@ function renderMatches(){
       `<div style="display:flex;align-items:center;gap:7px">`+
         `<div class="live-badge">`+
           `<div class="live-dot"></div>`+
-          `${escapeHTML(event?.time || "ONLINE")}`+
+          `${escapeHTML(meta.time || event?.time || "ONLINE")}`+
         `</div>`+
         `<button class="fav-toggle ${favorite ? "active" : ""}" type="button" aria-label="${favorite ? "Remove from" : "Add to"} favorites" aria-pressed="${favorite}">★</button>`+
       `</div>`;
@@ -4044,17 +4251,17 @@ function setFilter(
   type,
   name="all"
 ){
-  currentLeague=
-    type==="league"
-      ? canonicalLeagueKey(
-          name
-        )
-      : type==="all"
-        ? "all"
-        : canonicalLeagueKey(
-            type
-          );
+  let next="all";
 
+  if(type==="all"){
+    next="all";
+  }else if(type==="league"){
+    next=canonicalLeagueKey(name);
+  }else{
+    next=canonicalLeagueKey(type);
+  }
+
+  currentLeague=next || "all";
   renderLeagueTabs();
   renderMatches();
 }
