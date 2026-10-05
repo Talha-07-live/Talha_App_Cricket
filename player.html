@@ -7,6 +7,45 @@
 <meta name="color-scheme" content="dark">
 <title>Talha's Player</title>
 <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png">
+<script>
+(function(){
+  const ALLOWED_ORIGIN='https://talhas.stream.site.je';
+  const exactOrigin=
+    window.location.origin===ALLOWED_ORIGIN &&
+    window.location.protocol==='https:' &&
+    window.location.hostname==='talhas.stream.site.je' &&
+    window.location.port==='';
+
+  let topLevel=true;
+
+  try{
+    topLevel=window.top===window.self;
+  }catch(e){
+    topLevel=false;
+  }
+
+  const allowed=exactOrigin&&topLevel;
+
+  window.__TALHA_DOMAIN_ALLOWED__=allowed;
+
+  if(!allowed){
+    document.documentElement.setAttribute('data-domain-blocked','1');
+    const blockStyle=document.createElement('style');
+    blockStyle.textContent='html,body{margin:0!important;padding:0!important;width:100%!important;height:100%!important;background:#000!important;color:#fff!important;overflow:hidden!important}';
+    document.documentElement.appendChild(blockStyle);
+
+    document.addEventListener('DOMContentLoaded',function(){
+      document.body.innerHTML=
+        '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;background:#000;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;text-align:center">' +
+          '<div style="max-width:480px">' +
+            '<div style="font-size:18px;font-weight:800;margin-bottom:10px">Access Denied</div>' +
+            '<div style="font-size:13px;line-height:1.6;color:rgba(255,255,255,.7)">This player is restricted to talhas.stream.site.je.</div>' +
+          '</div>' +
+        '</div>';
+    },{once:true});
+  }
+})();
+</script>
 
 <style>
 :root[data-theme="netflix"]{
@@ -1198,6 +1237,10 @@ input[type="range"]::-moz-range-thumb{
 </div>
 
 <script>
+if(window.__TALHA_DOMAIN_ALLOWED__!==true){
+  throw new Error("Talha's Player: unauthorized origin");
+}
+
 let autoHideTimer=null;
 let overlayMoveStamp=0;
 let videoFilterFrame=0;
