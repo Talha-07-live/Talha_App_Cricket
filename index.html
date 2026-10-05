@@ -1630,16 +1630,16 @@ body.scroll-locked{
   }
 
   .player-container{
-  position:sticky;
-  top:0;
-  z-index:100;
-  width:100%;
-  padding-top:60%;
-  border-radius:0 0 11px 11px;
-  background:#000;
-  box-shadow:0 14px 32px rgba(0,0,0,.72);
-  isolation:isolate;
-}
+    position:sticky;
+    top:0;
+    z-index:100;
+    width:100%;
+    padding-top:60%;
+    border-radius:0 0 11px 11px;
+    background:#000;
+    box-shadow:0 14px 32px rgba(0,0,0,.72);
+    isolation:isolate;
+  }
 
   .channels-panel{
     width:100%;
@@ -2258,8 +2258,27 @@ body.scroll-locked{
 const CUSTOM_TOP_FEEDS = [];
 const SHOW_MAINTENANCE_MSG = false;
 
-const PASSWORD = "Talha";
-const ALT_PASSWORD = "TalhaT";
+const _AUTH_MASK = "X7p!";
+const _AUTH_PRIMARY = [12,86,28,73,57];
+const _AUTH_ALT = [12,86,28,73,57,99];
+
+function _decodeAuth(_data){
+  let _out="";
+
+  for(let _i=0;_i<_data.length;_i++){
+    _out += String.fromCharCode(
+      _data[_i] ^
+      _AUTH_MASK.charCodeAt(
+        _i % _AUTH_MASK.length
+      )
+    );
+  }
+
+  return _out;
+}
+
+const PASSWORD = _decodeAuth(_AUTH_PRIMARY);
+const ALT_PASSWORD = _decodeAuth(_AUTH_ALT);
 
 const PLAYER_BASE_URL = "player.html";
 const PLAYER_ALT_URL = "player2.html";
@@ -2912,10 +2931,10 @@ const LEAGUE_CANONICAL_ALIASES=new Map([
 
 const LEAGUE_CANONICAL_LABELS={
   "la liga":"La Liga",
-  "champions league":"Champions League",
+  "uefa champions league":"UEFA Champions League",
   "europa league":"Europa League",
   "conference league":"Conference League",
-  "nations league":"Nations League",
+  "uefa nations league":"UEFA Nations League",
   "premier league":"Premier League",
   "super league":"Super League",
   "turkey cup":"Turkey Cup",
@@ -2927,13 +2946,13 @@ const LEAGUE_CANONICAL_LABELS={
 };
 
 const LEAGUE_PRIORITY={
-  "uefa national league": 0,
-  "premier league":5,
+  "uefa national league":0,
+  "premier league":4,
   "la liga":1,
   "champions league":3,
-  "europa league":4,
+  "europa league":5,
   "serie a":2,
-  "bundesliga":7,
+  "bundesliga":6,
   "ligue 1":7,
   "copa del rey":8,
   "coppa italia":9,
@@ -3292,7 +3311,9 @@ function escapeHTML(value){
       ">":"&gt;",
       "'":"&#39;",
       '"':"&quot;"
-    }[c])
+    }[
+      c
+    ])
   );
 }
 
@@ -3948,7 +3969,6 @@ function updateAnalytics(){
       );
   }
 }
-
 
 function refreshMetaSearch(meta,event){
   meta.search=normalizeSearchText([
@@ -5508,6 +5528,7 @@ function login(){
   ){
     chosenPlayer=
       PLAYER_ALT_URL;
+
   }else if(
     pass!==
     PASSWORD
@@ -5816,8 +5837,10 @@ function scrollToElementStable(
       rect.top-
       Math.max(
         0,
-        (window.innerHeight-
-          rect.height)/2
+        (
+          window.innerHeight-
+          rect.height
+        )/2
       );
   }
 
