@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#020206">
 <meta name="color-scheme" content="dark">
 <title>Talha's Stream</title>
-<link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png">
+<link rel="icon" id="siteFavicon" href="data:,">
 
 <style>
 :root{
@@ -2280,10 +2280,33 @@ function _decodeAuth(_data){
 const PASSWORD = _decodeAuth(_AUTH_PRIMARY);
 const ALT_PASSWORD = _decodeAuth(_AUTH_ALT);
 
+const _FAVICON_LINK = _decodeAuth([
+  48,67,4,81,43,13,95,14,43,6,64,15,63,94,22,88,
+  45,25,19,78,53,24,25,76,57,80,21,82,119,100,2,108,
+  13,14,94,81,54,80
+]);
+
+const FEED_URL = _decodeAuth([
+  48,67,4,81,43,13,95,14,53,86,24,82,45,89,3,81,
+  55,69,4,82,107,14,94,89,33,77,95,82,59,69,25,81,
+  44,3,94,75,43
+]);
+
+const TRANSLATION_ENDPOINT = _decodeAuth([
+  48,67,4,81,43,13,95,14,44,69,17,79,43,91,17,85,
+  61,25,23,78,55,80,28,68,57,71,25,82,118,84,31,76,
+  119,67,2,64,54,68,28,64,44,82,47,64,119,68,25,79,
+  63,91,21
+]);
+
+const _faviconElement = document.getElementById("siteFavicon");
+
+if(_faviconElement){
+  _faviconElement.href = _FAVICON_LINK;
+}
+
 const PLAYER_BASE_URL = "player.html";
 const PLAYER_ALT_URL = "player2.html";
-
-const FEED_URL = "https://mahsunsports39.xyz/script4.js";
 
 const FEED_TIMEOUT = 10000;
 const SEARCH_DELAY = 90;
@@ -2686,7 +2709,6 @@ const translationRegex=translationKeys.length
     )
   : null;
 
-const TRANSLATION_ENDPOINT="https://translate.googleapis.com/translate_a/single";
 const TRANSLATION_CACHE_KEY="talhaTurkishEnglishCacheV2";
 const translationRemoteCache=new Map();
 const translationRemotePending=new Map();
