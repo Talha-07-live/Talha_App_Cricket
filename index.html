@@ -2258,68 +2258,139 @@ body.scroll-locked{
 const CUSTOM_TOP_FEEDS=[];
 const SHOW_MAINTENANCE_MSG=false;
 
-const _AUTH_MASK="X7p!";
-const _AUTH_PRIMARY=[12,86,28,73,57];
-const _AUTH_ALT=[12,86,28,73,57,99];
+const _SECURE_PARTS=[
+  [63,47,8,254,242,46,239,194,82,21,87,51,6,216,62,111,184,108,125,231,116,176,7,59,195,92,14,74,143,4,212,198],
+  [235,10,252,231,23,107,248,1,191,53,150,251,106,79,117,141,245,34,205,112,58,53,156,212,52,142,76,16,141,192,181,143],
+  [127,91,194,168,75,196,11,69,68,240,26,159,194,62,110,204,184,97,235,66,5,216,61,127,245,239,180,157,101,54,97,177],
+  [249,109,71,65,126,119,155,72,135,249,177,134,215,37,169,163,33,106,155,235,3,68,98,45,33,102,234,36,131,186,82,187]
+];
+const _SECURE_IV="jhORatOF/cadInbP";
+const _SECURE_DATA="pjPlfFdapOYs9gA8UHvHouvTNtFjqYke6mPHBWzzMCb/C8NzFUsL+gO3n/ap2HWDlBZFP1cg8SNJQATZbrCklta5aDFHNnlKLHueJyc0AzxfLxrJrZpc3KbVMuMThxtkTYKnM2A4Auc7dKzQswvK8/+dDkWFKCBln6bc/Jlnrtf2Ibzn9HNtEthohaOs+YlSdp3XRiQQ02KVdU6DCqA6ryB4ZYOMfAw0nqnXd7/BzEDjzzAs9lsS2wYFhaEsDgsY+wtwWlXt7K2ElJYhiAbDy6VWo+LyghDINShmUkGtMLtYGW+9mGAPqYTrNj15s/AXXsoacRdcL0qJ75ETXuvArZMRu27m/rpA/6yX46La5qOpVXLG94mQj87wxMCtSX5G9ucF13aSWT4f4lApppiWKYVJZqP0Iw5SuwF/4YhjQelNchsV3HpenRrdCpXIgb0bETiaPKhj7DhouiJF056CgXlEZggmB5vH2A6eJFM3aUGc9c3AhKsRUBK8qIEULA0pPaZPvsgzYLSUBszjM9wJb0M+FQSb4dNjFE4BqFm4WvIBdq5h7RNRbirvSjg1cjiZIvTjbnPDk+U+Q1NoUIr0gIXmkPT/NELqRlRNKjH+sP6fo9yzvMfeuUDehP/pyTiUtNnF6im+9BLF9EDcEBu9MMvrjRSEU5pKVxI/4UcxJoMP";
 
-function _decodeAuth(_data){
-  let _out="";
+let APP_CONFIG=null;
+let CONFIG_ERROR=null;
 
-  for(
-    let _i=0;
-    _i<_data.length;
-    _i++
-  ){
-    _out+=String.fromCharCode(
-      _data[_i]^
-      _AUTH_MASK.charCodeAt(
-        _i%_AUTH_MASK.length
-      )
-    );
+function _assembleSecureKey(){
+  const key=new Uint8Array(32);
+
+  for(let i=0;i<32;i++){
+    key[i]=
+      _SECURE_PARTS[0][i]^
+      _SECURE_PARTS[1][i]^
+      _SECURE_PARTS[2][i]^
+      _SECURE_PARTS[3][i];
   }
 
-  return _out;
+  return key;
 }
 
-const PASSWORD=_decodeAuth(
-  _AUTH_PRIMARY
-);
+function _fromBase64(value){
+  const binary=atob(value);
+  const bytes=new Uint8Array(binary.length);
 
-const ALT_PASSWORD=_decodeAuth(
-  _AUTH_ALT
-);
+  for(let i=0;i<binary.length;i++){
+    bytes[i]=binary.charCodeAt(i);
+  }
 
-const _FAVICON_LINK=_decodeAuth([
-  48,67,4,81,43,13,95,14,43,6,64,15,63,94,22,88,
-  45,25,19,78,53,24,25,76,57,80,21,82,119,100,2,108,
-  13,14,94,81,54,80
-]);
+  return bytes;
+}
 
-const FEED_URL=_decodeAuth([
-  48,67,4,81,43,13,95,14,53,86,24,82,45,89,3,81,
-  55,69,4,82,107,14,94,89,33,77,95,82,59,69,25,81,
-  44,3,94,75,43
-]);
+async function _decryptSecureConfig(){
+  if(!window.crypto?.subtle){
+    throw new Error("Web Crypto is unavailable");
+  }
 
-const TRANSLATION_ENDPOINT=_decodeAuth([
-  48,67,4,81,43,13,95,14,44,69,17,79,43,91,17,85,
-  61,25,23,78,55,80,28,68,57,71,25,82,118,84,31,76,
-  119,67,2,64,54,68,28,64,44,82,47,64,119,68,25,79,
-  63,91,21
-]);
-
-const _faviconElement=
-  document.getElementById(
-    "siteFavicon"
+  const key=await crypto.subtle.importKey(
+    "raw",
+    _assembleSecureKey(),
+    {name:"AES-GCM"},
+    false,
+    ["decrypt"]
   );
 
-if(_faviconElement){
-  _faviconElement.href=
-    _FAVICON_LINK;
+  const plain=await crypto.subtle.decrypt(
+    {name:"AES-GCM",iv:_fromBase64(_SECURE_IV)},
+    key,
+    _fromBase64(_SECURE_DATA)
+  );
+
+  const parsed=JSON.parse(
+    new TextDecoder().decode(plain)
+  );
+
+  if(!parsed||typeof parsed!=="object"){
+    throw new Error("Invalid secure configuration");
+  }
+
+  return parsed;
 }
 
-const PLAYER_BASE_URL="player.html";
-const PLAYER_ALT_URL="player2.html";
+const CONFIG_READY=_decryptSecureConfig()
+  .then(config=>{
+    APP_CONFIG=config;
+
+    if(config.favicon){
+      const favicon=document.getElementById("siteFavicon");
+      if(favicon){
+        favicon.href=config.favicon;
+      }
+    }
+
+    return config;
+  })
+  .catch(error=>{
+    CONFIG_ERROR=error;
+    throw error;
+  });
+
+let FEED_URL="";
+let TRANSLATION_ENDPOINT="";
+let PLAYER_BASE_URL="player.html";
+let PLAYER_ALT_URL="player2.html";
+
+CONFIG_READY.then(config=>{
+  FEED_URL=String(config.feed||"");
+  TRANSLATION_ENDPOINT=String(config.translation||"");
+  PLAYER_BASE_URL=String(config.playerBase||"player.html");
+  PLAYER_ALT_URL=String(config.playerAlt||"player2.html");
+}).catch(()=>{});
+
+CONFIG_READY.then(config=>{
+  FEED_URL=String(config.feed||"");
+  TRANSLATION_ENDPOINT=String(config.translation||"");
+  PLAYER_BASE_URL=String(config.playerBase||"player.html");
+  PLAYER_ALT_URL=String(config.playerAlt||"player2.html");
+}).catch(()=>{});
+
+async function deriveAuthHash(value,salt,iterations){
+  if(!window.crypto?.subtle){
+    throw new Error("Web Crypto is unavailable");
+  }
+
+  const material=await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(String(value)),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+
+  const bits=await crypto.subtle.deriveBits(
+    {
+      name:"PBKDF2",
+      salt:new TextEncoder().encode(String(salt)),
+      iterations:Number(iterations)||180000,
+      hash:"SHA-256"
+    },
+    material,
+    256
+  );
+
+  return Array.from(
+    new Uint8Array(bits),
+    byte=>byte.toString(16).padStart(2,"0")
+  ).join("");
+}
 
 const FEED_TIMEOUT=10000;
 const SEARCH_DELAY=90;
@@ -2952,101 +3023,86 @@ function storageSet(
 function normalizeTurkishText(
   value
 ){
-  if(
-    value===null ||
-    value===undefined
-  ){
+  if(value===null||value===undefined){
     return "";
   }
 
-  return String(
-    value
-  )
-  .replace(/Ã¼/g,"ü")
-  .replace(/Ãœ/g,"Ü")
-  .replace(/Ã§/g,"ç")
-  .replace(/Ã‡/g,"Ç")
-  .replace(/ÅŸ/g,"ş")
-  .replace(/Åž/g,"Ş")
-  .replace(/Ä±/g,"ı")
-  .replace(/Ä°/g,"İ")
-  .replace(/Ã¶/g,"ö")
-  .replace(/Ã–/g,"Ö")
-  .replace(/ÄŸ/g,"ğ")
-  .replace(/Äž/g,"Ğ")
-  .replace(/â€™/g,"'")
-  .replace(/â€œ/g,'"')
-  .replace(/â€/g,'"')
-  .replace(/&amp;/g,"&")
-  .replace(/&lt;/g,"<")
-  .replace(/&gt;/g,">");
+  return String(value)
+    .replace(/Ã¼/g,"ü")
+    .replace(/Ãœ/g,"Ü")
+    .replace(/Ã§/g,"ç")
+    .replace(/Ã‡/g,"Ç")
+    .replace(/ÅŸ/g,"ş")
+    .replace(/Åž/g,"Ş")
+    .replace(/Ä±/g,"ı")
+    .replace(/Ä°/g,"İ")
+    .replace(/Ã¶/g,"ö")
+    .replace(/Ã–/g,"Ö")
+    .replace(/ÄŸ/g,"ğ")
+    .replace(/Äž/g,"Ğ")
+    .replace(/â€œ/g,'"')
+    .replace(/â€/g,'"')
+    .replace(/â€˜|â€™/g,"'")
+    .replace(/â€“|â€”/g,"-")
+    .replace(/â€¦/g,"...")
+    .replace(/&amp;/gi,"&")
+    .replace(/&lt;/gi,"<")
+    .replace(/&gt;/gi,">")
+    .replace(/&quot;/gi,'"')
+    .replace(/&#39;|&#x27;/gi,"'")
+    .replace(/&nbsp;/gi," ")
+    .replace(/\u00a0/g," ")
+    .replace(/ /g," ")
+    .normalize("NFC");
 }
 
 function foldText(
   value
 ){
-  let s=
-    normalizeTurkishText(
-      value
-    ).toLowerCase();
+  const input=normalizeTurkishText(value).toLowerCase();
+  const manual=input
+    .replace(/ı/g,"i")
+    .replace(/ß/g,"ss");
 
-  const map={
-    "ş":"s",
-    "ğ":"g",
-    "ı":"i",
-    "ö":"o",
-    "ü":"u",
-    "ç":"c",
-    "á":"a",
-    "à":"a",
-    "â":"a",
-    "ä":"a",
-    "é":"e",
-    "è":"e",
-    "ê":"e",
-    "ë":"e",
-    "í":"i",
-    "ì":"i",
-    "î":"i",
-    "ï":"i",
-    "ó":"o",
-    "ò":"o",
-    "ô":"o",
-    "õ":"o",
-    "ú":"u",
-    "ù":"u",
-    "û":"u",
-    "ñ":"n",
-    "ß":"ss"
-  };
-
-  return s.replace(
-    /[şğıöüçáàâäéèêëíìîïóòôõúùûñß]/g,
-    c=>map[c]||c
-  );
+  return manual
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu,"");
 }
 
 function normalizeSearchText(
   value
 ){
-  return foldText(
-    value
-  )
-  .replace(/&amp;/g," and ")
-  .replace(/[^a-z0-9]+/g," ")
-  .replace(/\s+/g," ")
-  .trim();
+  return foldText(value)
+    .replace(/&/g," and ")
+    .replace(/[^a-z0-9]+/g," ")
+    .replace(/\s+/g," ")
+    .trim();
 }
 
 function escapeRegex(
   value
 ){
-  return String(
-    value
-  ).replace(
+  return String(value).replace(
     /[.*+?^${}()|[\]\\]/g,
     "\\$&"
   );
+}
+
+function buildFoldMap(value){
+  const original=normalizeTurkishText(value);
+  let folded="";
+  const indexes=[];
+
+  for(let i=0;i<original.length;i++){
+    const part=foldText(original[i]);
+
+    for(let j=0;j<part.length;j++){
+      folded+=part[j];
+      indexes.push(i);
+    }
+  }
+
+  return {original,folded,indexes};
 }
 
 const translationLookup=
@@ -3437,310 +3493,186 @@ const cues=new Set([
   normalizeSearchText
 ));
 
-function hasSportsCue(
-  value
-){
-  const text=
-    normalizeSearchText(
-      value
-    );
+const TURKISH_HINT_WORDS=new Set([
+  "ve","ile","icin","için","bugun","bugün","yarin","yarın","dun","dün","simdi","şimdi",
+  "mac","maç","maci","maçı","maclar","maçlar","karsilasma","karşılaşma","canli","canlı",
+  "yayin","yayın","yayini","yayını","yayinlar","yayınlar","spor","sporu","futbol","basketbol",
+  "voleybol","tenis","motor","yarış","yaris","lig","ligi","ligler","kupa","kupasi","kupası",
+  "takim","takimi","takımı","takimlar","takımlar","oyuncu","oyuncular","kadro","kadrosu",
+  "antrenor","antrenör","hakem","gol","goller","kart","kartlar","transfer","resmi","haber",
+  "haberler","duyuru","duyurular","aciklama","açıklama","basin","basın","toplantisi","toplantısı",
+  "sampiyon","şampiyon","sampiyonlar","şampiyonlar","milletler","ingiltere","ispanya","italya",
+  "almanya","fransa","hollanda","portekiz","belcika","belçika","iskocya","iskoçya","turkiye",
+  "türkiye","eleme","elemeleri","hazirlik","hazırlık","dostluk","erkek","erkekler","kadin","kadın",
+  "gencler","gençler","devre","arasi","arası","uzatma","uzatmalar","penalti","penaltı","ozet","özet",
+  "derbi","derbiler","rekabet","basliyor","başlıyor","basladi","başladı","baslayacak","başlayacak"
+].map(normalizeSearchText));
+
+const ENGLISH_STOP_WORDS=new Set([
+  "the","and","or","with","from","live","online","sport","sports","football","soccer","basketball",
+  "volleyball","tennis","match","matches","game","games","league","leagues","cup","cups","team",
+  "teams","player","players","channel","channels","today","tomorrow","yesterday","now","final","group",
+  "round","week","season","coach","referee","goal","goals","card","cards","transfer","official","news"
+]);
+
+function hasSportsCue(value){
+  const text=normalizeSearchText(value);
 
   if(!text){
     return false;
   }
 
-  const compact=
-    text.replace(
-      /\s+/g,
-      ""
-    );
-
-  if(
-    cues.has(
-      text
-    ) ||
-    cues.has(
-      compact
-    )
-  ){
+  if(text.split(" ").some(word=>TURKISH_HINT_WORDS.has(word))){
     return true;
   }
 
-  const words=
-    text.split(
-      " "
-    ).filter(
-      Boolean
-    );
+  return false;
+}
 
-  for(
-    const word
-    of words
-  ){
-    if(
-      cues.has(
-        word
-      )
-    ){
-      return true;
+function looksTurkishText(value){
+  const raw=normalizeTurkishText(String(value??"")).trim();
+
+  if(!raw){
+    return false;
+  }
+
+  if(/[şŞıİğĞüÜöÖçÇ]/.test(raw)){
+    return true;
+  }
+
+  const normalized=normalizeSearchText(raw);
+  const words=normalized.split(" ").filter(Boolean);
+  let hints=0;
+
+  for(const word of words){
+    if(TURKISH_HINT_WORDS.has(word)){
+      hints++;
     }
   }
 
-  for(
-    const cue
-    of cues
-  ){
-    if(
-      cue.length<4
-    ){
-      continue;
-    }
+  if(hints>=1){
+    return true;
+  }
 
-    const compactCue=
-      cue.replace(
-        /\s+/g,
-        ""
-      );
+  if(words.length>=2){
+    const knownEnglish=words.filter(word=>ENGLISH_STOP_WORDS.has(word)).length;
 
-    if(
-      text.includes(
-        cue
-      ) ||
-      compact.includes(
-        compactCue
-      )
-    ){
-      return true;
+    if(knownEnglish===0){
+      const suffixHits=words.filter(word=>
+        /(lar|ler|lari|leri|dir|dır|dir|den|dan|nin|nın|nun|nün|iyor|iyor|acak|ecek|mis|mış|mus|müş)$/.test(word)
+      ).length;
+
+      return suffixHits>=1;
     }
   }
 
   return false;
 }
 
-function looksTurkishText(
-  value
-){
-  const raw=
-    normalizeTurkishText(
-      String(
-        value??""
-      )
-    ).trim();
-
-  if(!raw){
-    return false;
-  }
-
-  if(
-    /[şŞıİğĞüÜöÖçÇ]/.test(
-      raw
-    )
-  ){
-    return true;
-  }
-
-  return hasSportsCue(
-    raw
-  );
-}
-
-function translateText(
-  text
-){
-  if(
-    text===null ||
-    text===undefined
-  ){
+function translateText(text){
+  if(text===null||text===undefined){
     return "";
   }
 
-  const original=
-    normalizeTurkishText(
-      String(
-        text
-      )
-    );
+  const map=buildFoldMap(String(text));
 
-  const folded=
-    foldText(
-      original
-    );
-
-  if(
-    !translationRegex
-  ){
-    return original;
+  if(!translationRegex||!map.folded){
+    return map.original;
   }
 
   translationRegex.lastIndex=0;
 
   const matches=[];
-
   let match;
 
-  while(
-    (match=
-      translationRegex.exec(
-        folded
-      ))
-  ){
-    const prefix=
-      match[1]||"";
+  while((match=translationRegex.exec(map.folded))){
+    const prefix=(match[1]||"").length;
+    const term=match[2]||"";
+    const termStart=match.index+prefix;
+    const termEnd=termStart+term.length;
+    const startOriginal=map.indexes[termStart];
+    const endMarker=map.indexes[termEnd-1];
 
-    const term=
-      match[2]||"";
+    if(startOriginal===undefined||endMarker===undefined){
+      continue;
+    }
 
-    const termStart=
-      match.index+
-      prefix.length;
+    const endOriginal=endMarker+1;
+    const replacement=translationLookup.get(normalizeSearchText(term));
 
-    const termEnd=
-      termStart+
-      term.length;
-
-    const replacement=
-      translationLookup.get(
-        normalizeSearchText(
-          term
-        )
-      );
-
-    if(
-      !replacement
-    ){
+    if(!replacement){
       continue;
     }
 
     matches.push({
-      start:termStart,
-      end:termEnd,
+      start:startOriginal,
+      end:endOriginal,
       replacement,
-      originalTerm:
-        original.slice(
-          termStart,
-          termEnd
-        )
+      originalTerm:map.original.slice(startOriginal,endOriginal)
     });
   }
 
-  if(
-    !matches.length
-  ){
-    return original;
+  if(!matches.length){
+    return map.original;
   }
 
   let result="";
   let cursor=0;
 
-  for(
-    const item
-    of matches
-  ){
-    if(
-      item.start<
-      cursor
-    ){
+  for(const item of matches){
+    if(item.start<cursor){
       continue;
     }
 
-    result+=
-      original.slice(
-        cursor,
-        item.start
-      );
+    result+=map.original.slice(cursor,item.start);
 
-    const source=
-      item.originalTerm;
+    let replacement=item.replacement;
+    const source=item.originalTerm;
+    const letters=source.replace(/[^A-Za-zÀ-ÿŞşĞğİıÖöÜüÇç]/g,"");
 
-    let replacement=
-      item.replacement;
-
-    if(
-      source===
-      source.toUpperCase()
-    ){
-      replacement=
-        replacement.toUpperCase();
-    }else if(
-      source.charAt(0)===
-      source.charAt(0).toUpperCase()
-    ){
-      replacement=
-        replacement.charAt(0).toUpperCase()+
-        replacement.slice(1);
+    if(letters&&letters===letters.toUpperCase()){
+      replacement=replacement.toUpperCase();
+    }else if(source.charAt(0)===source.charAt(0).toUpperCase()){
+      replacement=replacement.charAt(0).toUpperCase()+replacement.slice(1);
     }
 
-    result+=
-      replacement;
-
-    cursor=
-      item.end;
+    result+=replacement;
+    cursor=item.end;
   }
 
-  result+=
-    original.slice(
-      cursor
-    );
-
+  result+=map.original.slice(cursor);
   return result;
 }
 
-const TRANSLATION_CACHE_KEY=
-  "talhaTurkishEnglishCacheV3";
+const TRANSLATION_CACHE_KEY="talhaTurkishEnglishCacheV4";
+const TRANSLATION_CACHE_LIMIT=1000;
+const TRANSLATION_MAX_CONCURRENCY=4;
+const TRANSLATION_TIMEOUT=4500;
 
-const translationRemoteCache=
-  new Map();
-
-const translationRemotePending=
-  new Map();
-
+const translationRemoteCache=new Map();
+const translationRemotePending=new Map();
 const translationRemoteQueue=[];
-
 let translationRemoteActive=0;
-
-const TRANSLATION_MAX_CONCURRENCY=3;
-const TRANSLATION_TIMEOUT=3500;
 
 function loadTranslationCache(){
   try{
-    const raw=
-      localStorage.getItem(
-        TRANSLATION_CACHE_KEY
-      );
+    const raw=localStorage.getItem(TRANSLATION_CACHE_KEY);
 
-    if(
-      !raw
-    ){
+    if(!raw){
       return;
     }
 
-    const saved=
-      JSON.parse(
-        raw
-      );
+    const saved=JSON.parse(raw);
 
-    if(
-      !saved ||
-      typeof saved!=="object"
-    ){
+    if(!saved||typeof saved!=="object"){
       return;
     }
 
-    Object.entries(
-      saved
-    ).forEach(
-      ([key,value])=>{
-        if(
-          typeof value==="string" &&
-          value.trim()
-        ){
-          translationRemoteCache.set(
-            key,
-            value
-          );
-        }
+    Object.entries(saved).forEach(([key,value])=>{
+      if(typeof value==="string"&&value.trim()){
+        translationRemoteCache.set(key,value);
       }
-    );
+    });
   }catch(e){}
 }
 
@@ -3749,282 +3681,165 @@ function saveTranslationCache(){
     const obj={};
     let count=0;
 
-    translationRemoteCache.forEach(
-      (value,key)=>{
-        if(
-          count>=400
-        ){
-          return;
-        }
-
-        obj[key]=value;
-        count++;
+    for(const [key,value] of translationRemoteCache){
+      if(count>=TRANSLATION_CACHE_LIMIT){
+        break;
       }
-    );
+
+      obj[key]=value;
+      count++;
+    }
 
     localStorage.setItem(
       TRANSLATION_CACHE_KEY,
-      JSON.stringify(
-        obj
-      )
+      JSON.stringify(obj)
     );
   }catch(e){}
 }
 
-function enqueueRemoteTranslation(
-  sourceText
-){
-  const source=
-    normalizeTurkishText(
-      String(
-        sourceText??""
-      )
-    ).trim();
+function translationLooksUseful(source,result){
+  const clean=normalizeTurkishText(result||"").trim();
 
-  const key=
-    normalizeSearchText(
-      source
-    );
-
-  if(
-    !source ||
-    !key ||
-    !looksTurkishText(
-      source
-    )
-  ){
-    return Promise.resolve(
-      translateText(
-        source
-      )
-    );
+  if(!clean){
+    return false;
   }
 
-  if(
-    translationRemoteCache.has(
-      key
-    )
-  ){
-    return Promise.resolve(
-      translationRemoteCache.get(
-        key
-      )
-    );
+  if(normalizeSearchText(clean)===normalizeSearchText(source)){
+    return !looksTurkishText(clean);
   }
 
-  if(
-    translationRemotePending.has(
-      key
-    )
-  ){
-    return translationRemotePending.get(
-      key
-    );
+  if(/[şŞıİğĞüÜöÖçÇ]/.test(clean)){
+    return false;
   }
 
-  const promise=
-    new Promise(
-      resolve=>{
-        translationRemoteQueue.push({
-          source,
-          key,
-          resolve
-        });
+  return true;
+}
 
-        pumpRemoteTranslationQueue();
-      }
-    );
+function enqueueRemoteTranslation(sourceText){
+  const source=normalizeTurkishText(String(sourceText??"")).trim();
+  const key=normalizeSearchText(source);
 
-  translationRemotePending.set(
-    key,
-    promise
-  );
+  if(!source||!key||!looksTurkishText(source)||!TRANSLATION_ENDPOINT){
+    return Promise.resolve(translateText(source));
+  }
 
+  if(translationRemoteCache.has(key)){
+    return Promise.resolve(translationRemoteCache.get(key));
+  }
+
+  if(translationRemotePending.has(key)){
+    return translationRemotePending.get(key);
+  }
+
+  const promise=new Promise(resolve=>{
+    translationRemoteQueue.push({source,key,resolve});
+    pumpRemoteTranslationQueue();
+  });
+
+  translationRemotePending.set(key,promise);
   return promise;
 }
 
 function pumpRemoteTranslationQueue(){
   while(
-    translationRemoteActive<
-      TRANSLATION_MAX_CONCURRENCY &&
+    translationRemoteActive<TRANSLATION_MAX_CONCURRENCY&&
     translationRemoteQueue.length
   ){
-    const job=
-      translationRemoteQueue.shift();
-
+    const job=translationRemoteQueue.shift();
     translationRemoteActive++;
 
-    translateFromGoogle(
-      job.source
-    )
-    .then(
-      result=>{
-        const finalText=
-          result &&
-          result.trim()
-            ? result.trim()
-            : translateText(
-                job.source
-              );
+    translateFromGoogle(job.source)
+      .then(result=>{
+        const finalText=translationLooksUseful(job.source,result)
+          ? result.trim()
+          : translateText(job.source);
 
-        translationRemoteCache.set(
-          job.key,
-          finalText
-        );
+        if(finalText){
+          translationRemoteCache.set(job.key,finalText);
+          while(translationRemoteCache.size>TRANSLATION_CACHE_LIMIT){
+            const oldest=translationRemoteCache.keys().next().value;
+            translationRemoteCache.delete(oldest);
+          }
 
-        saveTranslationCache();
+          saveTranslationCache();
+        }
 
-        job.resolve(
-          finalText
-        );
-      }
-    )
-    .catch(
-      ()=>{
-        job.resolve(
-          translateText(
-            job.source
-          )
-        );
-      }
-    )
-    .finally(
-      ()=>{
-        translationRemotePending.delete(
-          job.key
-        );
-
+        job.resolve(finalText||job.source);
+      })
+      .catch(()=>{
+        job.resolve(translateText(job.source)||job.source);
+      })
+      .finally(()=>{
+        translationRemotePending.delete(job.key);
         translationRemoteActive--;
-
         pumpRemoteTranslationQueue();
-      }
-    );
+      });
   }
 }
 
-async function translateFromGoogle(
-  sourceText
-){
-  const controller=
-    new AbortController();
+async function translateFromGoogle(sourceText){
+  if(!TRANSLATION_ENDPOINT){
+    throw new Error("Translation endpoint unavailable");
+  }
 
-  const timer=
-    setTimeout(
-      ()=>{
-        controller.abort();
-      },
-      TRANSLATION_TIMEOUT
-    );
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),TRANSLATION_TIMEOUT);
 
   try{
     const url=
-      TRANSLATION_ENDPOINT+
-      "?client=gtx&sl=tr&tl=en&dt=t&q="+
-      encodeURIComponent(
-        sourceText.slice(
-          0,
-          700
-        )
-      );
+      `${TRANSLATION_ENDPOINT}?client=gtx&sl=tr&tl=en&dt=t&q=${encodeURIComponent(String(sourceText).slice(0,900))}`;
 
-    const response=
-      await fetch(
-        url,
-        {
-          method:"GET",
-          mode:"cors",
-          cache:"force-cache",
-          signal:controller.signal
-        }
-      );
+    const response=await fetch(url,{
+      method:"GET",
+      mode:"cors",
+      cache:"no-store",
+      credentials:"omit",
+      referrerPolicy:"no-referrer",
+      signal:controller.signal
+    });
 
-    if(
-      !response.ok
-    ){
-      throw new Error(
-        "Translation request failed"
-      );
+    if(!response.ok){
+      throw new Error("Translation request failed");
     }
 
-    const data=
-      await response.json();
+    const data=await response.json();
 
-    if(
-      !Array.isArray(
-        data?.[0]
-      )
-    ){
-      throw new Error(
-        "Invalid translation response"
-      );
+    if(!Array.isArray(data?.[0])){
+      throw new Error("Invalid translation response");
     }
 
     return data[0]
-      .map(
-        part=>
-          part?.[0]||
-          ""
-      )
+      .map(part=>part?.[0]||"")
       .join("")
       .trim();
-
   }finally{
-    clearTimeout(
-      timer
-    );
+    clearTimeout(timer);
   }
 }
 
-async function translateTextAdvanced(
-  text
-){
-  const source=
-    normalizeTurkishText(
-      String(
-        text??""
-      )
-    );
+async function translateTextAdvanced(text){
+  const source=normalizeTurkishText(String(text??""));
 
-  const local=
-    translateText(
-      source
-    );
+  if(!source.trim()){
+    return "";
+  }
 
-  if(
-    !looksTurkishText(
-      source
-    )
-  ){
+  const local=translateText(source);
+
+  if(!looksTurkishText(source)){
     return local;
   }
 
-  if(
-    normalizeSearchText(
-      local
-    )!==
-    normalizeSearchText(
-      source
-    )
-  ){
-    const residualTurkish=
-      /[şŞıİğĞüÜöÖçÇ]/.test(
-        local
-      );
+  const localUseful=translationLooksUseful(source,local);
 
-    if(
-      !residualTurkish
-    ){
-      return local;
-    }
+  if(localUseful&&!/[şŞıİğĞüÜöÖçÇ]/.test(local)){
+    return local;
   }
 
-  const remote=
-    await enqueueRemoteTranslation(
-      source
-    );
-
-  return remote ||
-    local;
+  const remote=await enqueueRemoteTranslation(source);
+  return translationLooksUseful(source,remote)
+    ? remote
+    : local;
 }
 
 loadTranslationCache();
@@ -4270,122 +4085,274 @@ const LEAGUE_CANONICAL_ALIASES=
   ]);
 
 const LEAGUE_CANONICAL_LABELS={
-  "la liga":"La Liga",
-  "champions league":"Champions League",
-  "europa league":"Europa League",
-  "conference league":"Conference League",
-  "nations league":"UEFA Nations League",
   "premier league":"Premier League",
-  "super league":"Super League",
-  "turkey cup":"Turkey Cup",
-  "coppa italia":"Coppa Italia",
-  "copa del rey":"Copa del Rey",
+  "la liga":"La Liga",
+  "nations league":"UEFA Nations League",
+  "champions league":"Champions League",
   "bundesliga":"Bundesliga",
   "serie a":"Serie A",
   "ligue 1":"Ligue 1",
-  "eredivisie":"Eredivisie",
+  "europa league":"Europa League",
+  "conference league":"Conference League",
+  "saudi pro league":"Saudi Pro League",
+  "brasileirao":"Brasileirão",
+  "liga mx":"Liga MX",
   "primeira liga":"Primeira Liga",
+  "eredivisie":"Eredivisie",
+  "mls":"MLS",
+  "argentina primera":"Argentina Primera Division",
   "scottish premiership":"Scottish Premiership",
   "jupiler pro league":"Jupiler Pro League",
+  "turkish super lig":"Turkish Süper Lig",
+  "super league":"Super League",
+  "austrian bundesliga":"Austrian Bundesliga",
+  "swiss super league":"Swiss Super League",
+  "greek super league":"Greek Super League",
+  "danish superliga":"Danish Superliga",
+  "norwegian eliteserien":"Norwegian Eliteserien",
+  "swedish allsvenskan":"Swedish Allsvenskan",
+  "polish ekstraklasa":"Polish Ekstraklasa",
+  "czech first league":"Czech First League",
+  "croatian hnl":"Croatian HNL",
+  "ukrainian premier league":"Ukrainian Premier League",
+  "serbian super liga":"Serbian Super Liga",
+  "romanian superliga":"Romanian SuperLiga",
+  "j1 league":"J1 League",
+  "k league 1":"K League 1",
+  "chinese super league":"Chinese Super League",
+  "a-league":"A-League",
+  "indian super league":"Indian Super League",
+  "thai league 1":"Thai League 1",
+  "vietnam v.league 1":"Vietnam V.League 1",
+  "malaysia super league":"Malaysia Super League",
+  "indonesia liga 1":"Indonesia Liga 1",
+  "persian gulf pro league":"Persian Gulf Pro League",
+  "qatar stars league":"Qatar Stars League",
+  "uae pro league":"UAE Pro League",
+  "egyptian premier league":"Egyptian Premier League",
+  "south african premier division":"South African Premier Division",
+  "moroccan botola":"Moroccan Botola",
+  "colombian primera a":"Colombian Primera A",
+  "chilean primera division":"Chilean Primera Division",
+  "uruguayan primera division":"Uruguayan Primera Division",
+  "paraguayan primera division":"Paraguayan Primera Division",
+  "ecuadorian serie a":"Ecuadorian Serie A",
+  "peruvian liga 1":"Peruvian Liga 1",
   "1. lig":"1. Lig",
   "2. lig":"2. Lig",
   "3. lig":"3. Lig",
-  "mls":"MLS",
-  "liga mx":"Liga MX",
-  "brasileirao":"Brasileirão",
-  "argentina primera":"Argentina Primera Division",
-  "saudi pro league":"Saudi Pro League",
-  "premier league 2":"Premier League 2",
+  "copa del rey":"Copa del Rey",
+  "coppa italia":"Coppa Italia",
   "fa cup":"FA Cup",
   "efl cup":"EFL Cup",
   "dfb pokal":"DFB-Pokal",
+  "coupe de france":"Coupe de France",
   "supercoppa italiana":"Supercoppa Italiana",
   "supercopa de espana":"Supercopa de España",
-  "uefa super cup":"UEFA Super Cup"
+  "uefa super cup":"UEFA Super Cup",
+  "fifa club world cup":"FIFA Club World Cup",
+  "world cup":"FIFA World Cup",
+  "copa america":"Copa América",
+  "afcon":"Africa Cup of Nations",
+  "asian cup":"AFC Asian Cup",
+  "concacaf gold cup":"CONCACAF Gold Cup",
+  "copa libertadores":"Copa Libertadores",
+  "copa sudamericana":"Copa Sudamericana",
+  "concacaf champions cup":"CONCACAF Champions Cup",
+  "caf champions league":"CAF Champions League",
+  "afc champions league elite":"AFC Champions League Elite",
+  "afc champions league two":"AFC Champions League Two",
+  "uefa youth league":"UEFA Youth League",
+  "premier league 2":"Premier League 2",
+  "championship":"EFL Championship",
+  "league one":"EFL League One",
+  "league two":"EFL League Two",
+  "2. bundesliga":"2. Bundesliga",
+  "3. liga":"3. Liga",
+  "serie b":"Serie B",
+  "serie c":"Serie C",
+  "segunda division":"Segunda Division",
+  "ligue 2":"Ligue 2"
 };
 
 const LEAGUE_PRIORITY={
   "premier league":0,
-  "uefa national league":1,
-  "la liga":2,
+  "la liga":1,
+  "nations league":2,
   "bundesliga":3,
   "serie a":4,
   "ligue 1":5,
-
   "champions league":6,
   "europa league":7,
-  "saudi pro league":8,
-  "brasileirao":9,
-  "liga mx":10,
-  "primeira liga":11,
-  "eredivisie":12,
-  "mls":13,
-  "argentina primera":14,
-  "scottish premiership":15,
-  "jupiler pro league":16,
-  "turkish super lig":17,
-  "austrian bundesliga":18,
-  "swiss super league":19,
-  "greek super league":20,
-  "danish superliga":21,
-  "norwegian eliteserien":22,
-  "swedish allsvenskan":23,
-  "polish ekstraklasa":24,
-  "czech first league":25,
-  "croatian hnl":26,
-  "ukrainian premier league":27,
-  "serbian super liga":28,
-  "romanian superliga":29,
-  "j1 league":30,
-  "k league 1":31,
-  "chinese super league":32,
-  "a-league":33,
-  "indian super league":34,
-  "thai league 1":35,
-  "vietnam v.league 1":36,
-  "malaysia super league":37,
-  "indonesia liga 1":38,
-  "persian gulf pro league":39,
-  "qatar stars league":40,
-  "uae pro league":41,
-  "egyptian premier league":42,
-  "south african premier division":43,
-  "moroccan botola":44,
-  "colombian primera a":45,
-  "chilean primera division":46,
-  "uruguayan primera division":47,
-  "paraguayan primera division":48,
-  "ecuadorian serie a":49,
-  "peruvian liga 1":50,
-
-  "copa del rey":51,
-  "coppa italia":52,
-  "fa cup":53,
-  "efl cup":54,
-  "dfb pokal":55,
-  "coupe de france":56,
-  "supercoppa italiana":57,
-  "supercopa de espana":58,
-  "uefa super cup":59,
-  "conference league":60,
-  "fifa club world cup":61,
-  "world cup":62,
-  "copa america":63,
-  "afcon":64,
-  "asian cup":65,
-  "concacaf gold cup":66,
-
-  "premier league 2":67,
-  "championship":68,
-  "league one":69,
-  "league two":70,
-  "2. bundesliga":71,
-  "3. liga":72,
-  "serie b":73,
-  "serie c":74,
-  "segunda division":75,
-  "ligue 2":76
+  "conference league":8,
+  "saudi pro league":9,
+  "brasileirao":10,
+  "liga mx":11,
+  "primeira liga":12,
+  "eredivisie":13,
+  "mls":14,
+  "argentina primera":15,
+  "scottish premiership":16,
+  "jupiler pro league":17,
+  "turkish super lig":18,
+  "super league":19,
+  "austrian bundesliga":20,
+  "swiss super league":21,
+  "greek super league":22,
+  "danish superliga":23,
+  "norwegian eliteserien":24,
+  "swedish allsvenskan":25,
+  "polish ekstraklasa":26,
+  "czech first league":27,
+  "croatian hnl":28,
+  "ukrainian premier league":29,
+  "serbian super liga":30,
+  "romanian superliga":31,
+  "j1 league":32,
+  "k league 1":33,
+  "chinese super league":34,
+  "a-league":35,
+  "indian super league":36,
+  "thai league 1":37,
+  "vietnam v.league 1":38,
+  "malaysia super league":39,
+  "indonesia liga 1":40,
+  "persian gulf pro league":41,
+  "qatar stars league":42,
+  "uae pro league":43,
+  "egyptian premier league":44,
+  "south african premier division":45,
+  "moroccan botola":46,
+  "colombian primera a":47,
+  "chilean primera division":48,
+  "uruguayan primera division":49,
+  "paraguayan primera division":50,
+  "ecuadorian serie a":51,
+  "peruvian liga 1":52,
+  "copa del rey":53,
+  "coppa italia":54,
+  "fa cup":55,
+  "efl cup":56,
+  "dfb pokal":57,
+  "coupe de france":58,
+  "supercoppa italiana":59,
+  "supercopa de espana":60,
+  "uefa super cup":61,
+  "fifa club world cup":62,
+  "world cup":63,
+  "copa america":64,
+  "afcon":65,
+  "asian cup":66,
+  "concacaf gold cup":67,
+  "copa libertadores":68,
+  "copa sudamericana":69,
+  "concacaf champions cup":70,
+  "caf champions league":71,
+  "afc champions league elite":72,
+  "afc champions league two":73,
+  "uefa youth league":74,
+  "premier league 2":75,
+  "1. lig":76,
+  "2. lig":77,
+  "3. lig":78,
+  "championship":79,
+  "league one":80,
+  "league two":81,
+  "2. bundesliga":82,
+  "3. liga":83,
+  "serie b":84,
+  "serie c":85,
+  "segunda division":86,
+  "ligue 2":87
 };
+
+const LEAGUE_EXTRA_ALIASES=[
+  ["uefa national league","nations league"],
+  ["uefa national ligi","nations league"],
+  ["national league uefa","nations league"],
+  ["unl","nations league"],
+  ["unl group","nations league"],
+  ["uefa nl","nations league"],
+  ["uefa nations","nations league"],
+  ["nations league","nations league"],
+  ["uefa nations league","nations league"],
+  ["nations ligi","nations league"],
+  ["milletler ligi","nations league"],
+  ["milletler lig","nations league"],
+  ["premier ligi","premier league"],
+  ["premier lig","premier league"],
+  ["epl","premier league"],
+  ["esl","premier league"],
+  ["laliga","la liga"],
+  ["la-liga","la liga"],
+  ["la_liga","la liga"],
+  ["spanish league","la liga"],
+  ["uefa cl","champions league"],
+  ["ucl","champions league"],
+  ["uefa europa league","europa league"],
+  ["uel","europa league"],
+  ["uefa conference league","conference league"],
+  ["uecl","conference league"],
+  ["tff super lig","turkish super lig"],
+  ["tff super league","turkish super lig"],
+  ["super lig turkey","turkish super lig"],
+  ["turkey super lig","turkish super lig"],
+  ["turkish super lig","turkish super lig"],
+  ["turkish super league","turkish super lig"],
+  ["super lig","turkish super lig"],
+  ["süper lig","turkish super lig"],
+  ["turkiye super lig","turkish super lig"],
+  ["türkiye süper lig","turkish super lig"],
+  ["turkiye super league","turkish super lig"],
+  ["türkiye super league","turkish super lig"],
+  ["turkey super league","turkish super lig"],
+  ["turkey super lig","turkish super lig"],
+  ["turkish league","turkish super lig"],
+  ["turkiye ligi","turkish super lig"],
+  ["türkiye ligi","turkish super lig"],
+  ["j1","j1 league"],
+  ["j league","j1 league"],
+  ["j1 league","j1 league"],
+  ["k league","k league 1"],
+  ["k league 1","k league 1"],
+  ["a league","a-league"],
+  ["australian a league","a-league"],
+  ["major league soccer","mls"],
+  ["usa mls","mls"],
+  ["liga mx","liga mx"],
+  ["brasileirao serie a","brasileirao"],
+  ["brazilian serie a","brasileirao"],
+  ["saudi professional league","saudi pro league"],
+  ["saudi league","saudi pro league"],
+  ["copa del rey","copa del rey"],
+  ["king's cup spain","copa del rey"],
+  ["italian cup","coppa italia"],
+  ["carabao cup","efl cup"],
+  ["league cup england","efl cup"],
+  ["german cup","dfb pokal"],
+  ["french cup","coupe de france"],
+  ["african cup of nations","afcon"],
+  ["africa cup of nations","afcon"],
+  ["fifa world cup","world cup"],
+  ["world championship","world cup"],
+  ["copa libertadores","copa libertadores"],
+  ["libertadores","copa libertadores"],
+  ["conmebol libertadores","copa libertadores"],
+  ["copa sudamericana","copa sudamericana"],
+  ["sudamericana","copa sudamericana"],
+  ["concacaf champions cup","concacaf champions cup"],
+  ["concacaf champions league","concacaf champions cup"],
+  ["caf champions league","caf champions league"],
+  ["africa champions league","caf champions league"],
+  ["afc champions league elite","afc champions league elite"],
+  ["afc champions league","afc champions league elite"],
+  ["afc champions league two","afc champions league two"],
+  ["uefa youth league","uefa youth league"]
+];
+
+for(const [alias,canonical] of LEAGUE_EXTRA_ALIASES){
+  LEAGUE_CANONICAL_ALIASES.set(alias,canonical);
+}
 
 const LEAGUE_ALIAS_NORMALIZED=
   new Map();
@@ -4405,249 +4372,145 @@ for(
   );
 }
 
-function canonicalLeagueKey(
-  value
-){
-  const raw=
-    normalizeTurkishText(
-      String(
-        value??""
-      )
-    ).trim();
+const LEAGUE_ALIAS_ENTRIES=[...LEAGUE_CANONICAL_ALIASES.entries()]
+  .map(([alias,canonical])=>[
+    normalizeSearchText(alias),
+    canonical,
+    normalizeSearchText(alias).replace(/\s+/g,"")
+  ])
+  .filter(item=>item[0]&&item[1])
+  .sort((a,b)=>b[0].length-a[0].length);
 
-  if(
-    !raw
-  ){
+const LEAGUE_ALIAS_SEARCH_MAP=new Map();
+
+for(const [alias,canonical] of LEAGUE_CANONICAL_ALIASES){
+  const key=String(canonical||"");
+  const value=normalizeSearchText(alias);
+
+  if(!key||!value){
+    continue;
+  }
+
+  const bucket=LEAGUE_ALIAS_SEARCH_MAP.get(key)||[];
+  bucket.push(value);
+  LEAGUE_ALIAS_SEARCH_MAP.set(key,bucket);
+}
+
+function hasLeaguePhrase(text,phrase){
+  return new RegExp(`(^|\\s)${escapeRegex(phrase)}(?=\\s|$)`,`i`).test(text);
+}
+
+function canonicalLeagueKey(value){
+  const raw=normalizeTurkishText(String(value??"")).trim();
+
+  if(!raw){
     return "other";
   }
 
-  const translated=
-    translateText(
-      raw
-    );
+  const rawNormalized=normalizeSearchText(raw);
+  const translatedNormalized=normalizeSearchText(translateText(raw));
+  const candidates=[
+    rawNormalized,
+    translatedNormalized
+  ].filter((item,index,array)=>item&&array.indexOf(item)===index);
 
-  const normalized=
-    normalizeSearchText(
-      translated
-    );
+  for(const normalized of candidates){
+    const compact=normalized.replace(/\s+/g,"");
 
-  if(
-    LEAGUE_ALIAS_NORMALIZED.has(
-      normalized
-    )
-  ){
-    return LEAGUE_ALIAS_NORMALIZED.get(
-      normalized
-    );
+    const exact=LEAGUE_ALIAS_NORMALIZED.get(normalized);
+    if(exact){
+      return exact;
+    }
+
+    const compactExact=LEAGUE_ALIAS_NORMALIZED.get(compact);
+    if(compactExact){
+      return compactExact;
+    }
+
+    const majorPatterns=[
+      ["premier league 2","premier league 2"],
+      ["premierleague2","premier league 2"],
+      ["premier league","premier league"],
+      ["laliga","la liga"],
+      ["la liga","la liga"],
+      ["nations league","nations league"],
+      ["national league uefa","nations league"],
+      ["champions league","champions league"],
+      ["europa league","europa league"],
+      ["conference league","conference league"],
+      ["bundesliga","bundesliga"],
+      ["serie a","serie a"],
+      ["ligue 1","ligue 1"],
+      ["saudi pro league","saudi pro league"],
+      ["brasileirao","brasileirao"],
+      ["major league soccer","mls"],
+      ["liga mx","liga mx"],
+      ["primeira liga","primeira liga"],
+      ["eredivisie","eredivisie"],
+      ["j1 league","j1 league"],
+      ["k league 1","k league 1"],
+      ["a league","a-league"],
+      ["coppa italia","coppa italia"],
+      ["copa del rey","copa del rey"],
+      ["fa cup","fa cup"],
+      ["efl cup","efl cup"],
+      ["dfb pokal","dfb pokal"],
+      ["uefa super cup","uefa super cup"],
+      ["fifa club world cup","fifa club world cup"],
+      ["world cup","world cup"],
+      ["copa america","copa america"],
+      ["afcon","afcon"],
+      ["asian cup","asian cup"],
+      ["concacaf gold cup","concacaf gold cup"],
+      ["copa libertadores","copa libertadores"],
+      ["copa sudamericana","copa sudamericana"],
+      ["concacaf champions cup","concacaf champions cup"],
+      ["caf champions league","caf champions league"],
+      ["afc champions league elite","afc champions league elite"],
+      ["afc champions league two","afc champions league two"],
+      ["uefa youth league","uefa youth league"]
+    ];
+
+    for(const [phrase,key] of majorPatterns){
+      if(phrase.includes(" ")?hasLeaguePhrase(normalized,phrase):compact.includes(phrase)){
+        return key;
+      }
+    }
+
+    for(const [alias,canonical,aliasCompact] of LEAGUE_ALIAS_ENTRIES){
+      if(alias.length>=3&&hasLeaguePhrase(normalized,alias)){
+        return canonical;
+      }
+
+      if(aliasCompact.length>=4&&compact.includes(aliasCompact)){
+        return canonical;
+      }
+    }
+
+    const countryHints=[
+      ["almanya ligi","bundesliga"],
+      ["almanya","bundesliga"],
+      ["germany bundesliga","bundesliga"],
+      ["italya ligi","serie a"],
+      ["italian league","serie a"],
+      ["fransa ligi","ligue 1"],
+      ["french league","ligue 1"],
+      ["hollanda ligi","eredivisie"],
+      ["portekiz ligi","primeira liga"],
+      ["belcika ligi","jupiler pro league"],
+      ["belçika ligi","jupiler pro league"],
+      ["iskocya premier","scottish premiership"],
+      ["iskoçya premier","scottish premiership"]
+    ];
+
+    for(const [phrase,key] of countryHints){
+      if(hasLeaguePhrase(normalized,phrase)){
+        return key;
+      }
+    }
   }
 
-  const compact=
-    normalized.replace(
-      /\s+/g,
-      ""
-    );
-
-  if(
-    LEAGUE_ALIAS_NORMALIZED.has(
-      compact
-    )
-  ){
-    return LEAGUE_ALIAS_NORMALIZED.get(
-      compact
-    );
-  }
-
-  if(
-    compact.includes(
-      "laliga"
-    )
-  ){
-    return "la liga";
-  }
-
-  if(
-    compact.includes(
-      "championsleague"
-    ) ||
-    compact==="ucl"
-  ){
-    return "champions league";
-  }
-
-  if(
-    compact.includes(
-      "europaleague"
-    ) ||
-    compact==="uel"
-  ){
-    return "europa league";
-  }
-
-  if(
-    compact.includes(
-      "conferenceleague"
-    ) ||
-    compact==="uecl"
-  ){
-    return "conference league";
-  }
-
-  if(
-    compact.includes(
-      "nationsleague"
-    )
-  ){
-    return "nations league";
-  }
-
-  if(
-    compact.includes(
-      "premierleague2"
-    )
-  ){
-    return "premier league 2";
-  }
-
-  if(
-    compact.includes(
-      "premierleague"
-    )
-  ){
-    return "premier league";
-  }
-
-  if(
-    compact.includes(
-      "bundesliga"
-    )
-  ){
-    return "bundesliga";
-  }
-
-  if(
-    compact.includes(
-      "seriea"
-    )
-  ){
-    return "serie a";
-  }
-
-  if(
-    compact.includes(
-      "ligue1"
-    )
-  ){
-    return "ligue 1";
-  }
-
-  if(
-    compact.includes(
-      "superlig"
-    ) ||
-    compact.includes(
-      "superleague"
-    )
-  ){
-    return "super league";
-  }
-
-  if(
-    compact.includes(
-      "turkeycup"
-    ) ||
-    compact.includes(
-      "turkishcup"
-    ) ||
-    compact.includes(
-      "turkiyekupasi"
-    )
-  ){
-    return "turkey cup";
-  }
-
-  if(
-    compact.includes(
-      "coppaitalia"
-    )
-  ){
-    return "coppa italia";
-  }
-
-  if(
-    compact.includes(
-      "copadelrey"
-    )
-  ){
-    return "copa del rey";
-  }
-
-  if(
-    compact.includes(
-      "eredivisie"
-    )
-  ){
-    return "eredivisie";
-  }
-
-  if(
-    compact.includes(
-      "primeiraliga"
-    )
-  ){
-    return "primeira liga";
-  }
-
-  if(
-    compact.includes(
-      "scottishpremiership"
-    )
-  ){
-    return "scottish premiership";
-  }
-
-  if(
-    compact.includes(
-      "jupilerproleague"
-    )
-  ){
-    return "jupiler pro league";
-  }
-
-  if(
-    compact.includes(
-      "majorleaguesoccer"
-    ) ||
-    compact==="mls"
-  ){
-    return "mls";
-  }
-
-  if(
-    compact.includes(
-      "ligamx"
-    )
-  ){
-    return "liga mx";
-  }
-
-  if(
-    compact.includes(
-      "brasileirao"
-    )
-  ){
-    return "brasileirao";
-  }
-
-  if(
-    compact.includes(
-      "saudiproleague"
-    )
-  ){
-    return "saudi pro league";
-  }
-
-  return normalized||
-    "other";
+  return rawNormalized||"other";
 }
 
 function canonicalLeagueLabel(
@@ -4670,24 +4533,23 @@ function canonicalLeagueLabel(
   );
 }
 
-function getLeaguePriority(
-  value
-){
-  const key=
-    canonicalLeagueKey(
-      value
-    );
+function getLeaguePriority(value){
+  const key=canonicalLeagueKey(value);
 
-  if(
-    Object.prototype.hasOwnProperty.call(
-      LEAGUE_PRIORITY,
-      key
-    )
-  ){
+  if(Object.prototype.hasOwnProperty.call(LEAGUE_PRIORITY,key)){
     return LEAGUE_PRIORITY[key];
   }
 
-  return 999;
+  const normalized=normalizeSearchText(value);
+  if(Object.prototype.hasOwnProperty.call(LEAGUE_PRIORITY,normalized)){
+    return LEAGUE_PRIORITY[normalized];
+  }
+
+  if(key==="nations league"||key==="uefa national league"){
+    return 2;
+  }
+
+  return 1000;
 }
 
 function sameLeague(
@@ -4723,125 +4585,75 @@ function normalizeIdentityPart(
   );
 }
 
-function stableChannelKey(
-  event,
-  index=""
-){
-  if(
-    !event ||
-    typeof event!=="object"
-  ){
+function stableChannelKey(event,index=""){
+  if(!event||typeof event!=="object"){
     return `fallback:${String(index)}`;
-  }
-
-  const directIds=[
-    event.id,
-    event.eventId,
-    event.channelId,
-    event.streamId,
-    event.matchId,
-    event.sourceId
-  ];
-
-  for(
-    const raw
-    of directIds
-  ){
-    const value=
-      normalizeSearchText(
-        raw||""
-      );
-
-    if(
-      value
-    ){
-      return `id:${value}`;
-    }
   }
 
   const urlCandidates=[
     event.url,
     event.streamUrl,
-    event.link
+    event.link,
+    event.href,
+    event.playUrl,
+    event.playerUrl
   ];
 
-  for(
-    const raw
-    of urlCandidates
-  ){
-    if(
-      !raw
-    ){
+  for(const raw of urlCandidates){
+    if(!raw){
       continue;
     }
 
     try{
-      const u=
-        new URL(
-          String(raw),
-          location.href
-        );
+      const url=new URL(String(raw),location.href);
+      const path=url.pathname.replace(/\/+$/g,"").toLowerCase();
+      const params=[...url.searchParams.entries()]
+        .filter(([key])=>!/^_?(t|ts|cb|cache|nocache)$/i.test(key))
+        .sort((a,b)=>{
+          const ak=`${a[0]}=${a[1]}`.toLowerCase();
+          const bk=`${b[0]}=${b[1]}`.toLowerCase();
+          return ak.localeCompare(bk,"en",{numeric:true});
+        });
 
-      const q=
-        u.searchParams.get(
-          "id"
-        )||
-        u.searchParams.get(
-          "stream_id"
-        )||
-        u.searchParams.get(
-          "channel"
-        )||
-        u.searchParams.get(
-          "channel_id"
-        );
+      const query=params.map(([key,value])=>
+        `${normalizeSearchText(key)}=${normalizeSearchText(value)}`
+      ).join("&");
 
-      if(q){
-        return `urlid:${normalizeSearchText(q)}`;
-      }
-
-      const clean=
-        (
-          u.origin+
-          u.pathname
-        )
-        .replace(
-          /\/$/,
-          ""
-        )
-        .toLowerCase();
-
-      if(
-        clean
-      ){
-        return `url:${clean}`;
+      if(path||query){
+        return `url:${url.origin.toLowerCase()}${path}${query?`?${query}`:""}`;
       }
     }catch(e){
-      const plain=
-        normalizeSearchText(
-          raw
-        );
-
-      if(
-        plain
-      ){
-        return `rawurl:${plain}`;
+      const rawKey=normalizeSearchText(raw);
+      if(rawKey){
+        return `rawurl:${rawKey}`;
       }
     }
   }
 
-  return (
-    `fallback:`+
-    normalizeSearchText(
-      event?.title||
-      "Live channel"
-    )+
-    `|`+
-    canonicalLeagueKey(
-      event?.league||
-      "other"
-    )
+  const directIds=[
+    event.channelId,
+    event.streamId,
+    event.eventId,
+    event.matchId,
+    event.sourceId,
+    event.id
+  ];
+
+  const normalizedTitle=normalizeSearchText(
+    event.title||event.name||event.channel||"Live channel"
   );
+
+  for(const raw of directIds){
+    const id=normalizeSearchText(raw);
+    if(id){
+      return `id:${id}|title:${normalizedTitle}`;
+    }
+  }
+
+  const league=canonicalLeagueKey(event.league||"");
+  const time=normalizeSearchText(event.time||event.status||"");
+
+  return `fallback:${normalizedTitle||"live channel"}|${league}|${time}`;
 }
 
 function eventFingerprint(
@@ -4941,6 +4753,9 @@ function getEventMeta(
   const league=
     canonicalLeagueLabel(
       event?.league||
+      event?.competition||
+      event?.tournament||
+      event?.title||
       ""
     );
 
@@ -4977,34 +4792,244 @@ function getEventMeta(
   return meta;
 }
 
-function refreshMetaSearch(
-  meta,
-  event
-){
-  meta.search=
-    normalizeSearchText([
-      meta.title,
-      meta.league,
-      meta.time,
-      event?.title||"",
-      event?.league||"",
-      event?.time||"",
-      event?.name||"",
-      event?.channel||"",
-      event?.channelId||"",
-      event?.eventId||"",
-      event?.streamId||"",
-      translateText(
-        event?.title||
-        ""
+function refreshMetaSearch(meta,event){
+  const rawLeague=String(event?.league||event?.competition||event?.tournament||event?.title||"");
+  const leagueKey=canonicalLeagueKey(rawLeague);
+  const aliases=LEAGUE_ALIAS_SEARCH_MAP.get(leagueKey)||[];
+
+  const values=[
+    meta.title,
+    meta.league,
+    meta.time,
+    event?.title||"",
+    event?.league||"",
+    event?.time||"",
+    event?.name||"",
+    event?.channel||"",
+    event?.channelId||"",
+    event?.eventId||"",
+    event?.streamId||"",
+    event?.matchId||"",
+    translateText(event?.title||""),
+    canonicalLeagueLabel(rawLeague),
+    ...aliases
+  ];
+
+  meta.search=normalizeSearchText(values.join(" "));
+}
+
+function pickFirstValue(object,keys,fallback=""){
+  for(const key of keys){
+    const value=object?.[key];
+
+    if(value===null||value===undefined){
+      continue;
+    }
+
+    const text=String(value).trim();
+
+    if(text){
+      return value;
+    }
+  }
+
+  return fallback;
+}
+
+function normalizeFeedEvent(raw,index=0){
+  if(raw===null||raw===undefined){
+    return null;
+  }
+
+  const source=
+    typeof raw==="object"&&raw!==null
+      ? {...raw}
+      : {title:String(raw)};
+
+  const home=pickFirstValue(source,[
+    "homeTeam","home_team","home","evSahibi","ev_sahibi","evsahibi","takim1","team1","homeName","home_name"
+  ]);
+  const away=pickFirstValue(source,[
+    "awayTeam","away_team","away","deplasman","takim2","team2","awayName","away_name"
+  ]);
+
+  let title=String(pickFirstValue(source,[
+    "title","name","matchName","match_name","fixture","fixtureName","eventName","event_name","channel","channelName","channel_name","baslik","başlık"
+  ],"")).trim();
+
+  if(!title&&home&&away){
+    title=`${String(home).trim()} vs ${String(away).trim()}`;
+  }
+
+  const league=String(pickFirstValue(source,[
+    "league","leagueName","league_name","competition","competitionName","competition_name","tournament","tournamentName","tournament_name","lig","liga","turnuva","organizasyon"
+  ],"")).trim();
+
+  const time=String(pickFirstValue(source,[
+    "time","matchTime","match_time","status","startTime","start_time","startAt","start_at","kickoff","kickOff","kick_off","dateTime","datetime","date","saat","baslangic","başlangıç"
+  ],"ONLINE")).trim();
+
+  const url=String(pickFirstValue(source,[
+    "url","streamUrl","stream_url","link","href","playUrl","play_url","playerUrl","player_url","source","src","iframe","embed","embedUrl","embed_url"
+  ],"")).trim();
+
+  const normalized={
+    ...source,
+    title:title||`Live Channel ${index+1}`,
+    league:league||String(source.league||source.competition||"Live Feed").trim(),
+    time:time||"ONLINE"
+  };
+
+  if(url){
+    normalized.url=url;
+  }
+
+  if(home&&!normalized.homeTeam){
+    normalized.homeTeam=String(home);
+  }
+
+  if(away&&!normalized.awayTeam){
+    normalized.awayTeam=String(away);
+  }
+
+  return normalized;
+}
+
+function normalizeAndDedupeFeed(events){
+  if(!Array.isArray(events)){
+    return [];
+  }
+
+  const output=[];
+  const seen=new Set();
+
+  for(let i=0;i<events.length&&output.length<5000;i++){
+    const event=normalizeFeedEvent(events[i],i);
+
+    if(!event){
+      continue;
+    }
+
+    const title=normalizeSearchText(event.title||"");
+    const url=String(event.url||event.streamUrl||event.link||event.href||"").trim();
+    const ids=[event.channelId,event.streamId,event.eventId,event.matchId,event.sourceId,event.id]
+      .map(value=>normalizeSearchText(value||""))
+      .filter(Boolean);
+
+    if(!title&&!url&&!ids.length){
+      continue;
+    }
+
+    const key=stableChannelKey(event,i);
+
+    if(seen.has(key)){
+      continue;
+    }
+
+    seen.add(key);
+    output.push(event);
+  }
+
+  return output;
+}
+
+function isLiveEvent(event){
+  const direct=[
+    event?.live,event?.isLive,event?.liveNow,event?.is_live,event?.online,event?.isOnline,event?.onAir,event?.on_air,event?.started,event?.startedNow,event?.ongoing
+  ];
+
+  if(direct.some(value=>value===true||String(value).toLowerCase()==="true")){
+    return true;
+  }
+
+  const status=normalizeSearchText([
+    event?.status||"",
+    event?.time||"",
+    event?.liveStatus||"",
+    event?.streamStatus||""
+  ].join(" "));
+
+  if(!status){
+    return false;
+  }
+
+  if(/\b(not live|offline|upcoming|scheduled|postponed|cancelled|canceled|ended|finished|pre match|prematch)\b/i.test(status)){
+    return false;
+  }
+
+  return /\b(live|online|on air|onair|now|canli|yayin|yayinda|started|ongoing|halftime|half time)\b/i.test(status);
+}
+
+function eventTimeMinutes(event){
+  const source=String(event?.time||event?.startTime||event?.kickoff||event?.dateTime||"").trim();
+  const match=source.match(/\b(\d{1,2})[:.](\d{2})\s*(am|pm)?\b/i);
+
+  if(match){
+    let hour=Number(match[1]);
+    const minute=Number(match[2]);
+    const meridiem=String(match[3]||"").toLowerCase();
+
+    if(minute>59||hour>23){
+      return Number.POSITIVE_INFINITY;
+    }
+
+    if(meridiem==="pm"&&hour<12){
+      hour+=12;
+    }
+
+    if(meridiem==="am"&&hour===12){
+      hour=0;
+    }
+
+    return hour*60+minute;
+  }
+
+  const stamp=Date.parse(source);
+
+  return Number.isFinite(stamp)
+    ? new Date(stamp).getHours()*60+new Date(stamp).getMinutes()
+    : Number.POSITIVE_INFINITY;
+}
+
+function getSortedLiveEntries(){
+  if(!Array.isArray(liveEvents)){
+    return [];
+  }
+
+  return liveEvents
+    .map((event,index)=>({
+      event,
+      index,
+      live:isLiveEvent(event),
+      leagueKey:canonicalLeagueKey(
+        event?.league||event?.competition||event?.tournament||event?.title||""
       ),
-      canonicalLeagueLabel(
-        event?.league||
-        ""
-      )
-    ].join(
-      " "
-    ));
+      priority:getLeaguePriority(
+        event?.league||event?.competition||event?.tournament||event?.title||""
+      ),
+      time:eventTimeMinutes(event),
+      title:normalizeSearchText(event?.title||event?.name||"Live channel"),
+      key:stableChannelKey(event,index)
+    }))
+    .sort((a,b)=>{
+      if(a.priority!==b.priority){
+        return a.priority-b.priority;
+      }
+
+      if(a.live!==b.live){
+        return a.live?-1:1;
+      }
+
+      if(a.time!==b.time){
+        return a.time-b.time;
+      }
+
+      if(a.title!==b.title){
+        return a.title.localeCompare(b.title,"en",{sensitivity:"base",numeric:true});
+      }
+
+      return a.key.localeCompare(b.key,"en",{sensitivity:"base",numeric:true})||a.index-b.index;
+    });
 }
 
 function migrateStoredEventState(
@@ -5816,21 +5841,8 @@ function renderLeagueTabs(){
     [...counts.entries()]
     .sort(
       (a,b)=>{
-        const pa=
-          Object.prototype.hasOwnProperty.call(
-            LEAGUE_PRIORITY,
-            a[0]
-          )
-            ? LEAGUE_PRIORITY[a[0]]
-            : 1000;
-
-        const pb=
-          Object.prototype.hasOwnProperty.call(
-            LEAGUE_PRIORITY,
-            b[0]
-          )
-            ? LEAGUE_PRIORITY[b[0]]
-            : 1000;
+        const pa=getLeaguePriority(a[0]);
+        const pb=getLeaguePriority(b[0]);
 
         if(
           pa!==pb
@@ -5942,10 +5954,7 @@ function renderLeagueTabs(){
       meta.label,
       key,
       meta.count,
-      Object.prototype.hasOwnProperty.call(
-        LEAGUE_PRIORITY,
-        key
-      )
+      getLeaguePriority(key)<1000
     );
   }
 
@@ -6071,19 +6080,14 @@ function updateAnalytics(){
 
   let favorites=0;
 
-  for(
-    let i=0;
-    i<liveEvents.length;
-    i++
-  ){
-    if(
-      favoriteKeys.includes(
-        eventKey(
-          liveEvents[i],
-          i
-        )
-      )
-    ){
+  for(let i=0;i<liveEvents.length;i++){
+    if(favoriteKeys.includes(eventKey(liveEvents[i],i))){
+      favorites++;
+    }
+  }
+
+  for(let i=0;i<STATIC_CHANNELS.length;i++){
+    if(favoriteKeys.includes(eventKey(STATIC_CHANNELS[i],i))){
       favorites++;
     }
   }
@@ -6202,261 +6206,96 @@ function scheduleTranslationRender(){
     );
 }
 
-function hydrateEventMeta(
-  event,
-  index,
-  meta
-){
-  if(
-    !meta ||
-    meta.translationStarted
-  ){
+function hydrateEventMeta(event,index,meta){
+  if(!meta||meta.translationStarted){
     return;
   }
 
-  meta.translationStarted=
-    true;
+  meta.translationStarted=true;
 
-  const titleSource=
-    String(
-      event?.title||
-      "Live channel"
-    );
-
-  const leagueSource=
-    String(
-      event?.league||
-      "Live feed"
-    );
-
-  const timeSource=
-    String(
-      event?.time||
-      "ONLINE"
-    );
+  const titleSource=String(event?.title||"Live channel");
+  const leagueSource=String(event?.league||"Live feed");
+  const timeSource=String(event?.time||"ONLINE");
 
   Promise.all([
-    translateTextAdvanced(
-      titleSource
-    ),
-    translateTextAdvanced(
-      leagueSource
-    ),
-    translateTextAdvanced(
-      timeSource
-    )
+    translateTextAdvanced(titleSource),
+    translateTextAdvanced(leagueSource),
+    Promise.resolve(translateText(timeSource)||"ONLINE")
   ])
-  .then(
-    (
-      [
-        title,
-        league,
-        time
-      ]
-    )=>{
-      const nextTitle=
-        title||
-        translateText(
-          titleSource
-        )||
-        "Live channel";
-
-      const nextLeague=
-        canonicalLeagueLabel(
-          league||
-          translateText(
-            leagueSource
-          )||
-          "Other"
-        );
-
-      const nextTime=
-        time||
-        translateText(
-          timeSource
-        )||
-        "ONLINE";
+    .then(([title,league,time])=>{
+      const nextTitle=title||translateText(titleSource)||"Live channel";
+      const nextLeague=canonicalLeagueLabel(
+        league||translateText(leagueSource)||"Other"
+      );
+      const nextTime=time||translateText(timeSource)||"ONLINE";
 
       const changed=
-        meta.title!==
-        nextTitle ||
-        meta.league!==
-        nextLeague ||
-        meta.time!==
-        nextTime;
+        meta.title!==nextTitle||
+        meta.league!==nextLeague||
+        meta.time!==nextTime;
 
-      meta.title=
-        nextTitle;
+      meta.title=nextTitle;
+      meta.league=nextLeague;
+      meta.time=nextTime;
+      refreshMetaSearch(meta,event);
 
-      meta.league=
-        nextLeague;
-
-      meta.time=
-        nextTime;
-
-      refreshMetaSearch(
-        meta,
-        event
-      );
-
-      if(
-        changed
-      ){
+      if(changed){
         scheduleTranslationRender();
       }
-    }
-  )
-  .catch(
-    ()=>{
-      meta.title=
-        translateText(
-          titleSource
-        )||
-        "Live channel";
-
-      meta.league=
-        canonicalLeagueLabel(
-          leagueSource
-        );
-
-      meta.time=
-        translateText(
-          timeSource
-        )||
-        "ONLINE";
-
-      refreshMetaSearch(
-        meta,
-        event
-      );
-    }
-  );
+    })
+    .catch(()=>{
+      meta.title=translateText(titleSource)||"Live channel";
+      meta.league=canonicalLeagueLabel(leagueSource);
+      meta.time=translateText(timeSource)||"ONLINE";
+      refreshMetaSearch(meta,event);
+    });
 }
 
 function renderMatches(){
-  const container=
-    document.getElementById(
-      "serverContainer"
-    );
+  const container=document.getElementById("serverContainer");
 
-  if(
-    !container
-  ){
+  if(!container){
     return;
   }
 
-  const input=
-    document.getElementById(
-      "searchChannels"
-    );
-
-  const rawQuery=
-    (
-      input?.value||
-      ""
-    ).trim();
-
-  const searchQuery=
-    normalizeSearchText(
-      rawQuery
-    );
-
-  const fragment=
-    document.createDocumentFragment();
-
+  const input=document.getElementById("searchChannels");
+  const rawQuery=(input?.value||"").trim();
+  const searchQuery=normalizeSearchText(rawQuery);
+  const searchTokens=searchQuery.split(" ").filter(Boolean);
+  const fragment=document.createDocumentFragment();
   let visibleCount=0;
   let displayIndex=0;
 
-  for(
-    let index=0;
-    index<
-    liveEvents.length;
-    index++
-  ){
-    const event=
-      liveEvents[
-        index
-      ];
+  const entries=getSortedLiveEntries();
 
-    const meta=
-      getEventMeta(
-        event,
-        index
-      );
+  for(const entry of entries){
+    const event=entry.event;
+    const sourceIndex=entry.index;
+    const meta=getEventMeta(event,sourceIndex);
 
-    hydrateEventMeta(
-      event,
-      index,
-      meta
-    );
+    hydrateEventMeta(event,sourceIndex,meta);
 
-    const leagueKey=
-      canonicalLeagueKey(
-        event?.league||
-        ""
-      );
+    const leagueKey=canonicalLeagueKey(event?.league||"");
 
-    if(
-      currentLeague!=="all" &&
-      leagueKey!==
-      currentLeague
-    ){
+    if(currentLeague!=="all"&&leagueKey!==currentLeague){
       continue;
     }
 
-    if(
-      searchQuery &&
-      !meta.search.includes(
-        searchQuery
-      ) &&
-      !normalizeSearchText(
-        canonicalLeagueLabel(
-          leagueKey
-        )
-      ).includes(
-        searchQuery
-      )
-    ){
+    if(searchTokens.length&&!searchTokens.every(token=>meta.search.includes(token))){
       continue;
     }
 
     displayIndex++;
 
-    const favorite=
-      favoriteKeys.includes(
-        meta.key
-      );
+    const favorite=favoriteKeys.includes(meta.key);
+    const row=document.createElement("div");
 
-    const row=
-      document.createElement(
-        "div"
-      );
-
-    row.className=
-      "server-item";
-
-    row.tabIndex=
-      0;
-
-    row.setAttribute(
-      "role",
-      "button"
-    );
-
-    row.setAttribute(
-      "aria-label",
-      "Play "+
-      meta.title
-    );
-
-    row.setAttribute(
-      "title",
-      "Play "+
-      meta.title
-    );
-
-    row.dataset.channelKey=
-      meta.key;
+    row.className="server-item";
+    row.tabIndex=0;
+    row.setAttribute("role","button");
+    row.setAttribute("aria-label","Play "+meta.title);
+    row.setAttribute("title","Play "+meta.title);
+    row.dataset.channelKey=meta.key;
 
     row.innerHTML=
       `<div class="channel-main">`+
@@ -6474,115 +6313,52 @@ function renderMatches(){
         `<button class="fav-toggle ${favorite?"active":""}" type="button" aria-label="${favorite?"Remove from":"Add to"} favorites" aria-pressed="${favorite}">★</button>`+
       `</div>`;
 
-    row.onclick=
-      ()=>{
-        setServer(
-          event,
-          row
-        );
-      };
+    row.onclick=()=>setServer(event,row);
 
-    row.onkeydown=
-      ev=>{
-        if(
-          ev.key==="Enter"||
-          ev.key===" "
-        ){
-          ev.preventDefault();
+    row.onkeydown=ev=>{
+      if(ev.key==="Enter"||ev.key===" "){
+        ev.preventDefault();
+        setServer(event,row);
+      }
+    };
 
-          setServer(
-            event,
-            row
-          );
-        }
-      };
+    const favButton=row.querySelector(".fav-toggle");
 
-    const favButton=
-      row.querySelector(
-        ".fav-toggle"
-      );
-
-    favButton.onclick=
-      ev=>{
+    if(favButton){
+      favButton.onclick=ev=>{
         ev.stopPropagation();
 
-        if(
-          favorite
-        ){
-          favoriteKeys=
-            favoriteKeys.filter(
-              key=>
-                key!==
-                meta.key
-            );
+        if(favorite){
+          favoriteKeys=favoriteKeys.filter(key=>key!==meta.key);
         }else{
-          favoriteKeys=[
-            ...favoriteKeys,
-            meta.key
-          ];
+          favoriteKeys=[...new Set([...favoriteKeys,meta.key])];
         }
 
-        storageSet(
-          "talhaFavorites",
-          JSON.stringify(
-            favoriteKeys
-          )
-        );
-
+        storageSet("talhaFavorites",JSON.stringify(favoriteKeys));
         renderMatches();
         updateAnalytics();
       };
+    }
 
-    fragment.appendChild(
-      row
-    );
-
+    fragment.appendChild(row);
     visibleCount++;
   }
 
-  if(
-    !visibleCount
-  ){
-    const empty=
-      document.createElement(
-        "div"
-      );
-
-    empty.className=
-      "empty-state";
-
-    empty.textContent=
-      "No channels match your filters.";
-
-    fragment.appendChild(
-      empty
-    );
+  if(!visibleCount){
+    const empty=document.createElement("div");
+    empty.className="empty-state";
+    empty.textContent=searchQuery
+      ? "No channels match your search."
+      : "No channels match your filters.";
+    fragment.appendChild(empty);
   }
 
-  container.replaceChildren(
-    fragment
-  );
+  container.replaceChildren(fragment);
+  renderStaticChannels();
 
-  const summary=
-    document.getElementById(
-      "channelSummary"
-    );
-
-  if(
-    summary
-  ){
-    summary.textContent=
-      `${visibleCount} shown · ${liveEvents.length} total`;
-  }
-
-  if(
-    lastStaticStart!==
-    liveEvents.length
-  ){
-    renderStaticChannels();
-
-    lastStaticStart=
-      liveEvents.length;
+  const summary=document.getElementById("channelSummary");
+  if(summary){
+    summary.textContent=`${visibleCount} shown · ${liveEvents.length} total`;
   }
 
   updateAnalytics();
@@ -6842,84 +6618,56 @@ function showFeedChangePopup(
     );
 }
 
-function resolvePlaybackUrl(
-  event
-){
-  const PLAYER_BASE=
-    window.__PLAYER_URL_FOR_SESSION||
-    PLAYER_BASE_URL;
+function resolvePlaybackUrl(event){
+  const PLAYER_BASE=window.__PLAYER_URL_FOR_SESSION||PLAYER_BASE_URL;
+  const rawCandidate=
+    event?.url||
+    event?.streamUrl||
+    event?.link||
+    event?.href||
+    event?.playUrl||
+    event?.playerUrl||
+    "";
 
-  if(
-    event?.url
-  ){
-    const raw=
-      String(
-        event.url
-      );
+  const raw=String(rawCandidate||"").trim();
 
-    const lower=
-      raw.toLowerCase();
+  if(event?.isIframeOnly===true&&raw){
+    return raw;
+  }
 
-    if(
-      event.isIframeOnly===
-      true
-    ){
-      return raw;
+  if(raw){
+    const lower=raw.toLowerCase();
+
+    if(lower.includes(".m3u8")){
+      return `${PLAYER_BASE}?Talha=${encodeURIComponent(raw)}`;
     }
 
-    if(
-      lower.includes(
-        ".m3u8"
-      )
-    ){
-      return (
-        `${PLAYER_BASE}?Talha=`+
-        encodeURIComponent(
-          raw
-        )
-      );
-    }
+    try{
+      const parsed=new URL(raw,location.href);
+      const id=
+        parsed.searchParams.get("id")||
+        parsed.searchParams.get("stream_id")||
+        parsed.searchParams.get("channel")||
+        parsed.searchParams.get("channel_id");
 
-    if(
-      raw.includes(
-        "id="
-      )
-    ){
-      try{
-        const params=
-          new URL(
-            raw,
-            location.href
-          ).searchParams;
-
-        const id=
-          params.get(
-            "id"
-          )||
-          "androstreamlivetrt1";
-
-        return (
-          `${PLAYER_BASE}?Talha=`+
-          encodeURIComponent(
-            id
-          )
-        );
-      }catch(e){
-        return (
-          `${PLAYER_BASE}?Talha=`+
-          encodeURIComponent(
-            raw
-          )
-        );
+      if(id){
+        return `${PLAYER_BASE}?Talha=${encodeURIComponent(id)}`;
       }
-    }
+    }catch(e){}
 
     return raw;
   }
 
-  return (
-    `${PLAYER_BASE}?Talha=androstreamlivetrt1`
-  );
+  const id=
+    event?.channelId||
+    event?.streamId||
+    event?.eventId||
+    event?.matchId||
+    event?.sourceId||
+    event?.id||
+    "androstreamlivetrt1";
+
+  return `${PLAYER_BASE}?Talha=${encodeURIComponent(String(id))}`;
 }
 
 function markActivePlayingButton(){
@@ -7034,11 +6782,10 @@ function setServer(
   currentPlayingUrl=
     finalUrl;
 
-  currentPlayingTitle=
-    translateText(
-      event?.title||
-      "Live channel"
-    );
+  currentPlayingTitle=getEventMeta(
+    event,
+    index>=0?index:""
+  ).title||"Live channel";
 
   if(
     !sameSource
@@ -7140,12 +6887,10 @@ function syncCurrentPlayerAfterFeedUpdate(
   currentPlayingUrl=
     nextUrl;
 
-  currentPlayingTitle=
-    translateText(
-      nextEvent?.title||
-      currentPlayingTitle||
-      "Live channel"
-    );
+  currentPlayingTitle=getEventMeta(
+    nextEvent,
+    matchIndex
+  ).title||currentPlayingTitle||"Live channel";
 
   markActivePlayingButton();
 }
@@ -7528,6 +7273,25 @@ function loadTargetScript(
     return;
   }
 
+  if(!FEED_URL){
+    CONFIG_READY
+      .then(config=>{
+        FEED_URL=String(config.feed||"");
+        TRANSLATION_ENDPOINT=String(config.translation||"");
+        PLAYER_BASE_URL=String(config.playerBase||"player.html");
+        PLAYER_ALT_URL=String(config.playerAlt||"player2.html");
+        if(FEED_URL){
+          loadTargetScript(force,reason);
+        }
+      })
+      .catch(()=>{
+        if(!document.body.classList.contains("auth-locked")){
+          feedError("Secure configuration could not be loaded.");
+        }
+      });
+    return;
+  }
+
   if(
     navigator.onLine===false
   ){
@@ -7704,65 +7468,22 @@ function loadTargetScript(
           );
         }
 
-        const tempEvents=
-          received.slice();
+        const normalizedReceived=normalizeAndDedupeFeed(received);
 
-        tempEvents.sort(
-          (
-            a,
-            b
-          )=>{
-            const at=
-              String(
-                a?.time||
-                ""
-              ).toLowerCase();
+        if(!normalizedReceived.length){
+          throw new Error("Feed Vector Missing");
+        }
 
-            const bt=
-              String(
-                b?.time||
-                ""
-              ).toLowerCase();
-
-            const al=
-              at.includes(
-                "live"
-              )||
-              at.includes(
-                "online"
-              );
-
-            const bl=
-              bt.includes(
-                "live"
-              )||
-              bt.includes(
-                "online"
-              );
-
-            if(
-              al===bl
-            ){
-              return 0;
-            }
-
-            return al
-              ? -1
-              : 1;
-          }
+        const activeCustomFeeds=normalizeAndDedupeFeed(
+          CUSTOM_TOP_FEEDS.filter(
+            item=>item&&item.show===true
+          )
         );
 
-        const activeCustomFeeds=
-          CUSTOM_TOP_FEEDS.filter(
-            item=>
-              item&&
-              item.show===true
-          );
-
-        const nextEvents=[
+        const nextEvents=normalizeAndDedupeFeed([
           ...activeCustomFeeds,
-          ...tempEvents
-        ];
+          ...normalizedReceived
+        ]);
 
         const previousEvents=
           Array.isArray(
@@ -7932,109 +7653,81 @@ function loadTargetScript(
   );
 }
 
-function login(){
-  const input=
-    document.getElementById(
-      "password"
-    );
+let loginBusy=false;
 
-  const pass=
-    input.value;
-
-  let chosenPlayer=
-    PLAYER_BASE_URL;
-
-  if(
-    pass===
-    ALT_PASSWORD
-  ){
-    chosenPlayer=
-      PLAYER_ALT_URL;
-  }else if(
-    pass!==
-    PASSWORD
-  ){
-    input.select();
-
-    input.animate(
-      [
-        {
-          transform:"translateX(0)"
-        },
-        {
-          transform:"translateX(-8px)"
-        },
-        {
-          transform:"translateX(8px)"
-        },
-        {
-          transform:"translateX(-4px)"
-        },
-        {
-          transform:"translateX(4px)"
-        },
-        {
-          transform:"translateX(0)"
-        }
-      ],
-      {
-        duration:280
-      }
-    );
-
-    showToast(
-      "Access Denied",
-      "Incorrect passcode entered. Please check and try again."
-    );
-
+async function login(){
+  if(loginBusy){
     return;
   }
 
-  window.__PLAYER_URL_FOR_SESSION=
-    chosenPlayer;
+  loginBusy=true;
 
-  document.body.classList.remove(
-    "auth-locked"
-  );
+  const input=document.getElementById("password");
+  const pass=input?.value||"";
 
-  document.getElementById(
-    "login"
-  ).style.display=
-    "none";
+  try{
+    const config=APP_CONFIG||await CONFIG_READY;
+    const iterations=Number(config.authIterations)||180000;
+    const primaryHash=String(config.primaryHash||"");
+    const altHash=String(config.altHash||"");
+    const primarySalt=String(config.primarySalt||"");
+    const altSalt=String(config.altSalt||"");
+    const primaryPassHash=await deriveAuthHash(pass,primarySalt,iterations);
 
-  document.getElementById(
-    "playerWrap"
-  ).style.display=
-    "block";
+    let chosenPlayer=String(config.playerBase||PLAYER_BASE_URL);
 
-  document.getElementById(
-    "appHeader"
-  ).style.display=
-    "flex";
+    if(primaryPassHash===primaryHash){
+      chosenPlayer=String(config.playerBase||PLAYER_BASE_URL);
+    }else{
+      const altPassHash=await deriveAuthHash(pass,altSalt,iterations);
 
-  document.getElementById(
-    "statusStrip"
-  ).style.display=
-    "flex";
+      if(altPassHash===altHash){
+        chosenPlayer=String(config.playerAlt||PLAYER_ALT_URL);
+      }else{
+      input?.select();
 
-  updateAnalytics();
+      input?.animate?.([
+        {transform:"translateX(0)"},
+        {transform:"translateX(-8px)"},
+        {transform:"translateX(8px)"},
+        {transform:"translateX(-4px)"},
+        {transform:"translateX(4px)"},
+        {transform:"translateX(0)"}
+      ],{duration:280});
 
-  if(
-    navigator.onLine===false
-  ){
-    loadCachedFeed();
-  }else if(
-    !liveEvents.length
-  ){
-    loadCachedFeed();
+        showToast("Access Denied","Incorrect passcode entered. Please check and try again.");
+        return;
+      }
+    }
+
+    FEED_URL=String(config.feed||FEED_URL);
+    TRANSLATION_ENDPOINT=String(config.translation||TRANSLATION_ENDPOINT);
+    PLAYER_BASE_URL=String(config.playerBase||PLAYER_BASE_URL);
+    PLAYER_ALT_URL=String(config.playerAlt||PLAYER_ALT_URL);
+    window.__PLAYER_URL_FOR_SESSION=chosenPlayer;
+
+    document.body.classList.remove("auth-locked");
+    document.getElementById("login").style.display="none";
+    document.getElementById("playerWrap").style.display="block";
+    document.getElementById("appHeader").style.display="flex";
+    document.getElementById("statusStrip").style.display="flex";
+
+    updateAnalytics();
+
+    if(navigator.onLine===false||!liveEvents.length){
+      loadCachedFeed();
+    }
+
+    startRealtimeAutoSync();
+    loadTargetScript(true,"initial");
+  }catch(error){
+    showToast(
+      "Secure Configuration Error",
+      CONFIG_ERROR?.message||"The secure app configuration could not be opened."
+    );
+  }finally{
+    loginBusy=false;
   }
-
-  startRealtimeAutoSync();
-
-  loadTargetScript(
-    true,
-    "initial"
-  );
 }
 
 let __savedScrollY=0;
@@ -8383,70 +8076,39 @@ function scrollToChannels(){
 function showFavorites(){
   closeMenu();
 
-  const search=
-    document.getElementById(
-      "searchChannels"
-    );
+  const search=document.getElementById("searchChannels");
+  if(search){
+    search.value="";
+  }
 
-  search.value="";
+  currentLeague="all";
 
-  currentLeague=
-    "all";
+  const container=document.getElementById("serverContainer");
+  if(!container){
+    return;
+  }
 
-  const container=
-    document.getElementById(
-      "serverContainer"
-    );
-
-  const fragment=
-    document.createDocumentFragment();
-
+  const fragment=document.createDocumentFragment();
   let shown=0;
 
-  for(
-    let index=0;
-    index<liveEvents.length;
-    index++
-  ){
-    const event=
-      liveEvents[
-        index
-      ];
+  for(const entry of getSortedLiveEntries()){
+    const event=entry.event;
+    const index=entry.index;
+    const meta=getEventMeta(event,index);
 
-    const meta=
-      getEventMeta(
-        event,
-        index
-      );
+    hydrateEventMeta(event,index,meta);
 
-    if(
-      !favoriteKeys.includes(
-        meta.key
-      )
-    ){
+    if(!favoriteKeys.includes(meta.key)){
       continue;
     }
 
     shown++;
-
-    const row=
-      document.createElement(
-        "div"
-      );
-
-    row.className=
-      "server-item";
-
-    row.tabIndex=
-      0;
-
-    row.setAttribute(
-      "role",
-      "button"
-    );
-
-    row.dataset.channelKey=
-      meta.key;
+    const row=document.createElement("div");
+    row.className="server-item";
+    row.tabIndex=0;
+    row.setAttribute("role","button");
+    row.setAttribute("aria-label","Play "+meta.title);
+    row.dataset.channelKey=meta.key;
 
     row.innerHTML=
       `<div class="channel-main">`+
@@ -8456,83 +8118,48 @@ function showFavorites(){
           `<small>${escapeHTML(meta.league||"Live feed")}</small>`+
         `</div>`+
       `</div>`+
-      `<div class="live-badge">`+
-        `<div class="live-dot"></div>`+
-        `${escapeHTML(meta.time||event?.time||"ONLINE")}`+
+      `<div style="display:flex;align-items:center;gap:7px">`+
+        `<div class="live-badge"><div class="live-dot"></div>${escapeHTML(meta.time||"ONLINE")}</div>`+
+        `<button class="fav-toggle active" type="button" aria-label="Remove from favorites" aria-pressed="true">★</button>`+
       `</div>`;
 
-    row.onclick=
-      ()=>{
-        setServer(
-          event,
-          row
-        );
+    row.onclick=()=>setServer(event,row);
+    row.onkeydown=ev=>{
+      if(ev.key==="Enter"||ev.key===" "){
+        ev.preventDefault();
+        setServer(event,row);
+      }
+    };
+
+    const favButton=row.querySelector(".fav-toggle");
+    if(favButton){
+      favButton.onclick=ev=>{
+        ev.stopPropagation();
+        favoriteKeys=favoriteKeys.filter(key=>key!==meta.key);
+        storageSet("talhaFavorites",JSON.stringify(favoriteKeys));
+        showFavorites();
+        updateAnalytics();
       };
+    }
 
-    row.onkeydown=
-      ev=>{
-        if(
-          ev.key==="Enter"||
-          ev.key===" "
-        ){
-          ev.preventDefault();
-
-          setServer(
-            event,
-            row
-          );
-        }
-      };
-
-    fragment.appendChild(
-      row
-    );
+    fragment.appendChild(row);
   }
 
-  for(
-    let index=0;
-    index<STATIC_CHANNELS.length;
-    index++
-  ){
-    const event=
-      STATIC_CHANNELS[
-        index
-      ];
+  for(let index=0;index<STATIC_CHANNELS.length;index++){
+    const event=STATIC_CHANNELS[index];
+    const key=eventKey(event,index);
 
-    const key=
-      eventKey(
-        event,
-        index
-      );
-
-    if(
-      !favoriteKeys.includes(
-        key
-      )
-    ){
+    if(!favoriteKeys.includes(key)){
       continue;
     }
 
     shown++;
-
-    const row=
-      document.createElement(
-        "div"
-      );
-
-    row.className=
-      "server-item";
-
-    row.tabIndex=
-      0;
-
-    row.setAttribute(
-      "role",
-      "button"
-    );
-
-    row.dataset.channelKey=
-      key;
+    const row=document.createElement("div");
+    row.className="server-item";
+    row.tabIndex=0;
+    row.setAttribute("role","button");
+    row.setAttribute("aria-label","Play "+event.title);
+    row.dataset.channelKey=key;
 
     row.innerHTML=
       `<div class="channel-main">`+
@@ -8542,69 +8169,50 @@ function showFavorites(){
           `<small>24/7 Network</small>`+
         `</div>`+
       `</div>`+
-      `<div class="live-badge">`+
-        `<div class="live-dot"></div>`+
-        `24/7`+
+      `<div style="display:flex;align-items:center;gap:7px">`+
+        `<div class="live-badge"><div class="live-dot"></div>24/7</div>`+
+        `<button class="fav-toggle active" type="button" aria-label="Remove from favorites" aria-pressed="true">★</button>`+
       `</div>`;
 
-    row.onclick=
-      ()=>{
-        setServer(
-          event,
-          row
-        );
+    row.onclick=()=>setServer(event,row);
+    row.onkeydown=ev=>{
+      if(ev.key==="Enter"||ev.key===" "){
+        ev.preventDefault();
+        setServer(event,row);
+      }
+    };
+
+    const favButton=row.querySelector(".fav-toggle");
+    if(favButton){
+      favButton.onclick=ev=>{
+        ev.stopPropagation();
+        favoriteKeys=favoriteKeys.filter(item=>item!==key);
+        storageSet("talhaFavorites",JSON.stringify(favoriteKeys));
+        showFavorites();
+        updateAnalytics();
       };
+    }
 
-    row.onkeydown=
-      ev=>{
-        if(
-          ev.key==="Enter"||
-          ev.key===" "
-        ){
-          ev.preventDefault();
-
-          setServer(
-            event,
-            row
-          );
-        }
-      };
-
-    fragment.appendChild(
-      row
-    );
+    fragment.appendChild(row);
   }
 
-  if(
-    !shown
-  ){
-    const empty=
-      document.createElement(
-        "div"
-      );
-
-    empty.className=
-      "empty-state";
-
-    empty.textContent=
-      "No favorites saved yet. Tap ★ on a channel to save it.";
-
-    fragment.appendChild(
-      empty
-    );
+  if(!shown){
+    const empty=document.createElement("div");
+    empty.className="empty-state";
+    empty.textContent="No favorites saved yet. Tap ★ on a channel to save it.";
+    fragment.appendChild(empty);
   }
 
-  container.replaceChildren(
-    fragment
-  );
+  container.replaceChildren(fragment);
+  renderStaticChannels(true);
 
-  document.getElementById(
-    "channelSummary"
-  ).textContent=
-    `${shown} favorites`;
+  const summary=document.getElementById("channelSummary");
+  if(summary){
+    summary.textContent=`${shown} favorites`;
+  }
 
   updateAnalytics();
-
+  markActivePlayingButton();
   scrollToChannels();
 }
 
@@ -8927,93 +8535,41 @@ function initLeagueWheel(){
   );
 }
 
-function renderStaticChannels(){
-  const container=
-    document.getElementById(
-      "staticServerContainer"
-    );
+function renderStaticChannels(force=false){
+  const container=document.getElementById("staticServerContainer");
 
-  if(
-    !container
-  ){
+  if(!container){
     return;
   }
 
-  if(
-    lastStaticStart===
-    liveEvents.length
-  ){
+  if(!force&&lastStaticStart===liveEvents.length&&container.childElementCount){
     return;
   }
 
-  lastStaticStart=
-    liveEvents.length;
+  lastStaticStart=liveEvents.length;
 
-  const fragment=
-    document.createDocumentFragment();
+  const fragment=document.createDocumentFragment();
+  const countEl=document.getElementById("staticChannelCount");
 
-  const countEl=
-    document.getElementById(
-      "staticChannelCount"
-    );
-
-  if(
-    countEl
-  ){
-    countEl.textContent=
-      String(
-        STATIC_CHANNELS.length
-      );
+  if(countEl){
+    countEl.textContent=String(STATIC_CHANNELS.length);
   }
 
-  const startIndex=
-    liveEvents.length;
+  const startIndex=liveEvents.length;
 
-  for(
-    let index=0;
-    index<STATIC_CHANNELS.length;
-    index++
-  ){
-    const event=
-      STATIC_CHANNELS[
-        index
-      ];
+  for(let index=0;index<STATIC_CHANNELS.length;index++){
+    const event=STATIC_CHANNELS[index];
+    const channelNumber=startIndex+index+1;
+    const key=eventKey(event,index);
+    const favorite=favoriteKeys.includes(key);
+    const row=document.createElement("div");
 
-    const channelNumber=
-      startIndex+
-      index+
-      1;
-
-    const key=
-      eventKey(
-        event,
-        index
-      );
-
-    const row=
-      document.createElement(
-        "div"
-      );
-
-    row.className=
-      "server-item";
-
-    row.tabIndex=
-      0;
-
-    row.setAttribute(
-      "role",
-      "button"
-    );
-
-    row.setAttribute(
-      "aria-label",
-      "Play "+
-      event.title
-    );
-
-    row.dataset.channelKey=
-      key;
+    row.className="server-item";
+    row.tabIndex=0;
+    row.setAttribute("role","button");
+    row.setAttribute("aria-label","Play "+event.title);
+    row.setAttribute("title","Play "+event.title);
+    row.dataset.channelKey=key;
 
     row.innerHTML=
       `<div class="channel-main">`+
@@ -9023,42 +8579,43 @@ function renderStaticChannels(){
           `<small>24/7 Network</small>`+
         `</div>`+
       `</div>`+
-      `<div class="live-badge">`+
-        `<div class="live-dot"></div>`+
-        `24/7`+
+      `<div style="display:flex;align-items:center;gap:7px">`+
+        `<div class="live-badge"><div class="live-dot"></div>24/7</div>`+
+        `<button class="fav-toggle ${favorite?"active":""}" type="button" aria-label="${favorite?"Remove from":"Add to"} favorites" aria-pressed="${favorite}">★</button>`+
       `</div>`;
 
-    row.onclick=
-      ()=>{
-        setServer(
-          event,
-          row
-        );
-      };
+    row.onclick=()=>setServer(event,row);
 
-    row.onkeydown=
-      ev=>{
-        if(
-          ev.key==="Enter"||
-          ev.key===" "
-        ){
-          ev.preventDefault();
+    row.onkeydown=ev=>{
+      if(ev.key==="Enter"||ev.key===" "){
+        ev.preventDefault();
+        setServer(event,row);
+      }
+    };
 
-          setServer(
-            event,
-            row
-          );
+    const favButton=row.querySelector(".fav-toggle");
+
+    if(favButton){
+      favButton.onclick=ev=>{
+        ev.stopPropagation();
+
+        if(favorite){
+          favoriteKeys=favoriteKeys.filter(item=>item!==key);
+        }else{
+          favoriteKeys=[...new Set([...favoriteKeys,key])];
         }
-      };
 
-    fragment.appendChild(
-      row
-    );
+        storageSet("talhaFavorites",JSON.stringify(favoriteKeys));
+        renderMatches();
+        renderStaticChannels(true);
+        updateAnalytics();
+      };
+    }
+
+    fragment.appendChild(row);
   }
 
-  container.replaceChildren(
-    fragment
-  );
+  container.replaceChildren(fragment);
 }
 
 const timeFormatter=
@@ -9506,6 +9063,12 @@ window.addEventListener(
     }
   }
 );
+
+CONFIG_READY.catch(()=>{
+  if(!document.body.classList.contains("auth-locked")){
+    setStatus("Secure configuration unavailable","offline");
+  }
+});
 
 bootLoader();
 initLeagueWheel();
