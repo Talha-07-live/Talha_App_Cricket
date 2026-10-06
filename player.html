@@ -10,27 +10,61 @@
 
 <script>
 (function(){
-  const X7P_KEY='x7p';
+  const X7P_KEY='TalhaX7P-2026-Stream';
+  const X7P_ROUNDS=7;
 
   function x7pDecode(value){
     try{
       const binary=atob(String(value||''));
-      let result='';
-
+      const data=new Uint8Array(binary.length);
       for(
         let i=0;
         i<binary.length;
         i++
       ){
-        result+=String.fromCharCode(
-          binary.charCodeAt(i)^
-          X7P_KEY.charCodeAt(
-            i%X7P_KEY.length
-          )
-        );
+        data[i]=binary.charCodeAt(i);
       }
 
-      return result;
+      const key=
+        new TextEncoder().encode(
+          X7P_KEY
+        );
+
+      for(
+        let r=X7P_ROUNDS-1;
+        r>=0;
+        r--
+      ){
+        let prev=
+          key[r%key.length];
+
+        for(
+          let i=0;
+          i<data.length;
+          i++
+        ){
+          const current=
+            data[i];
+
+          let x=
+            (
+              current-
+              prev-
+              ((i*29+r*41)&255)
+            )&255;
+
+          x=
+            x^
+            key[
+              (i+r*3)%key.length
+            ];
+
+          data[i]=x;
+          prev=current;
+        }
+      }
+
+      return new TextDecoder().decode(data);
     }catch(e){
       return '';
     }
@@ -38,92 +72,62 @@
 
   const urls=Object.freeze({
 
-    allowedOrigin:x7pDecode(
-      'EEMECERKVxgEGVsYGUReC0MCHVYdVkQZDFJeElI='
-    ),
+    allowedOrigin:x7pDecode('FjZx2DqcuIfdJHq5gbMNWJFAdLmcCs1iyWHfl/0='),
 
-    favicon:x7pDecode(
-      'EEMECERKVxgDSQdeH14WAUJeG1gdV14dGVAVCxgjCnolQRkAFlA='
-    ),
+    favicon:x7pDecode('FjZx2DqcuIcAexoHqa0XLjUMXrfOfcS8CBamgwK6RdZefwu9rV0='),
 
-    clappr:x7pDecode(
-      'EEMECERKVxgTHFleEkQUHVsZDkVeFlIEV1kAFRgwG1sRCEcCV0ccGU4VCnccGUMVC0NfHF4DDBgTFFYACEVeFV4eVl0D'
-    ),
+    clappr:x7pDecode('FjZx2DqcuIewvGPBSoqXQIKtD+fFpu+hEDgfKC3IAh9tlOu63bNrrvxIB1re9paBDBaQItM17Yr/UeYLAvHgQdakZCsb'),
 
-    levelSelector:x7pDecode(
-      'EEMECERKVxgTHFleEkQUHVsZDkVeFlIEV1kAFRgwG1sRCEcCV1sVDlIcVUQVFFITDFgCOFsRDFIDDBgUEUQEV1sVDlIcVUQVFFITDFgCVloZFhkaCw=='
-    ),
+    levelSelector:x7pDecode('FjZx2DqcuIewvGPBSoqXQIKtD+fFpu+hEDgfKC3IAh9tlOu63ZeU1lG5hybOblsi8M+QG2jeAB9pCFhIOOCkQPcfe28joNgdEsklXPVp216tsGR4/w=='),
 
-    pip:x7pDecode(
-      'EEMECERKVxgTHFleEkQUHVsZDkVeFlIEV1kAFRgTFFYACEVdCF4AVUccDVAZFnccGUMVC0NfHF4DDBgTFFYACEVdCF4AVUccDVAZFhkaCw=='
-    ),
+    pip:x7pDecode('FjZx2DqcuIewvGPBSoqXQIKtD+fFpu+hEDgfKC0lNB/PQwfJwRbA7q9xH2WmIxB6bveOaouhnQvJ0J5WgcydJUg9W8e+Mh6en4p5gN0Exg=='),
 
-    jquery:x7pDecode(
-      'EEMECERKVxgTHFleEkQUHVsZDkVeFlIEV1kAFRgaCUIVCk4wSxlHVgZfHF4DDBgaCUIVCk5eFV4eVl0D'
-    ),
+    jquery:x7pDecode('FjZx2DqcuIewvGPBSoqXQIKtD+fFpu+hEDgfKC0C3sBIGD7tqTeeyTq0ktYsXK/6ZUfmhEGURLwVzxFv'),
 
-    checklist1:x7pDecode(
-      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZCSRkTFF4TExgTEFITE1sZC0Nf'
-    ),
+    checklist1:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWEOP6UE0bHjyJgD1TPwq+lZb9br'),
 
-    checklist2:x7pDecode(
-      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZBTRkTFF4TExgTEFITE1sZC0Nf'
-    ),
+    checklist2:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWERNs0IecMNtiNsr9vQUc8rFv1n'),
 
-    checklist3:x7pDecode(
-      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZBSRkTFF4TExgTEFITE1sZC0Nf'
-    ),
+    checklist3:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWEROmmY0csV/qMgs5vokTeTfgnr'),
 
-    checklist4:x7pDecode(
-      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZBSxkTFF4TExgTEFITE1sZC0Nf'
-    ),
+    checklist4:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWERIFNs3dM5lgvmjXsQ3UP3ci8d'),
 
-    cinema:x7pDecode(
-      'EEMECERKVxgDDEUVGVoDCFgCDARGTRkTF1pfG14eHVoR'
-    ),
+    cinema:x7pDecode('FjZx2DqcuIcAPAdeJKkIsORrGmU8bsw1G1/s/xTSJZT9'),
 
-    feedScript:x7pDecode(
-      'EEMECERKVxgdGV8DDVkDCFgCDERDQRkIAU1fC1QCEUcETBkaCw=='
-    ),
+    feedScript:x7pDecode('FjZx2DqcuIc2ddLGlhhRaFTONWXBYgPazAPsJ30KggSGQCjL8w=='),
 
-    pphPrefix:x7pDecode(
-      'EEMECERKVxgACF9eCFsRAVICVUIDVk8JAhgEDhhPC0MCHVYdJ14URQ=='
-    ),
+    pphPrefix:x7pDecode('FjZx2DqcuIdZAcUPvHUb2fZ4v0VFGIRGTNUw6QTDJo4APfbXwcUQsw=='),
 
-    warm1:x7pDecode(
-      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZCSRkTFF4TEw=='
-    ),
+    warm1:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWEOP6UE0bHjyA=='),
 
-    warm2:x7pDecode(
-      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZBTRkTFF4TEw=='
-    ),
+    warm2:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWERNs0IecMNtg=='),
 
-    warm3:x7pDecode(
-      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZBSRkTFF4TEw=='
-    ),
+    warm3:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWEROmmY0csV/g=='),
 
-    warm4:x7pDecode(
-      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZBSxkTFF4TEw=='
-    ),
+    warm4:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWERIFNs3dM5lg=='),
 
-    warm5:x7pDecode(
-      'EEMECERKVxgDDEUVGVoDCFgCDARGTRkTF1o='
-    ),
+    warm5:x7pDecode('FjZx2DqcuIcAPAdeJKkIsORrGmU8bsw1G18='),
 
-    warm6:x7pDecode(
-      'EEMECERKVxgdGV8DDVkDCFgCDERDQRkIAU0='
-    )
+    warm6:x7pDecode('FjZx2DqcuIc2ddLGlhhRaFTONWXBYgPazAM=')
+
   });
 
+  let parsedOrigin=null;
+
+  try{
+    parsedOrigin=
+      new URL(
+        urls.allowedOrigin
+      );
+  }catch(e){
+    parsedOrigin=null;
+  }
+
   const allowedHost=
-    new URL(
-      urls.allowedOrigin
-    ).hostname;
+    parsedOrigin?.hostname||'';
 
   const protocol=
-    new URL(
-      urls.allowedOrigin
-    ).protocol;
+    parsedOrigin?.protocol||'';
 
   const protocolRelative=
     '//';
@@ -152,6 +156,10 @@
 
   const earlyIsExactOrigin=()=>{
     try{
+      if(!parsedOrigin){
+        return false;
+      }
+
       const u=
         new URL(
           window.location.href
@@ -164,7 +172,7 @@
         allowedHost &&
         u.port==='' &&
         u.origin===
-        urls.allowedOrigin
+        parsedOrigin.origin
       );
     }catch(e){
       return false;
@@ -183,7 +191,7 @@
     try{
       return(
         window.parent.location.origin===
-        urls.allowedOrigin
+        parsedOrigin.origin
       );
     }catch(e){
       return false;
@@ -201,7 +209,6 @@
       Promise.resolve(
         false
       );
-
     return;
   }
 
@@ -211,29 +218,67 @@
     );
 
   if(favicon){
-    favicon.href=urls.favicon;
+    favicon.href=
+      urls.favicon;
   }
 
-  function loadScript(src){
+  function loadScript(
+    src,
+    timeout=9000
+  ){
     return new Promise(
       (resolve,reject)=>{
         const script=
-          document.createElement('script');
+          document.createElement(
+            'script'
+          );
+
+        let settled=false;
+
+        const finish=(
+          error
+        )=>{
+          if(settled){
+            return;
+          }
+
+          settled=true;
+
+          clearTimeout(timer);
+
+          if(error){
+            reject(error);
+          }else{
+            resolve();
+          }
+        };
 
         script.src=src;
         script.async=false;
 
         script.onload=()=>{
-          resolve();
+          finish(null);
         };
 
         script.onerror=()=>{
-          reject(
+          finish(
             new Error(
               'External library failed'
             )
           );
         };
+
+        const timer=
+          setTimeout(
+            ()=>{
+              finish(
+                new Error(
+                  'External library timed out'
+                )
+              );
+            },
+            timeout
+          );
 
         document.head.appendChild(
           script
@@ -242,19 +287,27 @@
     );
   }
 
-  const libraries=[
-    urls.clappr,
-    urls.levelSelector,
-    urls.pip,
-    urls.jquery
-  ];
+  const libraries=
+    Array.from(
+      new Set([
+        urls.clappr,
+        urls.levelSelector,
+        urls.pip,
+        urls.jquery
+      ].filter(Boolean))
+    );
 
   window.__X7P_LIBS_READY__=
     libraries.reduce(
-      (chain,src)=>{
+      (
+        chain,
+        src
+      )=>{
         return chain.then(
           ()=>{
-            return loadScript(src);
+            return loadScript(
+              src
+            );
           }
         );
       },
@@ -282,6 +335,7 @@
         );
 
       return(
+        !!ALLOWED_ORIGIN &&
         u.protocol===
         ALLOWED_PROTOCOL &&
         u.hostname===
@@ -306,38 +360,33 @@
     }
   };
 
+  const getParentOrigin=()=>{
+    try{
+      return(
+        window.parent.location.origin||''
+      );
+    }catch(e){
+      return '';
+    }
+  };
+
   const isAuthorizedParent=()=>{
     if(isTopLevel()){
       return false;
     }
 
-    try{
-      const parentOrigin=
-        window.parent.location.origin;
-
-      return(
-        parentOrigin===
-        ALLOWED_ORIGIN
-      );
-    }catch(e){
-      return false;
-    }
+    return(
+      getParentOrigin()===
+      ALLOWED_ORIGIN
+    );
   };
 
   const isAuthorizedEmbed=()=>{
-    if(!isExactOrigin()){
-      return false;
-    }
-
-    if(isTopLevel()){
-      return false;
-    }
-
-    if(!isAuthorizedParent()){
-      return false;
-    }
-
-    return true;
+    return(
+      isExactOrigin()&&
+      !isTopLevel()&&
+      isAuthorizedParent()
+    );
   };
 
   const denyPlayer=()=>{
@@ -350,7 +399,9 @@
     );
 
     const blockStyle=
-      document.createElement('style');
+      document.createElement(
+        'style'
+      );
 
     blockStyle.textContent=
       'html,body{margin:0!important;padding:0!important;width:100%!important;height:100%!important;background:#000!important;color:#fff!important;overflow:hidden!important;visibility:visible!important}';
@@ -392,13 +443,9 @@
     }
   };
 
-  const allowPlayer=()=>{
+  if(isAuthorizedEmbed()){
     window.__TALHA_DOMAIN_ALLOWED__=
       true;
-  };
-
-  if(isAuthorizedEmbed()){
-    allowPlayer();
   }else{
     denyPlayer();
   }
@@ -427,16 +474,25 @@
                 }catch(e){}
 
                 try{
-                  node.removeAttribute(
-                    'src'
-                  );
+                  if(
+                    node.tagName===
+                    'IFRAME'
+                  ){
+                    node.src=
+                      'about:blank';
+                  }else{
+                    node.removeAttribute(
+                      'src'
+                    );
+                    node.load?.();
+                  }
                 }catch(e){}
               }
             );
           }catch(e){}
         }
       },
-      1500
+      900
     );
 })();
 </script>
@@ -1626,6 +1682,7 @@ input[type="range"]::-moz-range-thumb{
 </div>
 
 <script>
+
 if(
   window.__TALHA_DOMAIN_ALLOWED__!==true
 ){
@@ -2915,6 +2972,23 @@ function setClapprVolumeSafe(
     );
 
   try{
+    const current=
+      typeof player.getVolume===
+      'function'
+        ? Number(
+            player.getVolume()
+          )
+        : NaN;
+
+    if(
+      Number.isFinite(current) &&
+      Math.abs(
+        current-value
+      )<0.5
+    ){
+      return;
+    }
+
     player.setVolume(
       value
     );
@@ -2925,7 +2999,6 @@ function syncAudioFromPlayer(
   volume,
   applyToVideo=true
 ){
-
   const value=
     clampNumber(
       volume,
@@ -2934,57 +3007,64 @@ function syncAudioFromPlayer(
       audioUserVolume
     );
 
+  const video=
+    document.querySelector(
+      '#player-container video'
+    );
+
+  const actuallyMuted=
+    !!(
+      video?.muted||
+      !audioUnlocked
+    );
+
   audioUserVolume=value;
 
-  if(value>0){
-
+  if(
+    value>0 &&
+    !actuallyMuted
+  ){
     audioLastNonZeroVolume=
       value;
 
     audioUnlocked=true;
     audioUserMuted=false;
 
-  }else if(audioUnlocked){
-
-    audioUserMuted=true;
+  }else if(
+    audioUnlocked
+  ){
+    audioUserMuted=
+      value<=0||
+      actuallyMuted;
   }
 
   if(!applyToVideo){
     return;
   }
 
-  const video=
-    document.querySelector(
-      '#player-container video'
-    );
-
   if(!video){
     return;
   }
 
   try{
-
     const muted=
-      value<=0;
-
-    if(
-      video.muted!==muted
-    ){
-      video.muted=
-        muted;
-    }
-
-    if(
-      video.defaultMuted!==muted
-    ){
-      video.defaultMuted=
-        muted;
-    }
+      value<=0||
+      audioUserMuted;
 
     const targetVolume=
       muted
         ? 0
         : value/100;
+
+    if(video.muted!==muted){
+      video.muted=
+        muted;
+    }
+
+    if(video.defaultMuted!==muted){
+      video.defaultMuted=
+        muted;
+    }
 
     if(
       Math.abs(
@@ -2997,14 +3077,11 @@ function syncAudioFromPlayer(
     }
 
     if(muted){
-
       video.setAttribute(
         'muted',
         ''
       );
-
     }else{
-
       video.removeAttribute(
         'muted'
       );
@@ -3891,16 +3968,99 @@ function getEightDigitPphSource(
 
 let feedScriptPromise=null;
 
-function loadFeedScript(){
+function normalizeFeedEvents(
+  source
+){
+  if(!source){
+    return [];
+  }
 
   if(
-    Array.isArray(
-      window.karsilasmalar
-    )
+    Array.isArray(source)
   ){
+    return source.filter(Boolean);
+  }
 
+  const candidates=[
+    source.karsilasmalar,
+    source.futbolMatches,
+    source.events,
+    source.data,
+    source.matches
+  ];
+
+  for(
+    const candidate
+    of candidates
+  ){
+    if(
+      Array.isArray(candidate)
+    ){
+      return candidate.filter(Boolean);
+    }
+  }
+
+  return [];
+}
+
+function collectGlobalFeedEvents(){
+  const groups=[
+    window.karsilasmalar,
+    window.futbolMatches,
+    window.events
+  ];
+
+  const result=[];
+  const seen=
+    new Set();
+
+  for(
+    const group
+    of groups
+  ){
+    if(!Array.isArray(group)){
+      continue;
+    }
+
+    for(
+      const item
+      of group
+    ){
+      if(!item){
+        continue;
+      }
+
+      const signature=
+        JSON.stringify(
+          [
+            item.id,
+            item.channelId,
+            item.url,
+            item.streamUrl,
+            item.link,
+            item.title
+          ]
+        );
+
+      if(seen.has(signature)){
+        continue;
+      }
+
+      seen.add(signature);
+      result.push(item);
+    }
+  }
+
+  return result;
+}
+
+function loadFeedScript(){
+  const existing=
+    collectGlobalFeedEvents();
+
+  if(existing.length){
     return Promise.resolve(
-      window.karsilasmalar
+      existing
     );
   }
 
@@ -3911,46 +4071,58 @@ function loadFeedScript(){
   feedScriptPromise=
     new Promise(
       (resolve,reject)=>{
-
-        const existing=
+        const existingScript=
           document.getElementById(
             'dynamic-feed-script'
           );
 
-        const finish=()=>{
+        let settled=false;
+
+        const finish=(
+          error
+        )=>{
+          if(settled){
+            return;
+          }
+
+          const events=
+            collectGlobalFeedEvents();
 
           if(
-            Array.isArray(
-              window.karsilasmalar
-            )
+            events.length
           ){
-
+            settled=true;
+            clearTimeout(
+              timer
+            );
             resolve(
-              window.karsilasmalar
+              events
             );
+            return;
+          }
 
-          }else{
-
-            reject(
-              new Error(
-                'Feed Vector Missing'
-              )
+          if(error){
+            settled=true;
+            clearTimeout(
+              timer
             );
+            reject(error);
           }
         };
 
-        if(existing){
-
-          existing.addEventListener(
+        if(existingScript){
+          existingScript.addEventListener(
             'load',
-            finish,
+            ()=>{
+              finish(null);
+            },
             {once:true}
           );
 
-          existing.addEventListener(
+          existingScript.addEventListener(
             'error',
             ()=>{
-              reject(
+              finish(
                 new Error(
                   'Feed Load Failed'
                 )
@@ -3959,10 +4131,17 @@ function loadFeedScript(){
             {once:true}
           );
 
-          setTimeout(
-            finish,
-            3000
-          );
+          var timer=
+            setTimeout(
+              ()=>{
+                finish(
+                  new Error(
+                    'Feed Vector Missing'
+                  )
+                );
+              },
+              4500
+            );
 
           return;
         }
@@ -3982,24 +4161,38 @@ function loadFeedScript(){
 
         script.async=true;
 
-        script.onload=finish;
+        script.onload=()=>{
+          finish(null);
+        };
 
         script.onerror=()=>{
-          reject(
+          finish(
             new Error(
               'Feed Load Failed'
             )
           );
         };
 
+        var timer=
+          setTimeout(
+            ()=>{
+              finish(
+                new Error(
+                  'Feed Vector Missing'
+                )
+              );
+            },
+            4500
+          );
+
         document.head.appendChild(
           script
         );
-
-        setTimeout(
-          finish,
-          3000
-        );
+      }
+    ).catch(
+      error=>{
+        feedScriptPromise=null;
+        throw error;
       }
     );
 
@@ -4010,70 +4203,120 @@ function findFeedEvent(
   events,
   key
 ){
-
   const target=
     normalizeInputId(
       key
     );
 
   if(
-    !target ||
+    !target||
     !Array.isArray(events)
   ){
     return null;
   }
 
-  return events.find(
-    event=>{
+  const targetFold=
+    target.toLowerCase();
 
-      const candidates=[
-        event?.id,
-        event?.channelId,
-        event?.channel,
-        event?.name,
-        event?.title,
-        event?.url,
-        event?.streamUrl,
-        event?.link
-      ].map(
-        item=>
-          String(
-            item||''
-          )
-      );
+  let best=
+    null;
 
-      return candidates.some(
-        value=>{
+  let bestScore=
+    -1;
 
-          if(
-            value===target
-          ){
-            return true;
-          }
-
-          try{
-
-            const u=
-              new URL(
-                value,
-                window.location.href
-              );
-
-            return(
-              u.searchParams.get(
-                'id'
-              )===
-              target
-            );
-
-          }catch(e){
-
-            return false;
-          }
-        }
-      );
+  for(
+    const event
+    of events
+  ){
+    if(!event){
+      continue;
     }
-  )||null;
+
+    const candidates=[
+      ['id',event?.id],
+      ['channelId',event?.channelId],
+      ['channel',event?.channel],
+      ['name',event?.name],
+      ['title',event?.title],
+      ['url',event?.url],
+      ['streamUrl',event?.streamUrl],
+      ['link',event?.link]
+    ];
+
+    for(
+      const [field,item]
+      of candidates
+    ){
+      const value=
+        String(
+          item||''
+        ).trim();
+
+      if(!value){
+        continue;
+      }
+
+      if(
+        value===
+        target
+      ){
+        return event;
+      }
+
+      let score=
+        0;
+
+      try{
+        const u=
+          new URL(
+            value,
+            window.location.href
+          );
+
+        const q=
+          u.searchParams.get('id');
+
+        if(q===target){
+          score=
+            field==='url'||
+            field==='streamUrl'||
+            field==='link'
+              ? 98
+              : 100;
+        }
+      }catch(e){}
+
+      if(
+        value.toLowerCase()===
+        targetFold
+      ){
+        score=
+          Math.max(
+            score,
+            field==='id'
+              ? 100
+              : field==='channelId'
+                ? 99
+                : 90
+          );
+      }
+
+      if(
+        score>
+        bestScore
+      ){
+        bestScore=
+          score;
+
+        best=
+          event;
+      }
+    }
+  }
+
+  return bestScore>=90
+    ? best
+    : null;
 }
 
 async function resolveFeedSource(
@@ -4092,7 +4335,9 @@ async function resolveFeedSource(
   try{
 
     const events=
-      await loadFeedScript();
+      normalizeFeedEvents(
+        await loadFeedScript()
+      );
 
     const event=
       findFeedEvent(
@@ -5356,44 +5601,40 @@ class StreamPlayer{
       return;
     }
 
-    const plugins=[];
+    const pluginSet=
+      new Set();
 
-    if(window.LevelSelector){
-
-      plugins.push(
-        window.LevelSelector
-      );
-    }
-
-    if(window.ClapprPip){
-
+    const addPlugin=(
+      plugin
+    )=>{
       if(
-        window.ClapprPip.PipPlugin
+        plugin &&
+        !pluginSet.has(plugin)
       ){
-
-        plugins.push(
-          window.ClapprPip.PipPlugin
-        );
+        pluginSet.add(plugin);
       }
+    };
 
-      if(
-        window.ClapprPip.PipButton
-      ){
+    addPlugin(
+      window.LevelSelector
+    );
 
-        plugins.push(
-          window.ClapprPip.PipButton
-        );
-      }
-    }
+    addPlugin(
+      window.ClapprPip?.PipPlugin
+    );
 
-    if(
+    addPlugin(
+      window.ClapprPip?.PipButton
+    );
+
+    addPlugin(
       window.ClapprPIPPlugin
-    ){
+    );
 
-      plugins.push(
-        window.ClapprPIPPlugin
+    const plugins=
+      Array.from(
+        pluginSet
       );
-    }
 
     this.player=
       new Clappr.Player({
