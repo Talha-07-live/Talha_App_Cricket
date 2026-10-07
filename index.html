@@ -869,12 +869,16 @@ input[type="password"]:focus{
     radial-gradient(
       circle at 50% 50%,
       transparent 0,
-      transparent var(--reveal-radius),
-      rgba(2,2,6,.985) calc(var(--reveal-radius) + 1px),
+      transparent max(0px,calc(var(--reveal-radius) - 56px)),
+      rgba(2,2,6,.18) calc(var(--reveal-radius) - 28px),
+      rgba(2,2,6,.82) calc(var(--reveal-radius) + 8px),
+      rgba(2,2,6,.985) calc(var(--reveal-radius) + 56px),
       rgba(2,2,6,.985) 100%
     );
   will-change:opacity,background;
   contain:strict;
+  transform:translateZ(0);
+  backface-visibility:hidden;
 }
 
 #centerReveal.active{
@@ -886,6 +890,17 @@ input[type="password"]:focus{
   opacity:0;
   visibility:hidden;
   background:transparent;
+}
+
+.reveal-building #mainCard{
+  will-change:transform,opacity;
+  animation:pageBuildIn 1.22s cubic-bezier(.16,1,.3,1) both;
+}
+
+@keyframes pageBuildIn{
+  0%{opacity:.72;transform:scale(.978) translate3d(0,8px,0)}
+  42%{opacity:.9;transform:scale(.992) translate3d(0,2px,0)}
+  100%{opacity:1;transform:scale(1) translate3d(0,0,0)}
 }
 
 #centerReveal::after{
@@ -8076,21 +8091,32 @@ function waitForPaint(){
 function finishCenterReveal(){
   const reveal=document.getElementById("centerReveal");
   if(!reveal){
+    document.body.classList.remove("reveal-ready","reveal-building");
     return;
   }
 
+  const mainCard=document.getElementById("mainCard");
   document.body.classList.remove("reveal-ready");
   reveal.classList.remove("active");
   reveal.classList.add("done");
   reveal.style.removeProperty("--reveal-radius");
 
+  if(mainCard){
+    mainCard.style.animation="none";
+    void mainCard.offsetWidth;
+    mainCard.style.animation="";
+  }
+
+  document.body.classList.remove("reveal-building");
+
   window.setTimeout(()=>{
     reveal.classList.remove("done");
-  },120);
+  },220);
 }
 
 function startCenterReveal(){
   const reveal=document.getElementById("centerReveal");
+  const mainCard=document.getElementById("mainCard");
   if(!reveal){
     return Promise.resolve();
   }
@@ -8098,23 +8124,30 @@ function startCenterReveal(){
   if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
     reveal.classList.remove("active","done");
     reveal.style.removeProperty("--reveal-radius");
+    document.body.classList.remove("reveal-ready","reveal-building");
     return Promise.resolve();
   }
 
-  const radius=Math.ceil(Math.hypot(window.innerWidth,window.innerHeight)/2)+80;
-  const duration=760;
+  const radius=Math.ceil(Math.hypot(window.innerWidth,window.innerHeight)/2)+110;
+  const duration=Math.max(1180,Math.min(1500,window.innerWidth<=600?1320:1260));
   const start=performance.now();
 
-  document.body.classList.add("reveal-ready");
+  document.body.classList.add("reveal-ready","reveal-building");
   reveal.classList.remove("done");
   reveal.classList.add("active");
   reveal.style.setProperty("--reveal-radius","0px");
+
+  if(mainCard){
+    mainCard.style.animation="none";
+    void mainCard.offsetWidth;
+    mainCard.style.animation="";
+  }
 
   return new Promise(resolve=>{
     const frame=now=>{
       const elapsed=now-start;
       const t=Math.min(1,elapsed/duration);
-      const eased=1-Math.pow(1-t,3);
+      const eased=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
       const current=radius*eased;
       reveal.style.setProperty("--reveal-radius",current+"px");
 
