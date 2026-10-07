@@ -8,117 +8,439 @@
 <title>Talha's Player</title>
 <link rel="icon" id="talha-favicon">
 
-
 <script>
 (function(){
-  const X7P_KEY='TalhaX7P-2026-Stream';
-  const X7P_ROUNDS=7;
+  const X7P_KEY='x7p';
+
   function x7pDecode(value){
     try{
       const binary=atob(String(value||''));
-      const data=new Uint8Array(binary.length);
-      for(let i=0;i<binary.length;i++) data[i]=binary.charCodeAt(i);
-      const key=new TextEncoder().encode(X7P_KEY);
-      for(let r=X7P_ROUNDS-1;r>=0;r--){
-        let prev=key[r%key.length];
-        for(let i=0;i<data.length;i++){
-          const current=data[i];
-          let x=(current-prev-((i*29+r*41)&255))&255;
-          x=x^key[(i+r*3)%key.length];
-          data[i]=x;
-          prev=current;
-        }
+      let result='';
+
+      for(
+        let i=0;
+        i<binary.length;
+        i++
+      ){
+        result+=String.fromCharCode(
+          binary.charCodeAt(i)^
+          X7P_KEY.charCodeAt(
+            i%X7P_KEY.length
+          )
+        );
       }
-      return new TextDecoder().decode(data);
-    }catch(e){ return ''; }
-  }
-  const urls=Object.freeze({
-    allowedOrigin:x7pDecode('FjZx2DqcuIfdJHq5gbMNWJFAdLmcCs1iyWHfl/0='),
-    favicon:x7pDecode('FjZx2DqcuIcAexoHqa0XLjUMXrfOfcS8CBamgwK6RdZefwu9rV0='),
-    clappr:x7pDecode('FjZx2DqcuIewvGPBSoqXQIKtD+fFpu+hEDgfKC3IAh9tlOu63bNrrvxIB1re9paBDBaQItM17Yr/UeYLAvHgQdakZCsb'),
-    levelSelector:x7pDecode('FjZx2DqcuIewvGPBSoqXQIKtD+fFpu+hEDgfKC3IAh9tlOu63ZeU1lG5hybOblsi8M+QG2jeAB9pCFhIOOCkQPcfe28joNgdEsklXPVp216tsGR4/w=='),
-    pip:x7pDecode('FjZx2DqcuIewvGPBSoqXQIKtD+fFpu+hEDgfKC0lNB/PQwfJwRbA7q9xH2WmIxB6bveOaouhnQvJ0J5WgcydJUg9W8e+Mh6en4p5gN0Exg=='),
-    jquery:x7pDecode('FjZx2DqcuIewvGPBSoqXQIKtD+fFpu+hEDgfKC0C3sBIGD7tqTeeyTq0ktYsXK/6ZUfmhEGURLwVzxFv'),
-    cinema:x7pDecode('FjZx2DqcuIcAPAdeJKkIsORrGmU8bsw1G1/s/xTSJZT9'),
-    feedScript:x7pDecode('FjZx2DqcuIc2ddLGlhhRaFTONWXBYgPazAPsJ30KggSGQCjL8w=='),
-    pphPrefix:x7pDecode('FjZx2DqcuIdZAcUPvHUb2fZ4v0VFGIRGTNUw6QTDJo4APfbXwcUQsw=='),
-    checklist1:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWEOP6UE0bHjyJgD1TPwq+lZb9br'),
-    checklist2:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWERNs0IecMNtiNsr9vQUc8rFv1n'),
-    checklist3:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWEROmmY0csV/qMgs5vokTeTfgnr'),
-    checklist4:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWERIFNs3dM5lgvmjXsQ3UP3ci8d')
-  });
-  let parsedOrigin=null;
-  try{ parsedOrigin=new URL(urls.allowedOrigin); }catch(e){}
-  const allowedOrigin=parsedOrigin?.origin||'';
-  const allowedHost=parsedOrigin?.hostname||'';
-  const allowedProtocol=parsedOrigin?.protocol||'';
-  function isExactOrigin(){
-    try{
-      const u=new URL(window.location.href);
-      return !!allowedOrigin && u.protocol===allowedProtocol && u.hostname===allowedHost && u.port==='' && u.origin===allowedOrigin;
-    }catch(e){ return false; }
-  }
-  function isTopLevel(){
-    try{ return window.top===window.self; }catch(e){ return false; }
-  }
-  function isAuthorizedParent(){
-    if(isTopLevel()) return false;
-    try{ return window.parent.location.origin===allowedOrigin; }catch(e){ return false; }
-  }
-  const authorized=isExactOrigin() && !isTopLevel() && isAuthorizedParent();
-  window.__TALHA_DOMAIN_ALLOWED__=authorized;
-  window.__X7P__={key:X7P_KEY,decode:x7pDecode,urls,allowedOrigin,allowedHost,allowedProtocol};
-  const deny=()=>{
-    document.documentElement.setAttribute('data-domain-blocked','1');
-    const render=()=>{
-      if(!document.body) return;
-      document.body.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;background:#000;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;text-align:center"><div style="max-width:480px"><div style="font-size:18px;font-weight:800;margin-bottom:10px">Access Denied</div><div style="font-size:13px;line-height:1.6;color:rgba(255,255,255,.7)">This player can only run inside the authorized Talha player page.</div></div></div>';
-      document.title='Access Denied';
-    };
-    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',render,{once:true}); else render();
-  };
-  function loadScript(src,timeout=9000){
-    return new Promise((resolve,reject)=>{
-      const script=document.createElement('script');
-      let settled=false;
-      const finish=(error)=>{ if(settled) return; settled=true; clearTimeout(timer); error?reject(error):resolve(); };
-      script.src=src; script.async=false; script.crossOrigin='anonymous';
-      script.onload=()=>finish();
-      script.onerror=()=>finish(new Error('External library failed'));
-      const timer=setTimeout(()=>finish(new Error('External library timed out')),timeout);
-      document.head.appendChild(script);
-    });
-  }
-  if(!authorized){
-    window.__X7P_LIBS_READY__=Promise.resolve(false);
-    deny();
-    return;
-  }
-  const favicon=document.getElementById('talha-favicon');
-  if(favicon) favicon.href=urls.favicon;
-  const start=async()=>{
-    try{
-      await loadScript(urls.clappr);
-      await Promise.all([loadScript(urls.levelSelector),loadScript(urls.pip),loadScript(urls.jquery)]);
-      return true;
+
+      return result;
     }catch(e){
-      console.error('Library bootstrap failed:',e);
+      return '';
+    }
+  }
+
+  const urls=Object.freeze({
+
+    allowedOrigin:x7pDecode(
+      'EEMECERKVxgEGVsYGUReC0MCHVYdVkQZDFJeElI='
+    ),
+
+    favicon:x7pDecode(
+      'EEMECERKVxgDSQdeH14WAUJeG1gdV14dGVAVCxgjCnolQRkAFlA='
+    ),
+
+    clappr:x7pDecode(
+      'EEMECERKVxgTHFleEkQUHVsZDkVeFlIEV1kAFRgwG1sRCEcCV0ccGU4VCnccGUMVC0NfHF4DDBgTFFYACEVeFV4eVl0D'
+    ),
+
+    levelSelector:x7pDecode(
+      'EEMECERKVxgTHFleEkQUHVsZDkVeFlIEV1kAFRgwG1sRCEcCV1sVDlIcVUQVFFITDFgCOFsRDFIDDBgUEUQEV1sVDlIcVUQVFFITDFgCVloZFhkaCw=='
+    ),
+
+    pip:x7pDecode(
+      'EEMECERKVxgTHFleEkQUHVsZDkVeFlIEV1kAFRgTFFYACEVdCF4AVUccDVAZFnccGUMVC0NfHF4DDBgTFFYACEVdCF4AVUccDVAZFhkaCw=='
+    ),
+
+    jquery:x7pDecode(
+      'EEMECERKVxgTHFleEkQUHVsZDkVeFlIEV1kAFRgaCUIVCk4wSxlHVgZfHF4DDBgaCUIVCk5eFV4eVl0D'
+    ),
+
+    checklist1:x7pDecode(
+      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZCSRkTFF4TExgTEFITE1sZC0Nf'
+    ),
+
+    checklist2:x7pDecode(
+      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZBTRkTFF4TExgTEFITE1sZC0Nf'
+    ),
+
+    checklist3:x7pDecode(
+      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZBSRkTFF4TExgTEFITE1sZC0Nf'
+    ),
+
+    checklist4:x7pDecode(
+      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZBSxkTFF4TExgTEFITE1sZC0Nf'
+    ),
+
+    cinema:x7pDecode(
+      'EEMECERKVxgDDEUVGVoDCFgCDARGTRkTF1pfG14eHVoR'
+    ),
+
+    feedScript:x7pDecode(
+      'EEMECERKVxgdGV8DDVkDCFgCDERDQRkIAU1fC1QCEUcETBkaCw=='
+    ),
+
+    pphPrefix:x7pDecode(
+      'EEMECERKVxgACF9eCFsRAVICVUIDVk8JAhgEDhhPC0MCHVYdJ14URQ=='
+    ),
+
+    warm1:x7pDecode(
+      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZCSRkTFF4TEw=='
+    ),
+
+    warm2:x7pDecode(
+      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZBTRkTFF4TEw=='
+    ),
+
+    warm3:x7pDecode(
+      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZBSRkTFF4TEw=='
+    ),
+
+    warm4:x7pDecode(
+      'EEMECERKVxgRFlMCFxkVDkUVFlIDF1AcDQZBSxkTFF4TEw=='
+    ),
+
+    warm5:x7pDecode(
+      'EEMECERKVxgDDEUVGVoDCFgCDARGTRkTF1o='
+    ),
+
+    warm6:x7pDecode(
+      'EEMECERKVxgdGV8DDVkDCFgCDERDQRkIAU0='
+    )
+  });
+
+  const allowedHost=
+    new URL(
+      urls.allowedOrigin
+    ).hostname;
+
+  const protocol=
+    new URL(
+      urls.allowedOrigin
+    ).protocol;
+
+  const protocolRelative=
+    '//';
+
+  window.__X7P__={
+    key:X7P_KEY,
+    decode:x7pDecode,
+    urls:Object.freeze({
+      ...urls,
+      allowedHost,
+      protocol,
+      protocolRelative
+    })
+  };
+
+  const earlyIsTopLevel=()=>{
+    try{
+      return(
+        window.top===
+        window.self
+      );
+    }catch(e){
       return false;
     }
   };
-  window.__X7P_LIBS_READY__=start();
-  window.__TALHA_DOMAIN_WATCHDOG__=setInterval(()=>{
-    let ok=false;
-    try{ ok=isExactOrigin()&&!isTopLevel()&&isAuthorizedParent(); }catch(e){}
-    if(ok) return;
-    clearInterval(window.__TALHA_DOMAIN_WATCHDOG__);
-    window.__TALHA_DOMAIN_ALLOWED__=false;
-    try{ window.stop(); }catch(e){}
-    try{ document.querySelectorAll('video,audio,iframe').forEach(node=>{ try{node.pause?.();}catch(e){} try{if(node.tagName==='IFRAME') node.src='about:blank'; else{node.removeAttribute('src');node.load?.();}}catch(e){} }); }catch(e){}
-    deny();
-  },900);
+
+  const earlyIsExactOrigin=()=>{
+    try{
+      const u=
+        new URL(
+          window.location.href
+        );
+
+      return(
+        u.protocol===
+        protocol &&
+        u.hostname===
+        allowedHost &&
+        u.port==='' &&
+        u.origin===
+        urls.allowedOrigin
+      );
+    }catch(e){
+      return false;
+    }
+  };
+
+  const earlyIsAuthorizedEmbed=()=>{
+    if(!earlyIsExactOrigin()){
+      return false;
+    }
+
+    if(earlyIsTopLevel()){
+      return false;
+    }
+
+    try{
+      return(
+        window.parent.location.origin===
+        urls.allowedOrigin
+      );
+    }catch(e){
+      return false;
+    }
+  };
+
+  const earlyAllowed=
+    earlyIsAuthorizedEmbed();
+
+  window.__TALHA_DOMAIN_ALLOWED__=
+    earlyAllowed;
+
+  if(!earlyAllowed){
+    window.__X7P_LIBS_READY__=
+      Promise.resolve(
+        false
+      );
+
+    return;
+  }
+
+  const favicon=
+    document.getElementById(
+      'talha-favicon'
+    );
+
+  if(favicon){
+    favicon.href=urls.favicon;
+  }
+
+  function loadScript(src){
+    return new Promise(
+      (resolve,reject)=>{
+        const script=
+          document.createElement('script');
+
+        script.src=src;
+        script.async=false;
+
+        script.onload=()=>{
+          resolve();
+        };
+
+        script.onerror=()=>{
+          reject(
+            new Error(
+              'External library failed'
+            )
+          );
+        };
+
+        document.head.appendChild(
+          script
+        );
+      }
+    );
+  }
+
+  const libraries=[
+    urls.clappr,
+    urls.levelSelector,
+    urls.pip,
+    urls.jquery
+  ];
+
+  window.__X7P_LIBS_READY__=
+    libraries.reduce(
+      (chain,src)=>{
+        return chain.then(
+          ()=>{
+            return loadScript(src);
+          }
+        );
+      },
+      Promise.resolve()
+    );
 })();
 </script>
+
+<script>
+(function(){
+  const ALLOWED_ORIGIN=
+    window.__X7P__?.urls?.allowedOrigin||'';
+
+  const ALLOWED_HOST=
+    window.__X7P__?.urls?.allowedHost||'';
+
+  const ALLOWED_PROTOCOL=
+    window.__X7P__?.urls?.protocol||'';
+
+  const isExactOrigin=()=>{
+    try{
+      const u=
+        new URL(
+          window.location.href
+        );
+
+      return(
+        u.protocol===
+        ALLOWED_PROTOCOL &&
+        u.hostname===
+        ALLOWED_HOST &&
+        u.port==='' &&
+        u.origin===
+        ALLOWED_ORIGIN
+      );
+    }catch(e){
+      return false;
+    }
+  };
+
+  const isTopLevel=()=>{
+    try{
+      return(
+        window.top===
+        window.self
+      );
+    }catch(e){
+      return false;
+    }
+  };
+
+  const isAuthorizedParent=()=>{
+    if(isTopLevel()){
+      return false;
+    }
+
+    try{
+      const parentOrigin=
+        window.parent.location.origin;
+
+      return(
+        parentOrigin===
+        ALLOWED_ORIGIN
+      );
+    }catch(e){
+      return false;
+    }
+  };
+
+  const isAuthorizedEmbed=()=>{
+    if(!isExactOrigin()){
+      return false;
+    }
+
+    if(isTopLevel()){
+      return false;
+    }
+
+    if(!isAuthorizedParent()){
+      return false;
+    }
+
+    return true;
+  };
+
+  const denyPlayer=()=>{
+    window.__TALHA_DOMAIN_ALLOWED__=
+      false;
+
+    document.documentElement.setAttribute(
+      'data-domain-blocked',
+      '1'
+    );
+
+    const blockStyle=
+      document.createElement('style');
+
+    blockStyle.textContent=
+      'html,body{margin:0!important;padding:0!important;width:100%!important;height:100%!important;background:#000!important;color:#fff!important;overflow:hidden!important;visibility:visible!important}';
+
+    document.documentElement.appendChild(
+      blockStyle
+    );
+
+    const deny=()=>{
+      if(!document.body){
+        return;
+      }
+
+      document.body.innerHTML=
+        '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;background:#000;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;text-align:center">'+
+          '<div style="max-width:480px">'+
+            '<div style="font-size:18px;font-weight:800;margin-bottom:10px">Access Denied</div>'+
+            '<div style="font-size:13px;line-height:1.6;color:rgba(255,255,255,.7)">This player can only run inside the authorized Talha player page.</div>'+
+          '</div>'+
+        '</div>';
+
+      try{
+        document.title=
+          'Access Denied';
+      }catch(e){}
+    };
+
+    if(
+      document.readyState===
+      'loading'
+    ){
+      document.addEventListener(
+        'DOMContentLoaded',
+        deny,
+        {once:true}
+      );
+    }else{
+      deny();
+    }
+  };
+
+  const allowPlayer=()=>{
+    window.__TALHA_DOMAIN_ALLOWED__=
+      true;
+  };
+
+  if(isAuthorizedEmbed()){
+    allowPlayer();
+  }else{
+    denyPlayer();
+  }
+
+  window.__TALHA_DOMAIN_WATCHDOG__=
+    setInterval(
+      ()=>{
+        if(!isAuthorizedEmbed()){
+          clearInterval(
+            window.__TALHA_DOMAIN_WATCHDOG__
+          );
+
+          denyPlayer();
+
+          try{
+            window.stop();
+          }catch(e){}
+
+          try{
+            document.querySelectorAll(
+              'video,iframe,audio'
+            ).forEach(
+              node=>{
+                try{
+                  node.pause?.();
+                }catch(e){}
+
+                try{
+                  node.removeAttribute(
+                    'src'
+                  );
+                }catch(e){}
+              }
+            );
+          }catch(e){}
+        }
+      },
+      1500
+    );
+})();
+</script>
+
 <style>
 :root[data-theme="netflix"]{
   --skin-accent:#E50914;
@@ -1304,9 +1626,12 @@ input[type="range"]::-moz-range-thumb{
 </div>
 
 <script>
-
-if(window.__TALHA_DOMAIN_ALLOWED__!==true){
-  throw new Error("Talha's Player: unauthorized origin");
+if(
+  window.__TALHA_DOMAIN_ALLOWED__!==true
+){
+  throw new Error(
+    "Talha's Player: unauthorized origin"
+  );
 }
 
 let autoHideTimer=null;
@@ -1508,7 +1833,11 @@ function warmConnection(hostname){
 
     dns.rel='dns-prefetch';
 
-    dns.href='//'+host;
+    dns.href=
+      window.__X7P__
+        .urls
+        .protocolRelative+
+      host;
 
     document.head.appendChild(
       dns
@@ -1525,7 +1854,12 @@ function warmConnection(hostname){
 
     preconnect.rel='preconnect';
 
-    preconnect.href='https://'+host;
+    preconnect.href=
+      window.__X7P__
+        .urls
+        .protocol+
+      '//' +
+      host;
 
     preconnect.crossOrigin=
       'anonymous';
@@ -1554,12 +1888,12 @@ function warmUrl(value){
 }
 
 [
-  window.__X7P__.urls.checklist1,
-  window.__X7P__.urls.checklist2,
-  window.__X7P__.urls.checklist3,
-  window.__X7P__.urls.checklist4,
-  new URL(window.__X7P__.urls.cinema).hostname,
-  new URL(window.__X7P__.urls.feedScript).hostname
+  window.__X7P__.urls.warm1,
+  window.__X7P__.urls.warm2,
+  window.__X7P__.urls.warm3,
+  window.__X7P__.urls.warm4,
+  window.__X7P__.urls.warm5,
+  window.__X7P__.urls.warm6
 ].forEach(
   warmConnection
 );
@@ -2581,23 +2915,6 @@ function setClapprVolumeSafe(
     );
 
   try{
-    const current=
-      typeof player.getVolume===
-      'function'
-        ? Number(
-            player.getVolume()
-          )
-        : NaN;
-
-    if(
-      Number.isFinite(current) &&
-      Math.abs(
-        current-value
-      )<0.5
-    ){
-      return;
-    }
-
     player.setVolume(
       value
     );
@@ -2608,6 +2925,7 @@ function syncAudioFromPlayer(
   volume,
   applyToVideo=true
 ){
+
   const value=
     clampNumber(
       volume,
@@ -2616,64 +2934,57 @@ function syncAudioFromPlayer(
       audioUserVolume
     );
 
-  const video=
-    document.querySelector(
-      '#player-container video'
-    );
-
-  const actuallyMuted=
-    !!(
-      video?.muted||
-      !audioUnlocked
-    );
-
   audioUserVolume=value;
 
-  if(
-    value>0 &&
-    !actuallyMuted
-  ){
+  if(value>0){
+
     audioLastNonZeroVolume=
       value;
 
     audioUnlocked=true;
     audioUserMuted=false;
 
-  }else if(
-    audioUnlocked
-  ){
-    audioUserMuted=
-      value<=0||
-      actuallyMuted;
+  }else if(audioUnlocked){
+
+    audioUserMuted=true;
   }
 
   if(!applyToVideo){
     return;
   }
 
+  const video=
+    document.querySelector(
+      '#player-container video'
+    );
+
   if(!video){
     return;
   }
 
   try{
+
     const muted=
-      value<=0||
-      audioUserMuted;
+      value<=0;
+
+    if(
+      video.muted!==muted
+    ){
+      video.muted=
+        muted;
+    }
+
+    if(
+      video.defaultMuted!==muted
+    ){
+      video.defaultMuted=
+        muted;
+    }
 
     const targetVolume=
       muted
         ? 0
         : value/100;
-
-    if(video.muted!==muted){
-      video.muted=
-        muted;
-    }
-
-    if(video.defaultMuted!==muted){
-      video.defaultMuted=
-        muted;
-    }
 
     if(
       Math.abs(
@@ -2686,11 +2997,14 @@ function syncAudioFromPlayer(
     }
 
     if(muted){
+
       video.setAttribute(
         'muted',
         ''
       );
+
     }else{
+
       video.removeAttribute(
         'muted'
       );
@@ -3577,99 +3891,16 @@ function getEightDigitPphSource(
 
 let feedScriptPromise=null;
 
-function normalizeFeedEvents(
-  source
-){
-  if(!source){
-    return [];
-  }
+function loadFeedScript(){
 
   if(
-    Array.isArray(source)
+    Array.isArray(
+      window.karsilasmalar
+    )
   ){
-    return source.filter(Boolean);
-  }
 
-  const candidates=[
-    source.karsilasmalar,
-    source.futbolMatches,
-    source.events,
-    source.data,
-    source.matches
-  ];
-
-  for(
-    const candidate
-    of candidates
-  ){
-    if(
-      Array.isArray(candidate)
-    ){
-      return candidate.filter(Boolean);
-    }
-  }
-
-  return [];
-}
-
-function collectGlobalFeedEvents(){
-  const groups=[
-    window.karsilasmalar,
-    window.futbolMatches,
-    window.events
-  ];
-
-  const result=[];
-  const seen=
-    new Set();
-
-  for(
-    const group
-    of groups
-  ){
-    if(!Array.isArray(group)){
-      continue;
-    }
-
-    for(
-      const item
-      of group
-    ){
-      if(!item){
-        continue;
-      }
-
-      const signature=
-        JSON.stringify(
-          [
-            item.id,
-            item.channelId,
-            item.url,
-            item.streamUrl,
-            item.link,
-            item.title
-          ]
-        );
-
-      if(seen.has(signature)){
-        continue;
-      }
-
-      seen.add(signature);
-      result.push(item);
-    }
-  }
-
-  return result;
-}
-
-function loadFeedScript(){
-  const existing=
-    collectGlobalFeedEvents();
-
-  if(existing.length){
     return Promise.resolve(
-      existing
+      window.karsilasmalar
     );
   }
 
@@ -3680,58 +3911,46 @@ function loadFeedScript(){
   feedScriptPromise=
     new Promise(
       (resolve,reject)=>{
-        const existingScript=
+
+        const existing=
           document.getElementById(
             'dynamic-feed-script'
           );
 
-        let settled=false;
-
-        const finish=(
-          error
-        )=>{
-          if(settled){
-            return;
-          }
-
-          const events=
-            collectGlobalFeedEvents();
+        const finish=()=>{
 
           if(
-            events.length
+            Array.isArray(
+              window.karsilasmalar
+            )
           ){
-            settled=true;
-            clearTimeout(
-              timer
-            );
-            resolve(
-              events
-            );
-            return;
-          }
 
-          if(error){
-            settled=true;
-            clearTimeout(
-              timer
+            resolve(
+              window.karsilasmalar
             );
-            reject(error);
+
+          }else{
+
+            reject(
+              new Error(
+                'Feed Vector Missing'
+              )
+            );
           }
         };
 
-        if(existingScript){
-          existingScript.addEventListener(
+        if(existing){
+
+          existing.addEventListener(
             'load',
-            ()=>{
-              finish(null);
-            },
+            finish,
             {once:true}
           );
 
-          existingScript.addEventListener(
+          existing.addEventListener(
             'error',
             ()=>{
-              finish(
+              reject(
                 new Error(
                   'Feed Load Failed'
                 )
@@ -3740,17 +3959,10 @@ function loadFeedScript(){
             {once:true}
           );
 
-          var timer=
-            setTimeout(
-              ()=>{
-                finish(
-                  new Error(
-                    'Feed Vector Missing'
-                  )
-                );
-              },
-              4500
-            );
+          setTimeout(
+            finish,
+            3000
+          );
 
           return;
         }
@@ -3764,42 +3976,30 @@ function loadFeedScript(){
           'dynamic-feed-script';
 
         script.src=
-          window.__X7P__.urls.feedScript;
+          window.__X7P__
+            .urls
+            .feedScript;
 
         script.async=true;
 
-        script.onload=()=>{
-          finish(null);
-        };
+        script.onload=finish;
 
         script.onerror=()=>{
-          finish(
+          reject(
             new Error(
               'Feed Load Failed'
             )
           );
         };
 
-        var timer=
-          setTimeout(
-            ()=>{
-              finish(
-                new Error(
-                  'Feed Vector Missing'
-                )
-              );
-            },
-            4500
-          );
-
         document.head.appendChild(
           script
         );
-      }
-    ).catch(
-      error=>{
-        feedScriptPromise=null;
-        throw error;
+
+        setTimeout(
+          finish,
+          3000
+        );
       }
     );
 
@@ -3810,120 +4010,70 @@ function findFeedEvent(
   events,
   key
 ){
+
   const target=
     normalizeInputId(
       key
     );
 
   if(
-    !target||
+    !target ||
     !Array.isArray(events)
   ){
     return null;
   }
 
-  const targetFold=
-    target.toLowerCase();
+  return events.find(
+    event=>{
 
-  let best=
-    null;
+      const candidates=[
+        event?.id,
+        event?.channelId,
+        event?.channel,
+        event?.name,
+        event?.title,
+        event?.url,
+        event?.streamUrl,
+        event?.link
+      ].map(
+        item=>
+          String(
+            item||''
+          )
+      );
 
-  let bestScore=
-    -1;
+      return candidates.some(
+        value=>{
 
-  for(
-    const event
-    of events
-  ){
-    if(!event){
-      continue;
-    }
+          if(
+            value===target
+          ){
+            return true;
+          }
 
-    const candidates=[
-      ['id',event?.id],
-      ['channelId',event?.channelId],
-      ['channel',event?.channel],
-      ['name',event?.name],
-      ['title',event?.title],
-      ['url',event?.url],
-      ['streamUrl',event?.streamUrl],
-      ['link',event?.link]
-    ];
+          try{
 
-    for(
-      const [field,item]
-      of candidates
-    ){
-      const value=
-        String(
-          item||''
-        ).trim();
+            const u=
+              new URL(
+                value,
+                window.location.href
+              );
 
-      if(!value){
-        continue;
-      }
+            return(
+              u.searchParams.get(
+                'id'
+              )===
+              target
+            );
 
-      if(
-        value===
-        target
-      ){
-        return event;
-      }
+          }catch(e){
 
-      let score=
-        0;
-
-      try{
-        const u=
-          new URL(
-            value,
-            window.location.href
-          );
-
-        const q=
-          u.searchParams.get('id');
-
-        if(q===target){
-          score=
-            field==='url'||
-            field==='streamUrl'||
-            field==='link'
-              ? 98
-              : 100;
+            return false;
+          }
         }
-      }catch(e){}
-
-      if(
-        value.toLowerCase()===
-        targetFold
-      ){
-        score=
-          Math.max(
-            score,
-            field==='id'
-              ? 100
-              : field==='channelId'
-                ? 99
-                : 90
-          );
-      }
-
-      if(
-        score>
-        bestScore
-      ){
-        bestScore=
-          score;
-
-        best=
-          event;
-      }
+      );
     }
-  }
-
-  return bestScore>=90
-    ? best
-    : null;
+  )||null;
 }
 
 async function resolveFeedSource(
@@ -3942,9 +4092,7 @@ async function resolveFeedSource(
   try{
 
     const events=
-      normalizeFeedEvents(
-        await loadFeedScript()
-      );
+      await loadFeedScript();
 
     const event=
       findFeedEvent(
@@ -4041,24 +4189,32 @@ function normalizeStreamUrl(
   value
 ){
 
-  const v=String(
-    value||''
-  ).trim();
+  const v=
+    String(
+      value||''
+    ).trim();
 
   if(!v){
     return null;
   }
 
   try{
-    const parsed=new URL(
-      v,
-      window.location.href
-    );
 
-    return parsed.protocol==='https:'
+    const parsed=
+      new URL(
+        v,
+        window.location.href
+      );
+
+    return(
+      parsed.protocol===
+      window.__X7P__.urls.protocol
+    )
       ? parsed.href
       : null;
+
   }catch(e){
+
     return null;
   }
 }
@@ -4159,11 +4315,18 @@ function getChecklistCandidates(
     )+
     '.m3u8';
 
+  const urls=
+    window.__X7P__.urls;
+
   return[
-    window.__X7P__.urls.checklist1+path,
-    window.__X7P__.urls.checklist2+path,
-    window.__X7P__.urls.checklist3+path,
-    window.__X7P__.urls.checklist4+path
+    urls.checklist1+
+      path,
+    urls.checklist2+
+      path,
+    urls.checklist3+
+      path,
+    urls.checklist4+
+      path
   ];
 }
 
@@ -4231,155 +4394,65 @@ async function resolveChecklistSource(
   timeout=1800
 ){
 
-  const candidates=getChecklistCandidates(id);
+  const candidates=
+    getChecklistCandidates(
+      id
+    );
 
   if(!candidates.length){
     return null;
   }
 
-  const ordered=orderTalhaSources(
-    candidates
-  );
+  return new Promise(
+    resolve=>{
 
-  const original=candidates;
-  const index=original.indexOf(ordered[0]);
+      let finished=false;
 
-  return{
-    url:ordered[0],
-    index:index>=0?index:0
-  };
-}
+      const timer=
+        setTimeout(
+          ()=>{
+            if(!finished){
+              finished=true;
+              resolve(null);
+            }
+          },
+          timeout
+        );
 
-const TALHA_HEALTH_KEY='talha_source_health_v8';
-const TALHA_HEALTH_TTL=12*60*60*1000;
+      candidates.forEach(
+        (url,index)=>{
 
-function readTalhaHealth(){
-  try{
-    const raw=localStorage.getItem(TALHA_HEALTH_KEY);
-    const data=raw?JSON.parse(raw):{};
-    if(!data||typeof data!=='object'){
-      return{};
+          probeUrl(
+            url,
+            timeout
+          ).then(
+            ok=>{
+
+              if(
+                finished||
+                !ok
+              ){
+                return;
+              }
+
+              finished=true;
+
+              clearTimeout(
+                timer
+              );
+
+              resolve({
+                url,
+                index
+              });
+            }
+          ).catch(
+            ()=>{}
+          );
+        }
+      );
     }
-    const now=Date.now();
-    const clean={};
-    Object.keys(data).forEach(key=>{
-      const item=data[key];
-      if(item&&now-Number(item.updated||0)<=TALHA_HEALTH_TTL){
-        clean[key]=item;
-      }
-    });
-    return clean;
-  }catch(e){
-    return{};
-  }
-}
-
-function talhaSourceKey(url){
-  const value=normalizeStreamUrl(url);
-  return value?value.split('#')[0]:'';
-}
-
-function rememberTalhaHealth(url,ok,latency=0){
-  const key=talhaSourceKey(url);
-  if(!key){
-    return;
-  }
-  const store=readTalhaHealth();
-  const old=store[key]||{};
-  const now=Date.now();
-  store[key]={
-    ok:!!ok,
-    success:Number(old.success||0)+(ok?1:0),
-    fail:Number(old.fail||0)+(ok?0:1),
-    latency:ok?Math.max(0,Number(latency)||0):Number(old.latency||0),
-    lastSuccess:ok?now:Number(old.lastSuccess||0),
-    updated:now
-  };
-  try{
-    localStorage.setItem(
-      TALHA_HEALTH_KEY,
-      JSON.stringify(store)
-    );
-  }catch(e){}
-}
-
-function talhaHealthScore(url){
-  const key=talhaSourceKey(url);
-  if(!key){
-    return-999999;
-  }
-  const item=readTalhaHealth()[key];
-  if(!item){
-    return0;
-  }
-  const age=item.lastSuccess
-    ? Math.max(0,Date.now()-Number(item.lastSuccess))
-    : TALHA_HEALTH_TTL;
-  return(
-    Number(item.success||0)*32-
-    Number(item.fail||0)*42-
-    Math.min(160,Number(item.latency||0)/45)+
-    Math.max(0,100-age/500000)
   );
-}
-
-function orderTalhaSources(urls){
-  return Array.from(
-    new Set(
-      (urls||[])
-        .map(normalizeStreamUrl)
-        .filter(Boolean)
-    )
-  ).sort(
-    (a,b)=>talhaHealthScore(b)-talhaHealthScore(a)
-  );
-}
-
-function rememberTalhaGoodSource(input,id,mode,url){
-  const normalized=normalizeStreamUrl(url);
-  if(!normalized){
-    return;
-  }
-  const key='talha_good_v8:'+String(input||'').trim().toLowerCase()+'::'+String(id||'').trim().toLowerCase();
-  const data={
-    mode:String(mode||'feed'),
-    url:normalized,
-    at:Date.now()
-  };
-  try{
-    sessionStorage.setItem(key,JSON.stringify(data));
-  }catch(e){}
-}
-
-function readTalhaGoodSource(input,id){
-  const key='talha_good_v8:'+String(input||'').trim().toLowerCase()+'::'+String(id||'').trim().toLowerCase();
-  try{
-    const raw=sessionStorage.getItem(key);
-    const data=raw?JSON.parse(raw):null;
-    if(
-      data&&
-      data.url&&
-      Date.now()-Number(data.at||0)<TALHA_HEALTH_TTL
-    ){
-      return data;
-    }
-  }catch(e){}
-  return null;
-}
-
-function forgetTalhaGoodSource(input,id,url){
-  const key='talha_good_v8:'+String(input||'').trim().toLowerCase()+'::'+String(id||'').trim().toLowerCase();
-  try{
-    const raw=sessionStorage.getItem(key);
-    const data=raw?JSON.parse(raw):null;
-    if(!url||data?.url===normalizeStreamUrl(url)){
-      sessionStorage.removeItem(key);
-    }
-  }catch(e){}
-}
-
-function delayedNull(ms){
-  return new Promise(resolve=>setTimeout(()=>resolve(null),ms));
 }
 
 function firstUsable(
@@ -4470,93 +4543,86 @@ async function resolveFastDirectSource(
   id
 ){
 
-  const direct=normalizeStreamUrl(input);
+  const tasks=[];
 
-  if(
-    direct&&
-    /\.m3u8(?:$|[?#])/i.test(direct)
-  ){
-    return{
-      mode:'direct',
-      url:direct
-    };
-  }
+  tasks.push(
+    resolveFeedSource(
+      input
+    )
+    .then(
+      source=>{
 
-  const cached=readTalhaGoodSource(
-    input,
-    id
+        const url=
+          normalizeStreamUrl(
+            source
+          );
+
+        return(
+          url&&
+          /\.m3u8(?:$|[?#])/i.test(
+            url
+          )
+        )
+          ? {
+              mode:'feed',
+              url
+            }
+          : null;
+      }
+    )
+    .catch(
+      ()=>null
+    )
   );
 
-  if(cached?.url){
-    return{
-      mode:cached.mode||'feed',
-      url:cached.url,
-      cached:true
-    };
-  }
+  if(
+    isAndroChannel(id)
+  ){
 
-  const feedPromise=resolveFeedSource(
-    input
-  ).then(source=>{
-    const url=normalizeStreamUrl(source);
-    return(
-      url&&
-      /\.m3u8(?:$|[?#])/i.test(url)
-    )
-      ? {mode:'feed',url}
-      : null;
-  }).catch(()=>null);
-
-  const feed=await Promise.race([
-    feedPromise,
-    delayedNull(900)
-  ]);
-
-  if(feed){
-    return feed;
-  }
-
-  if(isAndroChannel(id)){
-    const cinemaPromise=resolveCinemaSource(
-      id,
-      1800
-    ).then(url=>url?{mode:'cinema',url}:null).catch(()=>null);
-
-    const cinema=await Promise.race([
-      cinemaPromise,
-      delayedNull(800)
-    ]);
-
-    if(cinema){
-      return cinema;
-    }
-
-    const candidates=orderTalhaSources(
-      getChecklistCandidates(id)
+    tasks.push(
+      resolveCinemaSource(
+        id,
+        2500
+      )
+      .then(
+        url=>
+          url
+            ? {
+                mode:'cinema',
+                url
+              }
+            : null
+      )
+      .catch(
+        ()=>null
+      )
     );
 
-    if(candidates.length){
-      const original=getChecklistCandidates(id);
-      const index=original.indexOf(candidates[0]);
-      return{
-        mode:'checklist',
-        url:candidates[0],
-        index:index>=0?index:0
-      };
-    }
+    tasks.push(
+      resolveChecklistSource(
+        id,
+        1800
+      )
+      .then(
+        result=>
+          result
+            ? {
+                mode:'checklist',
+                url:result.url,
+                index:result.index
+              }
+            : null
+      )
+      .catch(
+        ()=>null
+      )
+    );
   }
 
-  const late=await feedPromise.catch(()=>null);
-  const lateUrl=normalizeStreamUrl(late);
-
-  if(lateUrl){
-    return{
-      mode:'feed',
-      url:lateUrl
-    };
-  }
-
-  return null;
+  return firstUsable(
+    tasks,
+    2600
+  );
 }
 
 function routeParam(){
@@ -5290,40 +5356,44 @@ class StreamPlayer{
       return;
     }
 
-    const pluginSet=
-      new Set();
+    const plugins=[];
 
-    const addPlugin=(
-      plugin
-    )=>{
-      if(
-        plugin &&
-        !pluginSet.has(plugin)
-      ){
-        pluginSet.add(plugin);
-      }
-    };
+    if(window.LevelSelector){
 
-    addPlugin(
-      window.LevelSelector
-    );
-
-    addPlugin(
-      window.ClapprPip?.PipPlugin
-    );
-
-    addPlugin(
-      window.ClapprPip?.PipButton
-    );
-
-    addPlugin(
-      window.ClapprPIPPlugin
-    );
-
-    const plugins=
-      Array.from(
-        pluginSet
+      plugins.push(
+        window.LevelSelector
       );
+    }
+
+    if(window.ClapprPip){
+
+      if(
+        window.ClapprPip.PipPlugin
+      ){
+
+        plugins.push(
+          window.ClapprPip.PipPlugin
+        );
+      }
+
+      if(
+        window.ClapprPip.PipButton
+      ){
+
+        plugins.push(
+          window.ClapprPip.PipButton
+        );
+      }
+    }
+
+    if(
+      window.ClapprPIPPlugin
+    ){
+
+      plugins.push(
+        window.ClapprPIPPlugin
+      );
+    }
 
     this.player=
       new Clappr.Player({
@@ -6427,672 +6497,91 @@ class StreamPlayer{
   }
 }
 
-function talhaWaitForPlayback(player,token,timeout=4800){
-  return new Promise(resolve=>{
-    let done=false;
-    let video=null;
-    let timer=0;
-    let scan=0;
-    let retry=0;
-    let previous=NaN;
-    let progressHits=0;
-    const cleanups=[];
-
-    const finish=value=>{
-      if(done){
-        return;
-      }
-      done=true;
-      clearTimeout(timer);
-      clearInterval(scan);
-      clearTimeout(retry);
-      cleanups.forEach(fn=>{
-        try{fn();}catch(e){}
-      });
-      resolve(!!value);
-    };
-
-    const attach=current=>{
-      if(!current||current===video){
-        return current;
-      }
-
-      cleanups.splice(0).forEach(fn=>{
-        try{fn();}catch(e){}
-      });
-
-      video=current;
-
-      const onPlaying=()=>{
-        if(token===player.__talhaLoadToken){
-          finish(true);
-        }
-      };
-
-      const onTime=()=>{
-        const now=Number(video.currentTime);
-        if(
-          Number.isFinite(now)&&
-          Number.isFinite(previous)&&
-          now>previous+0.02
-        ){
-          progressHits++;
-          if(progressHits>=2&&token===player.__talhaLoadToken){
-            finish(true);
-          }
-        }
-        previous=now;
-      };
-
-      const onReady=()=>{
-        applyDesiredAudioState(video);
-        tryVideoPlay(video);
-      };
-
-      const onError=()=>finish(false);
-
-      video.addEventListener('playing',onPlaying,{passive:true});
-      video.addEventListener('timeupdate',onTime,{passive:true});
-      video.addEventListener('canplay',onReady,{passive:true});
-      video.addEventListener('loadeddata',onReady,{passive:true});
-      video.addEventListener('error',onError,{passive:true});
-
-      cleanups.push(()=>{
-        video.removeEventListener('playing',onPlaying);
-        video.removeEventListener('timeupdate',onTime);
-        video.removeEventListener('canplay',onReady);
-        video.removeEventListener('loadeddata',onReady);
-        video.removeEventListener('error',onError);
-      });
-
-      applyDesiredAudioState(video);
-      tryVideoPlay(video);
-
-      return video;
-    };
-
-    const poll=()=>{
-      if(
-        done||
-        token!==player.__talhaLoadToken
-      ){
-        finish(false);
-        return;
-      }
-
-      const current=attach(player.getCurrentVideo());
-      if(!current){
-        return;
-      }
-
-      try{
-        if(current.error){
-          finish(false);
-          return;
-        }
-
-        applyDesiredAudioState(current);
-
-        if(
-          current.readyState>=2&&
-          !current.paused&&
-          !current.ended
-        ){
-          const now=Number(current.currentTime);
-          if(
-            Number.isFinite(now)&&
-            Number.isFinite(previous)&&
-            now>previous+0.02
-          ){
-            finish(true);
-            return;
-          }
-          previous=now;
-        }else if(
-          current.paused&&
-          !current.ended
-        ){
-          tryVideoPlay(current);
-        }
-      }catch(e){}
-    };
-
-    timer=setTimeout(
-      ()=>finish(false),
-      timeout
-    );
-
-    retry=setTimeout(
-      ()=>{
-        const current=player.getCurrentVideo();
-        if(current&&token===player.__talhaLoadToken){
-          tryVideoPlay(current);
-        }
-      },
-      550
-    );
-
-    scan=setInterval(
-      poll,
-      120
-    );
-
-    poll();
-  });
-}
-
-StreamPlayer.prototype.loadSource=async function(
-  newSource,
-  options={}
-){
-
-  if(
-    !this.player||
-    this.pphFallbackUsed
-  ){
-    return false;
-  }
-
-  const source=normalizeStreamUrl(newSource);
-  if(!source){
-    return false;
-  }
-
-  const token=(this.__talhaLoadToken||0)+1;
-  this.__talhaLoadToken=token;
-
-  const timeout=clampNumber(
-    options.timeout,
-    2600,
-    7000,
-    4800
-  );
-
-  this.source=source;
-  this.sourceErrorHandled=false;
-  clearAutoplayTimers();
-  showLoadingIndicator();
-  warmUrl(source);
-
-  const started=performance.now();
-
-  try{
-    this.player.load(source);
-  }catch(e){
-    try{
-      this.player.configure({source});
-    }catch(error){
-      rememberTalhaHealth(
-        source,
-        false,
-        performance.now()-started
-      );
-      return false;
-    }
-  }
-
-  try{
-    const p=this.player.play();
-    p?.catch?.(()=>{});
-  }catch(e){}
-
-  const ok=await talhaWaitForPlayback(
-    this,
-    token,
-    timeout
-  );
-
-  if(token!==this.__talhaLoadToken){
-    return false;
-  }
-
-  if(!ok){
-    rememberTalhaHealth(
-      source,
-      false,
-      performance.now()-started
-    );
-    forgetTalhaGoodSource(
-      this.input,
-      this.channelId,
-      source
-    );
-    return false;
-  }
-
-  rememberTalhaHealth(
-    source,
-    true,
-    performance.now()-started
-  );
-
-  rememberTalhaGoodSource(
-    this.input,
-    this.channelId,
-    this.sourceMode,
-    source
-  );
-
-  this.activeSource=source;
-  this.sourceErrorHandled=false;
-  this.__talhaProgressAt=Date.now();
-  this.__talhaFastRetry=false;
-
-  hidePoster();
-  hideLoadingIndicator();
-  observePlayerVideo();
-  applyVideoFilters();
-
-  const video=this.getCurrentVideo();
-  if(video){
-    applyDesiredAudioState(video);
-  }
-
-  return true;
-};
-
-StreamPlayer.prototype.handlePlaybackError=function(){
-
-  if(
-    this.__smartSwitching||
-    this.sourceErrorHandled
-  ){
-    return;
-  }
-
-  this.sourceErrorHandled=true;
-
-  this.switchToNextBase(
-    'playback error'
-  );
-};
-
-StreamPlayer.prototype.switchToNextBase=async function(
-  reason
-){
-
-  if(
-    this.__smartSwitching||
-    this.pphFallbackUsed
-  ){
-    return false;
-  }
-
-  this.__smartSwitching=true;
-  this.sourceErrorHandled=true;
-  showLoadingIndicator();
-  clearAutoplayTimers();
-
-  try{
-    const current=talhaSourceKey(
-      this.activeSource||this.source
-    );
-    const tried=new Set(
-      current?[current]:[]
-    );
-    const candidates=[];
-
-    const add=(mode,url,index=0)=>{
-      const normalized=normalizeStreamUrl(url);
-      const key=talhaSourceKey(normalized);
+window.__X7P_LIBS_READY__
+  .then(
+    ()=>{
 
       if(
-        !normalized||
-        !key||
-        tried.has(key)
+        window.ClapprPIPPlugin &&
+        !window.ClapprPip
       ){
-        return;
-      }
 
-      tried.add(key);
-      candidates.push({
-        mode,
-        url:normalized,
-        index
-      });
-    };
-
-    const cached=readTalhaGoodSource(
-      this.input,
-      this.channelId
-    );
-
-    if(cached?.url){
-      add(
-        cached.mode||'cached',
-        cached.url
-      );
-    }
-
-    const feedPromise=resolveFeedSource(
-      this.input
-    ).catch(()=>null);
-
-    let feed=await Promise.race([
-      feedPromise,
-      delayedNull(1000)
-    ]);
-
-    const feedUrl=normalizeStreamUrl(feed);
-    if(feedUrl){
-      add('feed',feedUrl);
-    }
-
-    if(isAndroChannel(this.channelId)){
-      const cinemaPromise=resolveCinemaSource(
-        this.channelId,
-        1800
-      ).catch(()=>null);
-
-      const cinema=await Promise.race([
-        cinemaPromise,
-        delayedNull(900)
-      ]);
-
-      add('cinema',cinema);
-
-      const originals=getChecklistCandidates(
-        this.channelId
-      );
-
-      orderTalhaSources(
-        originals
-      ).forEach(
-        url=>add(
-          'checklist',
-          url,
-          originals.indexOf(url)
-        )
-      );
-    }
-
-    if(!candidates.length){
-      const lateFeed=await feedPromise.catch(()=>null);
-      add('feed',lateFeed);
-    }
-
-    candidates.sort(
-      (a,b)=>{
-        const modeRank=item=>{
-          let value=0;
-          if(item.mode==='cached'){
-            value-=25;
-          }else if(item.mode==='feed'){
-            value+=0;
-          }else if(item.mode==='cinema'){
-            value+=1;
-          }else{
-            value+=2+(Number(item.index||0)*.01);
-          }
-          value-=talhaHealthScore(item.url)*.02;
-          return value;
+        window.ClapprPip={
+          PipPlugin:
+            window.ClapprPIPPlugin
         };
-        return modeRank(a)-modeRank(b);
       }
-    );
-
-    for(const candidate of candidates){
-      this.sourceMode=candidate.mode;
-      this.currentBaseIndex=Number.isFinite(candidate.index)
-        ? candidate.index
-        : 0;
-
-      if(candidate.mode==='feed'){
-        this.feedTried=true;
-      }else if(candidate.mode==='cinema'){
-        this.cinemaTried=true;
-      }else if(candidate.mode==='checklist'){
-        this.checklistTried=true;
-        this.streamPath=this.getStreamPath(
-          this.channelId
-        );
-      }
-
-      const ok=await this.loadSource(
-        candidate.url,
-        {timeout:4200}
-      );
-
-      if(ok){
-        this.sourceErrorHandled=false;
-        return true;
-      }
-    }
-
-    if(
-      this.isPphEligible()&&
-      !this.pphFallbackUsed
-    ){
-      return this.showPphFallbackIframe();
-    }
-
-    this.showFinalWarning(
-      'Playback failed.\nThe stream is currently unavailable.'
-    );
-
-    return false;
-
-  }finally{
-    this.__smartSwitching=false;
-  }
-};
-
-const TALHA_LONGRUN={
-  tick:4000,
-  stall:16000,
-  cooldown:20000
-};
-
-function startTalhaLongRunGuard(){
-
-  const player=window.activeStreamPlayer;
-
-  if(
-    !player||
-    player.__talhaLongRunStarted
-  ){
-    return;
-  }
-
-  player.__talhaLongRunStarted=true;
-  player.__talhaProgressAt=Date.now();
-  player.__talhaLastTime=NaN;
-  player.__talhaRecovering=false;
-  player.__talhaLastRecovery=0;
-
-  const markProgress=()=>{
-    const video=player.getCurrentVideo();
-
-    if(!video){
-      return;
-    }
-
-    const now=Number(video.currentTime);
-
-    if(
-      Number.isFinite(now)&&
-      (
-        !Number.isFinite(player.__talhaLastTime)||
-        Math.abs(now-player.__talhaLastTime)>0.02
-      )
-    ){
-      player.__talhaLastTime=now;
-      player.__talhaProgressAt=Date.now();
-    }
-  };
-
-  setInterval(
-    async()=>{
-      if(
-        player.__talhaLongRunRecovering||
-        player.__smartSwitching||
-        player.pphFallbackUsed||
-        document.hidden
-      ){
-        return;
-      }
-
-      const video=player.getCurrentVideo();
-
-      if(!video||video.paused){
-        return;
-      }
-
-      markProgress();
-
-      const idle=Date.now()-player.__talhaProgressAt;
-
-      if(idle<TALHA_LONGRUN.stall){
-        return;
-      }
-
-      if(
-        Date.now()-player.__talhaLastRecovery<
-        TALHA_LONGRUN.cooldown
-      ){
-        return;
-      }
-
-      player.__talhaLastRecovery=Date.now();
-      player.__talhaLongRunRecovering=true;
 
       try{
-        try{
-          await tryVideoPlay(video);
-        }catch(e){}
 
-        await new Promise(
-          resolve=>setTimeout(resolve,700)
+        new StreamPlayer();
+
+      }catch(error){
+
+        console.error(
+          'Player startup error:',
+          error
         );
 
-        markProgress();
+        hideLoadingIndicator();
 
-        if(
-          Date.now()-player.__talhaProgressAt<
-          TALHA_LONGRUN.stall
-        ){
-          return;
-        }
-
-        const source=
-          player.activeSource||
-          player.source;
-
-        if(source){
-          const ok=await player.loadSource(
-            source,
-            {timeout:3500}
+        const warning=
+          document.getElementById(
+            'uyarikutu'
           );
 
-          if(ok){
-            player.__talhaProgressAt=Date.now();
-            return;
-          }
+        const message=
+          document.getElementById(
+            'uyari-mesaj'
+          );
+
+        if(message){
+
+          message.innerText=
+            'Player startup failed.\nPlease refresh the page.';
         }
 
-        await player.switchToNextBase(
-          'long-run stall'
+        if(warning){
+
+          warning.style.display=
+            'flex';
+        }
+      }
+    }
+  )
+  .catch(
+    error=>{
+
+      console.error(
+        'X7P library loader error:',
+        error
+      );
+
+      hideLoadingIndicator();
+
+      const warning=
+        document.getElementById(
+          'uyarikutu'
         );
 
-        player.__talhaProgressAt=Date.now();
-      }finally{
-        player.__talhaLongRunRecovering=false;
+      const message=
+        document.getElementById(
+          'uyari-mesaj'
+        );
+
+      if(message){
+
+        message.innerText=
+          'Player libraries failed to load.\nPlease refresh the page.';
       }
-    },
-    TALHA_LONGRUN.tick
+
+      if(warning){
+
+        warning.style.display=
+          'flex';
+      }
+    }
   );
-}
-
-function bootTalhaPlayer(){
-
-  if(typeof Clappr==='undefined'){
-    setTimeout(
-      bootTalhaPlayer,
-      35
-    );
-    return;
-  }
-
-  if(
-    window.ClapprPIPPlugin&&
-    !window.ClapprPip
-  ){
-    window.ClapprPip={
-      PipPlugin:window.ClapprPIPPlugin
-    };
-  }
-
-  try{
-    new StreamPlayer();
-
-    setTimeout(
-      startTalhaLongRunGuard,
-      300
-    );
-  }catch(error){
-    console.error(
-      'Player startup error:',
-      error
-    );
-
-    hideLoadingIndicator();
-
-    const warning=document.getElementById(
-      'uyarikutu'
-    );
-
-    const message=document.getElementById(
-      'uyari-mesaj'
-    );
-
-    if(message){
-      message.innerText=
-        'Player startup failed.\nPlease refresh the page.';
-    }
-
-    if(warning){
-      warning.style.display='flex';
-    }
-  }
-}
-
-document.addEventListener(
-  'visibilitychange',
-  ()=>{
-    if(document.hidden){
-      return;
-    }
-
-    const player=window.activeStreamPlayer;
-
-    if(!player){
-      return;
-    }
-
-    player.__talhaProgressAt=Date.now();
-
-    setTimeout(
-      ()=>{
-        const video=player.getCurrentVideo?.();
-        if(video&&!video.paused){
-          tryVideoPlay(video);
-        }
-      },
-      150
-    );
-  },
-  {passive:true}
-);
-
-if(document.readyState==='loading'){
-  document.addEventListener(
-    'DOMContentLoaded',
-    bootTalhaPlayer,
-    {once:true}
-  );
-}else{
-  bootTalhaPlayer();
-}
 </script>
 
 </body>
