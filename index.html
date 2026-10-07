@@ -8129,7 +8129,7 @@ function startCenterReveal(){
   }
 
   const radius=Math.ceil(Math.hypot(window.innerWidth,window.innerHeight)/2)+110;
-  const duration=Math.max(1180,Math.min(1500,window.innerWidth<=600?1320:1260));
+  const duration=1500;
   const start=performance.now();
 
   document.body.classList.add("reveal-ready","reveal-building");
@@ -8268,13 +8268,8 @@ async function login(){
     const appHeader=document.getElementById("appHeader");
     const statusStrip=document.getElementById("statusStrip");
 
-    document.body.classList.remove("auth-locked");
-
     if(loginBox){
       loginBox.classList.add("login-leaving");
-    }
-
-    if(loginBox){
       loginBox.style.display="none";
     }
 
@@ -8291,9 +8286,11 @@ async function login(){
       statusStrip.style.display="flex";
     }
 
-    await waitForPaint();
+    const revealPromise=startCenterReveal();
 
-    await startCenterReveal();
+    document.body.classList.remove("auth-locked");
+
+    await revealPromise;
 
     if(playerWrap){
       playerWrap.classList.add("fade");
