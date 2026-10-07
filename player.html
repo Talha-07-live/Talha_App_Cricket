@@ -2410,6 +2410,64 @@ function startAutoplayRetries(){
   scheduleAutoplay(1800);
 }
 
+let audioSyncBusy=false;
+let lastAudibleVolume=100;
+
+function getPlayerVideo(){
+
+  return document.querySelector(
+    '#player-container video'
+  );
+}
+
+function syncUnmuteButton(){
+
+  const button=document.getElementById(
+    'unmute-overlay-btn'
+  );
+
+  const video=getPlayerVideo();
+
+  if(!button || !video){
+    return;
+  }
+
+  const muted=!!video.muted || Number(video.volume)<=0.001;
+
+  button.classList.toggle(
+    'hidden',
+    !audioUnlocked || !muted
+  );
+}
+
+function syncAudioState(volume,muted,source){
+
+  const value=clampNumber(
+    volume,
+    0,
+    100,
+    audioUserVolume
+  );
+
+  if(value>0){
+    lastAudibleVolume=value;
+  }
+
+  if(source!=='autoplay'){
+
+    audioUserVolume=
+      value>0
+        ? value
+        : Math.max(1,lastAudibleVolume);
+
+    if(audioUnlocked){
+      audioUserMuted=!!muted || value<=0;
+    }
+  }
+
+  syncUnmuteButton();
+}
+
 function syncAudioFromPlayer(volume){
 
   const value=clampNumber(
@@ -2419,24 +2477,91 @@ function syncAudioFromPlayer(volume){
     audioUserVolume
   );
 
-  audioUserVolume=value;
+  if(!audioSyncBusy){
 
-  if(value>0){
-
-    audioUnlocked=true;
-    audioUserMuted=false;
-
-  }else if(audioUnlocked){
-
-    audioUserMuted=true;
+    if(value>0){
+      lastAudibleVolume=value;
+      audioUserVolume=value;
+      audioUnlocked=true;
+      audioUserMuted=false;
+    }else if(audioUnlocked){
+      audioUserMuted=true;
+      audioUserVolume=Math.max(1,lastAudibleVolume);
+    }
   }
+
+  syncUnmuteButton();
+}
+
+function setPlayerVolume(value,unmute=true){
+
+  const volume=clampNumber(
+    value,
+    0,
+    100,
+    audioUserVolume
+  );
+
+  const video=getPlayerVideo();
+  const player=window.activeStreamPlayer?.player||null;
+
+  audioSyncBusy=true;
+
+  try{
+    if(player){
+      if(volume<=0){
+        if(typeof player.mute==='function'){
+          player.mute();
+        }else if(typeof player.setMute==='function'){
+          player.setMute(true);
+        }
+      }else{
+        if(typeof player.unmute==='function'){
+          player.unmute();
+        }else if(typeof player.setMute==='function'){
+          player.setMute(false);
+        }
+      }
+
+      if(typeof player.setVolume==='function'){
+        player.setVolume(volume);
+      }
+    }
+  }catch(e){}
+
+  try{
+    if(video){
+      video.volume=Math.max(0,Math.min(1,volume/100));
+
+      if(unmute){
+        video.muted=volume<=0;
+        video.defaultMuted=volume<=0;
+
+        if(video.muted){
+          video.setAttribute('muted','');
+        }else{
+          video.removeAttribute('muted');
+        }
+      }
+    }
+  }catch(e){}
+
+  audioSyncBusy=false;
+
+  if(volume>0){
+    lastAudibleVolume=volume;
+    audioUserVolume=volume;
+  }
+
+  audioUserMuted=volume<=0 || !!video?.muted;
+  syncUnmuteButton();
 }
 
 function unmuteEverything(){
 
   audioUnlocked=true;
   audioUserMuted=false;
-  audioUserVolume=100;
+  audioUserVolume=Math.max(1,lastAudibleVolume||100);
 
   clearAutoplayTimers();
 
@@ -2476,15 +2601,12 @@ function unmuteEverything(){
     }catch(e){}
   }
 
+  setPlayerVolume(
+    audioUserVolume,
+    true
+  );
+
   try{
-
-    video.muted=false;
-    video.defaultMuted=false;
-    video.volume=1;
-
-    video.removeAttribute(
-      'muted'
-    );
 
     video.autoplay=true;
     video.playsInline=true;
@@ -2517,9 +2639,7 @@ function unmuteEverything(){
   hidePoster();
   hideLoadingIndicator();
 
-  if(button){
-    button.classList.add('hidden');
-  }
+  syncUnmuteButton();
 }
 
 function bindCurrentVideo(video){
@@ -2550,6 +2670,25 @@ function bindCurrentVideo(video){
 
   boundVideo=video;
   applyDesiredAudioState(video);
+
+  const handleVolumeChange=()=>{
+
+    const nativeVolume=Math.round(
+      Math.max(
+        0,
+        Math.min(
+          1,
+          Number(video.volume)||0
+        )
+      )*100
+    );
+
+    syncAudioState(
+      nativeVolume,
+      !!video.muted,
+      audioUnlocked ? 'native' : 'autoplay'
+    );
+  };
 
   const handleMeta=()=>{
 
@@ -2609,6 +2748,12 @@ function bindCurrentVideo(video){
   };
 
   video.addEventListener(
+    'volumechange',
+    handleVolumeChange,
+    {passive:true}
+  );
+
+  video.addEventListener(
     'loadedmetadata',
     handleMeta,
     {passive:true}
@@ -2649,6 +2794,11 @@ function bindCurrentVideo(video){
     try{
 
       video.removeEventListener(
+        'volumechange',
+        handleVolumeChange
+      );
+
+      video.removeEventListener(
         'loadedmetadata',
         handleMeta
       );
@@ -2682,6 +2832,7 @@ function bindCurrentVideo(video){
   };
 
   applyVideoFilters();
+  syncUnmuteButton();
 
   if(audioUnlocked){
     applyDesiredAudioState(video);
@@ -4618,26 +4769,7 @@ class StreamPlayer{
       this.player.on(
         Clappr.Events.PLAYER_VOLUMEUPDATE,
         volume=>{
-
-          syncAudioFromPlayer(
-            volume
-          );
-
-          if(Number(volume)>0){
-
-            button.classList.add(
-              'hidden'
-            );
-
-          }else{
-
-            if(audioUnlocked){
-
-              button.classList.remove(
-                'hidden'
-              );
-            }
-          }
+          syncAudioFromPlayer(volume);
         }
       );
     }
