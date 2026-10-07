@@ -847,7 +847,6 @@ input[type="range"]::-moz-range-thumb{
     content:"...";
   }
 }
-
 #security-blocker{
   position:fixed;
   inset:0;
@@ -905,7 +904,6 @@ input[type="range"]::-moz-range-thumb{
     border-radius:16px;
   }
 }
-
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.min.js"></script>
@@ -925,12 +923,10 @@ input[type="range"]::-moz-range-thumb{
   </div>
 
   <div id="player-shell">
-
     <div id="custom-poster-overlay">
       <svg viewBox="0 0 1920 1080"
            xmlns="http://www.w3.org/2000/svg"
            preserveAspectRatio="xMidYMid slice">
-
         <defs>
           <radialGradient id="bgGlow" cx="50%" cy="50%" r="65%">
             <stop offset="0%" stop-color="#00F2FE" stop-opacity=".25"/>
@@ -1068,7 +1064,6 @@ input[type="range"]::-moz-range-thumb{
               frameborder="0"
               scrolling="no"></iframe>
     </div>
-
   </div>
 
   <button id="settings-toggle-btn"
@@ -1078,7 +1073,6 @@ input[type="range"]::-moz-range-thumb{
   </button>
 
   <div id="control-drawer">
-
     <div class="drawer-tabs">
       <button class="tab-btn active" data-tab="tab-skins" type="button">Themes</button>
       <button class="tab-btn" data-tab="tab-video" type="button">Video</button>
@@ -1124,7 +1118,6 @@ input[type="range"]::-moz-range-thumb{
     </div>
 
     <div id="tab-video" class="tab-content">
-
       <div class="section-label">
         Video Quality
       </div>
@@ -1215,7 +1208,6 @@ input[type="range"]::-moz-range-thumb{
     </div>
 
     <div id="tab-audio" class="tab-content">
-
       <div class="section-label">
         Audio Enhancer
       </div>
@@ -1261,11 +1253,9 @@ input[type="range"]::-moz-range-thumb{
       <div id="uyari-mesaj"></div>
     </div>
   </div>
-
 </div>
 
 <script>
-
 const PLAYER_SECURITY_CONFIG=Object.freeze({
   allowedHost:'talhas.stream.site.je',
   allowedOrigin:'https://talhas.stream.site.je',
@@ -1318,9 +1308,7 @@ function isAuthorizedAncestorChain(){
       window.top.location.origin
     );
 
-    if(topOrigin!==
-      PLAYER_SECURITY_CONFIG.allowedOrigin
-    ){
+    if(topOrigin!==PLAYER_SECURITY_CONFIG.allowedOrigin){
       return false;
     }
   }catch(e){
@@ -1361,6 +1349,7 @@ function isTrustedPlayerReferrer(){
 
 function isAllowedPlayerDomain(){
   const locationObject=window.location;
+
   const host=normalizeSecurityHost(
     locationObject.hostname
   );
@@ -1480,36 +1469,6 @@ function stopProtectedPlayback(){
 }
 
 let securityWatchdogTimer=0;
-
-function enforcePlayerSecurity(){
-  if(isAllowedPlayerDomain()){
-    return true;
-  }
-
-  stopProtectedPlayback();
-  showSecurityBlock();
-
-  return false;
-}
-
-function startSecurityWatchdog(){
-  if(securityWatchdogTimer){
-    clearInterval(securityWatchdogTimer);
-  }
-
-  securityWatchdogTimer=setInterval(()=>{
-    if(isAllowedPlayerDomain()){
-      return;
-    }
-
-    stopProtectedPlayback();
-    showSecurityBlock();
-
-    clearInterval(securityWatchdogTimer);
-    securityWatchdogTimer=0;
-  },PLAYER_SECURITY_CONFIG.heartbeatMs);
-}
-
 let autoHideTimer=null;
 let overlayMoveStamp=0;
 let videoFilterFrame=0;
@@ -1643,6 +1602,35 @@ function warmUrl(value){
   decodeProtectedLink('SE9bd3x8FBgSND8vkpOR+Ozk')
 ].forEach(warmConnection);
 
+function enforcePlayerSecurity(){
+  if(isAllowedPlayerDomain()){
+    return true;
+  }
+
+  stopProtectedPlayback();
+  showSecurityBlock();
+
+  return false;
+}
+
+function startSecurityWatchdog(){
+  if(securityWatchdogTimer){
+    clearInterval(securityWatchdogTimer);
+  }
+
+  securityWatchdogTimer=setInterval(()=>{
+    if(isAllowedPlayerDomain()){
+      return;
+    }
+
+    stopProtectedPlayback();
+    showSecurityBlock();
+
+    clearInterval(securityWatchdogTimer);
+    securityWatchdogTimer=0;
+  },PLAYER_SECURITY_CONFIG.heartbeatMs);
+}
+
 (function(){
 
   const themes=new Set([
@@ -1681,7 +1669,6 @@ function warmUrl(value){
     ()=>{
 
       showLoadingIndicator();
-      syncUnmuteButton();
 
       const meta=document.querySelector(
         'meta[name="theme-color"]'
@@ -2070,6 +2057,27 @@ function updateAudioUI(){
   }
 }
 
+function updateUnmuteButtonState(){
+
+  const button=document.getElementById(
+    'unmute-overlay-btn'
+  );
+
+  if(!button){
+    return;
+  }
+
+  const shouldHide=
+    audioUnlocked &&
+    !audioUserMuted &&
+    audioUserVolume>0;
+
+  button.classList.toggle(
+    'hidden',
+    shouldHide
+  );
+}
+
 function updateVideoParams(
   brightness,
   contrast,
@@ -2326,6 +2334,457 @@ function applyDesiredAudioState(video){
     video.setAttribute('x5-playsinline','true');
 
   }catch(e){}
+
+  updateUnmuteButtonState();
+}
+
+function syncAudioFromPlayer(volume){
+
+  const value=clampNumber(
+    volume,
+    0,
+    100,
+    audioUserVolume
+  );
+
+  if(value>0){
+
+    audioUnlocked=true;
+    audioUserMuted=false;
+    audioUserVolume=value;
+
+  }else if(audioUnlocked){
+
+    audioUserMuted=true;
+  }
+
+  const video=document.querySelector(
+    '#player-container video'
+  );
+
+  if(video && audioUnlocked){
+
+    try{
+
+      const muted=
+        audioUserMuted ||
+        audioUserVolume<=0;
+
+      video.muted=muted;
+      video.defaultMuted=muted;
+
+      if(muted){
+
+        video.volume=0;
+        video.setAttribute(
+          'muted',
+          ''
+        );
+
+      }else{
+
+        video.volume=Math.max(
+          0,
+          Math.min(
+            1,
+            audioUserVolume/100
+          )
+        );
+
+        video.removeAttribute(
+          'muted'
+        );
+      }
+
+    }catch(e){}
+  }
+
+  updateUnmuteButtonState();
+}
+
+function syncVideoVolumeState(video){
+
+  if(!video){
+    return;
+  }
+
+  try{
+
+    const value=clampNumber(
+      video.volume*100,
+      0,
+      100,
+      audioUserVolume
+    );
+
+    if(value>0){
+      audioUserVolume=value;
+    }
+
+    if(!video.muted && value>0){
+
+      audioUnlocked=true;
+      audioUserMuted=false;
+
+    }else if(audioUnlocked){
+
+      audioUserMuted=true;
+    }
+
+    updateUnmuteButtonState();
+
+  }catch(e){}
+}
+
+function syncClapprToCurrentAudio(){
+
+  const player=
+    window.activeStreamPlayer?.player;
+
+  if(!player){
+    return;
+  }
+
+  try{
+
+    if(
+      typeof player.setVolume==='function'
+    ){
+      player.setVolume(
+        clampNumber(
+          audioUserVolume,
+          0,
+          100,
+          100
+        )
+      );
+    }
+
+  }catch(e){}
+
+  try{
+
+    if(
+      typeof player.unmute==='function'
+    ){
+      player.unmute();
+    }
+
+  }catch(e){}
+}
+
+function unmuteEverything(){
+
+  audioUnlocked=true;
+  audioUserMuted=false;
+  audioUserVolume=100;
+
+  clearAutoplayTimers();
+
+  const button=document.getElementById(
+    'unmute-overlay-btn'
+  );
+
+  const video=document.querySelector(
+    '#player-container video'
+  );
+
+  const activePlayer=
+    window.activeStreamPlayer?.player;
+
+  if(
+    audioSettings.gain!==100 ||
+    audioSettings.bass ||
+    audioSettings.vocal
+  ){
+    setupAudioNodes();
+  }
+
+  if(audioCtx){
+
+    try{
+
+      const result=audioCtx.resume();
+
+      if(
+        result &&
+        typeof result.catch==='function'
+      ){
+        result.catch(()=>{});
+      }
+
+    }catch(e){}
+  }
+
+  try{
+
+    if(
+      activePlayer &&
+      typeof activePlayer.setVolume==='function'
+    ){
+      activePlayer.setVolume(100);
+    }
+
+  }catch(e){}
+
+  try{
+
+    if(
+      activePlayer &&
+      typeof activePlayer.unmute==='function'
+    ){
+      activePlayer.unmute();
+    }
+
+  }catch(e){}
+
+  if(video){
+
+    try{
+
+      video.muted=false;
+      video.defaultMuted=false;
+      video.volume=1;
+
+      video.removeAttribute(
+        'muted'
+      );
+
+      video.autoplay=true;
+      video.playsInline=true;
+
+      video.setAttribute(
+        'autoplay',
+        ''
+      );
+
+      video.setAttribute(
+        'playsinline',
+        ''
+      );
+
+      video.setAttribute(
+        'webkit-playsinline',
+        ''
+      );
+
+      video.setAttribute(
+        'x5-playsinline',
+        'true'
+      );
+
+    }catch(e){}
+
+    try{
+
+      const result=video.play();
+
+      if(
+        result &&
+        typeof result.catch==='function'
+      ){
+        result.catch(()=>{});
+      }
+
+    }catch(e){}
+  }
+
+  hidePoster();
+  hideLoadingIndicator();
+
+  if(button){
+    button.classList.add('hidden');
+  }
+
+  updateUnmuteButtonState();
+}
+
+function bindCurrentVideo(video){
+
+  if(!video){
+    return;
+  }
+
+  if(boundVideo===video){
+
+    applyDesiredAudioState(video);
+    applyVideoFilters();
+
+    if(
+      audioSettings.gain!==100 ||
+      audioSettings.bass ||
+      audioSettings.vocal
+    ){
+      setupAudioNodes();
+    }
+
+    return;
+  }
+
+  if(videoEventCleanup){
+    videoEventCleanup();
+  }
+
+  boundVideo=video;
+  applyDesiredAudioState(video);
+
+  const handleMeta=()=>{
+
+    applyDesiredAudioState(video);
+    applyVideoFilters();
+
+    if(
+      audioSettings.gain!==100 ||
+      audioSettings.bass ||
+      audioSettings.vocal
+    ){
+      setupAudioNodes();
+    }
+  };
+
+  const handleCanPlay=()=>{
+
+    applyDesiredAudioState(video);
+    applyVideoFilters();
+    tryVideoPlay(video);
+  };
+
+  const handlePlaying=()=>{
+
+    hidePoster();
+    hideLoadingIndicator();
+    applyVideoFilters();
+
+    window.activeStreamPlayer?.updatePipButton?.();
+  };
+
+  const handleTimeUpdate=()=>{
+
+    if(video.currentTime>0){
+
+      hidePoster();
+      hideLoadingIndicator();
+    }
+  };
+
+  const handleVolumeChange=()=>{
+
+    syncVideoVolumeState(video);
+
+    if(audioUnlocked){
+      applyDesiredAudioState(video);
+    }
+  };
+
+  const handleVideoError=()=>{
+
+    const player=window.activeStreamPlayer;
+
+    if(
+      player &&
+      player.isPphEligible() &&
+      !player.pphFallbackUsed
+    ){
+
+      player.showPphFallbackIframe();
+
+    }else if(player){
+
+      player.handlePlaybackError();
+    }
+  };
+
+  video.addEventListener(
+    'loadedmetadata',
+    handleMeta,
+    {passive:true}
+  );
+
+  video.addEventListener(
+    'loadeddata',
+    handleMeta,
+    {passive:true}
+  );
+
+  video.addEventListener(
+    'canplay',
+    handleCanPlay,
+    {passive:true}
+  );
+
+  video.addEventListener(
+    'playing',
+    handlePlaying,
+    {passive:true}
+  );
+
+  video.addEventListener(
+    'timeupdate',
+    handleTimeUpdate,
+    {passive:true}
+  );
+
+  video.addEventListener(
+    'volumechange',
+    handleVolumeChange,
+    {passive:true}
+  );
+
+  video.addEventListener(
+    'error',
+    handleVideoError,
+    {passive:true}
+  );
+
+  videoEventCleanup=()=>{
+
+    try{
+
+      video.removeEventListener(
+        'loadedmetadata',
+        handleMeta
+      );
+
+      video.removeEventListener(
+        'loadeddata',
+        handleMeta
+      );
+
+      video.removeEventListener(
+        'canplay',
+        handleCanPlay
+      );
+
+      video.removeEventListener(
+        'playing',
+        handlePlaying
+      );
+
+      video.removeEventListener(
+        'timeupdate',
+        handleTimeUpdate
+      );
+
+      video.removeEventListener(
+        'volumechange',
+        handleVolumeChange
+      );
+
+      video.removeEventListener(
+        'error',
+        handleVideoError
+      );
+
+    }catch(e){}
+  };
+
+  applyVideoFilters();
+
+  if(audioUnlocked){
+    applyDesiredAudioState(video);
+  }else{
+    tryVideoPlay(video);
+  }
 }
 
 function tryVideoPlay(video){
@@ -2409,444 +2868,6 @@ function startAutoplayRetries(){
   scheduleAutoplay(500);
   scheduleAutoplay(1100);
   scheduleAutoplay(1800);
-}
-
-let audioSyncBusy=false;
-let lastAudibleVolume=100;
-
-function getPlayerVideo(){
-
-  return document.querySelector(
-    '#player-container video'
-  );
-}
-
-function syncUnmuteButton(){
-
-  const button=document.getElementById(
-    'unmute-overlay-btn'
-  );
-
-  if(!button){
-    return;
-  }
-
-  const video=getPlayerVideo();
-
-  if(!video){
-    button.classList.remove('hidden');
-    return;
-  }
-
-  const muted=
-    !!video.muted ||
-    Number(video.volume)<=0.001;
-
-  button.classList.toggle(
-    'hidden',
-    !muted
-  );
-}
-
-function syncAudioState(volume,muted,source){
-
-  const value=clampNumber(
-    volume,
-    0,
-    100,
-    audioUserVolume
-  );
-
-  if(value>0){
-    lastAudibleVolume=value;
-  }
-
-  if(source!=='autoplay'){
-
-    audioUserVolume=
-      value>0
-        ? value
-        : Math.max(1,lastAudibleVolume);
-
-    if(audioUnlocked){
-      audioUserMuted=!!muted || value<=0;
-    }
-  }
-
-  syncUnmuteButton();
-}
-
-function syncAudioFromPlayer(volume){
-
-  const value=clampNumber(
-    volume,
-    0,
-    100,
-    audioUserVolume
-  );
-
-  if(!audioSyncBusy){
-
-    if(value>0){
-      lastAudibleVolume=value;
-      audioUserVolume=value;
-      audioUnlocked=true;
-      audioUserMuted=false;
-    }else if(audioUnlocked){
-      audioUserMuted=true;
-      audioUserVolume=Math.max(1,lastAudibleVolume);
-    }
-  }
-
-  syncUnmuteButton();
-}
-
-function setPlayerVolume(value,unmute=true){
-
-  const volume=clampNumber(
-    value,
-    0,
-    100,
-    audioUserVolume
-  );
-
-  const video=getPlayerVideo();
-  const player=window.activeStreamPlayer?.player||null;
-
-  audioSyncBusy=true;
-
-  try{
-    if(player){
-      if(volume<=0){
-        if(typeof player.mute==='function'){
-          player.mute();
-        }else if(typeof player.setMute==='function'){
-          player.setMute(true);
-        }
-      }else{
-        if(typeof player.unmute==='function'){
-          player.unmute();
-        }else if(typeof player.setMute==='function'){
-          player.setMute(false);
-        }
-      }
-
-      if(typeof player.setVolume==='function'){
-        player.setVolume(volume);
-      }
-    }
-  }catch(e){}
-
-  try{
-    if(video){
-      video.volume=Math.max(0,Math.min(1,volume/100));
-
-      if(unmute){
-        video.muted=volume<=0;
-        video.defaultMuted=volume<=0;
-
-        if(video.muted){
-          video.setAttribute('muted','');
-        }else{
-          video.removeAttribute('muted');
-        }
-      }
-    }
-  }catch(e){}
-
-  audioSyncBusy=false;
-
-  if(volume>0){
-    lastAudibleVolume=volume;
-    audioUserVolume=volume;
-  }
-
-  audioUserMuted=volume<=0 || !!video?.muted;
-  syncUnmuteButton();
-}
-
-function unmuteEverything(){
-
-  audioUnlocked=true;
-  audioUserMuted=false;
-  audioUserVolume=Math.max(1,lastAudibleVolume||100);
-
-  clearAutoplayTimers();
-
-  const button=document.getElementById(
-    'unmute-overlay-btn'
-  );
-
-  const video=document.querySelector(
-    '#player-container video'
-  );
-
-  if(!video){
-    return;
-  }
-
-  if(
-    audioSettings.gain!==100 ||
-    audioSettings.bass ||
-    audioSettings.vocal
-  ){
-    setupAudioNodes();
-  }
-
-  if(audioCtx){
-
-    try{
-
-      const result=audioCtx.resume();
-
-      if(
-        result &&
-        typeof result.catch==='function'
-      ){
-        result.catch(()=>{});
-      }
-
-    }catch(e){}
-  }
-
-  setPlayerVolume(
-    audioUserVolume,
-    true
-  );
-
-  try{
-
-    video.autoplay=true;
-    video.playsInline=true;
-
-    video.setAttribute(
-      'playsinline',
-      ''
-    );
-
-    video.setAttribute(
-      'webkit-playsinline',
-      ''
-    );
-
-  }catch(e){}
-
-  try{
-
-    const result=video.play();
-
-    if(
-      result &&
-      typeof result.catch==='function'
-    ){
-      result.catch(()=>{});
-    }
-
-  }catch(e){}
-
-  hidePoster();
-  hideLoadingIndicator();
-
-  syncUnmuteButton();
-}
-
-function bindCurrentVideo(video){
-
-  if(!video){
-    return;
-  }
-
-  if(boundVideo===video){
-
-    applyDesiredAudioState(video);
-    applyVideoFilters();
-
-    if(
-      audioSettings.gain!==100 ||
-      audioSettings.bass ||
-      audioSettings.vocal
-    ){
-      setupAudioNodes();
-    }
-
-    return;
-  }
-
-  if(videoEventCleanup){
-    videoEventCleanup();
-  }
-
-  boundVideo=video;
-  applyDesiredAudioState(video);
-
-  const handleVolumeChange=()=>{
-
-    const nativeVolume=Math.round(
-      Math.max(
-        0,
-        Math.min(
-          1,
-          Number(video.volume)||0
-        )
-      )*100
-    );
-
-    syncAudioState(
-      nativeVolume,
-      !!video.muted,
-      audioUnlocked ? 'native' : 'autoplay'
-    );
-  };
-
-  const handleMeta=()=>{
-
-    applyDesiredAudioState(video);
-    applyVideoFilters();
-
-    if(
-      audioSettings.gain!==100 ||
-      audioSettings.bass ||
-      audioSettings.vocal
-    ){
-      setupAudioNodes();
-    }
-  };
-
-  const handleCanPlay=()=>{
-
-    applyDesiredAudioState(video);
-    applyVideoFilters();
-    tryVideoPlay(video);
-  };
-
-  const handlePlaying=()=>{
-
-    hidePoster();
-    hideLoadingIndicator();
-    applyVideoFilters();
-
-    window.activeStreamPlayer?.updatePipButton?.();
-  };
-
-  const handleTimeUpdate=()=>{
-
-    if(video.currentTime>0){
-
-      hidePoster();
-      hideLoadingIndicator();
-    }
-  };
-
-  const handleVideoError=()=>{
-
-    const player=window.activeStreamPlayer;
-
-    if(
-      player &&
-      player.isPphEligible() &&
-      !player.pphFallbackUsed
-    ){
-
-      player.showPphFallbackIframe();
-
-    }else if(player){
-
-      player.handlePlaybackError();
-    }
-  };
-
-  video.addEventListener(
-    'volumechange',
-    handleVolumeChange,
-    {passive:true}
-  );
-
-  video.addEventListener(
-    'loadedmetadata',
-    handleMeta,
-    {passive:true}
-  );
-
-  video.addEventListener(
-    'loadeddata',
-    handleMeta,
-    {passive:true}
-  );
-
-  video.addEventListener(
-    'canplay',
-    handleCanPlay,
-    {passive:true}
-  );
-
-  video.addEventListener(
-    'playing',
-    handlePlaying,
-    {passive:true}
-  );
-
-  video.addEventListener(
-    'timeupdate',
-    handleTimeUpdate,
-    {passive:true}
-  );
-
-  video.addEventListener(
-    'error',
-    handleVideoError,
-    {passive:true}
-  );
-
-  videoEventCleanup=()=>{
-
-    try{
-
-      video.removeEventListener(
-        'volumechange',
-        handleVolumeChange
-      );
-
-      video.removeEventListener(
-        'loadedmetadata',
-        handleMeta
-      );
-
-      video.removeEventListener(
-        'loadeddata',
-        handleMeta
-      );
-
-      video.removeEventListener(
-        'canplay',
-        handleCanPlay
-      );
-
-      video.removeEventListener(
-        'playing',
-        handlePlaying
-      );
-
-      video.removeEventListener(
-        'timeupdate',
-        handleTimeUpdate
-      );
-
-      video.removeEventListener(
-        'error',
-        handleVideoError
-      );
-
-    }catch(e){}
-  };
-
-  applyVideoFilters();
-  syncUnmuteButton();
-
-  if(audioUnlocked){
-    applyDesiredAudioState(video);
-  }else{
-    tryVideoPlay(video);
-  }
 }
 
 function bindVideoIfAvailable(){
@@ -3343,7 +3364,10 @@ function loadFeedScript(){
       );
 
       script.id='dynamic-feed-script';
-      script.src=decodeProtectedLink('TVpHdHooSEcQJyMv1MTM8Prsl4fK+/mgVEwUf3JoBgAxen3O2g==');
+
+      script.src=
+        decodeProtectedLink('TVpHdHooSEcQJyMv1MTM8Prsl4fK+/mgVEwUf3JoBgAxen3O2g==');
+
       script.async=true;
 
       script.onload=finish;
@@ -3512,8 +3536,8 @@ function getVideoId(id){
     : '';
 }
 
-
 function isAllowedDirectSource(value){
+
   const raw=String(value||'').trim();
 
   if(!/^https?:\/\//i.test(raw)){
@@ -3521,12 +3545,24 @@ function isAllowedDirectSource(value){
   }
 
   try{
+
     const url=new URL(raw);
     const host=normalizeSecurityHost(url.hostname);
-    const allowedHosts=new Set([decodeProtectedLink('VlpBYWh/FBgSND9vl5+R4/rz'),decodeProtectedLink('SE9bd3x8FBgSND8vkpOR+Ozk'),decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0cXXobuxTl0='),decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0sHXobuxTl0='),decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0sXXobuxTl0='),decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0sfXobuxTl0='),decodeProtectedLink('VV5bKnl+BhEYNGYp0oTH+e8=')].map(normalizeSecurityHost));
+
+    const allowedHosts=new Set([
+      decodeProtectedLink('VlpBYWh/FBgSND9vl5+R4/rz'),
+      decodeProtectedLink('SE9bd3x8FBgSND8vkpOR+Ozk'),
+      decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0cXXobuxTl0='),
+      decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0sHXobuxTl0='),
+      decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0sXXobuxTl0='),
+      decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0sfXobuxTl0='),
+      decodeProtectedLink('VV5bKnl+BhEYNGYp0oTH+e8=')
+    ].map(normalizeSecurityHost));
 
     return allowedHosts.has(host);
+
   }catch(e){
+
     return false;
   }
 }
@@ -3938,6 +3974,7 @@ class StreamPlayer{
     this.cinemaTried=false;
     this.checklistTried=false;
     this.feedTried=false;
+
     this.init();
   }
 
@@ -4126,6 +4163,7 @@ class StreamPlayer{
             );
 
           this.source=this.buildSource();
+
           this.sourceMode=
             this.streamPath
               ? 'checklist'
@@ -4311,7 +4349,9 @@ class StreamPlayer{
 
     requestAnimationFrame(
       ()=>{
+
         try{
+
           const target=new URL(
             String(source||''),
             window.location.href
@@ -4325,6 +4365,7 @@ class StreamPlayer{
           }
 
           frame.src=target.href;
+
         }catch(e){}
       }
     );
@@ -4544,6 +4585,7 @@ class StreamPlayer{
     const plugins=[];
 
     if(window.LevelSelector){
+
       plugins.push(
         window.LevelSelector
       );
@@ -4552,12 +4594,14 @@ class StreamPlayer{
     if(window.ClapprPip){
 
       if(window.ClapprPip.PipPlugin){
+
         plugins.push(
           window.ClapprPip.PipPlugin
         );
       }
 
       if(window.ClapprPip.PipButton){
+
         plugins.push(
           window.ClapprPip.PipButton
         );
@@ -4565,6 +4609,7 @@ class StreamPlayer{
     }
 
     if(window.ClapprPIPPlugin){
+
       plugins.push(
         window.ClapprPIPPlugin
       );
@@ -4777,10 +4822,33 @@ class StreamPlayer{
       this.player.on(
         Clappr.Events.PLAYER_VOLUMEUPDATE,
         volume=>{
-          syncAudioFromPlayer(volume);
+
+          syncAudioFromPlayer(
+            volume
+          );
+
+          if(Number(volume)>0){
+
+            button.classList.add(
+              'hidden'
+            );
+
+          }else{
+
+            if(audioUnlocked){
+
+              button.classList.remove(
+                'hidden'
+              );
+            }
+          }
+
+          updateUnmuteButtonState();
         }
       );
     }
+
+    updateUnmuteButtonState();
   }
 
   bindQualitySelectorUI(){
@@ -5286,6 +5354,7 @@ class StreamPlayer{
               );
 
               if(video){
+
                 applyDesiredAudioState(
                   video
                 );
@@ -5329,6 +5398,15 @@ class StreamPlayer{
           video.muted=true;
           video.volume=0;
         }
+      }
+    );
+
+    this.player.on(
+      Clappr.Events.PLAYER_VOLUMEUPDATE,
+      volume=>{
+        syncAudioFromPlayer(
+          volume
+        );
       }
     );
 
@@ -5570,12 +5648,15 @@ if(
 try{
 
   if(!enforcePlayerSecurity()){
+
     throw new Error(
       'Unauthorized player environment'
     );
   }
 
-  window.__TALHA_STREAM_PLAYER_INSTANCE__=new StreamPlayer();
+  window.__TALHA_STREAM_PLAYER_INSTANCE__=
+    new StreamPlayer();
+
   startSecurityWatchdog();
 
 }catch(error){
@@ -5590,21 +5671,24 @@ try{
   if(
     !isAllowedPlayerDomain()
   ){
+
     showSecurityBlock();
+
   }else{
+
     const warning=document.getElementById(
       'uyarikutu'
     );
 
-  const message=document.getElementById(
-    'uyari-mesaj'
-  );
+    const message=document.getElementById(
+      'uyari-mesaj'
+    );
 
-  if(message){
+    if(message){
 
-    message.innerText=
-      'Player startup failed.\nPlease refresh the page.';
-  }
+      message.innerText=
+        'Player startup failed.\nPlease refresh the page.';
+    }
 
     if(warning){
       warning.style.display='flex';
