@@ -1268,8 +1268,12 @@ input[type="range"]::-moz-range-thumb{
 
 const PLAYER_SECURITY_CONFIG=Object.freeze({
   allowedHost:'talhas.stream.site.je',
+  allowedOrigin:'https://talhas.stream.site.je',
   requireHttps:true,
-  blockUnauthorizedEmbedding:true
+  requireIframe:true,
+  blockUnauthorizedEmbedding:true,
+  requireTrustedReferrer:true,
+  heartbeatMs:1200
 });
 
 const LINK_OBFUSCATION_KEY=37;
@@ -1300,9 +1304,65 @@ function normalizeSecurityHost(value){
     .replace(/\.$/,'');
 }
 
+function normalizeSecurityOrigin(value){
+  try{
+    return new URL(String(value||'')).origin.toLowerCase();
+  }catch(e){
+    return '';
+  }
+}
+
+function isAuthorizedAncestorChain(){
+  try{
+    const topOrigin=normalizeSecurityOrigin(
+      window.top.location.origin
+    );
+
+    if(topOrigin!==
+      PLAYER_SECURITY_CONFIG.allowedOrigin
+    ){
+      return false;
+    }
+  }catch(e){
+    return false;
+  }
+
+  try{
+    const ancestors=window.location.ancestorOrigins;
+
+    if(ancestors && ancestors.length){
+      for(const origin of ancestors){
+        if(
+          normalizeSecurityOrigin(origin)!==
+          PLAYER_SECURITY_CONFIG.allowedOrigin
+        ){
+          return false;
+        }
+      }
+    }
+  }catch(e){
+    return false;
+  }
+
+  return true;
+}
+
+function isTrustedPlayerReferrer(){
+  const referrer=String(document.referrer||'').trim();
+
+  if(!referrer){
+    return false;
+  }
+
+  const origin=normalizeSecurityOrigin(referrer);
+
+  return origin===PLAYER_SECURITY_CONFIG.allowedOrigin;
+}
+
 function isAllowedPlayerDomain(){
+  const locationObject=window.location;
   const host=normalizeSecurityHost(
-    window.location.hostname
+    locationObject.hostname
   );
 
   if(
@@ -1315,28 +1375,42 @@ function isAllowedPlayerDomain(){
 
   if(
     PLAYER_SECURITY_CONFIG.requireHttps &&
-    window.location.protocol!=='https:'
+    locationObject.protocol!=='https:'
   ){
     return false;
   }
 
   if(
-    PLAYER_SECURITY_CONFIG.blockUnauthorizedEmbedding &&
-    window.top!==window.self
+    normalizeSecurityOrigin(locationObject.href)!==
+    PLAYER_SECURITY_CONFIG.allowedOrigin
   ){
-    try{
-      const topHost=normalizeSecurityHost(
-        window.top.location.hostname
-      );
+    return false;
+  }
 
-      if(
-        topHost!==normalizeSecurityHost(
-          PLAYER_SECURITY_CONFIG.allowedHost
-        )
-      ){
-        return false;
-      }
-    }catch(e){
+  if(
+    PLAYER_SECURITY_CONFIG.blockUnauthorizedEmbedding
+  ){
+    const isFramed=window.top!==window.self;
+
+    if(
+      PLAYER_SECURITY_CONFIG.requireIframe &&
+      !isFramed
+    ){
+      return false;
+    }
+
+    if(!isFramed){
+      return false;
+    }
+
+    if(!isAuthorizedAncestorChain()){
+      return false;
+    }
+
+    if(
+      PLAYER_SECURITY_CONFIG.requireTrustedReferrer &&
+      !isTrustedPlayerReferrer()
+    ){
       return false;
     }
   }
@@ -1364,16 +1438,76 @@ function showSecurityBlock(){
   }catch(e){}
 }
 
+function stopProtectedPlayback(){
+  try{
+    if(
+      window.__TALHA_STREAM_PLAYER_INSTANCE__ &&
+      window.__TALHA_STREAM_PLAYER_INSTANCE__.player &&
+      typeof window.__TALHA_STREAM_PLAYER_INSTANCE__.player.stop==='function'
+    ){
+      window.__TALHA_STREAM_PLAYER_INSTANCE__.player.stop();
+    }
+  }catch(e){}
+
+  try{
+    const container=document.getElementById(
+      'player-container'
+    );
+
+    if(container){
+      container.style.visibility='hidden';
+      container.style.pointerEvents='none';
+    }
+  }catch(e){}
+
+  try{
+    const frame=document.getElementById(
+      'pph-fallback-frame'
+    );
+
+    if(frame){
+      frame.src='about:blank';
+    }
+  }catch(e){}
+
+  try{
+    const layer=document.getElementById(
+      'pph-fallback-layer'
+    );
+
+    layer?.classList.remove('active');
+  }catch(e){}
+}
+
+let securityWatchdogTimer=0;
+
 function enforcePlayerSecurity(){
-  if(
-    isAllowedPlayerDomain()
-  ){
+  if(isAllowedPlayerDomain()){
     return true;
   }
 
+  stopProtectedPlayback();
   showSecurityBlock();
 
   return false;
+}
+
+function startSecurityWatchdog(){
+  if(securityWatchdogTimer){
+    clearInterval(securityWatchdogTimer);
+  }
+
+  securityWatchdogTimer=setInterval(()=>{
+    if(isAllowedPlayerDomain()){
+      return;
+    }
+
+    stopProtectedPlayback();
+    showSecurityBlock();
+
+    clearInterval(securityWatchdogTimer);
+    securityWatchdogTimer=0;
+  },PLAYER_SECURITY_CONFIG.heartbeatMs);
 }
 
 let autoHideTimer=null;
@@ -5301,7 +5435,8 @@ try{
     );
   }
 
-  new StreamPlayer();
+  window.__TALHA_STREAM_PLAYER_INSTANCE__=new StreamPlayer();
+  startSecurityWatchdog();
 
 }catch(error){
 
