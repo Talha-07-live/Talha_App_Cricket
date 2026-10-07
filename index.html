@@ -852,6 +852,81 @@ input[type="password"]:focus{
   to{opacity:0;transform:translateY(-8px) scale(.985)}
 }
 
+@property --reveal-radius{
+  syntax:"<length>";
+  inherits:false;
+  initial-value:0px;
+}
+
+#centerReveal{
+  position:fixed;
+  inset:0;
+  z-index:99998;
+  pointer-events:none;
+  opacity:0;
+  visibility:hidden;
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      transparent 0,
+      transparent var(--reveal-radius),
+      rgba(2,2,6,.985) calc(var(--reveal-radius) + 1px),
+      rgba(2,2,6,.985) 100%
+    );
+  will-change:opacity,background;
+  contain:strict;
+}
+
+#centerReveal.active{
+  opacity:1;
+  visibility:visible;
+}
+
+#centerReveal.done{
+  opacity:0;
+  visibility:hidden;
+  background:transparent;
+}
+
+#centerReveal::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  transform:translate3d(-50%,-50%,0);
+  background:#fff;
+  box-shadow:
+    0 0 8px var(--accent-2),
+    0 0 18px var(--accent),
+    0 0 34px color-mix(in srgb,var(--accent-2) 65%,transparent);
+  opacity:0;
+  transition:opacity .08s ease;
+}
+
+#centerReveal.active::after{
+  opacity:.9;
+  animation:centerRevealDot .62s cubic-bezier(.22,1,.36,1) both;
+}
+
+@keyframes centerRevealDot{
+  0%{transform:translate3d(-50%,-50%,0) scale(.65);opacity:.95}
+  58%{transform:translate3d(-50%,-50%,0) scale(1.15);opacity:.95}
+  100%{transform:translate3d(-50%,-50%,0) scale(8);opacity:0}
+}
+
+.reveal-ready #mainCard{
+  will-change:opacity;
+}
+
+@media(prefers-reduced-motion:reduce){
+  #centerReveal{
+    display:none!important;
+  }
+}
+
 .analytics-panel{
   display:flex;
   gap:12px;
@@ -2076,6 +2151,8 @@ body.low-power .card::after{
 </head>
 
 <body class="auth-locked">
+
+<div id="centerReveal" aria-hidden="true"></div>
 
 <button class="theatre-exit-btn" id="exitTheatre" type="button">Exit Cinema Mode</button>
 
@@ -7996,6 +8073,64 @@ function waitForPaint(){
   });
 }
 
+function finishCenterReveal(){
+  const reveal=document.getElementById("centerReveal");
+  if(!reveal){
+    return;
+  }
+
+  document.body.classList.remove("reveal-ready");
+  reveal.classList.remove("active");
+  reveal.classList.add("done");
+  reveal.style.removeProperty("--reveal-radius");
+
+  window.setTimeout(()=>{
+    reveal.classList.remove("done");
+  },120);
+}
+
+function startCenterReveal(){
+  const reveal=document.getElementById("centerReveal");
+  if(!reveal){
+    return Promise.resolve();
+  }
+
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    reveal.classList.remove("active","done");
+    reveal.style.removeProperty("--reveal-radius");
+    return Promise.resolve();
+  }
+
+  const radius=Math.ceil(Math.hypot(window.innerWidth,window.innerHeight)/2)+80;
+  const duration=760;
+  const start=performance.now();
+
+  document.body.classList.add("reveal-ready");
+  reveal.classList.remove("done");
+  reveal.classList.add("active");
+  reveal.style.setProperty("--reveal-radius","0px");
+
+  return new Promise(resolve=>{
+    const frame=now=>{
+      const elapsed=now-start;
+      const t=Math.min(1,elapsed/duration);
+      const eased=1-Math.pow(1-t,3);
+      const current=radius*eased;
+      reveal.style.setProperty("--reveal-radius",current+"px");
+
+      if(t<1){
+        requestAnimationFrame(frame);
+        return;
+      }
+
+      finishCenterReveal();
+      resolve();
+    };
+
+    requestAnimationFrame(frame);
+  });
+}
+
 async function login(){
   if(loginBusy){
     return;
@@ -8106,8 +8241,6 @@ async function login(){
       loginBox.classList.add("login-leaving");
     }
 
-    await new Promise(resolve=>setTimeout(resolve,220));
-
     if(loginBox){
       loginBox.style.display="none";
     }
@@ -8115,30 +8248,22 @@ async function login(){
     if(playerWrap){
       playerWrap.style.display="block";
       playerWrap.classList.remove("fade");
-      void playerWrap.offsetWidth;
-      playerWrap.classList.add("fade");
     }
 
     if(appHeader){
       appHeader.style.display="flex";
-      appHeader.animate?.(
-        [
-          {opacity:0,transform:"translateY(-6px)"},
-          {opacity:1,transform:"translateY(0)"}
-        ],
-        {duration:260,easing:"cubic-bezier(.22,1,.36,1)",fill:"both"}
-      );
     }
 
     if(statusStrip){
       statusStrip.style.display="flex";
-      statusStrip.animate?.(
-        [
-          {opacity:0,transform:"translateY(-4px)"},
-          {opacity:1,transform:"translateY(0)"}
-        ],
-        {duration:240,easing:"cubic-bezier(.22,1,.36,1)",fill:"both"}
-      );
+    }
+
+    await waitForPaint();
+
+    await startCenterReveal();
+
+    if(playerWrap){
+      playerWrap.classList.add("fade");
     }
 
     updateAnalytics();
@@ -8753,6 +8878,7 @@ function toggleFocus(){
 }
 
 function lockSession(){
+  finishCenterReveal();
   closeMenu();
 
   toggleTheatre(
