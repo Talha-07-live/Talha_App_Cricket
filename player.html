@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Talha's Player</title>
 <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png">
 
@@ -846,6 +847,65 @@ input[type="range"]::-moz-range-thumb{
     content:"...";
   }
 }
+
+#security-blocker{
+  position:fixed;
+  inset:0;
+  z-index:999999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:#020206;
+  color:#fff;
+  text-align:center;
+}
+#security-blocker.active{
+  display:flex;
+}
+#security-blocker-inner{
+  width:min(460px,100%);
+  padding:30px 24px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;
+  background:rgba(10,8,18,.96);
+  box-shadow:0 30px 90px rgba(0,0,0,.8),0 0 24px var(--skin-glow);
+}
+#security-blocker-inner .security-icon{
+  width:58px;
+  height:58px;
+  margin:0 auto 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--skin-accent);
+  border-radius:50%;
+  color:var(--skin-accent);
+  font-size:24px;
+  box-shadow:0 0 18px var(--skin-glow);
+}
+#security-blocker-inner h2{
+  margin:0 0 8px;
+  color:var(--skin-accent);
+  font-size:20px;
+  font-weight:900;
+}
+#security-blocker-inner p{
+  margin:0;
+  color:rgba(255,255,255,.7);
+  font-size:13px;
+  line-height:1.65;
+}
+@media(max-width:480px){
+  #security-blocker{
+    padding:16px;
+  }
+  #security-blocker-inner{
+    padding:26px 18px;
+    border-radius:16px;
+  }
+}
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.min.js"></script>
@@ -856,6 +916,13 @@ input[type="range"]::-moz-range-thumb{
 
 <body>
 <div id="app">
+  <div id="security-blocker" aria-hidden="true">
+    <div id="security-blocker-inner">
+      <div class="security-icon">🔒</div>
+      <h2>ACCESS RESTRICTED</h2>
+      <p>This player is available only on the authorized Talha's Stream domain.</p>
+    </div>
+  </div>
 
   <div id="player-shell">
 
@@ -1198,6 +1265,117 @@ input[type="range"]::-moz-range-thumb{
 </div>
 
 <script>
+
+const PLAYER_SECURITY_CONFIG=Object.freeze({
+  allowedHost:'talhas.stream.site.je',
+  requireHttps:true,
+  blockUnauthorizedEmbedding:true
+});
+
+const LINK_OBFUSCATION_KEY=37;
+
+function decodeProtectedLink(value){
+  try{
+    const binary=atob(String(value||''));
+    const bytes=new Uint8Array(binary.length);
+
+    for(let i=0;i<binary.length;i++){
+      bytes[i]=binary.charCodeAt(i);
+    }
+
+    for(let i=0;i<bytes.length;i++){
+      bytes[i]=bytes[i]^LINK_OBFUSCATION_KEY^((i*11)&255);
+    }
+
+    return new TextDecoder().decode(bytes);
+  }catch(e){
+    return '';
+  }
+}
+
+function normalizeSecurityHost(value){
+  return String(value||'')
+    .trim()
+    .toLowerCase()
+    .replace(/\.$/,'');
+}
+
+function isAllowedPlayerDomain(){
+  const host=normalizeSecurityHost(
+    window.location.hostname
+  );
+
+  if(
+    host!==normalizeSecurityHost(
+      PLAYER_SECURITY_CONFIG.allowedHost
+    )
+  ){
+    return false;
+  }
+
+  if(
+    PLAYER_SECURITY_CONFIG.requireHttps &&
+    window.location.protocol!=='https:'
+  ){
+    return false;
+  }
+
+  if(
+    PLAYER_SECURITY_CONFIG.blockUnauthorizedEmbedding &&
+    window.top!==window.self
+  ){
+    try{
+      const topHost=normalizeSecurityHost(
+        window.top.location.hostname
+      );
+
+      if(
+        topHost!==normalizeSecurityHost(
+          PLAYER_SECURITY_CONFIG.allowedHost
+        )
+      ){
+        return false;
+      }
+    }catch(e){
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function showSecurityBlock(){
+  const blocker=document.getElementById(
+    'security-blocker'
+  );
+
+  if(blocker){
+    blocker.classList.add('active');
+    blocker.setAttribute(
+      'aria-hidden',
+      'false'
+    );
+  }
+
+  document.documentElement.style.pointerEvents='none';
+
+  try{
+    document.documentElement.style.userSelect='none';
+  }catch(e){}
+}
+
+function enforcePlayerSecurity(){
+  if(
+    isAllowedPlayerDomain()
+  ){
+    return true;
+  }
+
+  showSecurityBlock();
+
+  return false;
+}
+
 let autoHideTimer=null;
 let overlayMoveStamp=0;
 let videoFilterFrame=0;
@@ -1323,12 +1501,12 @@ function warmUrl(value){
 }
 
 [
-  'andro.evrenesoglu121.click',
-  'andro.evrenesoglu115.click',
-  'andro.evrenesoglu111.click',
-  'andro.evrenesoglu113.click',
-  'streamsport365.com',
-  'mahsunsports39.xyz'
+  decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0cXXobuxTl0='),
+  decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0sHXobuxTl0='),
+  decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0sXXobuxTl0='),
+  decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0sfXobuxTl0='),
+  decodeProtectedLink('VlpBYWh/FBgSND9vl5+R4/rz'),
+  decodeProtectedLink('SE9bd3x8FBgSND8vkpOR+Ozk')
 ].forEach(warmConnection);
 
 (function(){
@@ -2786,7 +2964,7 @@ function getEightDigitPphSource(id){
   }
 
   return(
-    'https://pph.player-us.xyz/tv/?stream_id='+
+    decodeProtectedLink('TVpHdHooSEcNNiNy0cbe+fDszoGK7K+hVxlPej4lHAQ3KzLJ9tvjtQ==')+
     encodeURIComponent(match[1])
   );
 }
@@ -2872,7 +3050,7 @@ function loadFeedScript(){
       );
 
       script.id='dynamic-feed-script';
-      script.src='https://mahsunsports39.xyz/script4.js';
+      script.src=decodeProtectedLink('TVpHdHooSEcQJyMv1MTM8Prsl4fK+/mgVEwUf3JoBgAxen3O2g==');
       script.async=true;
 
       script.onload=finish;
@@ -3041,6 +3219,25 @@ function getVideoId(id){
     : '';
 }
 
+
+function isAllowedDirectSource(value){
+  const raw=String(value||'').trim();
+
+  if(!/^https?:\/\//i.test(raw)){
+    return false;
+  }
+
+  try{
+    const url=new URL(raw);
+    const host=normalizeSecurityHost(url.hostname);
+    const allowedHosts=new Set([decodeProtectedLink('VlpBYWh/FBgSND9vl5+R4/rz'),decodeProtectedLink('SE9bd3x8FBgSND8vkpOR+Ozk'),decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0cXXobuxTl0='),decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0sHXobuxTl0='),decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0sXXobuxTl0='),decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv0sfXobuxTl0='),decodeProtectedLink('VV5bKnl+BhEYNGYp0oTH+e8=')].map(normalizeSecurityHost));
+
+    return allowedHosts.has(host);
+  }catch(e){
+    return false;
+  }
+}
+
 function normalizeStreamUrl(value){
 
   const v=String(
@@ -3087,7 +3284,7 @@ async function resolveCinemaSource(
   try{
 
     const response=await fetch(
-      'https://streamsport365.com/cinema',
+      decodeProtectedLink('TVpHdHooSEcOMjk5wMfM8Prsl8fP9/m7QlsUb3h0Ch0k'),
       {
         method:'POST',
         headers:{
@@ -3137,10 +3334,10 @@ function getChecklistCandidates(id){
   )+'.m3u8';
 
   return[
-    'https://andro.evrenesoglu121.click/checklist/'+path,
-    'https://andro.evrenesoglu115.click/checklist/'+path,
-    'https://andro.evrenesoglu111.click/checklist/'+path,
-    'https://andro.evrenesoglu113.click/checklist/'+path
+    decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcJPT95AxkmJXzHwdfk4/GPmIju')+path,
+    decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcKOT95AxkmJXzHwdfk4/GPmIju')+path,
+    decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcKPT95AxkmJXzHwdfk4/GPmIju')+path,
+    decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcKPz95AxkmJXzHwdfk4/GPmIju')+path
   ];
 }
 
@@ -3492,14 +3689,16 @@ class StreamPlayer{
     this.sourceErrorHandled=false;
 
     this.baseurls=[
-      'https://andro.evrenesoglu121.click/checklist/',
-      'https://andro.evrenesoglu115.click/checklist/',
-      'https://andro.evrenesoglu111.click/checklist/',
-      'https://andro.evrenesoglu113.click/checklist/'
+      decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcJPT95AxkmJXzHwdfk4/GPmIju'),
+      decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcKOT95AxkmJXzHwdfk4/GPmIju'),
+      decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcKPT95AxkmJXzHwdfk4/GPmIju'),
+      decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcKPz95AxkmJXzHwdfk4/GPmIju')
     ];
 
     this.directSource=
-      /\.m3u8(?:$|[?#])/i.test(this.input)
+      /^https?:\/\//i.test(this.input) &&
+      /\.m3u8(?:$|[?#])/i.test(this.input) &&
+      isAllowedDirectSource(this.input)
         ? this.input
         : null;
 
@@ -3819,7 +4018,21 @@ class StreamPlayer{
 
     requestAnimationFrame(
       ()=>{
-        frame.src=source;
+        try{
+          const target=new URL(
+            String(source||''),
+            window.location.href
+          );
+
+          if(
+            target.protocol!=='https:' &&
+            target.protocol!=='http:'
+          ){
+            return;
+          }
+
+          frame.src=target.href;
+        }catch(e){}
       }
     );
 
@@ -5082,6 +5295,12 @@ if(
 
 try{
 
+  if(!enforcePlayerSecurity()){
+    throw new Error(
+      'Unauthorized player environment'
+    );
+  }
+
   new StreamPlayer();
 
 }catch(error){
@@ -5093,9 +5312,14 @@ try{
 
   hideLoadingIndicator();
 
-  const warning=document.getElementById(
-    'uyarikutu'
-  );
+  if(
+    !isAllowedPlayerDomain()
+  ){
+    showSecurityBlock();
+  }else{
+    const warning=document.getElementById(
+      'uyarikutu'
+    );
 
   const message=document.getElementById(
     'uyari-mesaj'
@@ -5107,8 +5331,9 @@ try{
       'Player startup failed.\nPlease refresh the page.';
   }
 
-  if(warning){
-    warning.style.display='flex';
+    if(warning){
+      warning.style.display='flex';
+    }
   }
 }
 </script>
