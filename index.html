@@ -731,6 +731,127 @@ input[type="password"]:focus{
   transform:scale(.99);
 }
 
+#login.is-busy{
+  pointer-events:none;
+}
+
+#login.login-leaving{
+  animation:loginLeave .24s cubic-bezier(.22,1,.36,1) forwards;
+}
+
+.login-status{
+  width:min(380px,100%);
+  min-height:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin:2px 0 10px;
+  color:rgba(255,255,255,.42);
+  font-size:10px;
+  letter-spacing:.35px;
+  opacity:0;
+  transform:translateY(4px);
+  transition:opacity .18s ease,transform .18s ease;
+}
+
+.login-status.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.login-status.success{
+  color:#a9fff9;
+}
+
+.login-status.error{
+  color:#ff9eb5;
+}
+
+.login-spinner{
+  width:12px;
+  height:12px;
+  border:2px solid rgba(255,255,255,.12);
+  border-top-color:var(--accent-2);
+  border-right-color:var(--accent);
+  border-radius:50%;
+  animation:loginSpin .72s linear infinite;
+  flex:0 0 auto;
+}
+
+#login button{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  min-height:52px;
+}
+
+#login button::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(110deg,transparent 0%,rgba(255,255,255,.17) 42%,transparent 64%);
+  transform:translateX(-120%);
+  transition:transform .42s ease;
+  pointer-events:none;
+}
+
+#login button.busy::before{
+  transform:translateX(120%);
+}
+
+.login-btn-label,
+.login-btn-loader{
+  position:relative;
+  z-index:1;
+}
+
+.login-btn-loader{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+}
+
+.login-btn-loader i{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:#fff;
+  opacity:.35;
+  animation:loginDots 1s infinite ease-in-out;
+}
+
+.login-btn-loader i:nth-child(2){
+  animation-delay:.12s;
+}
+
+.login-btn-loader i:nth-child(3){
+  animation-delay:.24s;
+}
+
+#login button.busy .login-btn-label{
+  display:none;
+}
+
+#login button.busy .login-btn-loader{
+  display:flex;
+}
+
+@keyframes loginSpin{
+  to{transform:rotate(360deg)}
+}
+
+@keyframes loginDots{
+  0%,80%,100%{transform:translateY(0);opacity:.25}
+  40%{transform:translateY(-2px);opacity:1}
+}
+
+@keyframes loginLeave{
+  from{opacity:1;transform:translateY(0) scale(1)}
+  to{opacity:0;transform:translateY(-8px) scale(.985)}
+}
+
 .analytics-panel{
   display:flex;
   gap:12px;
@@ -1497,6 +1618,19 @@ body.scroll-locked{
   color:#ff9aae;
 }
 
+@media (pointer:coarse){
+  .menu-item:hover,
+  .servers .server-item:hover,
+  .mini-btn:hover,
+  #login button:hover{
+    transform:none;
+  }
+}
+
+body.low-power .card::after{
+  opacity:.2;
+}
+
 @media(prefers-reduced-motion:reduce){
   *,
   *::before,
@@ -2025,8 +2159,15 @@ body.scroll-locked{
     <div class="login-kicker">TALHA'S STREAM</div>
     <h2>Welcome back</h2>
     <p class="login-subtitle">Write Your Access Passcode To Enter Talha's Stream.</p>
-    <input id="password" type="password" autocomplete="current-password" placeholder="Passcode Entry">
-    <button id="loginBtn" type="button">Enter</button>
+    <input id="password" type="password" autocomplete="current-password" placeholder="Passcode Entry" enterkeyhint="go">
+    <div class="login-status" id="loginStatus" aria-live="polite">
+      <span class="login-spinner" id="loginSpinner"></span>
+      <span id="loginStatusText"></span>
+    </div>
+    <button id="loginBtn" type="button">
+      <span class="login-btn-label">Enter</span>
+      <span class="login-btn-loader" aria-hidden="true"><i></i><i></i><i></i></span>
+    </button>
   </div>
 
   <div id="playerWrap" style="display:none">
@@ -2393,7 +2534,7 @@ async function deriveAuthHash(value,salt,iterations){
 }
 
 const FEED_TIMEOUT=10000;
-const SEARCH_DELAY=90;
+const SEARCH_DELAY=120;
 
 const REALTIME_SYNC_INTERVAL_MS=30000;
 const AUTO_SYNC_STALE_MS=45000;
@@ -4760,8 +4901,11 @@ function getEventMeta(
     );
 
   const time=
-    translateText(
+    formatBDChannelTime(
       event?.time||
+      event?.startTime||
+      event?.kickoff||
+      event?.dateTime||
       "ONLINE"
     );
 
@@ -4960,43 +5104,112 @@ function isLiveEvent(event){
   return /\b(live|online|on air|onair|now|canli|yayin|yayinda|started|ongoing|halftime|half time)\b/i.test(status);
 }
 
-function eventTimeMinutes(event){
-  const source=String(event?.time||event?.startTime||event?.kickoff||event?.dateTime||"").trim();
-  const match=source.match(/\b(\d{1,2})[:.](\d{2})\s*(am|pm)?\b/i);
+function parseClockParts(source){
+  const match=String(source||"").match(/\b(\d{1,2})[:.](\d{2})\s*(am|pm)?\b/i);
 
-  if(match){
-    let hour=Number(match[1]);
-    const minute=Number(match[2]);
-    const meridiem=String(match[3]||"").toLowerCase();
-
-    if(minute>59||hour>23){
-      return Number.POSITIVE_INFINITY;
-    }
-
-    if(meridiem==="pm"&&hour<12){
-      hour+=12;
-    }
-
-    if(meridiem==="am"&&hour===12){
-      hour=0;
-    }
-
-    return hour*60+minute;
+  if(!match){
+    return null;
   }
 
-  const stamp=Date.parse(source);
+  let hour=Number(match[1]);
+  const minute=Number(match[2]);
+  const meridiem=String(match[3]||"").toLowerCase();
 
-  return Number.isFinite(stamp)
-    ? new Date(stamp).getHours()*60+new Date(stamp).getMinutes()
-    : Number.POSITIVE_INFINITY;
+  if(!Number.isFinite(hour)||!Number.isFinite(minute)||minute>59){
+    return null;
+  }
+
+  if(!meridiem&&hour>23){
+    return null;
+  }
+
+  if(meridiem==="pm"&&hour<12){
+    hour+=12;
+  }
+
+  if(meridiem==="am"&&hour===12){
+    hour=0;
+  }
+
+  if(hour>23){
+    return null;
+  }
+
+  return {hour,minute};
 }
+
+function formatBDChannelTime(source){
+  const raw=normalizeTurkishText(String(source??"")).trim();
+
+  if(!raw){
+    return "ONLINE";
+  }
+
+  const explicitZone=/([zZ]|[+-]\d{2}:?\d{2})\s*$/.test(raw);
+
+  if(explicitZone){
+    const stamp=Date.parse(raw);
+
+    if(Number.isFinite(stamp)){
+      return timeFormatter.format(new Date(stamp))+" BD";
+    }
+  }
+
+  const parts=parseClockParts(raw);
+
+  if(parts){
+    const bdMinutes=(parts.hour*60+parts.minute+180)%(24*60);
+    const hour=Math.floor(bdMinutes/60);
+    const minute=bdMinutes%60;
+
+    return `${String(hour).padStart(2,"0")}:${String(minute).padStart(2,"0")} BD`;
+  }
+
+  return translateText(raw)||raw;
+}
+
+function eventTimeMinutes(event){
+  const source=String(event?.time||event?.startTime||event?.kickoff||event?.dateTime||"").trim();
+  const explicitZone=/([zZ]|[+-]\d{2}:?\d{2})\s*$/.test(source);
+
+  if(explicitZone){
+    const stamp=Date.parse(source);
+
+    if(Number.isFinite(stamp)){
+      const formatted=timeFormatter.formatToParts(new Date(stamp));
+      const hour=Number(formatted.find(part=>part.type==="hour")?.value||24);
+      const minute=Number(formatted.find(part=>part.type==="minute")?.value||60);
+
+      if(hour<24&&minute<60){
+        return hour*60+minute;
+      }
+    }
+  }
+
+  const parts=parseClockParts(source);
+
+  if(parts){
+    return (parts.hour*60+parts.minute+180)%(24*60);
+  }
+
+  return Number.POSITIVE_INFINITY;
+}
+
+let sortedLiveEntriesSource=null;
+let sortedLiveEntriesCache=[];
 
 function getSortedLiveEntries(){
   if(!Array.isArray(liveEvents)){
     return [];
   }
 
-  return liveEvents
+  if(sortedLiveEntriesSource===liveEvents){
+    return sortedLiveEntriesCache;
+  }
+
+  sortedLiveEntriesSource=liveEvents;
+
+  sortedLiveEntriesCache=liveEvents
     .map((event,index)=>({
       event,
       index,
@@ -5030,6 +5243,8 @@ function getSortedLiveEntries(){
 
       return a.key.localeCompare(b.key,"en",{sensitivity:"base",numeric:true})||a.index-b.index;
     });
+
+  return sortedLiveEntriesCache;
 }
 
 function migrateStoredEventState(
@@ -5795,9 +6010,25 @@ function renderLeagueTabs(){
     new Map();
 
   for(
-    const event
-    of liveEvents
+    let index=0;
+    index<liveEvents.length;
+    index++
   ){
+    const event=
+      liveEvents[index];
+
+    const eventMeta=
+      getEventMeta(
+        event,
+        index
+      );
+
+    hydrateEventMeta(
+      event,
+      index,
+      eventMeta
+    );
+
     const key=
       canonicalLeagueKey(
         event?.league||
@@ -5805,6 +6036,7 @@ function renderLeagueTabs(){
       );
 
     const label=
+      eventMeta?.league||
       canonicalLeagueLabel(
         event?.league||
         "Other"
@@ -6198,12 +6430,48 @@ function scheduleTranslationRender(){
           document.visibilityState!==
           "hidden"
         ){
-          renderMatches();
           renderLeagueTabs();
         }
       },
-      120
+      420
     );
+}
+
+function refreshRenderedMeta(meta){
+  const row=meta?.row;
+
+  if(!row||!document.contains(row)){
+    return;
+  }
+
+  const titleEl=row.querySelector(".channel-copy strong");
+  const leagueEl=row.querySelector(".channel-copy small");
+  const timeEl=row.querySelector(".live-badge");
+
+  if(titleEl){
+    titleEl.textContent=meta.title||"Live channel";
+  }
+
+  if(leagueEl){
+    leagueEl.textContent=meta.league||"Live feed";
+  }
+
+  if(timeEl){
+    const dot=timeEl.querySelector(".live-dot");
+    timeEl.textContent="";
+
+    if(dot){
+      timeEl.appendChild(dot);
+    }else{
+      const newDot=document.createElement("div");
+      newDot.className="live-dot";
+      timeEl.appendChild(newDot);
+    }
+
+    timeEl.append(
+      document.createTextNode(meta.time||"ONLINE")
+    );
+  }
 }
 
 function hydrateEventMeta(event,index,meta){
@@ -6215,19 +6483,23 @@ function hydrateEventMeta(event,index,meta){
 
   const titleSource=String(event?.title||"Live channel");
   const leagueSource=String(event?.league||"Live feed");
-  const timeSource=String(event?.time||"ONLINE");
 
   Promise.all([
     translateTextAdvanced(titleSource),
-    translateTextAdvanced(leagueSource),
-    Promise.resolve(translateText(timeSource)||"ONLINE")
+    translateTextAdvanced(leagueSource)
   ])
-    .then(([title,league,time])=>{
+    .then(([title,league])=>{
       const nextTitle=title||translateText(titleSource)||"Live channel";
       const nextLeague=canonicalLeagueLabel(
         league||translateText(leagueSource)||"Other"
       );
-      const nextTime=time||translateText(timeSource)||"ONLINE";
+      const nextTime=formatBDChannelTime(
+        event?.time||
+        event?.startTime||
+        event?.kickoff||
+        event?.dateTime||
+        "ONLINE"
+      );
 
       const changed=
         meta.title!==nextTitle||
@@ -6238,16 +6510,24 @@ function hydrateEventMeta(event,index,meta){
       meta.league=nextLeague;
       meta.time=nextTime;
       refreshMetaSearch(meta,event);
+      refreshRenderedMeta(meta);
 
-      if(changed){
+      if(changed&&meta.league){
         scheduleTranslationRender();
       }
     })
     .catch(()=>{
       meta.title=translateText(titleSource)||"Live channel";
       meta.league=canonicalLeagueLabel(leagueSource);
-      meta.time=translateText(timeSource)||"ONLINE";
+      meta.time=formatBDChannelTime(
+        event?.time||
+        event?.startTime||
+        event?.kickoff||
+        event?.dateTime||
+        "ONLINE"
+      );
       refreshMetaSearch(meta,event);
+      refreshRenderedMeta(meta);
     });
 }
 
@@ -6296,6 +6576,7 @@ function renderMatches(){
     row.setAttribute("aria-label","Play "+meta.title);
     row.setAttribute("title","Play "+meta.title);
     row.dataset.channelKey=meta.key;
+    meta.row=row;
 
     row.innerHTML=
       `<div class="channel-main">`+
@@ -6395,7 +6676,12 @@ function setFilter(
     "all";
 
   renderLeagueTabs();
-  renderMatches();
+
+  requestAnimationFrame(
+    ()=>{
+      renderMatches();
+    }
+  );
 }
 
 function rememberRecent(
@@ -7016,6 +7302,8 @@ function loadCachedFeed(){
   liveEvents=
     cached.events;
 
+  sortedLiveEntriesSource=null;
+
   migrateStoredEventState(
     liveEvents
   );
@@ -7504,6 +7792,8 @@ function loadTargetScript(
         liveEvents=
           nextEvents;
 
+        sortedLiveEntriesSource=null;
+
         migrateStoredEventState(
           liveEvents
         );
@@ -7655,15 +7945,93 @@ function loadTargetScript(
 
 let loginBusy=false;
 
+function setLoginBusyUI(
+  busy,
+  message="Verifying secure access…",
+  state=""
+){
+  const loginBox=document.getElementById("login");
+  const button=document.getElementById("loginBtn");
+  const input=document.getElementById("password");
+  const status=document.getElementById("loginStatus");
+  const statusText=document.getElementById("loginStatusText");
+  const spinner=document.getElementById("loginSpinner");
+
+  if(loginBox){
+    loginBox.classList.toggle("is-busy",busy);
+  }
+
+  if(button){
+    button.classList.toggle("busy",busy);
+    button.disabled=busy;
+    button.setAttribute("aria-busy",busy?"true":"false");
+  }
+
+  if(input){
+    input.disabled=busy;
+  }
+
+  if(status){
+    status.classList.toggle("show",busy||!!message);
+    status.classList.toggle("success",state==="success");
+    status.classList.toggle("error",state==="error");
+  }
+
+  if(statusText){
+    statusText.textContent=message;
+  }
+
+  if(spinner){
+    spinner.style.display=busy?"block":"none";
+  }
+}
+
+function waitForPaint(){
+  return new Promise(resolve=>{
+    requestAnimationFrame(
+      ()=>{
+        requestAnimationFrame(resolve);
+      }
+    );
+  });
+}
+
 async function login(){
   if(loginBusy){
     return;
   }
 
-  loginBusy=true;
-
   const input=document.getElementById("password");
   const pass=input?.value||"";
+
+  if(!pass.trim()){
+    setLoginBusyUI(
+      false,
+      "Enter your access passcode to continue.",
+      "error"
+    );
+
+    input?.focus();
+
+    input?.animate?.([
+      {transform:"translateX(0)"},
+      {transform:"translateX(-7px)"},
+      {transform:"translateX(7px)"},
+      {transform:"translateX(-3px)"},
+      {transform:"translateX(3px)"},
+      {transform:"translateX(0)"}
+    ],{duration:260});
+
+    return;
+  }
+
+  loginBusy=true;
+  setLoginBusyUI(
+    true,
+    "Opening secure session…"
+  );
+
+  await waitForPaint();
 
   try{
     const config=APP_CONFIG||await CONFIG_READY;
@@ -7679,26 +8047,47 @@ async function login(){
     if(primaryPassHash===primaryHash){
       chosenPlayer=String(config.playerBase||PLAYER_BASE_URL);
     }else{
+      setLoginBusyUI(
+        true,
+        "Checking backup access route…"
+      );
+
+      await waitForPaint();
+
       const altPassHash=await deriveAuthHash(pass,altSalt,iterations);
 
       if(altPassHash===altHash){
         chosenPlayer=String(config.playerAlt||PLAYER_ALT_URL);
       }else{
-      input?.select();
+        setLoginBusyUI(
+          false,
+          "Access denied · please check your passcode.",
+          "error"
+        );
 
-      input?.animate?.([
-        {transform:"translateX(0)"},
-        {transform:"translateX(-8px)"},
-        {transform:"translateX(8px)"},
-        {transform:"translateX(-4px)"},
-        {transform:"translateX(4px)"},
-        {transform:"translateX(0)"}
-      ],{duration:280});
+        input?.select();
+
+        input?.animate?.([
+          {transform:"translateX(0)"},
+          {transform:"translateX(-8px)"},
+          {transform:"translateX(8px)"},
+          {transform:"translateX(-4px)"},
+          {transform:"translateX(4px)"},
+          {transform:"translateX(0)"}
+        ],{duration:280});
 
         showToast("Access Denied","Incorrect passcode entered. Please check and try again.");
         return;
       }
     }
+
+    setLoginBusyUI(
+      true,
+      "Access verified · opening stream…",
+      "success"
+    );
+
+    await waitForPaint();
 
     FEED_URL=String(config.feed||FEED_URL);
     TRANSLATION_ENDPOINT=String(config.translation||TRANSLATION_ENDPOINT);
@@ -7706,11 +8095,51 @@ async function login(){
     PLAYER_ALT_URL=String(config.playerAlt||PLAYER_ALT_URL);
     window.__PLAYER_URL_FOR_SESSION=chosenPlayer;
 
+    const loginBox=document.getElementById("login");
+    const playerWrap=document.getElementById("playerWrap");
+    const appHeader=document.getElementById("appHeader");
+    const statusStrip=document.getElementById("statusStrip");
+
     document.body.classList.remove("auth-locked");
-    document.getElementById("login").style.display="none";
-    document.getElementById("playerWrap").style.display="block";
-    document.getElementById("appHeader").style.display="flex";
-    document.getElementById("statusStrip").style.display="flex";
+
+    if(loginBox){
+      loginBox.classList.add("login-leaving");
+    }
+
+    await new Promise(resolve=>setTimeout(resolve,220));
+
+    if(loginBox){
+      loginBox.style.display="none";
+    }
+
+    if(playerWrap){
+      playerWrap.style.display="block";
+      playerWrap.classList.remove("fade");
+      void playerWrap.offsetWidth;
+      playerWrap.classList.add("fade");
+    }
+
+    if(appHeader){
+      appHeader.style.display="flex";
+      appHeader.animate?.(
+        [
+          {opacity:0,transform:"translateY(-6px)"},
+          {opacity:1,transform:"translateY(0)"}
+        ],
+        {duration:260,easing:"cubic-bezier(.22,1,.36,1)",fill:"both"}
+      );
+    }
+
+    if(statusStrip){
+      statusStrip.style.display="flex";
+      statusStrip.animate?.(
+        [
+          {opacity:0,transform:"translateY(-4px)"},
+          {opacity:1,transform:"translateY(0)"}
+        ],
+        {duration:240,easing:"cubic-bezier(.22,1,.36,1)",fill:"both"}
+      );
+    }
 
     updateAnalytics();
 
@@ -7721,12 +8150,27 @@ async function login(){
     startRealtimeAutoSync();
     loadTargetScript(true,"initial");
   }catch(error){
+    setLoginBusyUI(
+      false,
+      "Secure configuration error. Please try again.",
+      "error"
+    );
+
     showToast(
       "Secure Configuration Error",
       CONFIG_ERROR?.message||"The secure app configuration could not be opened."
     );
   }finally{
     loginBusy=false;
+
+    const input=document.getElementById("password");
+
+    if(!document.body.classList.contains("auth-locked")){
+      input?.blur();
+    }else{
+      input.disabled=false;
+      document.getElementById("loginBtn")?.removeAttribute("disabled");
+    }
   }
 }
 
@@ -8109,6 +8553,7 @@ function showFavorites(){
     row.setAttribute("role","button");
     row.setAttribute("aria-label","Play "+meta.title);
     row.dataset.channelKey=meta.key;
+    meta.row=row;
 
     row.innerHTML=
       `<div class="channel-main">`+
@@ -8333,10 +8778,26 @@ function lockSession(){
   ).style.display=
     "none";
 
-  document.getElementById(
-    "login"
-  ).style.display=
-    "flex";
+  const loginBox=
+    document.getElementById(
+      "login"
+    );
+
+  if(loginBox){
+    loginBox.classList.remove(
+      "login-leaving",
+      "is-busy"
+    );
+    loginBox.style.opacity="";
+    loginBox.style.transform="";
+    loginBox.style.display=
+      "flex";
+  }
+
+  setLoginBusyUI(
+    false,
+    ""
+  );
 
   const password=
     document.getElementById(
@@ -8344,8 +8805,14 @@ function lockSession(){
     );
 
   password.value="";
-
+  password.disabled=false;
   password.focus();
+
+  document.getElementById(
+    "loginBtn"
+  )?.removeAttribute(
+    "disabled"
+  );
 }
 
 function handleMenuAction(
@@ -8618,19 +9085,24 @@ function renderStaticChannels(force=false){
   container.replaceChildren(fragment);
 }
 
+const BD_TIME_ZONE="Asia/Dhaka";
+
 const timeFormatter=
   new Intl.DateTimeFormat(
-    undefined,
+    "en-GB",
     {
+      timeZone:BD_TIME_ZONE,
       hour:"2-digit",
-      minute:"2-digit"
+      minute:"2-digit",
+      hour12:false
     }
   );
 
 const timeClockFormatter=
   new Intl.DateTimeFormat(
-    undefined,
+    "en-GB",
     {
+      timeZone:BD_TIME_ZONE,
       hour:"2-digit",
       minute:"2-digit",
       second:"2-digit",
@@ -8958,6 +9430,7 @@ document.addEventListener(
     }
 
     updateNetwork();
+    updateClock();
 
     if(
       !document.body.classList.contains(
