@@ -1681,6 +1681,7 @@ function warmUrl(value){
     ()=>{
 
       showLoadingIndicator();
+      syncUnmuteButton();
 
       const meta=document.querySelector(
         'meta[name="theme-color"]'
@@ -2426,17 +2427,24 @@ function syncUnmuteButton(){
     'unmute-overlay-btn'
   );
 
-  const video=getPlayerVideo();
-
-  if(!button || !video){
+  if(!button){
     return;
   }
 
-  const muted=!!video.muted || Number(video.volume)<=0.001;
+  const video=getPlayerVideo();
+
+  if(!video){
+    button.classList.remove('hidden');
+    return;
+  }
+
+  const muted=
+    !!video.muted ||
+    Number(video.volume)<=0.001;
 
   button.classList.toggle(
     'hidden',
-    !audioUnlocked || !muted
+    !muted
   );
 }
 
