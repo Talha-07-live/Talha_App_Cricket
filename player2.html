@@ -6,119 +6,8 @@
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <title>Talha's Player</title>
-<link rel="icon" id="talha-favicon">
+<link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png">
 
-
-<script>
-(function(){
-  const X7P_KEY='TalhaX7P-2026-Stream';
-  const X7P_ROUNDS=7;
-  function x7pDecode(value){
-    try{
-      const binary=atob(String(value||''));
-      const data=new Uint8Array(binary.length);
-      for(let i=0;i<binary.length;i++) data[i]=binary.charCodeAt(i);
-      const key=new TextEncoder().encode(X7P_KEY);
-      for(let r=X7P_ROUNDS-1;r>=0;r--){
-        let prev=key[r%key.length];
-        for(let i=0;i<data.length;i++){
-          const current=data[i];
-          let x=(current-prev-((i*29+r*41)&255))&255;
-          x=x^key[(i+r*3)%key.length];
-          data[i]=x;
-          prev=current;
-        }
-      }
-      return new TextDecoder().decode(data);
-    }catch(e){ return ''; }
-  }
-  const urls=Object.freeze({
-    allowedOrigin:x7pDecode('FjZx2DqcuIfdJHq5gbMNWJFAdLmcCs1iyWHfl/0='),
-    favicon:x7pDecode('FjZx2DqcuIcAexoHqa0XLjUMXrfOfcS8CBamgwK6RdZefwu9rV0='),
-    clappr:x7pDecode('FjZx2DqcuIewvGPBSoqXQIKtD+fFpu+hEDgfKC3IAh9tlOu63bNrrvxIB1re9paBDBaQItM17Yr/UeYLAvHgQdakZCsb'),
-    levelSelector:x7pDecode('FjZx2DqcuIewvGPBSoqXQIKtD+fFpu+hEDgfKC3IAh9tlOu63ZeU1lG5hybOblsi8M+QG2jeAB9pCFhIOOCkQPcfe28joNgdEsklXPVp216tsGR4/w=='),
-    pip:x7pDecode('FjZx2DqcuIewvGPBSoqXQIKtD+fFpu+hEDgfKC0lNB/PQwfJwRbA7q9xH2WmIxB6bveOaouhnQvJ0J5WgcydJUg9W8e+Mh6en4p5gN0Exg=='),
-    jquery:x7pDecode('FjZx2DqcuIewvGPBSoqXQIKtD+fFpu+hEDgfKC0C3sBIGD7tqTeeyTq0ktYsXK/6ZUfmhEGURLwVzxFv'),
-    cinema:x7pDecode('FjZx2DqcuIcAPAdeJKkIsORrGmU8bsw1G1/s/xTSJZT9'),
-    feedScript:x7pDecode('FjZx2DqcuIc2ddLGlhhRaFTONWXBYgPazAPsJ30KggSGQCjL8w=='),
-    pphPrefix:x7pDecode('FjZx2DqcuIdZAcUPvHUb2fZ4v0VFGIRGTNUw6QTDJo4APfbXwcUQsw=='),
-    checklist1:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWEOP6UE0bHjyJgD1TPwq+lZb9br'),
-    checklist2:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWERNs0IecMNtiNsr9vQUc8rFv1n'),
-    checklist3:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWEROmmY0csV/qMgs5vokTeTfgnr'),
-    checklist4:x7pDecode('FjZx2DqcuIcaLLcDoZz5hG8ZnWgiyNKLbWERIFNs3dM5lgvmjXsQ3UP3ci8d')
-  });
-  let parsedOrigin=null;
-  try{ parsedOrigin=new URL(urls.allowedOrigin); }catch(e){}
-  const allowedOrigin=parsedOrigin?.origin||'';
-  const allowedHost=parsedOrigin?.hostname||'';
-  const allowedProtocol=parsedOrigin?.protocol||'';
-  function isExactOrigin(){
-    try{
-      const u=new URL(window.location.href);
-      return !!allowedOrigin && u.protocol===allowedProtocol && u.hostname===allowedHost && u.port==='' && u.origin===allowedOrigin;
-    }catch(e){ return false; }
-  }
-  function isTopLevel(){
-    try{ return window.top===window.self; }catch(e){ return false; }
-  }
-  function isAuthorizedParent(){
-    if(isTopLevel()) return false;
-    try{ return window.parent.location.origin===allowedOrigin; }catch(e){ return false; }
-  }
-  const authorized=isExactOrigin() && !isTopLevel() && isAuthorizedParent();
-  window.__TALHA_DOMAIN_ALLOWED__=authorized;
-  window.__X7P__={key:X7P_KEY,decode:x7pDecode,urls,allowedOrigin,allowedHost,allowedProtocol};
-  const deny=()=>{
-    document.documentElement.setAttribute('data-domain-blocked','1');
-    const render=()=>{
-      if(!document.body) return;
-      document.body.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;background:#000;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;text-align:center"><div style="max-width:480px"><div style="font-size:18px;font-weight:800;margin-bottom:10px">Access Denied</div><div style="font-size:13px;line-height:1.6;color:rgba(255,255,255,.7)">This player can only run inside the authorized Talha player page.</div></div></div>';
-      document.title='Access Denied';
-    };
-    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',render,{once:true}); else render();
-  };
-  function loadScript(src,timeout=9000){
-    return new Promise((resolve,reject)=>{
-      const script=document.createElement('script');
-      let settled=false;
-      const finish=(error)=>{ if(settled) return; settled=true; clearTimeout(timer); error?reject(error):resolve(); };
-      script.src=src; script.async=false; script.crossOrigin='anonymous';
-      script.onload=()=>finish();
-      script.onerror=()=>finish(new Error('External library failed'));
-      const timer=setTimeout(()=>finish(new Error('External library timed out')),timeout);
-      document.head.appendChild(script);
-    });
-  }
-  if(!authorized){
-    window.__X7P_LIBS_READY__=Promise.resolve(false);
-    deny();
-    return;
-  }
-  const favicon=document.getElementById('talha-favicon');
-  if(favicon) favicon.href=urls.favicon;
-  const start=async()=>{
-    try{
-      await loadScript(urls.clappr);
-      await Promise.all([loadScript(urls.levelSelector),loadScript(urls.pip),loadScript(urls.jquery)]);
-      return true;
-    }catch(e){
-      console.error('Library bootstrap failed:',e);
-      return false;
-    }
-  };
-  window.__X7P_LIBS_READY__=start();
-  window.__TALHA_DOMAIN_WATCHDOG__=setInterval(()=>{
-    let ok=false;
-    try{ ok=isExactOrigin()&&!isTopLevel()&&isAuthorizedParent(); }catch(e){}
-    if(ok) return;
-    clearInterval(window.__TALHA_DOMAIN_WATCHDOG__);
-    window.__TALHA_DOMAIN_ALLOWED__=false;
-    try{ window.stop(); }catch(e){}
-    try{ document.querySelectorAll('video,audio,iframe').forEach(node=>{ try{node.pause?.();}catch(e){} try{if(node.tagName==='IFRAME') node.src='about:blank'; else{node.removeAttribute('src');node.load?.();}}catch(e){} }); }catch(e){}
-    deny();
-  },900);
-})();
-</script>
 <style>
 :root[data-theme="netflix"]{
   --skin-accent:#E50914;
@@ -434,6 +323,7 @@ body{
   box-shadow:0 4px 18px rgba(0,0,0,.6);
   transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s ease,box-shadow .22s ease,opacity .3s ease,visibility .3s ease;
   touch-action:manipulation;
+  -webkit-user-select:none;
   user-select:none;
 }
 #pip-top-btn.fade-hidden,
@@ -958,6 +848,10 @@ input[type="range"]::-moz-range-thumb{
 }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@clappr/level-selector@latest/dist/level-selector.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/clappr-pip-plugin@latest/dist/clappr-pip-plugin.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 </head>
 
 <body>
@@ -1304,11 +1198,6 @@ input[type="range"]::-moz-range-thumb{
 </div>
 
 <script>
-
-if(window.__TALHA_DOMAIN_ALLOWED__!==true){
-  throw new Error("Talha's Player: unauthorized origin");
-}
-
 let autoHideTimer=null;
 let overlayMoveStamp=0;
 let videoFilterFrame=0;
@@ -1318,94 +1207,53 @@ let videoScanTimer=0;
 const warmupHosts=new Set();
 
 function showOverlayButtons(){
-
-  const pipBtn=
-    document.getElementById(
-      'pip-top-btn'
-    );
-
-  const settingsBtn=
-    document.getElementById(
-      'settings-toggle-btn'
-    );
+  const pipBtn=document.getElementById('pip-top-btn');
+  const settingsBtn=document.getElementById('settings-toggle-btn');
 
   if(pipBtn){
-    pipBtn.classList.remove(
-      'fade-hidden'
-    );
+    pipBtn.classList.remove('fade-hidden');
   }
 
   if(settingsBtn){
-    settingsBtn.classList.remove(
-      'fade-hidden'
-    );
+    settingsBtn.classList.remove('fade-hidden');
   }
 }
 
 function hideOverlayButtons(){
+  const drawer=document.getElementById('control-drawer');
 
-  const drawer=
-    document.getElementById(
-      'control-drawer'
-    );
-
-  if(
-    drawer &&
-    drawer.classList.contains('open')
-  ){
+  if(drawer && drawer.classList.contains('open')){
     return;
   }
 
-  const pipBtn=
-    document.getElementById(
-      'pip-top-btn'
-    );
-
-  const settingsBtn=
-    document.getElementById(
-      'settings-toggle-btn'
-    );
+  const pipBtn=document.getElementById('pip-top-btn');
+  const settingsBtn=document.getElementById('settings-toggle-btn');
 
   if(pipBtn){
-    pipBtn.classList.add(
-      'fade-hidden'
-    );
+    pipBtn.classList.add('fade-hidden');
   }
 
   if(settingsBtn){
-    settingsBtn.classList.add(
-      'fade-hidden'
-    );
+    settingsBtn.classList.add('fade-hidden');
   }
 }
 
 function resetControlsTimer(){
-
   showOverlayButtons();
 
   if(autoHideTimer){
-    clearTimeout(
-      autoHideTimer
-    );
+    clearTimeout(autoHideTimer);
   }
 
-  autoHideTimer=
-    setTimeout(
-      ()=>{
-        hideOverlayButtons();
-      },
-      4000
-    );
+  autoHideTimer=setTimeout(()=>{
+    hideOverlayButtons();
+  },4000);
 }
 
 function handleOverlayActivity(){
-
   const now=performance.now();
 
-  if(
-    now-overlayMoveStamp<
-    120
-  ){
+  if(now-overlayMoveStamp<120){
     return;
   }
 
@@ -1413,156 +1261,75 @@ function handleOverlayActivity(){
   resetControlsTimer();
 }
 
-document.addEventListener(
-  'pointerdown',
-  resetControlsTimer,
-  {passive:true}
-);
-
-document.addEventListener(
-  'touchstart',
-  resetControlsTimer,
-  {passive:true}
-);
-
-document.addEventListener(
-  'click',
-  resetControlsTimer,
-  {passive:true}
-);
-
-document.addEventListener(
-  'pointermove',
-  handleOverlayActivity,
-  {passive:true}
-);
+document.addEventListener('pointerdown',resetControlsTimer,{passive:true});
+document.addEventListener('touchstart',resetControlsTimer,{passive:true});
+document.addEventListener('click',resetControlsTimer,{passive:true});
+document.addEventListener('pointermove',handleOverlayActivity,{passive:true});
 
 function hidePoster(){
+  const poster=document.getElementById('custom-poster-overlay');
 
-  const poster=
-    document.getElementById(
-      'custom-poster-overlay'
-    );
-
-  if(
-    poster &&
-    !poster.classList.contains('hidden')
-  ){
+  if(poster && !poster.classList.contains('hidden')){
     poster.classList.add('hidden');
   }
 }
 
 function hideLoadingIndicator(){
+  const loading=document.getElementById('player-loading-indicator');
 
-  const loading=
-    document.getElementById(
-      'player-loading-indicator'
-    );
-
-  if(
-    loading &&
-    !loading.classList.contains('hide')
-  ){
+  if(loading && !loading.classList.contains('hide')){
     loading.classList.add('hide');
   }
 }
 
 function showLoadingIndicator(){
-
-  const loading=
-    document.getElementById(
-      'player-loading-indicator'
-    );
+  const loading=document.getElementById('player-loading-indicator');
 
   if(loading){
-    loading.classList.remove(
-      'hide'
-    );
+    loading.classList.remove('hide');
   }
 }
 
 function warmConnection(hostname){
+  const host=String(hostname||'').trim().toLowerCase();
 
-  const host=
-    String(
-      hostname||''
-    )
-    .trim()
-    .toLowerCase();
-
-  if(
-    !host ||
-    warmupHosts.has(host)
-  ){
+  if(!host || warmupHosts.has(host)){
     return;
   }
 
   warmupHosts.add(host);
 
   try{
-
-    const dns=
-      document.createElement(
-        'link'
-      );
-
+    const dns=document.createElement('link');
     dns.rel='dns-prefetch';
-
     dns.href='//'+host;
-
-    document.head.appendChild(
-      dns
-    );
-
+    document.head.appendChild(dns);
   }catch(e){}
 
   try{
-
-    const preconnect=
-      document.createElement(
-        'link'
-      );
-
+    const preconnect=document.createElement('link');
     preconnect.rel='preconnect';
-
     preconnect.href='https://'+host;
-
-    preconnect.crossOrigin=
-      'anonymous';
-
-    document.head.appendChild(
-      preconnect
-    );
-
+    preconnect.crossOrigin='anonymous';
+    document.head.appendChild(preconnect);
   }catch(e){}
 }
 
 function warmUrl(value){
-
   try{
-
-    const url=
-      new URL(
-        String(value||'')
-      );
-
-    warmConnection(
-      url.hostname
-    );
-
+    const url=new URL(String(value||''));
+    warmConnection(url.hostname);
   }catch(e){}
 }
 
 [
-  window.__X7P__.urls.checklist1,
-  window.__X7P__.urls.checklist2,
-  window.__X7P__.urls.checklist3,
-  window.__X7P__.urls.checklist4,
-  new URL(window.__X7P__.urls.cinema).hostname,
-  new URL(window.__X7P__.urls.feedScript).hostname
-].forEach(
-  warmConnection
-);
+  'andro.evrenesoglu121.click',
+  'andro.evrenesoglu115.click',
+  'andro.evrenesoglu111.click',
+  'andro.evrenesoglu113.click',
+  'streamsport365.com',
+  'mahsunsports39.xyz'
+].forEach(warmConnection);
 
 (function(){
 
@@ -1575,22 +1342,15 @@ function warmUrl(value){
     'amethyst'
   ]);
 
-  const params=
-    new URLSearchParams(
-      window.location.search
-    );
+  const params=new URLSearchParams(window.location.search);
 
-  const requestedTheme=
-    String(
-      params.get('theme')||''
-    ).toLowerCase();
+  const requestedTheme=String(
+    params.get('theme')||''
+  ).toLowerCase();
 
-  const storedTheme=
-    String(
-      localStorage.getItem(
-        'player_skin_theme'
-      )||'gold'
-    ).toLowerCase();
+  const storedTheme=String(
+    localStorage.getItem('player_skin_theme')||'gold'
+  ).toLowerCase();
 
   const activeTheme=
     themes.has(requestedTheme)
@@ -1610,60 +1370,30 @@ function warmUrl(value){
 
       showLoadingIndicator();
 
-      const meta=
-        document.querySelector(
-          'meta[name="theme-color"]'
-        );
+      const meta=document.querySelector(
+        'meta[name="theme-color"]'
+      );
 
       if(meta){
-
         meta.setAttribute(
           'content',
           getComputedStyle(
             document.documentElement
-          ).getPropertyValue(
-            '--skin-bg'
-          ).trim()||'#000000'
+          ).getPropertyValue('--skin-bg').trim()||'#000000'
         );
       }
 
-      const toggle=
-        document.getElementById(
-          'settings-toggle-btn'
-        );
-
-      const drawer=
-        document.getElementById(
-          'control-drawer'
-        );
-
-      const tabs=
-        document.querySelectorAll(
-          '.tab-btn'
-        );
-
-      const contents=
-        document.querySelectorAll(
-          '.tab-content'
-        );
-
-      const skins=
-        document.querySelectorAll(
-          '.skin-btn'
-        );
-
-      const poster=
-        document.getElementById(
-          'custom-poster-overlay'
-        );
+      const toggle=document.getElementById('settings-toggle-btn');
+      const drawer=document.getElementById('control-drawer');
+      const tabs=document.querySelectorAll('.tab-btn');
+      const contents=document.querySelectorAll('.tab-content');
+      const skins=document.querySelectorAll('.skin-btn');
+      const poster=document.getElementById('custom-poster-overlay');
 
       poster?.addEventListener(
         'click',
         ()=>{
-          const video=
-            document.querySelector(
-              '#player-container video'
-            );
+          const video=document.querySelector('#player-container video');
 
           if(video){
             tryVideoPlay(video);
@@ -1672,10 +1402,7 @@ function warmUrl(value){
       );
 
       const closeDrawer=()=>{
-
-        drawer?.classList.remove(
-          'open'
-        );
+        drawer?.classList.remove('open');
 
         toggle?.setAttribute(
           'aria-expanded',
@@ -1686,10 +1413,7 @@ function warmUrl(value){
       };
 
       const openDrawer=()=>{
-
-        drawer?.classList.add(
-          'open'
-        );
+        drawer?.classList.add('open');
 
         toggle?.setAttribute(
           'aria-expanded',
@@ -1699,68 +1423,53 @@ function warmUrl(value){
         showOverlayButtons();
 
         if(autoHideTimer){
-          clearTimeout(
-            autoHideTimer
-          );
+          clearTimeout(autoHideTimer);
         }
       };
 
-      skins.forEach(
-        button=>{
+      skins.forEach(button=>{
+        const skin=button.getAttribute('data-skin');
 
-          const skin=
-            button.getAttribute(
-              'data-skin'
+        if(skin===activeTheme){
+          button.classList.add('active');
+        }
+
+        button.addEventListener(
+          'click',
+          ()=>{
+
+            if(!themes.has(skin)){
+              return;
+            }
+
+            document.documentElement.setAttribute(
+              'data-theme',
+              skin
             );
 
-          if(skin===activeTheme){
-            button.classList.add(
-              'active'
+            localStorage.setItem(
+              'player_skin_theme',
+              skin
             );
-          }
 
-          button.addEventListener(
-            'click',
-            ()=>{
-
-              if(!themes.has(skin)){
-                return;
-              }
-
-              document.documentElement.setAttribute(
-                'data-theme',
-                skin
-              );
-
-              localStorage.setItem(
-                'player_skin_theme',
-                skin
-              );
-
-              if(meta){
-
-                meta.setAttribute(
-                  'content',
-                  getComputedStyle(
-                    document.documentElement
-                  ).getPropertyValue(
-                    '--skin-bg'
-                  ).trim()||'#000000'
-                );
-              }
-
-              skins.forEach(
-                item=>{
-                  item.classList.toggle(
-                    'active',
-                    item===button
-                  );
-                }
+            if(meta){
+              meta.setAttribute(
+                'content',
+                getComputedStyle(
+                  document.documentElement
+                ).getPropertyValue('--skin-bg').trim()||'#000000'
               );
             }
-          );
-        }
-      );
+
+            skins.forEach(item=>{
+              item.classList.toggle(
+                'active',
+                item===button
+              );
+            });
+          }
+        );
+      });
 
       toggle?.setAttribute(
         'aria-expanded',
@@ -1787,21 +1496,13 @@ function warmUrl(value){
         'pointerdown',
         event=>{
 
-          if(
-            !drawer?.classList.contains(
-              'open'
-            )
-          ){
+          if(!drawer?.classList.contains('open')){
             return;
           }
 
-          const target=
-            event.target;
+          const target=event.target;
 
-          if(
-            target!==toggle &&
-            !drawer.contains(target)
-          ){
+          if(target!==toggle && !drawer.contains(target)){
             closeDrawer();
           }
         },
@@ -1817,51 +1518,33 @@ function warmUrl(value){
         }
       );
 
-      tabs.forEach(
-        tab=>{
-          tab.addEventListener(
-            'click',
-            ()=>{
+      tabs.forEach(tab=>{
+        tab.addEventListener(
+          'click',
+          ()=>{
+            const id=tab.getAttribute('data-tab');
 
-              const id=
-                tab.getAttribute(
-                  'data-tab'
-                );
+            tabs.forEach(item=>{
+              item.classList.remove('active');
+            });
 
-              tabs.forEach(
-                item=>{
-                  item.classList.remove(
-                    'active'
-                  );
-                }
-              );
+            contents.forEach(item=>{
+              item.classList.remove('active');
+            });
 
-              contents.forEach(
-                item=>{
-                  item.classList.remove(
-                    'active'
-                  );
-                }
-              );
+            tab.classList.add('active');
 
-              tab.classList.add(
-                'active'
-              );
+            document
+              .getElementById(id)
+              ?.classList.add('active');
 
-              document
-                .getElementById(id)
-                ?.classList.add(
-                  'active'
-                );
-
-              drawer?.scrollTo({
-                top:0,
-                behavior:'smooth'
-              });
-            }
-          );
-        }
-      );
+            drawer?.scrollTo({
+              top:0,
+              behavior:'smooth'
+            });
+          }
+        );
+      });
 
       initAudioVideoFx();
     }
@@ -1871,36 +1554,24 @@ function warmUrl(value){
 
 let videoSettings={
   brightness:Number(
-    localStorage.getItem(
-      'player_brightness'
-    )||100
+    localStorage.getItem('player_brightness')||100
   ),
   contrast:Number(
-    localStorage.getItem(
-      'player_contrast'
-    )||100
+    localStorage.getItem('player_contrast')||100
   ),
   saturate:Number(
-    localStorage.getItem(
-      'player_saturate'
-    )||100
+    localStorage.getItem('player_saturate')||100
   )
 };
 
 let audioSettings={
   gain:Number(
-    localStorage.getItem(
-      'player_gain'
-    )||100
+    localStorage.getItem('player_gain')||100
   ),
   bass:
-    localStorage.getItem(
-      'player_bass'
-    )==='1',
+    localStorage.getItem('player_bass')==='1',
   vocal:
-    localStorage.getItem(
-      'player_vocal'
-    )==='1'
+    localStorage.getItem('player_vocal')==='1'
 };
 
 let audioCtx=null;
@@ -1915,33 +1586,25 @@ let boundVideo=null;
 let audioUnlocked=false;
 let audioUserMuted=true;
 let audioUserVolume=100;
-let audioLastNonZeroVolume=100;
 let autoplayTimers=[];
 
 function clearAutoplayTimers(){
-
-  autoplayTimers.forEach(
-    timer=>{
-      try{
-        clearTimeout(timer);
-      }catch(e){}
-    }
-  );
+  autoplayTimers.forEach(timer=>{
+    try{
+      clearTimeout(timer);
+    }catch(e){}
+  });
 
   autoplayTimers=[];
 }
 
 function scheduleAutoplay(delay){
-
-  const timer=
-    setTimeout(
-      forceAutoplay,
-      delay
-    );
-
-  autoplayTimers.push(
-    timer
+  const timer=setTimeout(
+    forceAutoplay,
+    delay
   );
+
+  autoplayTimers.push(timer);
 }
 
 function clampNumber(
@@ -1950,7 +1613,6 @@ function clampNumber(
   max,
   fallback
 ){
-
   const n=Number(value);
 
   return Number.isFinite(n)
@@ -1964,37 +1626,33 @@ function clampNumber(
     : fallback;
 }
 
-videoSettings.brightness=
-  clampNumber(
-    videoSettings.brightness,
-    60,
-    180,
-    100
-  );
+videoSettings.brightness=clampNumber(
+  videoSettings.brightness,
+  60,
+  180,
+  100
+);
 
-videoSettings.contrast=
-  clampNumber(
-    videoSettings.contrast,
-    60,
-    180,
-    100
-  );
+videoSettings.contrast=clampNumber(
+  videoSettings.contrast,
+  60,
+  180,
+  100
+);
 
-videoSettings.saturate=
-  clampNumber(
-    videoSettings.saturate,
-    0,
-    220,
-    100
-  );
+videoSettings.saturate=clampNumber(
+  videoSettings.saturate,
+  0,
+  220,
+  100
+);
 
-audioSettings.gain=
-  clampNumber(
-    audioSettings.gain,
-    100,
-    300,
-    100
-  );
+audioSettings.gain=clampNumber(
+  audioSettings.gain,
+  100,
+  300,
+  100
+);
 
 function applyVideoFilters(){
 
@@ -2002,53 +1660,40 @@ function applyVideoFilters(){
     return;
   }
 
-  videoFilterFrame=
-    requestAnimationFrame(
-      ()=>{
+  videoFilterFrame=requestAnimationFrame(()=>{
+    videoFilterFrame=0;
 
-        videoFilterFrame=0;
-
-        const video=
-          document.querySelector(
-            '#player-container video'
-          );
-
-        if(!video){
-          return;
-        }
-
-        const filter=
-          videoSettings.brightness===100 &&
-          videoSettings.contrast===100 &&
-          videoSettings.saturate===100
-            ? 'none'
-            : `brightness(${videoSettings.brightness}%) contrast(${videoSettings.contrast}%) saturate(${videoSettings.saturate}%)`;
-
-        if(
-          filter===
-          lastAppliedFilter
-        ){
-          return;
-        }
-
-        lastAppliedFilter=
-          filter;
-
-        try{
-
-          video.style.setProperty(
-            'filter',
-            filter,
-            'important'
-          );
-
-        }catch(e){
-
-          video.style.filter=
-            filter;
-        }
-      }
+    const video=document.querySelector(
+      '#player-container video'
     );
+
+    if(!video){
+      return;
+    }
+
+    const filter=
+      videoSettings.brightness===100 &&
+      videoSettings.contrast===100 &&
+      videoSettings.saturate===100
+        ? 'none'
+        : `brightness(${videoSettings.brightness}%) contrast(${videoSettings.contrast}%) saturate(${videoSettings.saturate}%)`;
+
+    if(filter===lastAppliedFilter){
+      return;
+    }
+
+    lastAppliedFilter=filter;
+
+    try{
+      video.style.setProperty(
+        'filter',
+        filter,
+        'important'
+      );
+    }catch(e){
+      video.style.filter=filter;
+    }
+  });
 }
 
 function updateVideoUI(){
@@ -2074,23 +1719,15 @@ function updateVideoUI(){
   items.forEach(
     ([inputId,labelId,value])=>{
 
-      const input=
-        document.getElementById(
-          inputId
-        );
-
-      const label=
-        document.getElementById(
-          labelId
-        );
+      const input=document.getElementById(inputId);
+      const label=document.getElementById(labelId);
 
       if(input){
         input.value=value;
       }
 
       if(label){
-        label.textContent=
-          value+'%';
+        label.textContent=value+'%';
       }
     }
   );
@@ -2098,45 +1735,25 @@ function updateVideoUI(){
 
 function updateAudioUI(){
 
-  const gain=
-    document.getElementById(
-      'slider-gain'
-    );
-
-  const gainLabel=
-    document.getElementById(
-      'val-gain'
-    );
-
-  const bass=
-    document.getElementById(
-      'toggle-bass'
-    );
-
-  const vocal=
-    document.getElementById(
-      'toggle-vocal'
-    );
+  const gain=document.getElementById('slider-gain');
+  const gainLabel=document.getElementById('val-gain');
+  const bass=document.getElementById('toggle-bass');
+  const vocal=document.getElementById('toggle-vocal');
 
   if(gain){
-    gain.value=
-      audioSettings.gain;
+    gain.value=audioSettings.gain;
   }
 
   if(gainLabel){
-    gainLabel.textContent=
-      audioSettings.gain+
-      '%';
+    gainLabel.textContent=audioSettings.gain+'%';
   }
 
   if(bass){
-    bass.checked=
-      audioSettings.bass;
+    bass.checked=audioSettings.bass;
   }
 
   if(vocal){
-    vocal.checked=
-      audioSettings.vocal;
+    vocal.checked=audioSettings.vocal;
   }
 }
 
@@ -2188,29 +1805,18 @@ function updateVideoParams(
 
 function applyAudioSettings(){
 
-  if(
-    !gainNode ||
-    !bassFilter ||
-    !vocalFilter
-  ){
+  if(!gainNode || !bassFilter || !vocalFilter){
     return;
   }
 
   try{
-
-    gainNode.gain.value=
-      audioSettings.gain/100;
+    gainNode.gain.value=audioSettings.gain/100;
 
     bassFilter.gain.value=
-      audioSettings.bass
-        ? 10
-        : 0;
+      audioSettings.bass ? 10 : 0;
 
     vocalFilter.gain.value=
-      audioSettings.vocal
-        ? 6
-        : 0;
-
+      audioSettings.vocal ? 6 : 0;
   }catch(e){}
 }
 
@@ -2221,14 +1827,9 @@ async function resumeAudioContext(){
   }
 
   try{
-
-    if(
-      audioCtx.state===
-      'suspended'
-    ){
+    if(audioCtx.state==='suspended'){
       await audioCtx.resume();
     }
-
   }catch(e){}
 }
 
@@ -2253,10 +1854,9 @@ function disconnectAudioGraph(){
 
 function setupAudioNodes(){
 
-  const video=
-    document.querySelector(
-      '#player-container video'
-    );
+  const video=document.querySelector(
+    '#player-container video'
+  );
 
   if(!video){
     return false;
@@ -2268,18 +1868,14 @@ function setupAudioNodes(){
     audioSettings.vocal;
 
   if(!needsEnhancer){
-
-    applyDesiredAudioState(
-      video
-    );
-
+    applyDesiredAudioState(video);
     return true;
   }
 
   try{
 
     const AudioContextClass=
-      window.AudioContext||
+      window.AudioContext ||
       window.webkitAudioContext;
 
     if(!AudioContextClass){
@@ -2287,8 +1883,7 @@ function setupAudioNodes(){
     }
 
     if(!audioCtx){
-      audioCtx=
-        new AudioContextClass();
+      audioCtx=new AudioContextClass();
     }
 
     if(
@@ -2336,9 +1931,7 @@ function setupAudioNodes(){
     source.connect(bass);
     bass.connect(vocal);
     vocal.connect(gain);
-    gain.connect(
-      audioCtx.destination
-    );
+    gain.connect(audioCtx.destination);
 
     mediaSource=source;
     gainNode=gain;
@@ -2365,9 +1958,7 @@ function setupAudioNodes(){
   }
 }
 
-function applyDesiredAudioState(
-  video
-){
+function applyDesiredAudioState(video){
 
   if(!video){
     return;
@@ -2389,7 +1980,7 @@ function applyDesiredAudioState(
     }else{
 
       const muted=
-        audioUserMuted||
+        audioUserMuted ||
         audioUserVolume<=0;
 
       video.muted=muted;
@@ -2407,66 +1998,38 @@ function applyDesiredAudioState(
             );
 
       if(muted){
-        video.setAttribute(
-          'muted',
-          ''
-        );
+        video.setAttribute('muted','');
       }else{
-        video.removeAttribute(
-          'muted'
-        );
+        video.removeAttribute('muted');
       }
     }
 
     video.autoplay=true;
     video.playsInline=true;
 
-    video.setAttribute(
-      'autoplay',
-      ''
-    );
-
-    video.setAttribute(
-      'playsinline',
-      ''
-    );
-
-    video.setAttribute(
-      'webkit-playsinline',
-      ''
-    );
-
-    video.setAttribute(
-      'x5-playsinline',
-      'true'
-    );
+    video.setAttribute('autoplay','');
+    video.setAttribute('playsinline','');
+    video.setAttribute('webkit-playsinline','');
+    video.setAttribute('x5-playsinline','true');
 
   }catch(e){}
 }
 
-function tryVideoPlay(
-  video
-){
+function tryVideoPlay(video){
 
   if(!video){
-    return Promise.resolve(
-      false
-    );
+    return Promise.resolve(false);
   }
 
-  applyDesiredAudioState(
-    video
-  );
+  applyDesiredAudioState(video);
 
   try{
 
-    const promise=
-      video.play();
+    const promise=video.play();
 
     if(
       promise &&
-      typeof promise.then===
-      'function'
+      typeof promise.then==='function'
     ){
 
       return promise.then(
@@ -2485,24 +2048,19 @@ function tryVideoPlay(
       hidePoster();
       hideLoadingIndicator();
 
-      return Promise.resolve(
-        true
-      );
+      return Promise.resolve(true);
     }
 
   }catch(e){}
 
-  return Promise.resolve(
-    false
-  );
+  return Promise.resolve(false);
 }
 
 function forceAutoplay(){
 
-  const video=
-    document.querySelector(
-      '#player-container video'
-    );
+  const video=document.querySelector(
+    '#player-container video'
+  );
 
   if(!video){
     return false;
@@ -2510,9 +2068,7 @@ function forceAutoplay(){
 
   if(audioUnlocked){
 
-    applyDesiredAudioState(
-      video
-    );
+    applyDesiredAudioState(video);
 
   }else{
 
@@ -2526,9 +2082,7 @@ function forceAutoplay(){
     );
   }
 
-  tryVideoPlay(
-    video
-  );
+  tryVideoPlay(video);
 
   return true;
 }
@@ -2544,190 +2098,18 @@ function startAutoplayRetries(){
   scheduleAutoplay(1800);
 }
 
-function getActiveClapprPlayer(){
+function syncAudioFromPlayer(volume){
 
-  const stream=
-    window.activeStreamPlayer;
-
-  if(
-    stream &&
-    stream.player &&
-    typeof stream.player.setVolume===
-    'function'
-  ){
-    return stream.player;
-  }
-
-  return null;
-}
-
-function setClapprVolumeSafe(
-  volume
-){
-
-  const player=
-    getActiveClapprPlayer();
-
-  if(!player){
-    return;
-  }
-
-  const value=
-    clampNumber(
-      volume,
-      0,
-      100,
-      audioUserVolume
-    );
-
-  try{
-    const current=
-      typeof player.getVolume===
-      'function'
-        ? Number(
-            player.getVolume()
-          )
-        : NaN;
-
-    if(
-      Number.isFinite(current) &&
-      Math.abs(
-        current-value
-      )<0.5
-    ){
-      return;
-    }
-
-    player.setVolume(
-      value
-    );
-  }catch(e){}
-}
-
-function syncAudioFromPlayer(
-  volume,
-  applyToVideo=true
-){
-  const value=
-    clampNumber(
-      volume,
-      0,
-      100,
-      audioUserVolume
-    );
-
-  const video=
-    document.querySelector(
-      '#player-container video'
-    );
-
-  const actuallyMuted=
-    !!(
-      video?.muted||
-      !audioUnlocked
-    );
+  const value=clampNumber(
+    volume,
+    0,
+    100,
+    audioUserVolume
+  );
 
   audioUserVolume=value;
 
-  if(
-    value>0 &&
-    !actuallyMuted
-  ){
-    audioLastNonZeroVolume=
-      value;
-
-    audioUnlocked=true;
-    audioUserMuted=false;
-
-  }else if(
-    audioUnlocked
-  ){
-    audioUserMuted=
-      value<=0||
-      actuallyMuted;
-  }
-
-  if(!applyToVideo){
-    return;
-  }
-
-  if(!video){
-    return;
-  }
-
-  try{
-    const muted=
-      value<=0||
-      audioUserMuted;
-
-    const targetVolume=
-      muted
-        ? 0
-        : value/100;
-
-    if(video.muted!==muted){
-      video.muted=
-        muted;
-    }
-
-    if(video.defaultMuted!==muted){
-      video.defaultMuted=
-        muted;
-    }
-
-    if(
-      Math.abs(
-        video.volume-
-        targetVolume
-      )>.001
-    ){
-      video.volume=
-        targetVolume;
-    }
-
-    if(muted){
-      video.setAttribute(
-        'muted',
-        ''
-      );
-    }else{
-      video.removeAttribute(
-        'muted'
-      );
-    }
-
-  }catch(e){}
-}
-
-function syncAudioFromVideo(
-  video,
-  pushToClappr=true
-){
-
-  if(!video){
-    return;
-  }
-
-  const muted=
-    !!video.muted;
-
-  const value=
-    muted
-      ? 0
-      : clampNumber(
-          Number(video.volume)*100,
-          0,
-          100,
-          audioUserVolume
-        );
-
   if(value>0){
-
-    audioUserVolume=
-      value;
-
-    audioLastNonZeroVolume=
-      value;
 
     audioUnlocked=true;
     audioUserMuted=false;
@@ -2736,65 +2118,23 @@ function syncAudioFromVideo(
 
     audioUserMuted=true;
   }
-
-  if(pushToClappr){
-    setClapprVolumeSafe(
-      value
-    );
-  }
-
-  const button=
-    document.getElementById(
-      'unmute-overlay-btn'
-    );
-
-  if(button){
-
-    if(
-      value>0 &&
-      !muted
-    ){
-
-      button.classList.add(
-        'hidden'
-      );
-
-    }else if(audioUnlocked){
-
-      button.classList.remove(
-        'hidden'
-      );
-    }
-  }
 }
 
 function unmuteEverything(){
 
   audioUnlocked=true;
   audioUserMuted=false;
-
-  audioUserVolume=
-    clampNumber(
-      audioLastNonZeroVolume||100,
-      1,
-      100,
-      100
-    );
-
-  audioLastNonZeroVolume=
-    audioUserVolume;
+  audioUserVolume=100;
 
   clearAutoplayTimers();
 
-  const button=
-    document.getElementById(
-      'unmute-overlay-btn'
-    );
+  const button=document.getElementById(
+    'unmute-overlay-btn'
+  );
 
-  const video=
-    document.querySelector(
-      '#player-container video'
-    );
+  const video=document.querySelector(
+    '#player-container video'
+  );
 
   if(!video){
     return;
@@ -2812,17 +2152,13 @@ function unmuteEverything(){
 
     try{
 
-      const result=
-        audioCtx.resume();
+      const result=audioCtx.resume();
 
       if(
         result &&
-        typeof result.catch===
-        'function'
+        typeof result.catch==='function'
       ){
-        result.catch(
-          ()=>{}
-        );
+        result.catch(()=>{});
       }
 
     }catch(e){}
@@ -2832,9 +2168,7 @@ function unmuteEverything(){
 
     video.muted=false;
     video.defaultMuted=false;
-
-    video.volume=
-      audioUserVolume/100;
+    video.volume=1;
 
     video.removeAttribute(
       'muted'
@@ -2855,24 +2189,15 @@ function unmuteEverything(){
 
   }catch(e){}
 
-  syncAudioFromVideo(
-    video,
-    true
-  );
-
   try{
 
-    const result=
-      video.play();
+    const result=video.play();
 
     if(
       result &&
-      typeof result.catch===
-      'function'
+      typeof result.catch==='function'
     ){
-      result.catch(
-        ()=>{}
-      );
+      result.catch(()=>{});
     }
 
   }catch(e){}
@@ -2881,28 +2206,19 @@ function unmuteEverything(){
   hideLoadingIndicator();
 
   if(button){
-    button.classList.add(
-      'hidden'
-    );
+    button.classList.add('hidden');
   }
 }
 
-function bindCurrentVideo(
-  video
-){
+function bindCurrentVideo(video){
 
   if(!video){
     return;
   }
 
-  if(
-    boundVideo===video
-  ){
+  if(boundVideo===video){
 
-    applyDesiredAudioState(
-      video
-    );
-
+    applyDesiredAudioState(video);
     applyVideoFilters();
 
     if(
@@ -2921,25 +2237,11 @@ function bindCurrentVideo(
   }
 
   boundVideo=video;
-
-  applyDesiredAudioState(
-    video
-  );
-
-  if(audioUnlocked){
-
-    syncAudioFromVideo(
-      video,
-      true
-    );
-  }
+  applyDesiredAudioState(video);
 
   const handleMeta=()=>{
 
-    applyDesiredAudioState(
-      video
-    );
-
+    applyDesiredAudioState(video);
     applyVideoFilters();
 
     if(
@@ -2953,15 +2255,9 @@ function bindCurrentVideo(
 
   const handleCanPlay=()=>{
 
-    applyDesiredAudioState(
-      video
-    );
-
+    applyDesiredAudioState(video);
     applyVideoFilters();
-
-    tryVideoPlay(
-      video
-    );
+    tryVideoPlay(video);
   };
 
   const handlePlaying=()=>{
@@ -2970,25 +2266,12 @@ function bindCurrentVideo(
     hideLoadingIndicator();
     applyVideoFilters();
 
-    window
-      .activeStreamPlayer
-      ?.updatePipButton
-      ?.();
-  };
-
-  const handleVolumeChange=()=>{
-
-    syncAudioFromVideo(
-      video,
-      true
-    );
+    window.activeStreamPlayer?.updatePipButton?.();
   };
 
   const handleTimeUpdate=()=>{
 
-    if(
-      video.currentTime>0
-    ){
+    if(video.currentTime>0){
 
       hidePoster();
       hideLoadingIndicator();
@@ -2997,8 +2280,7 @@ function bindCurrentVideo(
 
   const handleVideoError=()=>{
 
-    const player=
-      window.activeStreamPlayer;
+    const player=window.activeStreamPlayer;
 
     if(
       player &&
@@ -3039,12 +2321,6 @@ function bindCurrentVideo(
   );
 
   video.addEventListener(
-    'volumechange',
-    handleVolumeChange,
-    {passive:true}
-  );
-
-  video.addEventListener(
     'timeupdate',
     handleTimeUpdate,
     {passive:true}
@@ -3081,11 +2357,6 @@ function bindCurrentVideo(
       );
 
       video.removeEventListener(
-        'volumechange',
-        handleVolumeChange
-      );
-
-      video.removeEventListener(
         'timeupdate',
         handleTimeUpdate
       );
@@ -3101,34 +2372,23 @@ function bindCurrentVideo(
   applyVideoFilters();
 
   if(audioUnlocked){
-
-    applyDesiredAudioState(
-      video
-    );
-
+    applyDesiredAudioState(video);
   }else{
-
-    tryVideoPlay(
-      video
-    );
+    tryVideoPlay(video);
   }
 }
 
 function bindVideoIfAvailable(){
 
-  const container=
-    document.getElementById(
-      'player-container'
-    );
+  const container=document.getElementById(
+    'player-container'
+  );
 
   if(!container){
     return;
   }
 
-  const video=
-    container.querySelector(
-      'video'
-    );
+  const video=container.querySelector('video');
 
   if(
     !video ||
@@ -3137,15 +2397,11 @@ function bindVideoIfAvailable(){
     return;
   }
 
-  bindCurrentVideo(
-    video
-  );
+  bindCurrentVideo(video);
 
   if(audioUnlocked){
 
-    applyDesiredAudioState(
-      video
-    );
+    applyDesiredAudioState(video);
 
   }else{
 
@@ -3159,22 +2415,20 @@ function scheduleVideoScan(){
     return;
   }
 
-  videoScanTimer=
-    setTimeout(
-      ()=>{
-        videoScanTimer=0;
-        bindVideoIfAvailable();
-      },
-      80
-    );
+  videoScanTimer=setTimeout(
+    ()=>{
+      videoScanTimer=0;
+      bindVideoIfAvailable();
+    },
+    80
+  );
 }
 
 function observePlayerVideo(){
 
-  const container=
-    document.getElementById(
-      'player-container'
-    );
+  const container=document.getElementById(
+    'player-container'
+  );
 
   if(!container){
     return;
@@ -3182,12 +2436,11 @@ function observePlayerVideo(){
 
   videoObserver?.disconnect();
 
-  videoObserver=
-    new MutationObserver(
-      ()=>{
-        scheduleVideoScan();
-      }
-    );
+  videoObserver=new MutationObserver(
+    ()=>{
+      scheduleVideoScan();
+    }
+  );
 
   videoObserver.observe(
     container,
@@ -3202,35 +2455,29 @@ function observePlayerVideo(){
 
 function initAudioVideoFx(){
 
-  const brightness=
-    document.getElementById(
-      'slider-brightness'
-    );
+  const brightness=document.getElementById(
+    'slider-brightness'
+  );
 
-  const contrast=
-    document.getElementById(
-      'slider-contrast'
-    );
+  const contrast=document.getElementById(
+    'slider-contrast'
+  );
 
-  const saturate=
-    document.getElementById(
-      'slider-saturate'
-    );
+  const saturate=document.getElementById(
+    'slider-saturate'
+  );
 
-  const gain=
-    document.getElementById(
-      'slider-gain'
-    );
+  const gain=document.getElementById(
+    'slider-gain'
+  );
 
-  const bass=
-    document.getElementById(
-      'toggle-bass'
-    );
+  const bass=document.getElementById(
+    'toggle-bass'
+  );
 
-  const vocal=
-    document.getElementById(
-      'toggle-vocal'
-    );
+  const vocal=document.getElementById(
+    'toggle-vocal'
+  );
 
   updateVideoUI();
   updateAudioUI();
@@ -3250,8 +2497,7 @@ function initAudioVideoFx(){
       document.getElementById(
         'val-brightness'
       ).textContent=
-        videoSettings.brightness+
-        '%';
+        videoSettings.brightness+'%';
 
       localStorage.setItem(
         'player_brightness',
@@ -3277,8 +2523,7 @@ function initAudioVideoFx(){
       document.getElementById(
         'val-contrast'
       ).textContent=
-        videoSettings.contrast+
-        '%';
+        videoSettings.contrast+'%';
 
       localStorage.setItem(
         'player_contrast',
@@ -3304,8 +2549,7 @@ function initAudioVideoFx(){
       document.getElementById(
         'val-saturate'
       ).textContent=
-        videoSettings.saturate+
-        '%';
+        videoSettings.saturate+'%';
 
       localStorage.setItem(
         'player_saturate',
@@ -3383,8 +2627,7 @@ function initAudioVideoFx(){
       document.getElementById(
         'val-gain'
       ).textContent=
-        audioSettings.gain+
-        '%';
+        audioSettings.gain+'%';
 
       localStorage.setItem(
         'player_gain',
@@ -3409,9 +2652,7 @@ function initAudioVideoFx(){
 
       localStorage.setItem(
         'player_bass',
-        audioSettings.bass
-          ? '1'
-          : '0'
+        audioSettings.bass?'1':'0'
       );
 
       setupAudioNodes();
@@ -3432,9 +2673,7 @@ function initAudioVideoFx(){
 
       localStorage.setItem(
         'player_vocal',
-        audioSettings.vocal
-          ? '1'
-          : '0'
+        audioSettings.vocal?'1':'0'
       );
 
       setupAudioNodes();
@@ -3459,21 +2698,20 @@ function initAudioVideoFx(){
   observePlayerVideo();
 }
 
-const pageURL=
-  new URL(
-    window.location.href
-  );
+const pageURL=new URL(
+  window.location.href
+);
 
 const inputId=
-  pageURL.searchParams.get('id')||
-  pageURL.searchParams.get('Talha')||
-  pageURL.searchParams.get('stream')||
+  pageURL.searchParams.get('id') ||
+  pageURL.searchParams.get('Talha') ||
+  pageURL.searchParams.get('stream') ||
   '';
 
 const ua=
-  navigator.userAgent||
-  navigator.vendor||
-  window.opera||
+  navigator.userAgent ||
+  navigator.vendor ||
+  window.opera ||
   '';
 
 const isIOS=
@@ -3482,37 +2720,27 @@ const isIOS=
   );
 
 function getInputValue(){
-
   return String(
     inputId||''
   ).trim();
 }
 
-function normalizeInputId(
-  value
-){
+function normalizeInputId(value){
 
-  let v=
-    String(
-      value||''
-    ).trim();
+  let v=String(
+    value||''
+  ).trim();
 
   try{
-    v=
-      decodeURIComponent(v);
+    v=decodeURIComponent(v);
   }catch(e){}
 
   return v;
 }
 
-function extractIdFromUrl(
-  value
-){
+function extractIdFromUrl(value){
 
-  const raw=
-    normalizeInputId(
-      value
-    );
+  const raw=normalizeInputId(value);
 
   if(!raw){
     return '';
@@ -3520,16 +2748,12 @@ function extractIdFromUrl(
 
   try{
 
-    const u=
-      new URL(
-        raw,
-        window.location.href
-      );
+    const u=new URL(
+      raw,
+      window.location.href
+    );
 
-    const q=
-      u.searchParams.get(
-        'id'
-      );
+    const q=u.searchParams.get('id');
 
     if(q){
       return q;
@@ -3540,136 +2764,45 @@ function extractIdFromUrl(
   return raw;
 }
 
-function isPphFallbackChannel(
-  id
-){
+function isPphFallbackChannel(id){
 
   return /^androstreamlivech\d{8}$/i.test(
     String(id||'').trim()
   );
 }
 
-function getEightDigitPphSource(
-  id
-){
+function getEightDigitPphSource(id){
 
-  const value=
-    String(
-      id||''
-    ).trim();
+  const value=String(
+    id||''
+  ).trim();
 
-  const match=
-    value.match(
-      /^androstreamlivech(\d{8})$/i
-    );
+  const match=value.match(
+    /^androstreamlivech(\d{8})$/i
+  );
 
   if(!match){
     return null;
   }
 
   return(
-    window.__X7P__.urls.pphPrefix+
-    encodeURIComponent(
-      match[1]
-    )
+    'https://pph.player-us.xyz/tv/?stream_id='+
+    encodeURIComponent(match[1])
   );
 }
 
 let feedScriptPromise=null;
 
-function normalizeFeedEvents(
-  source
-){
-  if(!source){
-    return [];
-  }
+function loadFeedScript(){
 
   if(
-    Array.isArray(source)
+    Array.isArray(
+      window.karsilasmalar
+    )
   ){
-    return source.filter(Boolean);
-  }
 
-  const candidates=[
-    source.karsilasmalar,
-    source.futbolMatches,
-    source.events,
-    source.data,
-    source.matches
-  ];
-
-  for(
-    const candidate
-    of candidates
-  ){
-    if(
-      Array.isArray(candidate)
-    ){
-      return candidate.filter(Boolean);
-    }
-  }
-
-  return [];
-}
-
-function collectGlobalFeedEvents(){
-  const groups=[
-    window.karsilasmalar,
-    window.futbolMatches,
-    window.events
-  ];
-
-  const result=[];
-  const seen=
-    new Set();
-
-  for(
-    const group
-    of groups
-  ){
-    if(!Array.isArray(group)){
-      continue;
-    }
-
-    for(
-      const item
-      of group
-    ){
-      if(!item){
-        continue;
-      }
-
-      const signature=
-        JSON.stringify(
-          [
-            item.id,
-            item.channelId,
-            item.url,
-            item.streamUrl,
-            item.link,
-            item.title
-          ]
-        );
-
-      if(seen.has(signature)){
-        continue;
-      }
-
-      seen.add(signature);
-      result.push(item);
-    }
-  }
-
-  return result;
-}
-
-function loadFeedScript(){
-  const existing=
-    collectGlobalFeedEvents();
-
-  if(existing.length){
     return Promise.resolve(
-      existing
+      window.karsilasmalar
     );
   }
 
@@ -3677,263 +2810,154 @@ function loadFeedScript(){
     return feedScriptPromise;
   }
 
-  feedScriptPromise=
-    new Promise(
-      (resolve,reject)=>{
-        const existingScript=
-          document.getElementById(
-            'dynamic-feed-script'
+  feedScriptPromise=new Promise(
+    (resolve,reject)=>{
+
+      const existing=document.getElementById(
+        'dynamic-feed-script'
+      );
+
+      const finish=()=>{
+
+        if(
+          Array.isArray(
+            window.karsilasmalar
+          )
+        ){
+
+          resolve(
+            window.karsilasmalar
           );
 
-        let settled=false;
+        }else{
 
-        const finish=(
-          error
-        )=>{
-          if(settled){
-            return;
-          }
-
-          const events=
-            collectGlobalFeedEvents();
-
-          if(
-            events.length
-          ){
-            settled=true;
-            clearTimeout(
-              timer
-            );
-            resolve(
-              events
-            );
-            return;
-          }
-
-          if(error){
-            settled=true;
-            clearTimeout(
-              timer
-            );
-            reject(error);
-          }
-        };
-
-        if(existingScript){
-          existingScript.addEventListener(
-            'load',
-            ()=>{
-              finish(null);
-            },
-            {once:true}
-          );
-
-          existingScript.addEventListener(
-            'error',
-            ()=>{
-              finish(
-                new Error(
-                  'Feed Load Failed'
-                )
-              );
-            },
-            {once:true}
-          );
-
-          var timer=
-            setTimeout(
-              ()=>{
-                finish(
-                  new Error(
-                    'Feed Vector Missing'
-                  )
-                );
-              },
-              4500
-            );
-
-          return;
-        }
-
-        const script=
-          document.createElement(
-            'script'
-          );
-
-        script.id=
-          'dynamic-feed-script';
-
-        script.src=
-          window.__X7P__.urls.feedScript;
-
-        script.async=true;
-
-        script.onload=()=>{
-          finish(null);
-        };
-
-        script.onerror=()=>{
-          finish(
+          reject(
             new Error(
-              'Feed Load Failed'
+              'Feed Vector Missing'
             )
           );
-        };
+        }
+      };
 
-        var timer=
-          setTimeout(
-            ()=>{
-              finish(
-                new Error(
-                  'Feed Vector Missing'
-                )
-              );
-            },
-            4500
-          );
+      if(existing){
 
-        document.head.appendChild(
-          script
+        existing.addEventListener(
+          'load',
+          finish,
+          {once:true}
         );
+
+        existing.addEventListener(
+          'error',
+          ()=>{
+            reject(
+              new Error(
+                'Feed Load Failed'
+              )
+            );
+          },
+          {once:true}
+        );
+
+        setTimeout(
+          finish,
+          3000
+        );
+
+        return;
       }
-    ).catch(
-      error=>{
-        feedScriptPromise=null;
-        throw error;
-      }
-    );
+
+      const script=document.createElement(
+        'script'
+      );
+
+      script.id='dynamic-feed-script';
+      script.src='https://mahsunsports39.xyz/script4.js';
+      script.async=true;
+
+      script.onload=finish;
+
+      script.onerror=()=>{
+        reject(
+          new Error(
+            'Feed Load Failed'
+          )
+        );
+      };
+
+      document.head.appendChild(
+        script
+      );
+
+      setTimeout(
+        finish,
+        3000
+      );
+    }
+  );
 
   return feedScriptPromise;
 }
 
-function findFeedEvent(
-  events,
-  key
-){
-  const target=
-    normalizeInputId(
-      key
-    );
+function findFeedEvent(events,key){
+
+  const target=normalizeInputId(key);
 
   if(
-    !target||
+    !target ||
     !Array.isArray(events)
   ){
     return null;
   }
 
-  const targetFold=
-    target.toLowerCase();
+  return events.find(
+    event=>{
 
-  let best=
-    null;
+      const candidates=[
+        event?.id,
+        event?.channelId,
+        event?.channel,
+        event?.name,
+        event?.title,
+        event?.url,
+        event?.streamUrl,
+        event?.link
+      ].map(
+        item=>String(item||'')
+      );
 
-  let bestScore=
-    -1;
+      return candidates.some(
+        value=>{
 
-  for(
-    const event
-    of events
-  ){
-    if(!event){
-      continue;
-    }
+          if(value===target){
+            return true;
+          }
 
-    const candidates=[
-      ['id',event?.id],
-      ['channelId',event?.channelId],
-      ['channel',event?.channel],
-      ['name',event?.name],
-      ['title',event?.title],
-      ['url',event?.url],
-      ['streamUrl',event?.streamUrl],
-      ['link',event?.link]
-    ];
+          try{
 
-    for(
-      const [field,item]
-      of candidates
-    ){
-      const value=
-        String(
-          item||''
-        ).trim();
+            const u=new URL(
+              value,
+              window.location.href
+            );
 
-      if(!value){
-        continue;
-      }
+            return(
+              u.searchParams.get('id')===
+              target
+            );
 
-      if(
-        value===
-        target
-      ){
-        return event;
-      }
+          }catch(e){
 
-      let score=
-        0;
-
-      try{
-        const u=
-          new URL(
-            value,
-            window.location.href
-          );
-
-        const q=
-          u.searchParams.get('id');
-
-        if(q===target){
-          score=
-            field==='url'||
-            field==='streamUrl'||
-            field==='link'
-              ? 98
-              : 100;
+            return false;
+          }
         }
-      }catch(e){}
-
-      if(
-        value.toLowerCase()===
-        targetFold
-      ){
-        score=
-          Math.max(
-            score,
-            field==='id'
-              ? 100
-              : field==='channelId'
-                ? 99
-                : 90
-          );
-      }
-
-      if(
-        score>
-        bestScore
-      ){
-        bestScore=
-          score;
-
-        best=
-          event;
-      }
+      );
     }
-  }
-
-  return bestScore>=90
-    ? best
-    : null;
+  )||null;
 }
 
-async function resolveFeedSource(
-  value
-){
+async function resolveFeedSource(value){
 
-  const key=
-    extractIdFromUrl(
-      value
-    );
+  const key=extractIdFromUrl(value);
 
   if(!key){
     return null;
@@ -3941,16 +2965,12 @@ async function resolveFeedSource(
 
   try{
 
-    const events=
-      normalizeFeedEvents(
-        await loadFeedScript()
-      );
+    const events=await loadFeedScript();
 
-    const event=
-      findFeedEvent(
-        events,
-        key
-      );
+    const event=findFeedEvent(
+      events,
+      key
+    );
 
     if(!event){
       return null;
@@ -3965,20 +2985,13 @@ async function resolveFeedSource(
       event.src
     ]
     .map(
-      item=>
-        String(
-          item||''
-        ).trim()
+      item=>String(item||'').trim()
     )
     .filter(Boolean);
 
-    const m3u=
-      candidates.find(
-        value=>
-          /\.m3u8(?:$|[?#])/i.test(
-            value
-          )
-      );
+    const m3u=candidates.find(
+      value=>/\.m3u8(?:$|[?#])/i.test(value)
+    );
 
     if(m3u){
       return m3u;
@@ -3987,14 +3000,11 @@ async function resolveFeedSource(
     return(
       extractIdFromUrl(
         candidates.find(
-          value=>
-            /id=/i.test(
-              value
-            )
-        )||
-        event.id||
+          value=>/id=/i.test(value)
+        ) ||
+        event.id ||
         key
-      )||
+      ) ||
       key
     );
 
@@ -4009,58 +3019,37 @@ async function resolveFeedSource(
   }
 }
 
-function isAndroChannel(
-  id
-){
+function isAndroChannel(id){
 
   return /^androstreamlivech/i.test(
     String(id||'')
   );
 }
 
-function getVideoId(
-  id
-){
+function getVideoId(id){
 
-  const value=
-    String(
-      id||''
-    ).trim();
+  const value=String(
+    id||''
+  ).trim();
 
-  const match=
-    value.match(
-      /^androstreamlivech(\d+)$/i
-    );
+  const match=value.match(
+    /^androstreamlivech(\d+)$/i
+  );
 
   return match
     ? match[1]
     : '';
 }
 
-function normalizeStreamUrl(
-  value
-){
+function normalizeStreamUrl(value){
 
   const v=String(
     value||''
   ).trim();
 
-  if(!v){
-    return null;
-  }
-
-  try{
-    const parsed=new URL(
-      v,
-      window.location.href
-    );
-
-    return parsed.protocol==='https:'
-      ? parsed.href
-      : null;
-  }catch(e){
-    return null;
-  }
+  return /^https?:\/\//i.test(v)
+    ? v
+    : null;
 }
 
 async function resolveCinemaSource(
@@ -4072,10 +3061,7 @@ async function resolveCinemaSource(
     return null;
   }
 
-  const videoId=
-    getVideoId(
-      id
-    );
+  const videoId=getVideoId(id);
 
   if(!videoId){
     return null;
@@ -4100,38 +3086,33 @@ async function resolveCinemaSource(
 
   try{
 
-    const response=
-      await fetch(
-        window.__X7P__.urls.cinema,
-        {
-          method:'POST',
-          headers:{
-            'Content-Type':
-              'application/json'
-          },
-          body:
-            JSON.stringify({
-              AppId:'5000',
-              AppVer:'1',
-              VpcVer:'1.0.12',
-              Language:'en',
-              Token:'',
-              VideoId:videoId
-            }),
-          mode:'cors',
-          cache:'no-store',
-          credentials:'omit',
-          signal:
-            controller?.signal
-        }
-      );
+    const response=await fetch(
+      'https://streamsport365.com/cinema',
+      {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify({
+          AppId:'5000',
+          AppVer:'1',
+          VpcVer:'1.0.12',
+          Language:'en',
+          Token:'',
+          VideoId:videoId
+        }),
+        mode:'cors',
+        cache:'no-store',
+        credentials:'omit',
+        signal:controller?.signal
+      }
+    );
 
     if(!response.ok){
       return null;
     }
 
-    const data=
-      await response.json();
+    const data=await response.json();
 
     return normalizeStreamUrl(
       data?.URL
@@ -4149,21 +3130,17 @@ async function resolveCinemaSource(
   }
 }
 
-function getChecklistCandidates(
-  id
-){
+function getChecklistCandidates(id){
 
-  const path=
-    String(
-      id||''
-    )+
-    '.m3u8';
+  const path=String(
+    id||''
+  )+'.m3u8';
 
   return[
-    window.__X7P__.urls.checklist1+path,
-    window.__X7P__.urls.checklist2+path,
-    window.__X7P__.urls.checklist3+path,
-    window.__X7P__.urls.checklist4+path
+    'https://andro.evrenesoglu121.click/checklist/'+path,
+    'https://andro.evrenesoglu115.click/checklist/'+path,
+    'https://andro.evrenesoglu111.click/checklist/'+path,
+    'https://andro.evrenesoglu113.click/checklist/'+path
   ];
 }
 
@@ -4191,22 +3168,19 @@ async function probeUrl(
 
   try{
 
-    const response=
-      await fetch(
-        url,
-        {
-          method:'GET',
-          mode:'cors',
-          cache:'no-store',
-          credentials:'omit',
-          redirect:'follow',
-          signal:
-            controller?.signal
-        }
-      );
+    const response=await fetch(
+      url,
+      {
+        method:'GET',
+        mode:'cors',
+        cache:'no-store',
+        credentials:'omit',
+        redirect:'follow',
+        signal:controller?.signal
+      }
+    );
 
-    const ok=
-      !!response.ok;
+    const ok=!!response.ok;
 
     try{
       await response.body?.cancel();
@@ -4237,149 +3211,53 @@ async function resolveChecklistSource(
     return null;
   }
 
-  const ordered=orderTalhaSources(
-    candidates
-  );
+  return new Promise(
+    resolve=>{
 
-  const original=candidates;
-  const index=original.indexOf(ordered[0]);
+      let finished=false;
 
-  return{
-    url:ordered[0],
-    index:index>=0?index:0
-  };
-}
+      const timer=setTimeout(
+        ()=>{
+          if(!finished){
+            finished=true;
+            resolve(null);
+          }
+        },
+        timeout
+      );
 
-const TALHA_HEALTH_KEY='talha_source_health_v8';
-const TALHA_HEALTH_TTL=12*60*60*1000;
+      candidates.forEach(
+        (url,index)=>{
 
-function readTalhaHealth(){
-  try{
-    const raw=localStorage.getItem(TALHA_HEALTH_KEY);
-    const data=raw?JSON.parse(raw):{};
-    if(!data||typeof data!=='object'){
-      return{};
+          probeUrl(
+            url,
+            timeout
+          ).then(
+            ok=>{
+
+              if(
+                finished ||
+                !ok
+              ){
+                return;
+              }
+
+              finished=true;
+
+              clearTimeout(timer);
+
+              resolve({
+                url,
+                index
+              });
+            }
+          ).catch(
+            ()=>{}
+          );
+        }
+      );
     }
-    const now=Date.now();
-    const clean={};
-    Object.keys(data).forEach(key=>{
-      const item=data[key];
-      if(item&&now-Number(item.updated||0)<=TALHA_HEALTH_TTL){
-        clean[key]=item;
-      }
-    });
-    return clean;
-  }catch(e){
-    return{};
-  }
-}
-
-function talhaSourceKey(url){
-  const value=normalizeStreamUrl(url);
-  return value?value.split('#')[0]:'';
-}
-
-function rememberTalhaHealth(url,ok,latency=0){
-  const key=talhaSourceKey(url);
-  if(!key){
-    return;
-  }
-  const store=readTalhaHealth();
-  const old=store[key]||{};
-  const now=Date.now();
-  store[key]={
-    ok:!!ok,
-    success:Number(old.success||0)+(ok?1:0),
-    fail:Number(old.fail||0)+(ok?0:1),
-    latency:ok?Math.max(0,Number(latency)||0):Number(old.latency||0),
-    lastSuccess:ok?now:Number(old.lastSuccess||0),
-    updated:now
-  };
-  try{
-    localStorage.setItem(
-      TALHA_HEALTH_KEY,
-      JSON.stringify(store)
-    );
-  }catch(e){}
-}
-
-function talhaHealthScore(url){
-  const key=talhaSourceKey(url);
-  if(!key){
-    return-999999;
-  }
-  const item=readTalhaHealth()[key];
-  if(!item){
-    return0;
-  }
-  const age=item.lastSuccess
-    ? Math.max(0,Date.now()-Number(item.lastSuccess))
-    : TALHA_HEALTH_TTL;
-  return(
-    Number(item.success||0)*32-
-    Number(item.fail||0)*42-
-    Math.min(160,Number(item.latency||0)/45)+
-    Math.max(0,100-age/500000)
   );
-}
-
-function orderTalhaSources(urls){
-  return Array.from(
-    new Set(
-      (urls||[])
-        .map(normalizeStreamUrl)
-        .filter(Boolean)
-    )
-  ).sort(
-    (a,b)=>talhaHealthScore(b)-talhaHealthScore(a)
-  );
-}
-
-function rememberTalhaGoodSource(input,id,mode,url){
-  const normalized=normalizeStreamUrl(url);
-  if(!normalized){
-    return;
-  }
-  const key='talha_good_v8:'+String(input||'').trim().toLowerCase()+'::'+String(id||'').trim().toLowerCase();
-  const data={
-    mode:String(mode||'feed'),
-    url:normalized,
-    at:Date.now()
-  };
-  try{
-    sessionStorage.setItem(key,JSON.stringify(data));
-  }catch(e){}
-}
-
-function readTalhaGoodSource(input,id){
-  const key='talha_good_v8:'+String(input||'').trim().toLowerCase()+'::'+String(id||'').trim().toLowerCase();
-  try{
-    const raw=sessionStorage.getItem(key);
-    const data=raw?JSON.parse(raw):null;
-    if(
-      data&&
-      data.url&&
-      Date.now()-Number(data.at||0)<TALHA_HEALTH_TTL
-    ){
-      return data;
-    }
-  }catch(e){}
-  return null;
-}
-
-function forgetTalhaGoodSource(input,id,url){
-  const key='talha_good_v8:'+String(input||'').trim().toLowerCase()+'::'+String(id||'').trim().toLowerCase();
-  try{
-    const raw=sessionStorage.getItem(key);
-    const data=raw?JSON.parse(raw):null;
-    if(!url||data?.url===normalizeStreamUrl(url)){
-      sessionStorage.removeItem(key);
-    }
-  }catch(e){}
-}
-
-function delayedNull(ms){
-  return new Promise(resolve=>setTimeout(()=>resolve(null),ms));
 }
 
 function firstUsable(
@@ -4391,24 +3269,22 @@ function firstUsable(
     resolve=>{
 
       let done=false;
-      let pending=
-        promises.length;
+      let pending=promises.length;
 
       if(!pending){
         resolve(null);
         return;
       }
 
-      const timer=
-        setTimeout(
-          ()=>{
-            if(!done){
-              done=true;
-              resolve(null);
-            }
-          },
-          timeout
-        );
+      const timer=setTimeout(
+        ()=>{
+          if(!done){
+            done=true;
+            resolve(null);
+          }
+        },
+        timeout
+      );
 
       promises.forEach(
         promise=>{
@@ -4426,13 +3302,9 @@ function firstUsable(
 
                 done=true;
 
-                clearTimeout(
-                  timer
-                );
+                clearTimeout(timer);
 
-                resolve(
-                  value
-                );
+                resolve(value);
               }
             }
           )
@@ -4451,9 +3323,7 @@ function firstUsable(
 
                 done=true;
 
-                clearTimeout(
-                  timer
-                );
+                clearTimeout(timer);
 
                 resolve(null);
               }
@@ -4470,103 +3340,90 @@ async function resolveFastDirectSource(
   id
 ){
 
-  const direct=normalizeStreamUrl(input);
+  const tasks=[];
 
-  if(
-    direct&&
-    /\.m3u8(?:$|[?#])/i.test(direct)
-  ){
-    return{
-      mode:'direct',
-      url:direct
-    };
-  }
+  tasks.push(
+    resolveFeedSource(
+      input
+    )
+    .then(
+      source=>{
 
-  const cached=readTalhaGoodSource(
-    input,
-    id
+        const url=normalizeStreamUrl(
+          source
+        );
+
+        return(
+          url &&
+          /\.m3u8(?:$|[?#])/i.test(url)
+        )
+          ? {
+              mode:'feed',
+              url
+            }
+          : null;
+      }
+    )
+    .catch(
+      ()=>null
+    )
   );
 
-  if(cached?.url){
-    return{
-      mode:cached.mode||'feed',
-      url:cached.url,
-      cached:true
-    };
-  }
-
-  const feedPromise=resolveFeedSource(
-    input
-  ).then(source=>{
-    const url=normalizeStreamUrl(source);
-    return(
-      url&&
-      /\.m3u8(?:$|[?#])/i.test(url)
-    )
-      ? {mode:'feed',url}
-      : null;
-  }).catch(()=>null);
-
-  const feed=await Promise.race([
-    feedPromise,
-    delayedNull(900)
-  ]);
-
-  if(feed){
-    return feed;
-  }
-
   if(isAndroChannel(id)){
-    const cinemaPromise=resolveCinemaSource(
-      id,
-      1800
-    ).then(url=>url?{mode:'cinema',url}:null).catch(()=>null);
 
-    const cinema=await Promise.race([
-      cinemaPromise,
-      delayedNull(800)
-    ]);
-
-    if(cinema){
-      return cinema;
-    }
-
-    const candidates=orderTalhaSources(
-      getChecklistCandidates(id)
+    tasks.push(
+      resolveCinemaSource(
+        id,
+        2500
+      )
+      .then(
+        url=>
+          url
+            ? {
+                mode:'cinema',
+                url
+              }
+            : null
+      )
+      .catch(
+        ()=>null
+      )
     );
 
-    if(candidates.length){
-      const original=getChecklistCandidates(id);
-      const index=original.indexOf(candidates[0]);
-      return{
-        mode:'checklist',
-        url:candidates[0],
-        index:index>=0?index:0
-      };
-    }
+    tasks.push(
+      resolveChecklistSource(
+        id,
+        1800
+      )
+      .then(
+        result=>
+          result
+            ? {
+                mode:'checklist',
+                url:result.url,
+                index:result.index
+              }
+            : null
+      )
+      .catch(
+        ()=>null
+      )
+    );
   }
 
-  const late=await feedPromise.catch(()=>null);
-  const lateUrl=normalizeStreamUrl(late);
-
-  if(lateUrl){
-    return{
-      mode:'feed',
-      url:lateUrl
-    };
-  }
-
-  return null;
+  return firstUsable(
+    tasks,
+    2600
+  );
 }
 
 function routeParam(){
 
-  const value=
-    String(
-      pageURL.searchParams.get(
-        'source'
-      )||''
-    ).toLowerCase();
+  const value=String(
+    pageURL.searchParams.get(
+      'source'
+    )||''
+  ).toLowerCase();
 
   return[
     'auto',
@@ -4591,21 +3448,18 @@ class StreamPlayer{
     this.cinemaTried=false;
     this.checklistTried=false;
     this.feedTried=false;
-
     this.init();
   }
 
   async init(){
 
-    window.activeStreamPlayer=
-      this;
+    window.activeStreamPlayer=this;
 
     showLoadingIndicator();
 
-    const hash=
-      this.parseHashParams(
-        window.location.hash
-      );
+    const hash=this.parseHashParams(
+      window.location.hash
+    );
 
     this.urlConfig={
       watermark:this.safeDecode(
@@ -4614,22 +3468,19 @@ class StreamPlayer{
       watermarkLink:this.safeDecode(
         hash.watermarkLink||''
       ),
-      watermarkPosition:
-        this.safeDecode(
-          hash.watermarkPosition||
-          'bottom-left'
-        )
+      watermarkPosition:this.safeDecode(
+        hash.watermarkPosition||
+        'bottom-left'
+      )
     };
 
-    this.input=
-      normalizeInputId(
-        getInputValue()
-      );
+    this.input=normalizeInputId(
+      getInputValue()
+    );
 
-    this.channelId=
-      extractIdFromUrl(
-        this.input
-      );
+    this.channelId=extractIdFromUrl(
+      this.input
+    );
 
     this.sourceMode='';
     this.currentBaseIndex=0;
@@ -4641,42 +3492,31 @@ class StreamPlayer{
     this.sourceErrorHandled=false;
 
     this.baseurls=[
-      window.__X7P__.urls.checklist1,
-      window.__X7P__.urls.checklist2,
-      window.__X7P__.urls.checklist3,
-      window.__X7P__.urls.checklist4
+      'https://andro.evrenesoglu121.click/checklist/',
+      'https://andro.evrenesoglu115.click/checklist/',
+      'https://andro.evrenesoglu111.click/checklist/',
+      'https://andro.evrenesoglu113.click/checklist/'
     ];
 
     this.directSource=
-      /\.m3u8(?:$|[?#])/i.test(
-        this.input
-      )
+      /\.m3u8(?:$|[?#])/i.test(this.input)
         ? this.input
         : null;
 
     this.feedSource=null;
     this.streamPath=null;
 
-    const forced=
-      routeParam();
+    const forced=routeParam();
 
     if(this.directSource){
 
-      this.source=
-        this.directSource;
-
-      this.sourceMode=
-        'direct';
-
-      warmUrl(
-        this.source
-      );
+      this.source=this.directSource;
+      this.sourceMode='direct';
+      warmUrl(this.source);
 
     }else if(
       forced==='cinema' &&
-      isAndroChannel(
-        this.channelId
-      )
+      isAndroChannel(this.channelId)
     ){
 
       this.cinemaTried=true;
@@ -4692,9 +3532,7 @@ class StreamPlayer{
           ? 'cinema'
           : '';
 
-      warmUrl(
-        this.source
-      );
+      warmUrl(this.source);
 
     }else if(
       forced==='checklist' &&
@@ -4717,7 +3555,7 @@ class StreamPlayer{
           : 0;
 
       this.source=
-        resolved?.url||
+        resolved?.url ||
         this.buildSourceForBase(
           this.channelId,
           this.currentBaseIndex
@@ -4728,9 +3566,7 @@ class StreamPlayer{
           ? 'checklist'
           : '';
 
-      warmUrl(
-        this.source
-      );
+      warmUrl(this.source);
 
     }else{
 
@@ -4742,34 +3578,24 @@ class StreamPlayer{
 
       if(fast){
 
-        this.source=
-          fast.url;
-
-        this.sourceMode=
-          fast.mode;
+        this.source=fast.url;
+        this.sourceMode=fast.mode;
 
         this.currentBaseIndex=
-          Number.isFinite(
-            fast.index
-          )
+          Number.isFinite(fast.index)
             ? fast.index
             : 0;
 
         this.feedTried=
-          fast.mode===
-          'feed';
+          fast.mode==='feed';
 
         this.cinemaTried=
-          fast.mode===
-          'cinema';
+          fast.mode==='cinema';
 
         this.checklistTried=
-          fast.mode===
-          'checklist';
+          fast.mode==='checklist';
 
-        warmUrl(
-          this.source
-        );
+        warmUrl(this.source);
 
       }else{
 
@@ -4780,52 +3606,41 @@ class StreamPlayer{
             ()=>null
           );
 
-        const id=
-          extractIdFromUrl(
-            this.feedSource||
-            this.input
-          );
+        const id=extractIdFromUrl(
+          this.feedSource||
+          this.input
+        );
 
         this.channelId=
           id||
           this.channelId;
 
         if(
-          this.feedSource&&
+          this.feedSource &&
           /\.m3u8(?:$|[?#])/i.test(
             this.feedSource
           )
         ){
 
-          this.source=
-            this.feedSource;
-
-          this.sourceMode=
-            'feed';
-
+          this.source=this.feedSource;
+          this.sourceMode='feed';
           this.feedTried=true;
 
-        }else if(
-          this.channelId
-        ){
+        }else if(this.channelId){
 
           this.streamPath=
             this.getStreamPath(
               this.channelId
             );
 
-          this.source=
-            this.buildSource();
-
+          this.source=this.buildSource();
           this.sourceMode=
             this.streamPath
               ? 'checklist'
               : '';
         }
 
-        warmUrl(
-          this.source
-        );
+        warmUrl(this.source);
       }
     }
 
@@ -4838,27 +3653,21 @@ class StreamPlayer{
       return;
     }
 
-    const params=
-      new URLSearchParams(
-        window.location.search
-      );
+    const params=new URLSearchParams(
+      window.location.search
+    );
 
-    const title=
-      params.get(
-        'title'
-      );
+    const title=params.get('title');
 
     if(title){
 
       try{
-        document.title=
-          title;
+        document.title=title;
       }catch(e){}
     }
 
     if(
-      this.sourceMode===
-      'checklist' &&
+      this.sourceMode==='checklist' &&
       !this.streamPath
     ){
 
@@ -4870,21 +3679,18 @@ class StreamPlayer{
 
     this.initPlayer();
 
-    const container=
-      document.getElementById(
-        'player-container'
-      );
+    const container=document.getElementById(
+      'player-container'
+    );
 
     if(
-      !container||
+      !container ||
       !this.player
     ){
       return;
     }
 
-    this.player.attachTo(
-      container
-    );
+    this.player.attachTo(container);
 
     this.setupUnmuteOverlay();
     this.bindQualitySelectorUI();
@@ -4894,18 +3700,12 @@ class StreamPlayer{
     startAutoplayRetries();
   }
 
-  safeDecode(
-    value
-  ){
+  safeDecode(value){
 
     try{
-      return decodeURIComponent(
-        value
-      );
+      return decodeURIComponent(value);
     }catch(e){
-      return String(
-        value||''
-      );
+      return String(value||'');
     }
   }
 
@@ -4949,66 +3749,48 @@ class StreamPlayer{
     clearAutoplayTimers();
 
     try{
-
       if(
         this.player &&
-        typeof this.player.stop===
-        'function'
+        typeof this.player.stop==='function'
       ){
         this.player.stop();
       }
-
     }catch(e){}
 
-    const layer=
-      document.getElementById(
-        'pph-fallback-layer'
-      );
+    const layer=document.getElementById(
+      'pph-fallback-layer'
+    );
 
-    const frame=
-      document.getElementById(
-        'pph-fallback-frame'
-      );
+    const frame=document.getElementById(
+      'pph-fallback-frame'
+    );
 
-    const playerContainer=
-      document.getElementById(
-        'player-container'
-      );
+    const playerContainer=document.getElementById(
+      'player-container'
+    );
 
-    const unmute=
-      document.getElementById(
-        'unmute-overlay-btn'
-      );
+    const unmute=document.getElementById(
+      'unmute-overlay-btn'
+    );
 
-    const pip=
-      document.getElementById(
-        'pip-top-btn'
-      );
+    const pip=document.getElementById(
+      'pip-top-btn'
+    );
 
     if(playerContainer){
 
-      playerContainer.style.visibility=
-        'hidden';
-
-      playerContainer.style.pointerEvents=
-        'none';
+      playerContainer.style.visibility='hidden';
+      playerContainer.style.pointerEvents='none';
     }
 
     if(unmute){
-      unmute.classList.add(
-        'hidden'
-      );
+      unmute.classList.add('hidden');
     }
 
     if(pip){
 
-      pip.classList.add(
-        'unsupported'
-      );
-
-      pip.classList.remove(
-        'active'
-      );
+      pip.classList.add('unsupported');
+      pip.classList.remove('active');
 
       pip.setAttribute(
         'aria-pressed',
@@ -5022,19 +3804,13 @@ class StreamPlayer{
     hidePoster();
     hideLoadingIndicator();
 
-    if(
-      !layer||
-      !frame
-    ){
+    if(!layer || !frame){
       return false;
     }
 
-    frame.src=
-      'about:blank';
+    frame.src='about:blank';
 
-    layer.classList.add(
-      'active'
-    );
+    layer.classList.add('active');
 
     layer.setAttribute(
       'aria-hidden',
@@ -5043,38 +3819,31 @@ class StreamPlayer{
 
     requestAnimationFrame(
       ()=>{
-        frame.src=
-          source;
+        frame.src=source;
       }
     );
 
     return true;
   }
 
-  showFinalWarning(
-    messageText
-  ){
+  showFinalWarning(messageText){
 
     hideLoadingIndicator();
 
-    const warning=
-      document.getElementById(
-        'uyarikutu'
-      );
+    const warning=document.getElementById(
+      'uyarikutu'
+    );
 
-    const message=
-      document.getElementById(
-        'uyari-mesaj'
-      );
+    const message=document.getElementById(
+      'uyari-mesaj'
+    );
 
     if(message){
-      message.innerText=
-        messageText;
+      message.innerText=messageText;
     }
 
     if(warning){
-      warning.style.display=
-        'flex';
+      warning.style.display='flex';
     }
   }
 
@@ -5083,21 +3852,18 @@ class StreamPlayer{
     index
   ){
 
-    const bases=
-      this.baseurls||
-      [];
+    const bases=this.baseurls||[];
 
     if(
-      !bases[index]||
+      !bases[index] ||
       !id
     ){
       return null;
     }
 
-    const path=
-      this.getStreamPath(
-        id
-      );
+    const path=this.getStreamPath(
+      id
+    );
 
     return path
       ? bases[index]+path
@@ -5107,10 +3873,8 @@ class StreamPlayer{
   async resolveAndUseChecklist(){
 
     if(
-      !this.channelId||
-      !isAndroChannel(
-        this.channelId
-      )
+      !this.channelId ||
+      !isAndroChannel(this.channelId)
     ){
       return false;
     }
@@ -5124,27 +3888,20 @@ class StreamPlayer{
       );
 
     if(
-      result&&
+      result &&
       result.url
     ){
 
-      this.currentBaseIndex=
-        result.index;
-
-      this.source=
-        result.url;
-
-      this.sourceMode=
-        'checklist';
+      this.currentBaseIndex=result.index;
+      this.source=result.url;
+      this.sourceMode='checklist';
 
       this.streamPath=
         this.getStreamPath(
           this.channelId
         );
 
-      warmUrl(
-        this.source
-      );
+      warmUrl(this.source);
 
       return true;
     }
@@ -5167,38 +3924,29 @@ class StreamPlayer{
         this.channelId
       );
 
-    warmUrl(
-      this.source
-    );
+    warmUrl(this.source);
 
     return !!this.source;
   }
 
-  async loadSource(
-    newSource
-  ){
+  async loadSource(newSource){
 
     if(
-      !this.player||
-      !newSource||
+      !this.player ||
+      !newSource ||
       this.pphFallbackUsed
     ){
       return false;
     }
 
-    this.source=
-      newSource;
-
-    this.sourceErrorHandled=
-      false;
+    this.source=newSource;
+    this.sourceErrorHandled=false;
 
     clearAutoplayTimers();
 
     showLoadingIndicator();
 
-    warmUrl(
-      newSource
-    );
+    warmUrl(newSource);
 
     try{
 
@@ -5235,10 +3983,9 @@ class StreamPlayer{
         observePlayerVideo();
         applyVideoFilters();
 
-        const video=
-          document.querySelector(
-            '#player-container video'
-          );
+        const video=document.querySelector(
+          '#player-container video'
+        );
 
         if(!video){
           return;
@@ -5254,6 +4001,7 @@ class StreamPlayer{
 
           forceAutoplay();
         }
+
       },
       100
     );
@@ -5263,9 +4011,7 @@ class StreamPlayer{
 
   redirectToPph(){
 
-    if(
-      this.isPphEligible()
-    ){
+    if(this.isPphEligible()){
       return this.showPphFallbackIframe();
     }
 
@@ -5279,8 +4025,7 @@ class StreamPlayer{
   initPlayer(){
 
     if(
-      typeof Clappr===
-      'undefined'
+      typeof Clappr==='undefined'
     ){
 
       this.showFinalWarning(
@@ -5290,234 +4035,221 @@ class StreamPlayer{
       return;
     }
 
-    const pluginSet=
-      new Set();
+    const plugins=[];
 
-    const addPlugin=(
-      plugin
-    )=>{
-      if(
-        plugin &&
-        !pluginSet.has(plugin)
-      ){
-        pluginSet.add(plugin);
-      }
-    };
-
-    addPlugin(
-      window.LevelSelector
-    );
-
-    addPlugin(
-      window.ClapprPip?.PipPlugin
-    );
-
-    addPlugin(
-      window.ClapprPip?.PipButton
-    );
-
-    addPlugin(
-      window.ClapprPIPPlugin
-    );
-
-    const plugins=
-      Array.from(
-        pluginSet
+    if(window.LevelSelector){
+      plugins.push(
+        window.LevelSelector
       );
+    }
 
-    this.player=
-      new Clappr.Player({
+    if(window.ClapprPip){
 
-        source:
-          this.source,
+      if(window.ClapprPip.PipPlugin){
+        plugins.push(
+          window.ClapprPip.PipPlugin
+        );
+      }
 
-        autoPlay:true,
-        mute:true,
+      if(window.ClapprPip.PipButton){
+        plugins.push(
+          window.ClapprPip.PipButton
+        );
+      }
+    }
 
-        disableVideoTagContextMenu:
-          true,
+    if(window.ClapprPIPPlugin){
+      plugins.push(
+        window.ClapprPIPPlugin
+      );
+    }
 
-        height:'100%',
-        width:'100%',
+    this.player=new Clappr.Player({
 
-        position:'bottom-left',
+      source:this.source,
 
-        chromeless:isIOS,
+      autoPlay:true,
+      mute:true,
 
-        watermark:
-          this.urlConfig.watermark||
-          undefined,
+      disableVideoTagContextMenu:true,
 
-        watermarkLink:
-          this.urlConfig.watermarkLink||
-          undefined,
+      height:'100%',
+      width:'100%',
 
-        levelSelectorConfig:{
+      position:'bottom-left',
 
-          title:'QUALITY',
+      chromeless:isIOS,
 
-          labels:{
-            '-1':'Auto'
-          },
+      watermark:
+        this.urlConfig.watermark||
+        undefined,
 
-          labelCallback:
-            function(
-              playbackLevel,
-              customLabel
+      watermarkLink:
+        this.urlConfig.watermarkLink||
+        undefined,
+
+      levelSelectorConfig:{
+
+        title:'QUALITY',
+
+        labels:{
+          '-1':'Auto'
+        },
+
+        labelCallback:
+          function(
+            playbackLevel,
+            customLabel
+          ){
+
+            if(
+              playbackLevel &&
+              playbackLevel.level &&
+              playbackLevel.level.height
             ){
 
-              if(
-                playbackLevel &&
-                playbackLevel.level &&
-                playbackLevel.level.height
-              ){
-
-                return(
-                  playbackLevel.level.height+
-                  'p'
-                );
-              }
-
-              if(customLabel){
-                return customLabel;
-              }
-
-              if(
-                playbackLevel &&
-                playbackLevel.level &&
-                playbackLevel.level.bitrate
-              ){
-
-                return(
-                  Math.round(
-                    playbackLevel.level.bitrate/
-                    1000
-                  )+
-                  ' kbps'
-                );
-              }
-
-              return 'Auto';
+              return(
+                playbackLevel.level.height+
+                'p'
+              );
             }
-        },
 
-        hlsjsConfig:{
+            if(customLabel){
+              return customLabel;
+            }
 
-          enableWorker:true,
+            if(
+              playbackLevel &&
+              playbackLevel.level &&
+              playbackLevel.level.bitrate
+            ){
 
-          lowLatencyMode:true,
+              return(
+                Math.round(
+                  playbackLevel.level.bitrate/1000
+                )+
+                ' kbps'
+              );
+            }
 
-          startLevel:-1,
+            return 'Auto';
+          }
+      },
 
-          liveSyncDurationCount:2,
+      hlsjsConfig:{
 
-          liveMaxLatencyDurationCount:4,
+        enableWorker:true,
 
-          liveDurationInfinity:true,
+        lowLatencyMode:true,
 
-          maxBufferLength:9,
+        startLevel:-1,
 
-          maxMaxBufferLength:14,
+        liveSyncDurationCount:2,
 
-          maxBufferSize:
-            18*1000*1000,
+        liveMaxLatencyDurationCount:4,
 
-          maxBufferHole:.5,
+        liveDurationInfinity:true,
 
-          backBufferLength:20,
+        maxBufferLength:9,
 
-          capLevelToPlayerSize:true,
+        maxMaxBufferLength:14,
 
-          levelLoadingMaxRetry:2,
+        maxBufferSize:18*1000*1000,
 
-          fragLoadingMaxRetry:3,
+        maxBufferHole:.5,
 
-          manifestLoadingMaxRetry:2,
+        backBufferLength:20,
 
-          levelLoadingTimeOut:7000,
+        capLevelToPlayerSize:true,
 
-          fragLoadingTimeOut:10000,
+        levelLoadingMaxRetry:2,
 
-          manifestLoadingTimeOut:7000,
+        fragLoadingMaxRetry:3,
 
-          enableSoftwareAES:true,
+        manifestLoadingMaxRetry:2,
 
-          xhrSetup:(xhr)=>{
+        levelLoadingTimeOut:7000,
 
-            try{
-              xhr.withCredentials=
-                false;
-            }catch(e){}
+        fragLoadingTimeOut:10000,
 
-            xhr.addEventListener(
-              'loadend',
-              ()=>{
+        manifestLoadingTimeOut:7000,
+
+        enableSoftwareAES:true,
+
+        xhrSetup:(xhr)=>{
+
+          try{
+            xhr.withCredentials=false;
+          }catch(e){}
+
+          xhr.addEventListener(
+            'loadend',
+            ()=>{
+
+              if(
+                this.streamPath &&
+                xhr.status===403
+              ){
 
                 if(
-                  this.streamPath &&
-                  xhr.status===403
+                  this.isPphEligible() &&
+                  !this.pphFallbackUsed
                 ){
 
-                  if(
-                    this.isPphEligible()&&
-                    !this.pphFallbackUsed
-                  ){
+                  this.showPphFallbackIframe();
 
-                    this.showPphFallbackIframe();
+                }else{
 
-                  }else{
-
-                    this.switchToNextBase(
-                      '403'
-                    );
-                  }
+                  this.switchToNextBase(
+                    '403'
+                  );
                 }
-              },
-              {passive:true}
-            );
-          }
-        },
+              }
 
-        playback:{
-
-          playInline:true,
-
-          controls:isIOS,
-
-          crossOrigin:
-            'anonymous'
-        },
-
-        disableErrorScreen:true,
-
-        plugins,
-
-        language:'en',
-
-        strings:{
-
-          en:{
-
-            live:'LIVE',
-
-            default_error_message:
-              'A playback error occurred.',
-
-            default_error_title:
-              'Notice'
-          }
+            },
+            {passive:true}
+          );
         }
-      });
+      },
+
+      playback:{
+
+        playInline:true,
+
+        controls:isIOS,
+
+        crossOrigin:'anonymous'
+      },
+
+      disableErrorScreen:true,
+
+      plugins,
+
+      language:'en',
+
+      strings:{
+
+        en:{
+
+          live:'LIVE',
+
+          default_error_message:
+            'A playback error occurred.',
+
+          default_error_title:
+            'Notice'
+        }
+      }
+    });
 
     this.setupPlayerEvents();
   }
 
   setupUnmuteOverlay(){
 
-    const button=
-      document.getElementById(
-        'unmute-overlay-btn'
-      );
+    const button=document.getElementById(
+      'unmute-overlay-btn'
+    );
 
     if(!button){
       return;
@@ -5528,7 +4260,6 @@ class StreamPlayer{
       event=>{
 
         event.preventDefault();
-
         event.stopPropagation();
 
         unmuteEverything();
@@ -5542,9 +4273,24 @@ class StreamPlayer{
         volume=>{
 
           syncAudioFromPlayer(
-            volume,
-            true
+            volume
           );
+
+          if(Number(volume)>0){
+
+            button.classList.add(
+              'hidden'
+            );
+
+          }else{
+
+            if(audioUnlocked){
+
+              button.classList.remove(
+                'hidden'
+              );
+            }
+          }
         }
       );
     }
@@ -5552,44 +4298,35 @@ class StreamPlayer{
 
   bindQualitySelectorUI(){
 
-    const dropdown=
-      document.getElementById(
-        'drawer-quality-selector'
-      );
+    const dropdown=document.getElementById(
+      'drawer-quality-selector'
+    );
 
     if(
-      !dropdown||
+      !dropdown ||
       !this.player
     ){
       return;
     }
 
-    const populate=(
-      attempt=0
-    )=>{
+    const populate=(attempt=0)=>{
 
-      if(
-        this.pphFallbackUsed
-      ){
+      if(this.pphFallbackUsed){
         return;
       }
 
-      const plugin=
-        this.player.getPlugin(
-          'level_selector'
-        );
+      const plugin=this.player.getPlugin(
+        'level_selector'
+      );
 
       const levels=
-        Array.isArray(
-          plugin?.levels
-        )
+        Array.isArray(plugin?.levels)
           ? plugin.levels
           : [];
 
       if(levels.length){
 
-        const current=
-          dropdown.value;
+        const current=dropdown.value;
 
         dropdown.innerHTML=
           '<option value="-1">Auto</option>';
@@ -5597,15 +4334,13 @@ class StreamPlayer{
         levels.forEach(
           (level,index)=>{
 
-            const height=
-              Number(
-                level?.height||0
-              );
+            const height=Number(
+              level?.height||0
+            );
 
-            const bitrate=
-              Number(
-                level?.bitrate||0
-              );
+            const bitrate=Number(
+              level?.bitrate||0
+            );
 
             const label=
               height
@@ -5614,16 +4349,12 @@ class StreamPlayer{
                   ? `${Math.round(bitrate/1000)} kbps`
                   : `Level ${index+1}`;
 
-            const option=
-              document.createElement(
-                'option'
-              );
+            const option=document.createElement(
+              'option'
+            );
 
-            option.value=
-              String(index);
-
-            option.textContent=
-              label;
+            option.value=String(index);
+            option.textContent=label;
 
             dropdown.appendChild(
               option
@@ -5633,14 +4364,11 @@ class StreamPlayer{
 
         if(
           [...dropdown.options].some(
-            option=>
-              option.value===
-              current
+            option=>option.value===current
           )
         ){
 
-          dropdown.value=
-            current;
+          dropdown.value=current;
         }
 
         return;
@@ -5674,13 +4402,11 @@ class StreamPlayer{
 
             if(audioUnlocked){
 
-              const video=
-                document.querySelector(
-                  '#player-container video'
-                );
+              const video=document.querySelector(
+                '#player-container video'
+              );
 
               if(video){
-
                 applyDesiredAudioState(
                   video
                 );
@@ -5690,6 +4416,7 @@ class StreamPlayer{
 
               startAutoplayRetries();
             }
+
           },
           80
         );
@@ -5700,26 +4427,21 @@ class StreamPlayer{
       'change',
       event=>{
 
-        if(
-          this.pphFallbackUsed
-        ){
+        if(this.pphFallbackUsed){
           return;
         }
 
-        const value=
-          Number(
-            event.target.value
-          );
+        const value=Number(
+          event.target.value
+        );
 
-        const plugin=
-          this.player.getPlugin(
-            'level_selector'
-          );
+        const plugin=this.player.getPlugin(
+          'level_selector'
+        );
 
         if(
           plugin &&
-          typeof plugin.changeLevel===
-          'function'
+          typeof plugin.changeLevel==='function'
         ){
 
           plugin.changeLevel(
@@ -5734,10 +4456,9 @@ class StreamPlayer{
 
   setupTopPlayerControls(){
 
-    const pip=
-      document.getElementById(
-        'pip-top-btn'
-      );
+    const pip=document.getElementById(
+      'pip-top-btn'
+    );
 
     if(pip){
 
@@ -5754,8 +4475,7 @@ class StreamPlayer{
 
       this.updatePipButton();
 
-      const video=
-        this.getCurrentVideo();
+      const video=this.getCurrentVideo();
 
       video?.addEventListener(
         'click',
@@ -5805,14 +4525,11 @@ class StreamPlayer{
 
   async togglePictureInPicture(){
 
-    if(
-      this.pphFallbackUsed
-    ){
+    if(this.pphFallbackUsed){
       return;
     }
 
-    const video=
-      this.getCurrentVideo();
+    const video=this.getCurrentVideo();
 
     if(!video){
       return;
@@ -5820,9 +4537,7 @@ class StreamPlayer{
 
     try{
 
-      if(
-        document.pictureInPictureElement
-      ){
+      if(document.pictureInPictureElement){
 
         await document.exitPictureInPicture();
 
@@ -5831,9 +4546,7 @@ class StreamPlayer{
         return;
       }
 
-      if(
-        video.webkitSetPresentationMode
-      ){
+      if(video.webkitSetPresentationMode){
 
         video.webkitSetPresentationMode(
           video.webkitPresentationMode===
@@ -5847,9 +4560,7 @@ class StreamPlayer{
         return;
       }
 
-      if(
-        video.requestPictureInPicture
-      ){
+      if(video.requestPictureInPicture){
 
         await video.requestPictureInPicture();
 
@@ -5865,21 +4576,17 @@ class StreamPlayer{
 
   updatePipButton(){
 
-    const button=
-      document.getElementById(
-        'pip-top-btn'
-      );
+    const button=document.getElementById(
+      'pip-top-btn'
+    );
 
-    const video=
-      this.getCurrentVideo();
+    const video=this.getCurrentVideo();
 
     if(!button){
       return;
     }
 
-    if(
-      this.pphFallbackUsed
-    ){
+    if(this.pphFallbackUsed){
 
       button.classList.add(
         'unsupported'
@@ -5917,8 +4624,7 @@ class StreamPlayer{
 
     const active=!!(
       document.pictureInPictureElement||
-      video?.webkitPresentationMode===
-        'picture-in-picture'
+      video?.webkitPresentationMode==='picture-in-picture'
     );
 
     button.classList.toggle(
@@ -5928,18 +4634,14 @@ class StreamPlayer{
 
     button.setAttribute(
       'aria-pressed',
-      active
-        ? 'true'
-        : 'false'
+      active?'true':'false'
     );
   }
 
-  parseHashParams(
-    hash
-  ){
+  parseHashParams(hash){
 
     if(
-      !hash||
+      !hash ||
       hash==='#'
     ){
       return {};
@@ -5953,27 +4655,23 @@ class StreamPlayer{
       .forEach(
         item=>{
 
-          const index=
-            item.indexOf('=');
+          const index=item.indexOf('=');
 
           if(index===-1){
             return;
           }
 
-          const key=
-            item.substring(
-              0,
-              index
-            );
+          const key=item.substring(
+            0,
+            index
+          );
 
-          const value=
-            item.substring(
-              index+1
-            );
+          const value=item.substring(
+            index+1
+          );
 
           if(key){
-            result[key]=
-              value;
+            result[key]=value;
           }
         }
       );
@@ -5995,19 +4693,14 @@ class StreamPlayer{
     );
   }
 
-  getStreamPath(
-    id
-  ){
+  getStreamPath(id){
 
-    const value=
-      String(
-        id||''
-      );
+    const value=String(
+      id||''
+    );
 
     const useRealStream=
-      pageURL.searchParams.get(
-        'real'
-      )==='1';
+      pageURL.searchParams.get('real')==='1';
 
     if(!value){
       return null;
@@ -6015,10 +4708,8 @@ class StreamPlayer{
 
     if(
       (
-        value===
-          'androstreamlivebs1'||
-        value===
-          'facebooklivebs1'
+        value==='androstreamlivebs1'||
+        value==='facebooklivebs1'
       ) &&
       !useRealStream
     ){
@@ -6027,9 +4718,7 @@ class StreamPlayer{
     }
 
     if(
-      value.startsWith(
-        'facebooklive'
-      )
+      value.startsWith('facebooklive')
     ){
 
       return(
@@ -6039,17 +4728,14 @@ class StreamPlayer{
     }
 
     if(
-      value.startsWith(
-        'androstreamlive'
-      )
+      value.startsWith('androstreamlive')
     ){
 
       if(isIOS){
 
-        const suffix=
-          value.substring(
-            'androstreamlive'.length
-          );
+        const suffix=value.substring(
+          'androstreamlive'.length
+        );
 
         return(
           'facebooklive'+
@@ -6097,22 +4783,6 @@ class StreamPlayer{
             observePlayerVideo();
             applyVideoFilters();
 
-            const readyVideo=
-              document.querySelector(
-                '#player-container video'
-              );
-
-            if(
-              readyVideo&&
-              audioUnlocked
-            ){
-
-              syncAudioFromVideo(
-                readyVideo,
-                true
-              );
-            }
-
             if(
               audioSettings.gain!==100||
               audioSettings.bass||
@@ -6124,13 +4794,11 @@ class StreamPlayer{
 
             if(audioUnlocked){
 
-              const video=
-                document.querySelector(
-                  '#player-container video'
-                );
+              const video=document.querySelector(
+                '#player-container video'
+              );
 
               if(video){
-
                 applyDesiredAudioState(
                   video
                 );
@@ -6150,7 +4818,6 @@ class StreamPlayer{
     this.player.on(
       Clappr.Events.PLAYER_PLAY,
       ()=>{
-
         hidePoster();
         applyVideoFilters();
       }
@@ -6163,25 +4830,17 @@ class StreamPlayer{
         hidePoster();
         hideLoadingIndicator();
 
-        const video=
-          document.querySelector(
-            '#player-container video'
-          );
+        const video=document.querySelector(
+          '#player-container video'
+        );
 
-        if(video){
+        if(
+          video &&
+          !audioUnlocked
+        ){
 
-          if(!audioUnlocked){
-
-            video.muted=true;
-            video.defaultMuted=true;
-            video.volume=0;
-
-          }else{
-
-            applyDesiredAudioState(
-              video
-            );
-          }
+          video.muted=true;
+          video.volume=0;
         }
       }
     );
@@ -6190,10 +4849,7 @@ class StreamPlayer{
       Clappr.Events.PLAYER_BUFFER,
       ()=>{
 
-        if(
-          !this.pphFallbackUsed
-        ){
-
+        if(!this.pphFallbackUsed){
           applyVideoFilters();
         }
       }
@@ -6209,7 +4865,7 @@ class StreamPlayer{
         container=>{
 
           if(
-            container&&
+            container &&
             Clappr.Events.CONTAINER_ERROR
           ){
 
@@ -6218,7 +4874,7 @@ class StreamPlayer{
               ()=>{
 
                 if(
-                  this.isPphEligible()&&
+                  this.isPphEligible() &&
                   !this.pphFallbackUsed
                 ){
 
@@ -6233,7 +4889,7 @@ class StreamPlayer{
           }
 
           if(
-            container&&
+            container &&
             Clappr.Events.CONTAINER_TIMEUPDATE
           ){
 
@@ -6243,16 +4899,14 @@ class StreamPlayer{
 
                 hidePoster();
 
-                const video=
-                  document.querySelector(
-                    '#player-container video'
-                  );
+                const video=document.querySelector(
+                  '#player-container video'
+                );
 
                 if(
-                  video&&
+                  video &&
                   video.currentTime>0
                 ){
-
                   hideLoadingIndicator();
                 }
               }
@@ -6267,7 +4921,7 @@ class StreamPlayer{
       ()=>{
 
         if(
-          this.isPphEligible()&&
+          this.isPphEligible() &&
           !this.pphFallbackUsed
         ){
 
@@ -6284,7 +4938,7 @@ class StreamPlayer{
   handlePlaybackError(){
 
     if(
-      this.isPphEligible()&&
+      this.isPphEligible() &&
       !this.pphFallbackUsed
     ){
 
@@ -6298,12 +4952,10 @@ class StreamPlayer{
     );
   }
 
-  async switchToNextBase(
-    reason
-  ){
+  async switchToNextBase(reason){
 
     if(
-      this.isPphEligible()&&
+      this.isPphEligible() &&
       !this.pphFallbackUsed
     ){
 
@@ -6324,11 +4976,9 @@ class StreamPlayer{
     try{
 
       if(
-        this.sourceMode==='feed'&&
-        !this.cinemaTried&&
-        isAndroChannel(
-          this.channelId
-        )
+        this.sourceMode==='feed' &&
+        !this.cinemaTried &&
+        isAndroChannel(this.channelId)
       ){
 
         this.cinemaTried=true;
@@ -6341,11 +4991,8 @@ class StreamPlayer{
 
         if(cinema){
 
-          this.source=
-            cinema;
-
-          this.sourceMode=
-            'cinema';
+          this.source=cinema;
+          this.sourceMode='cinema';
 
           await this.loadSource(
             cinema
@@ -6356,10 +5003,8 @@ class StreamPlayer{
       }
 
       if(
-        this.sourceMode!=='checklist'&&
-        isAndroChannel(
-          this.channelId
-        )&&
+        this.sourceMode!=='checklist' &&
+        isAndroChannel(this.channelId) &&
         !this.checklistTried
       ){
 
@@ -6377,8 +5022,7 @@ class StreamPlayer{
       }
 
       if(
-        this.sourceMode===
-        'checklist'
+        this.sourceMode==='checklist'
       ){
 
         if(
@@ -6396,8 +5040,7 @@ class StreamPlayer{
 
           if(next){
 
-            this.source=
-              next;
+            this.source=next;
 
             await this.loadSource(
               next
@@ -6418,8 +5061,7 @@ class StreamPlayer{
 
       setTimeout(
         ()=>{
-          this.switchingBase=
-            false;
+          this.switchingBase=false;
         },
         700
       );
@@ -6427,671 +5069,47 @@ class StreamPlayer{
   }
 }
 
-function talhaWaitForPlayback(player,token,timeout=4800){
-  return new Promise(resolve=>{
-    let done=false;
-    let video=null;
-    let timer=0;
-    let scan=0;
-    let retry=0;
-    let previous=NaN;
-    let progressHits=0;
-    const cleanups=[];
-
-    const finish=value=>{
-      if(done){
-        return;
-      }
-      done=true;
-      clearTimeout(timer);
-      clearInterval(scan);
-      clearTimeout(retry);
-      cleanups.forEach(fn=>{
-        try{fn();}catch(e){}
-      });
-      resolve(!!value);
-    };
-
-    const attach=current=>{
-      if(!current||current===video){
-        return current;
-      }
-
-      cleanups.splice(0).forEach(fn=>{
-        try{fn();}catch(e){}
-      });
-
-      video=current;
-
-      const onPlaying=()=>{
-        if(token===player.__talhaLoadToken){
-          finish(true);
-        }
-      };
-
-      const onTime=()=>{
-        const now=Number(video.currentTime);
-        if(
-          Number.isFinite(now)&&
-          Number.isFinite(previous)&&
-          now>previous+0.02
-        ){
-          progressHits++;
-          if(progressHits>=2&&token===player.__talhaLoadToken){
-            finish(true);
-          }
-        }
-        previous=now;
-      };
-
-      const onReady=()=>{
-        applyDesiredAudioState(video);
-        tryVideoPlay(video);
-      };
-
-      const onError=()=>finish(false);
-
-      video.addEventListener('playing',onPlaying,{passive:true});
-      video.addEventListener('timeupdate',onTime,{passive:true});
-      video.addEventListener('canplay',onReady,{passive:true});
-      video.addEventListener('loadeddata',onReady,{passive:true});
-      video.addEventListener('error',onError,{passive:true});
-
-      cleanups.push(()=>{
-        video.removeEventListener('playing',onPlaying);
-        video.removeEventListener('timeupdate',onTime);
-        video.removeEventListener('canplay',onReady);
-        video.removeEventListener('loadeddata',onReady);
-        video.removeEventListener('error',onError);
-      });
-
-      applyDesiredAudioState(video);
-      tryVideoPlay(video);
-
-      return video;
-    };
-
-    const poll=()=>{
-      if(
-        done||
-        token!==player.__talhaLoadToken
-      ){
-        finish(false);
-        return;
-      }
-
-      const current=attach(player.getCurrentVideo());
-      if(!current){
-        return;
-      }
-
-      try{
-        if(current.error){
-          finish(false);
-          return;
-        }
-
-        applyDesiredAudioState(current);
-
-        if(
-          current.readyState>=2&&
-          !current.paused&&
-          !current.ended
-        ){
-          const now=Number(current.currentTime);
-          if(
-            Number.isFinite(now)&&
-            Number.isFinite(previous)&&
-            now>previous+0.02
-          ){
-            finish(true);
-            return;
-          }
-          previous=now;
-        }else if(
-          current.paused&&
-          !current.ended
-        ){
-          tryVideoPlay(current);
-        }
-      }catch(e){}
-    };
-
-    timer=setTimeout(
-      ()=>finish(false),
-      timeout
-    );
-
-    retry=setTimeout(
-      ()=>{
-        const current=player.getCurrentVideo();
-        if(current&&token===player.__talhaLoadToken){
-          tryVideoPlay(current);
-        }
-      },
-      550
-    );
-
-    scan=setInterval(
-      poll,
-      120
-    );
-
-    poll();
-  });
-}
-
-StreamPlayer.prototype.loadSource=async function(
-  newSource,
-  options={}
+if(
+  window.ClapprPIPPlugin &&
+  !window.ClapprPip
 ){
 
-  if(
-    !this.player||
-    this.pphFallbackUsed
-  ){
-    return false;
-  }
-
-  const source=normalizeStreamUrl(newSource);
-  if(!source){
-    return false;
-  }
-
-  const token=(this.__talhaLoadToken||0)+1;
-  this.__talhaLoadToken=token;
-
-  const timeout=clampNumber(
-    options.timeout,
-    2600,
-    7000,
-    4800
-  );
-
-  this.source=source;
-  this.sourceErrorHandled=false;
-  clearAutoplayTimers();
-  showLoadingIndicator();
-  warmUrl(source);
-
-  const started=performance.now();
-
-  try{
-    this.player.load(source);
-  }catch(e){
-    try{
-      this.player.configure({source});
-    }catch(error){
-      rememberTalhaHealth(
-        source,
-        false,
-        performance.now()-started
-      );
-      return false;
-    }
-  }
-
-  try{
-    const p=this.player.play();
-    p?.catch?.(()=>{});
-  }catch(e){}
-
-  const ok=await talhaWaitForPlayback(
-    this,
-    token,
-    timeout
-  );
-
-  if(token!==this.__talhaLoadToken){
-    return false;
-  }
-
-  if(!ok){
-    rememberTalhaHealth(
-      source,
-      false,
-      performance.now()-started
-    );
-    forgetTalhaGoodSource(
-      this.input,
-      this.channelId,
-      source
-    );
-    return false;
-  }
-
-  rememberTalhaHealth(
-    source,
-    true,
-    performance.now()-started
-  );
-
-  rememberTalhaGoodSource(
-    this.input,
-    this.channelId,
-    this.sourceMode,
-    source
-  );
-
-  this.activeSource=source;
-  this.sourceErrorHandled=false;
-  this.__talhaProgressAt=Date.now();
-  this.__talhaFastRetry=false;
-
-  hidePoster();
-  hideLoadingIndicator();
-  observePlayerVideo();
-  applyVideoFilters();
-
-  const video=this.getCurrentVideo();
-  if(video){
-    applyDesiredAudioState(video);
-  }
-
-  return true;
-};
-
-StreamPlayer.prototype.handlePlaybackError=function(){
-
-  if(
-    this.__smartSwitching||
-    this.sourceErrorHandled
-  ){
-    return;
-  }
-
-  this.sourceErrorHandled=true;
-
-  this.switchToNextBase(
-    'playback error'
-  );
-};
-
-StreamPlayer.prototype.switchToNextBase=async function(
-  reason
-){
-
-  if(
-    this.__smartSwitching||
-    this.pphFallbackUsed
-  ){
-    return false;
-  }
-
-  this.__smartSwitching=true;
-  this.sourceErrorHandled=true;
-  showLoadingIndicator();
-  clearAutoplayTimers();
-
-  try{
-    const current=talhaSourceKey(
-      this.activeSource||this.source
-    );
-    const tried=new Set(
-      current?[current]:[]
-    );
-    const candidates=[];
-
-    const add=(mode,url,index=0)=>{
-      const normalized=normalizeStreamUrl(url);
-      const key=talhaSourceKey(normalized);
-
-      if(
-        !normalized||
-        !key||
-        tried.has(key)
-      ){
-        return;
-      }
-
-      tried.add(key);
-      candidates.push({
-        mode,
-        url:normalized,
-        index
-      });
-    };
-
-    const cached=readTalhaGoodSource(
-      this.input,
-      this.channelId
-    );
-
-    if(cached?.url){
-      add(
-        cached.mode||'cached',
-        cached.url
-      );
-    }
-
-    const feedPromise=resolveFeedSource(
-      this.input
-    ).catch(()=>null);
-
-    let feed=await Promise.race([
-      feedPromise,
-      delayedNull(1000)
-    ]);
-
-    const feedUrl=normalizeStreamUrl(feed);
-    if(feedUrl){
-      add('feed',feedUrl);
-    }
-
-    if(isAndroChannel(this.channelId)){
-      const cinemaPromise=resolveCinemaSource(
-        this.channelId,
-        1800
-      ).catch(()=>null);
-
-      const cinema=await Promise.race([
-        cinemaPromise,
-        delayedNull(900)
-      ]);
-
-      add('cinema',cinema);
-
-      const originals=getChecklistCandidates(
-        this.channelId
-      );
-
-      orderTalhaSources(
-        originals
-      ).forEach(
-        url=>add(
-          'checklist',
-          url,
-          originals.indexOf(url)
-        )
-      );
-    }
-
-    if(!candidates.length){
-      const lateFeed=await feedPromise.catch(()=>null);
-      add('feed',lateFeed);
-    }
-
-    candidates.sort(
-      (a,b)=>{
-        const modeRank=item=>{
-          let value=0;
-          if(item.mode==='cached'){
-            value-=25;
-          }else if(item.mode==='feed'){
-            value+=0;
-          }else if(item.mode==='cinema'){
-            value+=1;
-          }else{
-            value+=2+(Number(item.index||0)*.01);
-          }
-          value-=talhaHealthScore(item.url)*.02;
-          return value;
-        };
-        return modeRank(a)-modeRank(b);
-      }
-    );
-
-    for(const candidate of candidates){
-      this.sourceMode=candidate.mode;
-      this.currentBaseIndex=Number.isFinite(candidate.index)
-        ? candidate.index
-        : 0;
-
-      if(candidate.mode==='feed'){
-        this.feedTried=true;
-      }else if(candidate.mode==='cinema'){
-        this.cinemaTried=true;
-      }else if(candidate.mode==='checklist'){
-        this.checklistTried=true;
-        this.streamPath=this.getStreamPath(
-          this.channelId
-        );
-      }
-
-      const ok=await this.loadSource(
-        candidate.url,
-        {timeout:4200}
-      );
-
-      if(ok){
-        this.sourceErrorHandled=false;
-        return true;
-      }
-    }
-
-    if(
-      this.isPphEligible()&&
-      !this.pphFallbackUsed
-    ){
-      return this.showPphFallbackIframe();
-    }
-
-    this.showFinalWarning(
-      'Playback failed.\nThe stream is currently unavailable.'
-    );
-
-    return false;
-
-  }finally{
-    this.__smartSwitching=false;
-  }
-};
-
-const TALHA_LONGRUN={
-  tick:4000,
-  stall:16000,
-  cooldown:20000
-};
-
-function startTalhaLongRunGuard(){
-
-  const player=window.activeStreamPlayer;
-
-  if(
-    !player||
-    player.__talhaLongRunStarted
-  ){
-    return;
-  }
-
-  player.__talhaLongRunStarted=true;
-  player.__talhaProgressAt=Date.now();
-  player.__talhaLastTime=NaN;
-  player.__talhaRecovering=false;
-  player.__talhaLastRecovery=0;
-
-  const markProgress=()=>{
-    const video=player.getCurrentVideo();
-
-    if(!video){
-      return;
-    }
-
-    const now=Number(video.currentTime);
-
-    if(
-      Number.isFinite(now)&&
-      (
-        !Number.isFinite(player.__talhaLastTime)||
-        Math.abs(now-player.__talhaLastTime)>0.02
-      )
-    ){
-      player.__talhaLastTime=now;
-      player.__talhaProgressAt=Date.now();
-    }
+  window.ClapprPip={
+    PipPlugin:
+      window.ClapprPIPPlugin
   };
-
-  setInterval(
-    async()=>{
-      if(
-        player.__talhaLongRunRecovering||
-        player.__smartSwitching||
-        player.pphFallbackUsed||
-        document.hidden
-      ){
-        return;
-      }
-
-      const video=player.getCurrentVideo();
-
-      if(!video||video.paused){
-        return;
-      }
-
-      markProgress();
-
-      const idle=Date.now()-player.__talhaProgressAt;
-
-      if(idle<TALHA_LONGRUN.stall){
-        return;
-      }
-
-      if(
-        Date.now()-player.__talhaLastRecovery<
-        TALHA_LONGRUN.cooldown
-      ){
-        return;
-      }
-
-      player.__talhaLastRecovery=Date.now();
-      player.__talhaLongRunRecovering=true;
-
-      try{
-        try{
-          await tryVideoPlay(video);
-        }catch(e){}
-
-        await new Promise(
-          resolve=>setTimeout(resolve,700)
-        );
-
-        markProgress();
-
-        if(
-          Date.now()-player.__talhaProgressAt<
-          TALHA_LONGRUN.stall
-        ){
-          return;
-        }
-
-        const source=
-          player.activeSource||
-          player.source;
-
-        if(source){
-          const ok=await player.loadSource(
-            source,
-            {timeout:3500}
-          );
-
-          if(ok){
-            player.__talhaProgressAt=Date.now();
-            return;
-          }
-        }
-
-        await player.switchToNextBase(
-          'long-run stall'
-        );
-
-        player.__talhaProgressAt=Date.now();
-      }finally{
-        player.__talhaLongRunRecovering=false;
-      }
-    },
-    TALHA_LONGRUN.tick
-  );
 }
 
-function bootTalhaPlayer(){
+try{
 
-  if(typeof Clappr==='undefined'){
-    setTimeout(
-      bootTalhaPlayer,
-      35
-    );
-    return;
-  }
+  new StreamPlayer();
 
-  if(
-    window.ClapprPIPPlugin&&
-    !window.ClapprPip
-  ){
-    window.ClapprPip={
-      PipPlugin:window.ClapprPIPPlugin
-    };
-  }
+}catch(error){
 
-  try{
-    new StreamPlayer();
-
-    setTimeout(
-      startTalhaLongRunGuard,
-      300
-    );
-  }catch(error){
-    console.error(
-      'Player startup error:',
-      error
-    );
-
-    hideLoadingIndicator();
-
-    const warning=document.getElementById(
-      'uyarikutu'
-    );
-
-    const message=document.getElementById(
-      'uyari-mesaj'
-    );
-
-    if(message){
-      message.innerText=
-        'Player startup failed.\nPlease refresh the page.';
-    }
-
-    if(warning){
-      warning.style.display='flex';
-    }
-  }
-}
-
-document.addEventListener(
-  'visibilitychange',
-  ()=>{
-    if(document.hidden){
-      return;
-    }
-
-    const player=window.activeStreamPlayer;
-
-    if(!player){
-      return;
-    }
-
-    player.__talhaProgressAt=Date.now();
-
-    setTimeout(
-      ()=>{
-        const video=player.getCurrentVideo?.();
-        if(video&&!video.paused){
-          tryVideoPlay(video);
-        }
-      },
-      150
-    );
-  },
-  {passive:true}
-);
-
-if(document.readyState==='loading'){
-  document.addEventListener(
-    'DOMContentLoaded',
-    bootTalhaPlayer,
-    {once:true}
+  console.error(
+    'Player startup error:',
+    error
   );
-}else{
-  bootTalhaPlayer();
+
+  hideLoadingIndicator();
+
+  const warning=document.getElementById(
+    'uyarikutu'
+  );
+
+  const message=document.getElementById(
+    'uyari-mesaj'
+  );
+
+  if(message){
+
+    message.innerText=
+      'Player startup failed.\nPlease refresh the page.';
+  }
+
+  if(warning){
+    warning.style.display='flex';
+  }
 }
 </script>
 
