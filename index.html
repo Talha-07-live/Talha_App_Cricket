@@ -852,12 +852,6 @@ input[type="password"]:focus{
   to{opacity:0;transform:translateY(-8px) scale(.985)}
 }
 
-@property --reveal-radius{
-  syntax:"<length>";
-  inherits:false;
-  initial-value:0px;
-}
-
 #centerReveal{
   position:fixed;
   inset:0;
@@ -865,42 +859,13 @@ input[type="password"]:focus{
   pointer-events:none;
   opacity:0;
   visibility:hidden;
-  background:
-    radial-gradient(
-      circle at 50% 50%,
-      transparent 0,
-      transparent max(0px,calc(var(--reveal-radius) - 56px)),
-      rgba(2,2,6,.18) calc(var(--reveal-radius) - 28px),
-      rgba(2,2,6,.82) calc(var(--reveal-radius) + 8px),
-      rgba(2,2,6,.985) calc(var(--reveal-radius) + 56px),
-      rgba(2,2,6,.985) 100%
-    );
-  will-change:opacity,background;
+  background:radial-gradient(circle at 50% 50%,#0b0b1c 0,#020206 72%);
   contain:strict;
   transform:translateZ(0);
-  backface-visibility:hidden;
 }
 
 #centerReveal.active{
-  opacity:1;
   visibility:visible;
-}
-
-#centerReveal.done{
-  opacity:0;
-  visibility:hidden;
-  background:transparent;
-}
-
-.reveal-building #mainCard{
-  will-change:transform,opacity;
-  animation:pageBuildIn 1.22s cubic-bezier(.16,1,.3,1) both;
-}
-
-@keyframes pageBuildIn{
-  0%{opacity:.72;transform:scale(.978) translate3d(0,8px,0)}
-  42%{opacity:.9;transform:scale(.992) translate3d(0,2px,0)}
-  100%{opacity:1;transform:scale(1) translate3d(0,0,0)}
 }
 
 #centerReveal::after{
@@ -915,25 +880,19 @@ input[type="password"]:focus{
   background:#fff;
   box-shadow:
     0 0 8px var(--accent-2),
-    0 0 18px var(--accent),
-    0 0 34px color-mix(in srgb,var(--accent-2) 65%,transparent);
+    0 0 18px var(--accent);
   opacity:0;
-  transition:opacity .08s ease;
 }
 
-#centerReveal.active::after{
+#centerReveal.opening::after{
   opacity:.9;
-  animation:centerRevealDot .62s cubic-bezier(.22,1,.36,1) both;
+  animation:centerRevealDot .6s cubic-bezier(.22,1,.36,1) both;
 }
 
 @keyframes centerRevealDot{
   0%{transform:translate3d(-50%,-50%,0) scale(.65);opacity:.95}
   58%{transform:translate3d(-50%,-50%,0) scale(1.15);opacity:.95}
   100%{transform:translate3d(-50%,-50%,0) scale(8);opacity:0}
-}
-
-.reveal-ready #mainCard{
-  will-change:opacity;
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -2162,6 +2121,29 @@ body.low-power .card::after{
     padding:3px 4px;
   }
 }
+
+/* ---- performance patch ---- */
+.servers .server-item{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 56px;
+}
+
+.servers .live-dot{
+  animation:none;
+}
+
+body.low-power .live-dot{
+  animation:none;
+}
+
+.player-container{
+  will-change:transform;
+  isolation:isolate;
+}
+
+.league-tabs{
+  overscroll-behavior-x:contain;
+}
 </style>
 </head>
 
@@ -2497,8 +2479,8 @@ const _SECURE_PARTS=[
   [127,91,194,168,75,196,11,69,68,240,26,159,194,62,110,204,184,97,235,66,5,216,61,127,245,239,180,157,101,54,97,177],
   [249,109,71,65,126,119,155,72,135,249,177,134,215,37,169,163,33,106,155,235,3,68,98,45,33,102,234,36,131,186,82,187]
 ];
-const _SECURE_IV="jhORatOF/cadInbP";
-const _SECURE_DATA="pjPlfFdapOYs9gA8UHvHouvTNtFjqYke6mPHBWzzMCb/C8NzFUsL+gO3n/ap2HWDlBZFP1cg8SNJQATZbrCklta5aDFHNnlKLHueJyc0AzxfLxrJrZpc3KbVMuMThxtkTYKnM2A4Auc7dKzQswvK8/+dDkWFKCBln6bc/Jlnrtf2Ibzn9HNtEthohaOs+YlSdp3XRiQQ02KVdU6DCqA6ryB4ZYOMfAw0nqnXd7/BzEDjzzAs9lsS2wYFhaEsDgsY+wtwWlXt7K2ElJYhiAbDy6VWo+LyghDINShmUkGtMLtYGW+9mGAPqYTrNj15s/AXXsoacRdcL0qJ75ETXuvArZMRu27m/rpA/6yX46La5qOpVXLG94mQj87wxMCtSX5G9ucF13aSWT4f4lApppiWKYVJZqP0Iw5SuwF/4YhjQelNchsV3HpenRrdCpXIgb0bETiaPKhj7DhouiJF056CgXlEZggmB5vH2A6eJFM3aUGc9c3AhKsRUBK8qIEULA0pPaZPvsgzYLSUBszjM9wJb0M+FQSb4dNjFE4BqFm4WvIBdq5h7RNRbirvSjg1cjiZIvTjbnPDk+U+Q1NoUIr0gIXmkPT/NELqRlRNKjH+sP6fo9yzvMfeuUDehP/pyTiUtNnF6im+9BLF9EDcEBu9MMvrjRSEU5pKVxI/4UcxJoMP";
+const _SECURE_IV="+zVA4PLdgjuYLuoG";
+const _SECURE_DATA="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";
 
 let APP_CONFIG=null;
 let CONFIG_ERROR=null;
@@ -2639,61 +2621,36 @@ const FEED_CACHE_KEY=
 const FEED_LAST_SYNC_KEY=
   "talhaFeedLastSyncV3";
 
-const STATIC_CHANNELS=[
-  {title:"BeIN Sports 1",url:"/event.html?id=androstreamlivebs1"},
-  {title:"BeIN Sports 2",url:"/event.html?id=androstreamlivebs2"},
-  {title:"BeIN Sports 3",url:"/event.html?id=androstreamlivebs3"},
-  {title:"BeIN Sports 4",url:"/event.html?id=androstreamlivebs4"},
-  {title:"BeIN Sports 5",url:"/event.html?id=androstreamlivebs5"},
-  {title:"BeIN Sports Max 1",url:"/event.html?id=androstreamlivebsm1"},
-  {title:"BeIN Sports Max 2",url:"/event.html?id=androstreamlivebsm2"},
-  {title:"S Sport",url:"/event.html?id=androstreamlivess1"},
-  {title:"S Sport 2",url:"/event.html?id=androstreamlivess2"},
-  {title:"S Sport Plus",url:"/event.html?id=androstreamlivessplus1"},
-  {title:"Tivibu Spor",url:"/event.html?id=androstreamlivets"},
-  {title:"Tivibu Spor 1",url:"/event.html?id=androstreamlivets1"},
-  {title:"Tivibu Spor 2",url:"/event.html?id=androstreamlivets2"},
-  {title:"Tivibu Spor 3",url:"/event.html?id=androstreamlivets3"},
-  {title:"Tivibu Spor 4",url:"/event.html?id=androstreamlivets4"},
-  {title:"Smart Spor 1",url:"/event.html?id=androstreamlivesm1"},
-  {title:"Smart Spor 2",url:"/event.html?id=androstreamlivesm2"},
-  {title:"Euro Sport 1",url:"/event.html?id=androstreamlivees1"},
-  {title:"Euro Sport 2",url:"/event.html?id=androstreamlivees2"},
-  {title:"iDMAN Tv",url:"/event.html?id=androstreamliveidm"},
-  {title:"Trt 1",url:"/event.html?id=androstreamlivetrt1"},
-  {title:"Trt Spor",url:"/event.html?id=androstreamlivetrts"},
-  {title:"TRT Sports Star",url:"/event.html?id=androstreamlivetrtsy"},
-  {title:"Atv",url:"/event.html?id=androstreamliveatv"},
-  {title:"A Spor",url:"/event.html?id=androstreamliveas"},
-  {title:"A2",url:"/event.html?id=androstreamlivea2"},
-  {title:"Tjk Tv",url:"/event.html?id=androstreamlivetjk"},
-  {title:"Ht Spor",url:"/event.html?id=androstreamliveht"},
-  {title:"Nba Tv",url:"/event.html?id=androstreamlivenba"},
-  {title:"Tv8",url:"/event.html?id=androstreamlivetv8"},
-  {title:"Tv8,5",url:"/event.html?id=androstreamlivetv85"},
-  {title:"Tabi Spor",url:"/event.html?id=androstreamlivetb"},
-  {title:"Tabi Spor 1",url:"/event.html?id=androstreamlivetb1"},
-  {title:"Tabi Spor 2",url:"/event.html?id=androstreamlivetb2"},
-  {title:"Tabi Spor 3",url:"/event.html?id=androstreamlivetb3"},
-  {title:"Tabi Spor 4",url:"/event.html?id=androstreamlivetb4"},
-  {title:"Tabi Spor 5",url:"/event.html?id=androstreamlivetb5"},
-  {title:"Tabi Spor 6",url:"/event.html?id=androstreamlivetb6"},
-  {title:"Tabi Spor 7",url:"/event.html?id=androstreamlivetb7"},
-  {title:"Tabi Spor 8",url:"/event.html?id=androstreamlivetb8"},
-  {title:"Fb Tv",url:"/event.html?id=androstreamlivefb"},
-  {title:"Cbc Sport",url:"/event.html?id=androstreamlivecbcs"},
-  {title:"Gs Tv",url:"/event.html?id=androstreamlivegs"},
-  {title:"Sports Tv",url:"/event.html?id=androstreamlivesptstv"},
-  {title:"Exxen Tv",url:"/event.html?id=androstreamliveexn"},
-  {title:"Exxen Sports 1",url:"/event.html?id=androstreamliveexn1"},
-  {title:"Exxen Sports 2",url:"/event.html?id=androstreamliveexn2"},
-  {title:"Exxen Sports 3",url:"/event.html?id=androstreamliveexn3"},
-  {title:"Exxen Sports 4",url:"/event.html?id=androstreamliveexn4"},
-  {title:"Exxen Sports 5",url:"/event.html?id=androstreamliveexn5"},
-  {title:"Exxen Sports 6",url:"/event.html?id=androstreamliveexn6"},
-  {title:"Exxen Sports 7",url:"/event.html?id=androstreamliveexn7"},
-  {title:"Exxen Sports 8",url:"/event.html?id=androstreamliveexn8"}
-];
+let STATIC_CHANNELS=[];
+const STATIC_FILTER_KEY="__static247";
+const staticRowCache=new WeakMap();
+const staticSearchCache=new WeakMap();
+const liveRowCache=new WeakMap();
+const leagueKeyCache=new WeakMap();
+let lastTabsSignature="";
+let lastLiveVisibleCount=0;
+let renderQueued=false;
+
+/* 24/7 channel list lives inside the encrypted config (same AES-GCM blob as the other links) */
+CONFIG_READY.then(config=>{
+  const list=Array.isArray(config&&config.static)?config.static:[];
+
+  STATIC_CHANNELS=list
+    .filter(item=>Array.isArray(item)&&item[0]&&item[1])
+    .map(item=>({
+      title:String(item[0]),
+      url:"/event.html?id="+encodeURIComponent(String(item[1]))
+    }));
+
+  try{
+    renderLeagueTabs();
+    renderStaticChannels(true);
+
+    if(!document.body.classList.contains("auth-locked")){
+      renderMatches();
+    }
+  }catch(e){}
+}).catch(()=>{});
 
 let liveEvents=[];
 let currentLeague="all";
@@ -6086,205 +6043,142 @@ function bootLoader(){
   );
 }
 
-function renderLeagueTabs(){
-  const tabs=
-    document.getElementById(
-      "leagueTabs"
-    );
+function getEventLeagueKey(event){
+  if(!event||typeof event!=="object"){
+    return canonicalLeagueKey("Other");
+  }
 
-  if(
-    !tabs
-  ){
+  let key=leagueKeyCache.get(event);
+
+  if(key===undefined){
+    key=canonicalLeagueKey(event.league||"Other");
+    leagueKeyCache.set(event,key);
+  }
+
+  return key;
+}
+
+function updateActiveTabs(){
+  const tabs=document.getElementById("leagueTabs");
+
+  if(!tabs){
     return;
   }
 
-  const counts=
-    new Map();
+  let activeBtn=null;
 
-  for(
-    let index=0;
-    index<liveEvents.length;
-    index++
-  ){
-    const event=
-      liveEvents[index];
+  for(const btn of tabs.children){
+    const on=btn.dataset.leagueKey===currentLeague;
 
-    const eventMeta=
-      getEventMeta(
-        event,
-        index
-      );
+    if(btn.classList.contains("active")!==on){
+      btn.classList.toggle("active",on);
+    }
 
-    hydrateEventMeta(
-      event,
-      index,
-      eventMeta
-    );
+    btn.setAttribute("aria-selected",on?"true":"false");
 
-    const key=
-      canonicalLeagueKey(
-        event?.league||
-        "Other"
-      );
+    if(on){
+      activeBtn=btn;
+    }
+  }
 
-    const label=
-      eventMeta?.league||
-      canonicalLeagueLabel(
-        event?.league||
-        "Other"
-      );
+  if(activeBtn&&tabs.scrollWidth>tabs.clientWidth){
+    const tr=tabs.getBoundingClientRect();
+    const br=activeBtn.getBoundingClientRect();
 
-    const meta=
-      counts.get(
-        key
-      )||
-      {
-        label,
-        count:0
-      };
+    if(br.left<tr.left||br.right>tr.right){
+      tabs.scrollLeft+=(br.left+br.width/2)-(tr.left+tr.width/2);
+    }
+  }
+}
+
+function renderLeagueTabs(){
+  const tabs=document.getElementById("leagueTabs");
+
+  if(!tabs){
+    return;
+  }
+
+  const counts=new Map();
+
+  for(let index=0;index<liveEvents.length;index++){
+    const event=liveEvents[index];
+    const eventMeta=getEventMeta(event,index);
+
+    hydrateEventMeta(event,index,eventMeta);
+
+    const key=getEventLeagueKey(event);
+    const label=eventMeta?.league||canonicalLeagueLabel(event?.league||"Other");
+    const meta=counts.get(key)||{label,count:0};
 
     meta.count++;
-
-    counts.set(
-      key,
-      meta
-    );
+    counts.set(key,meta);
   }
 
-  if(
-    currentLeague!=="all" &&
-    !counts.has(
-      currentLeague
-    )
-  ){
-    currentLeague=
-      "all";
+  if(currentLeague===STATIC_FILTER_KEY){
+    if(!STATIC_CHANNELS.length){
+      currentLeague="all";
+    }
+  }else if(currentLeague!=="all"&&!counts.has(currentLeague)){
+    currentLeague="all";
   }
 
-  const leagues=
-    [...counts.entries()]
-    .sort(
-      (a,b)=>{
-        const pa=getLeaguePriority(a[0]);
-        const pb=getLeaguePriority(b[0]);
+  const leagues=[...counts.entries()].sort((a,b)=>{
+    const pa=getLeaguePriority(a[0]);
+    const pb=getLeaguePriority(b[0]);
 
-        if(
-          pa!==pb
-        ){
-          return pa-pb;
-        }
+    if(pa!==pb){
+      return pa-pb;
+    }
 
-        if(
-          b[1].count!==
-          a[1].count
-        ){
-          return b[1].count-
-            a[1].count;
-        }
+    if(b[1].count!==a[1].count){
+      return b[1].count-a[1].count;
+    }
 
-        return a[1].label.localeCompare(
-          b[1].label,
-          "en",
-          {
-            sensitivity:"base",
-            numeric:true
-          }
-        );
-      }
-    );
+    return a[1].label.localeCompare(b[1].label,"en",{sensitivity:"base",numeric:true});
+  });
 
-  const fragment=
-    document.createDocumentFragment();
+  const defs=[{label:"All",key:"all",count:liveEvents.length,major:true}];
 
-  const addTab=
-    (
-      label,
-      key,
-      count,
-      major=false
-    )=>{
-      const button=
-        document.createElement(
-          "button"
-        );
+  if(STATIC_CHANNELS.length){
+    defs.push({label:"📺 24/7",key:STATIC_FILTER_KEY,count:STATIC_CHANNELS.length,major:true});
+  }
 
-      button.className=
-        "tab-btn"+
-        (
-          currentLeague===
-          key
-            ? " active"
-            : ""
-        )+
-        (
-          major
-            ? " major-league"
-            : ""
-        );
+  for(const [key,meta] of leagues){
+    defs.push({label:meta.label,key,count:meta.count,major:getLeaguePriority(key)<1000});
+  }
 
-      button.type=
-        "button";
+  const signature=defs.map(d=>`${d.key}|${d.label}|${d.count}|${d.major?1:0}`).join("\n");
 
-      button.dataset.leagueKey=
-        key;
+  /* nothing changed -> never rebuild the buttons (this was causing the glitch) */
+  if(signature===lastTabsSignature&&tabs.childElementCount){
+    updateActiveTabs();
+    return;
+  }
 
-      button.setAttribute(
-        "role",
-        "tab"
-      );
+  lastTabsSignature=signature;
 
-      button.setAttribute(
-        "aria-selected",
-        currentLeague===
-        key
-          ? "true"
-          : "false"
-      );
+  const previousScroll=tabs.scrollLeft;
+  const fragment=document.createDocumentFragment();
 
-      button.textContent=
-        `${label} (${count})`;
+  for(const def of defs){
+    const button=document.createElement("button");
 
-      button.title=
-        `Filter ${label}`;
-
-      button.onclick=
-        ()=>{
-          setFilter(
-            "league",
-            key
-          );
-        };
-
-      fragment.appendChild(
-        button
-      );
+    button.className="tab-btn"+(def.major?" major-league":"");
+    button.type="button";
+    button.dataset.leagueKey=def.key;
+    button.setAttribute("role","tab");
+    button.textContent=`${def.label} (${def.count})`;
+    button.title=`Filter ${def.label}`;
+    button.onclick=()=>{
+      setFilter("league",def.key);
     };
 
-  addTab(
-    "All",
-    "all",
-    liveEvents.length,
-    true
-  );
-
-  for(
-    const [
-      key,
-      meta
-    ]
-    of leagues
-  ){
-    addTab(
-      meta.label,
-      key,
-      meta.count,
-      getLeaguePriority(key)<1000
-    );
+    fragment.appendChild(button);
   }
 
-  tabs.replaceChildren(
-    fragment
-  );
+  tabs.replaceChildren(fragment);
+  tabs.scrollLeft=previousScroll;
+  updateActiveTabs();
 }
 
 function renderRecent(){
@@ -6623,120 +6517,311 @@ function hydrateEventMeta(event,index,meta){
     });
 }
 
-function renderMatches(){
+function setRowIndex(row,number){
+  if(row.__n===number){
+    return;
+  }
+
+  row.__n=number;
+
+  if(!row.__idx){
+    row.__idx=row.querySelector(".channel-index");
+  }
+
+  if(row.__idx){
+    row.__idx.textContent=String(number).padStart(2,"0");
+  }
+}
+
+function setRowFavorite(row,favorite){
+  if(row.__fav===favorite){
+    return;
+  }
+
+  row.__fav=favorite;
+
+  if(!row.__favBtn){
+    row.__favBtn=row.querySelector(".fav-toggle");
+  }
+
+  const btn=row.__favBtn;
+
+  if(btn){
+    btn.classList.toggle("active",favorite);
+    btn.setAttribute("aria-pressed",favorite?"true":"false");
+    btn.setAttribute("aria-label",(favorite?"Remove from":"Add to")+" favorites");
+  }
+}
+
+function syncRowMeta(row,meta,event){
+  const titleEl=row.querySelector(".channel-copy strong");
+  const leagueEl=row.querySelector(".channel-copy small");
+  const badge=row.querySelector(".live-badge");
+  const title=meta.title||"Live channel";
+  const league=meta.league||"Live feed";
+  const time=meta.time||event?.time||"ONLINE";
+
+  if(titleEl&&titleEl.textContent!==title){
+    titleEl.textContent=title;
+  }
+
+  if(leagueEl&&leagueEl.textContent!==league){
+    leagueEl.textContent=league;
+  }
+
+  const last=badge&&badge.lastChild;
+
+  if(last&&last.nodeType===3&&last.nodeValue!==time){
+    last.nodeValue=time;
+  }
+}
+
+function buildLiveRow(event,meta){
+  const row=document.createElement("div");
+
+  row.className="server-item";
+  row.tabIndex=0;
+  row.setAttribute("role","button");
+  row.setAttribute("aria-label","Play "+meta.title);
+  row.setAttribute("title","Play "+meta.title);
+  row.dataset.channelKey=meta.key;
+
+  row.innerHTML=
+    `<div class="channel-main">`+
+      `<div class="channel-index">00</div>`+
+      `<div class="channel-copy">`+
+        `<strong>${escapeHTML(meta.title)}</strong>`+
+        `<small>${escapeHTML(meta.league||"Live feed")}</small>`+
+      `</div>`+
+    `</div>`+
+    `<div style="display:flex;align-items:center;gap:7px">`+
+      `<div class="live-badge">`+
+        `<div class="live-dot"></div>`+
+        `${escapeHTML(meta.time||event?.time||"ONLINE")}`+
+      `</div>`+
+      `<button class="fav-toggle" type="button" aria-label="Add to favorites" aria-pressed="false">★</button>`+
+    `</div>`;
+
+  row.onclick=()=>setServer(event,row);
+
+  row.onkeydown=ev=>{
+    if(ev.key==="Enter"||ev.key===" "){
+      ev.preventDefault();
+      setServer(event,row);
+    }
+  };
+
+  const favButton=row.querySelector(".fav-toggle");
+
+  if(favButton){
+    favButton.onclick=ev=>{
+      ev.stopPropagation();
+
+      if(favoriteKeys.includes(meta.key)){
+        favoriteKeys=favoriteKeys.filter(key=>key!==meta.key);
+      }else{
+        favoriteKeys=[...new Set([...favoriteKeys,meta.key])];
+      }
+
+      storageSet("talhaFavorites",JSON.stringify(favoriteKeys));
+      renderMatches();
+    };
+  }
+
+  return row;
+}
+
+function replaceChildrenIfChanged(container,nodes){
+  const current=container.children;
+
+  if(current.length===nodes.length){
+    let same=true;
+
+    for(let i=0;i<nodes.length;i++){
+      if(current[i]!==nodes[i]){
+        same=false;
+        break;
+      }
+    }
+
+    if(same){
+      return false;
+    }
+  }
+
+  const fragment=document.createDocumentFragment();
+
+  for(const node of nodes){
+    fragment.appendChild(node);
+  }
+
+  container.replaceChildren(fragment);
+
+  return true;
+}
+
+function getSearchTokens(){
+  const input=document.getElementById("searchChannels");
+  const query=normalizeSearchText((input?.value||"").trim());
+
+  return query?query.split(" ").filter(Boolean):[];
+}
+
+function getStaticSearchText(event){
+  let text=staticSearchCache.get(event);
+
+  if(text===undefined){
+    text=normalizeSearchText(`${event.title} 24/7 247 24 7 network channel`);
+    staticSearchCache.set(event,text);
+  }
+
+  return text;
+}
+
+function getVisibleStatic(){
+  const tokens=getSearchTokens();
+  const out=[];
+
+  for(let i=0;i<STATIC_CHANNELS.length;i++){
+    const event=STATIC_CHANNELS[i];
+
+    if(tokens.length){
+      const hay=getStaticSearchText(event);
+
+      if(!tokens.every(token=>hay.includes(token))){
+        continue;
+      }
+    }
+
+    out.push({event,index:i});
+  }
+
+  return out;
+}
+
+/* keeps the page from jumping when the list height changes (html has smooth scrolling) */
+function withScrollAnchor(work){
+  const anchor=document.getElementById("leagueTabs");
+  const visible=!!(anchor&&anchor.offsetParent!==null);
+  const before=visible?anchor.getBoundingClientRect().top:0;
+
+  work();
+
+  if(!visible){
+    return;
+  }
+
+  const delta=anchor.getBoundingClientRect().top-before;
+
+  if(Math.abs(delta)>1){
+    const root=document.documentElement;
+    const previous=root.style.scrollBehavior;
+
+    root.style.scrollBehavior="auto";
+    window.scrollBy(0,delta);
+    root.style.scrollBehavior=previous;
+  }
+}
+
+function renderMatches(opts){
+  const light=!!(opts&&opts.light===true);
   const container=document.getElementById("serverContainer");
 
   if(!container){
     return;
   }
 
-  const input=document.getElementById("searchChannels");
-  const rawQuery=(input?.value||"").trim();
-  const searchQuery=normalizeSearchText(rawQuery);
-  const searchTokens=searchQuery.split(" ").filter(Boolean);
-  const fragment=document.createDocumentFragment();
+  const searchTokens=getSearchTokens();
+  const hasQuery=searchTokens.length>0;
+  const showLive=currentLeague!==STATIC_FILTER_KEY;
+  const rows=[];
   let visibleCount=0;
-  let displayIndex=0;
 
-  const entries=getSortedLiveEntries();
+  if(showLive){
+    const entries=getSortedLiveEntries();
 
-  for(const entry of entries){
-    const event=entry.event;
-    const sourceIndex=entry.index;
-    const meta=getEventMeta(event,sourceIndex);
+    for(const entry of entries){
+      const event=entry.event;
+      const sourceIndex=entry.index;
+      const meta=getEventMeta(event,sourceIndex);
 
-    hydrateEventMeta(event,sourceIndex,meta);
+      hydrateEventMeta(event,sourceIndex,meta);
 
-    const leagueKey=canonicalLeagueKey(event?.league||"");
-
-    if(currentLeague!=="all"&&leagueKey!==currentLeague){
-      continue;
-    }
-
-    if(searchTokens.length&&!searchTokens.every(token=>meta.search.includes(token))){
-      continue;
-    }
-
-    displayIndex++;
-
-    const favorite=favoriteKeys.includes(meta.key);
-    const row=document.createElement("div");
-
-    row.className="server-item";
-    row.tabIndex=0;
-    row.setAttribute("role","button");
-    row.setAttribute("aria-label","Play "+meta.title);
-    row.setAttribute("title","Play "+meta.title);
-    row.dataset.channelKey=meta.key;
-    meta.row=row;
-
-    row.innerHTML=
-      `<div class="channel-main">`+
-        `<div class="channel-index">${String(displayIndex).padStart(2,"0")}</div>`+
-        `<div class="channel-copy">`+
-          `<strong>${escapeHTML(meta.title)}</strong>`+
-          `<small>${escapeHTML(meta.league||"Live feed")}</small>`+
-        `</div>`+
-      `</div>`+
-      `<div style="display:flex;align-items:center;gap:7px">`+
-        `<div class="live-badge">`+
-          `<div class="live-dot"></div>`+
-          `${escapeHTML(meta.time||event?.time||"ONLINE")}`+
-        `</div>`+
-        `<button class="fav-toggle ${favorite?"active":""}" type="button" aria-label="${favorite?"Remove from":"Add to"} favorites" aria-pressed="${favorite}">★</button>`+
-      `</div>`;
-
-    row.onclick=()=>setServer(event,row);
-
-    row.onkeydown=ev=>{
-      if(ev.key==="Enter"||ev.key===" "){
-        ev.preventDefault();
-        setServer(event,row);
+      if(currentLeague!=="all"&&getEventLeagueKey(event)!==currentLeague){
+        continue;
       }
-    };
 
-    const favButton=row.querySelector(".fav-toggle");
+      if(hasQuery&&!searchTokens.every(token=>meta.search.includes(token))){
+        continue;
+      }
 
-    if(favButton){
-      favButton.onclick=ev=>{
-        ev.stopPropagation();
+      visibleCount++;
 
-        if(favorite){
-          favoriteKeys=favoriteKeys.filter(key=>key!==meta.key);
-        }else{
-          favoriteKeys=[...new Set([...favoriteKeys,meta.key])];
-        }
+      let row=liveRowCache.get(event);
 
-        storageSet("talhaFavorites",JSON.stringify(favoriteKeys));
-        renderMatches();
-        updateAnalytics();
-      };
+      if(!row){
+        row=buildLiveRow(event,meta);
+        liveRowCache.set(event,row);
+      }else{
+        syncRowMeta(row,meta,event);
+      }
+
+      setRowIndex(row,visibleCount);
+      setRowFavorite(row,favoriteKeys.includes(meta.key));
+      meta.row=row;
+      rows.push(row);
     }
 
-    fragment.appendChild(row);
-    visibleCount++;
+    if(!visibleCount){
+      const staticHasMatches=currentLeague==="all"&&hasQuery&&getVisibleStatic().length>0;
+
+      if(!staticHasMatches){
+        const empty=document.createElement("div");
+
+        empty.className="empty-state";
+        empty.textContent=hasQuery
+          ? "No channels match your search."
+          : "No channels match your filters.";
+        rows.push(empty);
+      }
+    }
   }
 
-  if(!visibleCount){
-    const empty=document.createElement("div");
-    empty.className="empty-state";
-    empty.textContent=searchQuery
-      ? "No channels match your search."
-      : "No channels match your filters.";
-    fragment.appendChild(empty);
-  }
+  lastLiveVisibleCount=visibleCount;
 
-  container.replaceChildren(fragment);
-  renderStaticChannels();
+  withScrollAnchor(()=>{
+    container.style.display=showLive?"":"none";
+    replaceChildrenIfChanged(container,rows);
+    renderStaticChannels();
+  });
 
   const summary=document.getElementById("channelSummary");
+
   if(summary){
-    summary.textContent=`${visibleCount} shown · ${liveEvents.length} total`;
+    summary.textContent=showLive
+      ? `${visibleCount} shown · ${liveEvents.length} total`
+      : `${getVisibleStatic().length} 24/7 channels`;
   }
 
-  updateAnalytics();
-  renderRecent();
+  if(!light){
+    updateAnalytics();
+    renderRecent();
+  }
+
   markActivePlayingButton();
+}
+
+function queueRender(){
+  if(renderQueued){
+    return;
+  }
+
+  renderQueued=true;
+
+  requestAnimationFrame(()=>{
+    renderQueued=false;
+    renderMatches({light:true});
+  });
 }
 
 function setFilter(
@@ -6745,35 +6830,21 @@ function setFilter(
 ){
   let next="all";
 
-  if(
-    type==="all"
-  ){
+  if(type==="all"){
     next="all";
-  }else if(
-    type==="league"
-  ){
-    next=
-      canonicalLeagueKey(
-        name
-      );
+  }else if(type==="league"){
+    next=(name===STATIC_FILTER_KEY||name==="all")
+      ? name
+      : canonicalLeagueKey(name);
   }else{
-    next=
-      canonicalLeagueKey(
-        type
-      );
+    next=canonicalLeagueKey(type);
   }
 
-  currentLeague=
-    next||
-    "all";
+  currentLeague=next||"all";
 
-  renderLeagueTabs();
-
-  requestAnimationFrame(
-    ()=>{
-      renderMatches();
-    }
-  );
+  /* highlight instantly, then render the list once per frame (no tab rebuild) */
+  updateActiveTabs();
+  queueRender();
 }
 
 function rememberRecent(
@@ -7043,7 +7114,7 @@ function resolvePlaybackUrl(event){
     event?.matchId||
     event?.sourceId||
     event?.id||
-    "androstreamlivetrt1";
+    (String((STATIC_CHANNELS.find(c=>/trt1$/.test(c.url))||{url:""}).url).split("id=")[1]||"");
 
   return `${PLAYER_BASE}?Talha=${encodeURIComponent(String(id))}`;
 }
@@ -8090,78 +8161,60 @@ function waitForPaint(){
 
 function finishCenterReveal(){
   const reveal=document.getElementById("centerReveal");
+
+  document.body.classList.remove("reveal-ready","reveal-building");
+
   if(!reveal){
-    document.body.classList.remove("reveal-ready","reveal-building");
     return;
   }
 
-  const mainCard=document.getElementById("mainCard");
-  document.body.classList.remove("reveal-ready");
-  reveal.classList.remove("active");
-  reveal.classList.add("done");
-  reveal.style.removeProperty("--reveal-radius");
+  try{
+    reveal.getAnimations?.().forEach(animation=>animation.cancel());
+  }catch(e){}
 
-  if(mainCard){
-    mainCard.style.animation="none";
-    void mainCard.offsetWidth;
-    mainCard.style.animation="";
-  }
-
-  document.body.classList.remove("reveal-building");
-
-  window.setTimeout(()=>{
-    reveal.classList.remove("done");
-  },220);
+  reveal.classList.remove("active","opening","done");
+  reveal.style.opacity="";
 }
 
-function startCenterReveal(){
+function revealDuration(normal,weak){
+  return document.body.classList.contains("low-power")?weak:normal;
+}
+
+/* step 1: fade a solid cover over the login box (opacity only = GPU, no repaint) */
+function coverForReveal(){
   const reveal=document.getElementById("centerReveal");
-  const mainCard=document.getElementById("mainCard");
-  if(!reveal){
+
+  if(!reveal||typeof reveal.animate!=="function"){
     return Promise.resolve();
   }
 
-  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
-    reveal.classList.remove("active","done");
-    reveal.style.removeProperty("--reveal-radius");
-    document.body.classList.remove("reveal-ready","reveal-building");
-    return Promise.resolve();
-  }
-
-  const radius=Math.ceil(Math.hypot(window.innerWidth,window.innerHeight)/2)+110;
-  const duration=1500;
-  const start=performance.now();
-
-  document.body.classList.add("reveal-ready","reveal-building");
-  reveal.classList.remove("done");
   reveal.classList.add("active");
-  reveal.style.setProperty("--reveal-radius","0px");
 
-  if(mainCard){
-    mainCard.style.animation="none";
-    void mainCard.offsetWidth;
-    mainCard.style.animation="";
+  const animation=reveal.animate(
+    [{opacity:0},{opacity:1}],
+    {duration:revealDuration(220,120),easing:"ease-out",fill:"forwards"}
+  );
+
+  return animation.finished.catch(()=>{});
+}
+
+/* step 2: UI was built under the cover, now just fade the cover out */
+function openCenterReveal(){
+  const reveal=document.getElementById("centerReveal");
+
+  if(!reveal||typeof reveal.animate!=="function"){
+    finishCenterReveal();
+    return Promise.resolve();
   }
 
-  return new Promise(resolve=>{
-    const frame=now=>{
-      const elapsed=now-start;
-      const t=Math.min(1,elapsed/duration);
-      const eased=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
-      const current=radius*eased;
-      reveal.style.setProperty("--reveal-radius",current+"px");
+  reveal.classList.add("opening");
 
-      if(t<1){
-        requestAnimationFrame(frame);
-        return;
-      }
+  const animation=reveal.animate(
+    [{opacity:1},{opacity:0}],
+    {duration:revealDuration(560,220),easing:"cubic-bezier(.22,1,.36,1)",fill:"forwards"}
+  );
 
-      finishCenterReveal();
-      resolve();
-    };
-
-    requestAnimationFrame(frame);
-  });
+  return animation.finished.catch(()=>{}).then(finishCenterReveal);
 }
 
 async function login(){
@@ -8268,8 +8321,10 @@ async function login(){
     const appHeader=document.getElementById("appHeader");
     const statusStrip=document.getElementById("statusStrip");
 
+    /* cover first, build the heavy UI while nobody can see it, then fade it away */
+    await coverForReveal();
+
     if(loginBox){
-      loginBox.classList.add("login-leaving");
       loginBox.style.display="none";
     }
 
@@ -8286,25 +8341,26 @@ async function login(){
       statusStrip.style.display="flex";
     }
 
-    const revealPromise=startCenterReveal();
-
     document.body.classList.remove("auth-locked");
-
-    await revealPromise;
-
-    if(playerWrap){
-      playerWrap.classList.add("fade");
-    }
-
-    updateAnalytics();
 
     if(navigator.onLine===false||!liveEvents.length){
       loadCachedFeed();
     }
 
+    updateAnalytics();
+
+    await waitForPaint();
+    await openCenterReveal();
+
+    if(playerWrap){
+      playerWrap.classList.add("fade");
+    }
+
     startRealtimeAutoSync();
     loadTargetScript(true,"initial");
   }catch(error){
+    finishCenterReveal();
+
     setLoginBusyUI(
       false,
       "Secure configuration error. Please try again.",
@@ -8681,11 +8737,14 @@ function showFavorites(){
   }
 
   currentLeague="all";
+  updateActiveTabs();
 
   const container=document.getElementById("serverContainer");
   if(!container){
     return;
   }
+
+  container.style.display="";
 
   const fragment=document.createDocumentFragment();
   let shown=0;
@@ -9158,87 +9217,112 @@ function initLeagueWheel(){
   );
 }
 
+function buildStaticRow(event,index){
+  const key=eventKey(event,index);
+  const row=document.createElement("div");
+
+  row.className="server-item";
+  row.tabIndex=0;
+  row.setAttribute("role","button");
+  row.setAttribute("aria-label","Play "+event.title);
+  row.setAttribute("title","Play "+event.title);
+  row.dataset.channelKey=key;
+
+  row.innerHTML=
+    `<div class="channel-main">`+
+      `<div class="channel-index">00</div>`+
+      `<div class="channel-copy">`+
+        `<strong>${escapeHTML(event.title)}</strong>`+
+        `<small>24/7 Network</small>`+
+      `</div>`+
+    `</div>`+
+    `<div style="display:flex;align-items:center;gap:7px">`+
+      `<div class="live-badge"><div class="live-dot"></div>24/7</div>`+
+      `<button class="fav-toggle" type="button" aria-label="Add to favorites" aria-pressed="false">★</button>`+
+    `</div>`;
+
+  row.onclick=()=>setServer(event,row);
+
+  row.onkeydown=ev=>{
+    if(ev.key==="Enter"||ev.key===" "){
+      ev.preventDefault();
+      setServer(event,row);
+    }
+  };
+
+  const favButton=row.querySelector(".fav-toggle");
+
+  if(favButton){
+    favButton.onclick=ev=>{
+      ev.stopPropagation();
+
+      if(favoriteKeys.includes(key)){
+        favoriteKeys=favoriteKeys.filter(item=>item!==key);
+      }else{
+        favoriteKeys=[...new Set([...favoriteKeys,key])];
+      }
+
+      storageSet("talhaFavorites",JSON.stringify(favoriteKeys));
+      renderMatches();
+    };
+  }
+
+  return row;
+}
+
 function renderStaticChannels(force=false){
   const container=document.getElementById("staticServerContainer");
+  const wrap=document.getElementById("staticSectionWrap");
 
   if(!container){
     return;
   }
 
-  if(!force&&lastStaticStart===liveEvents.length&&container.childElementCount){
+  const onlyStatic=currentLeague===STATIC_FILTER_KEY;
+  const hideSection=!STATIC_CHANNELS.length||(currentLeague!=="all"&&!onlyStatic);
+
+  if(wrap){
+    wrap.style.display=hideSection?"none":"";
+    wrap.style.marginTop=onlyStatic?"12px":"18px";
+  }
+
+  if(hideSection){
     return;
   }
 
-  lastStaticStart=liveEvents.length;
-
-  const fragment=document.createDocumentFragment();
+  const visible=getVisibleStatic();
   const countEl=document.getElementById("staticChannelCount");
 
   if(countEl){
-    countEl.textContent=String(STATIC_CHANNELS.length);
+    countEl.textContent=String(getSearchTokens().length?visible.length:STATIC_CHANNELS.length);
   }
 
-  const startIndex=liveEvents.length;
+  const base=currentLeague==="all"?lastLiveVisibleCount:0;
+  const nodes=[];
 
-  for(let index=0;index<STATIC_CHANNELS.length;index++){
-    const event=STATIC_CHANNELS[index];
-    const channelNumber=startIndex+index+1;
-    const key=eventKey(event,index);
-    const favorite=favoriteKeys.includes(key);
-    const row=document.createElement("div");
+  for(let pos=0;pos<visible.length;pos++){
+    const item=visible[pos];
+    let row=staticRowCache.get(item.event);
 
-    row.className="server-item";
-    row.tabIndex=0;
-    row.setAttribute("role","button");
-    row.setAttribute("aria-label","Play "+event.title);
-    row.setAttribute("title","Play "+event.title);
-    row.dataset.channelKey=key;
-
-    row.innerHTML=
-      `<div class="channel-main">`+
-        `<div class="channel-index">${String(channelNumber).padStart(2,"0")}</div>`+
-        `<div class="channel-copy">`+
-          `<strong>${escapeHTML(event.title)}</strong>`+
-          `<small>24/7 Network</small>`+
-        `</div>`+
-      `</div>`+
-      `<div style="display:flex;align-items:center;gap:7px">`+
-        `<div class="live-badge"><div class="live-dot"></div>24/7</div>`+
-        `<button class="fav-toggle ${favorite?"active":""}" type="button" aria-label="${favorite?"Remove from":"Add to"} favorites" aria-pressed="${favorite}">★</button>`+
-      `</div>`;
-
-    row.onclick=()=>setServer(event,row);
-
-    row.onkeydown=ev=>{
-      if(ev.key==="Enter"||ev.key===" "){
-        ev.preventDefault();
-        setServer(event,row);
-      }
-    };
-
-    const favButton=row.querySelector(".fav-toggle");
-
-    if(favButton){
-      favButton.onclick=ev=>{
-        ev.stopPropagation();
-
-        if(favorite){
-          favoriteKeys=favoriteKeys.filter(item=>item!==key);
-        }else{
-          favoriteKeys=[...new Set([...favoriteKeys,key])];
-        }
-
-        storageSet("talhaFavorites",JSON.stringify(favoriteKeys));
-        renderMatches();
-        renderStaticChannels(true);
-        updateAnalytics();
-      };
+    if(!row){
+      row=buildStaticRow(item.event,item.index);
+      staticRowCache.set(item.event,row);
     }
 
-    fragment.appendChild(row);
+    setRowIndex(row,base+pos+1);
+    setRowFavorite(row,favoriteKeys.includes(row.dataset.channelKey));
+    nodes.push(row);
   }
 
-  container.replaceChildren(fragment);
+  if(!nodes.length){
+    const empty=document.createElement("div");
+
+    empty.className="empty-state";
+    empty.textContent="No 24/7 channels match your search.";
+    nodes.push(empty);
+  }
+
+  replaceChildrenIfChanged(container,nodes);
 }
 
 const BD_TIME_ZONE="Asia/Dhaka";
