@@ -2631,7 +2631,6 @@ let lastTabsSignature="";
 let lastLiveVisibleCount=0;
 let renderQueued=false;
 
-/* 24/7 channel list lives inside the encrypted config (same AES-GCM blob as the other links) */
 CONFIG_READY.then(config=>{
   const list=Array.isArray(config&&config.static)?config.static:[];
 
@@ -6842,7 +6841,6 @@ function setFilter(
 
   currentLeague=next||"all";
 
-  /* highlight instantly, then render the list once per frame (no tab rebuild) */
   updateActiveTabs();
   queueRender();
 }
@@ -8180,7 +8178,6 @@ function revealDuration(normal,weak){
   return document.body.classList.contains("low-power")?weak:normal;
 }
 
-/* step 1: fade a solid cover over the login box (opacity only = GPU, no repaint) */
 function coverForReveal(){
   const reveal=document.getElementById("centerReveal");
 
@@ -8198,7 +8195,6 @@ function coverForReveal(){
   return animation.finished.catch(()=>{});
 }
 
-/* step 2: UI was built under the cover, now just fade the cover out */
 function openCenterReveal(){
   const reveal=document.getElementById("centerReveal");
 
@@ -8321,7 +8317,6 @@ async function login(){
     const appHeader=document.getElementById("appHeader");
     const statusStrip=document.getElementById("statusStrip");
 
-    /* cover first, build the heavy UI while nobody can see it, then fade it away */
     await coverForReveal();
 
     if(loginBox){
