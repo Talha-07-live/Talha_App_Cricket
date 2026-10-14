@@ -10573,7 +10573,7 @@ Tumi je channel/league choose korcho seta follow kore guide dite pari, page-er n
           setStatus('AI connected · secure site proxy');
         }catch(error){
           setStatus('AI API unavailable · local help active');
-          answer=localReply(question)+`\n\n(Note: shared AI service currently unavailable: ${String(error?.message||'network/limit issue').slice(0,150)}. Built-in page help cholche.)`;
+          answer=localReply(question)+`\n\n(Note: service currently unavailable: ${String(error?.message||'network/limit issue').slice(0,150)}. Built-in page help cholche.)`;
         }
       }else{
         setStatus('Page helper ready · secure AI service not connected');
