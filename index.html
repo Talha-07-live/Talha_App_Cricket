@@ -10067,7 +10067,7 @@ updateAnalytics();
 
 Tumi je channel/league choose korcho seta follow kore guide dite pari, page-er next step bolte pari, player problem troubleshoot korte pari, ar live/upcoming football fixture-o dekhate pari.
 
-Ami tomar page-er current state onujayi guide dite pari. Full AI chat backend connect thakle aro natural answer pabe; key charao basic help, quick actions, ar match list available.</div>
+</div>
       </div>
       <div id="sbSuggestions">
         <button class="sb-chip" type="button" data-sb-prompt="Ekhon page-e amar next step ki?">✨ What's next?</button>
@@ -10113,7 +10113,7 @@ Ami tomar page-er current state onujayi guide dite pari. Full AI chat backend co
   const LEGACY_KEY_STORE = 'talhaStreamBuddyGeminiKeyV1';
   const FIXTURE_STORE = 'talhaStreamBuddyFixturesV1';
   const DEFAULT_MODEL = 'gemini-3.8-flash';
-  const DEFAULT_PROXY_URL = 'https://buddyai.talha07.workers.dev/'; // Set to your deployed Cloudflare Worker URL. The same Worker serves AI POST / and ESPN GET /fixtures.
+  const DEFAULT_PROXY_URL = 'https://buddyai.talha07.workers.dev';
   const LEAGUES = [
     {id:'eng.1',name:'Premier League'},
     {id:'esp.1',name:'La Liga'},
@@ -10301,8 +10301,6 @@ Ami tomar page-er current state onujayi guide dite pari. Full AI chat backend co
   async function fetchLeagueFixtures(league){
     const dates = dateRangeBD(6);
     const directUrl = `https://site.api.espn.com/apis/site/v2/sports/soccer/${encodeURIComponent(league.id)}/scoreboard?dates=${dates}`;
-    // Prefer the same-origin-allowlisted Cloudflare Worker relay to avoid browser CORS/network blocks.
-    // If the Worker URL has not been configured, try ESPN directly as a best-effort fallback.
     const url = proxyUrl
       ? `${proxyUrl.replace(/\/$/,'')}/fixtures?league=${encodeURIComponent(league.id)}&dates=${encodeURIComponent(dates)}`
       : directUrl;
@@ -10316,7 +10314,7 @@ Ami tomar page-er current state onujayi guide dite pari. Full AI chat backend co
       return events.map(ev=>normalizeFixture(ev,league.name)).filter(Boolean);
     } catch(error){
       if(!proxyUrl && (error instanceof TypeError || error?.name === 'AbortError')){
-        throw new Error('Browser cannot reach ESPN directly (likely CORS/network block). Configure the Cloudflare Worker URL in DEFAULT_PROXY_URL to use /fixtures relay.');
+        throw new Error('Browser cannot reach ESPN directly (likely CORS/network block).');
       }
       throw error;
     } finally { clearTimeout(timer); }
@@ -10384,7 +10382,7 @@ Ami tomar page-er current state onujayi guide dite pari. Full AI chat backend co
       list.innerHTML = '';
       const empty = document.createElement('div');
       empty.className = 'sb-fixture-empty';
-      empty.textContent = fixtureList.length ? `${fixtureError} Showing the last cached fixture list.` : `${fixtureError} Check the internet connection and tap Refresh. No ESPN API key is needed; if browser access is blocked, configure the Cloudflare Worker relay in DEFAULT_PROXY_URL.`;
+      empty.textContent = fixtureList.length ? `${fixtureError} Showing the last cached fixture list.` : `${fixtureError} Check the internet connection and tap Refresh.`;
       list.appendChild(empty);
       if(fixtureList.length) renderFixtureCards(list,fixtureList);
       return;
@@ -10465,7 +10463,7 @@ Ami tomar page-er current state onujayi guide dite pari. Full AI chat backend co
     if(/(favorite|favourite|save|star|recent)/i.test(q)) return 'Kono channel-er ★ icon tap kore favorite save/unsave koro. Tarpor ★ Favorites button ba Quick help → Open my favorites use koro. Recently Watched dekhte Quick Menu → Recently Watched open koro.';
     if(/(refresh|sync|feed|channel load|channel nai|channel dekhacche na|not loading)/i.test(q)) return `Live feed-er jonno header/Quick Menu theke Sync Live Feed use koro. Ekhon feed status: ${ctx.feedStatus}; feed item count: ${ctx.channelFeedCount}. Jodi empty thake, internet connection check kore abar sync koro. Kono feed source offline hole shob channel ek sathe nao aste pare.`;
     if(/(cinema|theatre|focus)/i.test(q)) return 'Cinema Mode video player-ke boro kore; Focus View surrounding panel hide kore. Assistant-er Quick help tab theke ek tap-e activate korte paro. Esc diye Cinema Mode ber howa jay.';
-    if(/(api key|gemini|ai connect|ai setup|full ai)/i.test(q)) return 'Full AI chat website backend-er maddhome enable kora hoy. API key frontend-e rakha hoy na; site owner Cloudflare Worker secret configure korle AI connect hobe. Ekhon-o built-in page guide, quick help ebong fixture list use korte parbe.';
+    if(/(api key|gemini|ai connect|ai setup|full ai)/i.test(q)) return 'Ekhon-o built-in page guide, quick help ebong fixture list use korte parbe';
     if(/(hello|hi|hey|salam|assalamu|kemon|hello buddy)/i.test(q)) return 'Hey! 🐾 Ami ready. Channel guide, player troubleshooting, page-er next step, ar live/upcoming football fixtures—jeta lagbe bolo. Matches tab-e fixtures, Quick help tab-e one-tap action ache.';
     return `Ami tomar page context dekhchi.\n\nSession: ${ctx.session}\nSelected stream: ${ctx.currentPlaying}\nFilter: ${ctx.selectedLeague}\nSearch: ${ctx.channelSearch}\nFeed status: ${ctx.feedStatus}\nLast action: ${ctx.lastUserAction}\n\nSpecific help pete “player black screen”, “show upcoming matches”, “next step ki”, ba “channel khuje dao” likho. Full AI reply backend connection-er upor depend kore; site owner server-side AI proxy configure korle natural AI chat cholbe.`;
   }
