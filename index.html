@@ -10099,7 +10099,7 @@ Ami tomar page-er current state onujayi guide dite pari. Full AI chat backend co
         <button class="sb-help-action" type="button" data-sb-action="audio"><span class="sb-help-icon">🔊</span><span><strong>No sound / buffering</strong><small>Check player mute, network connection, and try another source.</small></span></button>
       </div>
     </section>
-    <footer id="sbFooter">Stream Buddy · Context-aware help · Fixtures: ESPN scoreboard · Times: BDT</footer>
+    <footer id="sbFooter">Stream Buddy · Context-aware help · Fixtures: ESPN via Worker relay · Times: BDT</footer>
   </section>
 </div>
 
@@ -10113,7 +10113,7 @@ Ami tomar page-er current state onujayi guide dite pari. Full AI chat backend co
   const LEGACY_KEY_STORE = 'talhaStreamBuddyGeminiKeyV1';
   const FIXTURE_STORE = 'talhaStreamBuddyFixturesV1';
   const DEFAULT_MODEL = 'gemini-3.8-flash';
-  const DEFAULT_PROXY_URL = '';
+  const DEFAULT_PROXY_URL = 'https://buddyai.talha07.workers.dev/'; // Set to your deployed Cloudflare Worker URL. The same Worker serves AI POST / and ESPN GET /fixtures.
   const LEAGUES = [
     {id:'eng.1',name:'Premier League'},
     {id:'esp.1',name:'La Liga'},
@@ -10299,15 +10299,26 @@ Ami tomar page-er current state onujayi guide dite pari. Full AI chat backend co
     return new Date(a.date)-new Date(b.date);
   }
   async function fetchLeagueFixtures(league){
-    const url = `https://site.api.espn.com/apis/site/v2/sports/soccer/${encodeURIComponent(league.id)}/scoreboard?dates=${dateRangeBD(6)}`;
+    const dates = dateRangeBD(6);
+    const directUrl = `https://site.api.espn.com/apis/site/v2/sports/soccer/${encodeURIComponent(league.id)}/scoreboard?dates=${dates}`;
+    // Prefer the same-origin-allowlisted Cloudflare Worker relay to avoid browser CORS/network blocks.
+    // If the Worker URL has not been configured, try ESPN directly as a best-effort fallback.
+    const url = proxyUrl
+      ? `${proxyUrl.replace(/\/$/,'')}/fixtures?league=${encodeURIComponent(league.id)}&dates=${encodeURIComponent(dates)}`
+      : directUrl;
     const controller = new AbortController();
-    const timer = setTimeout(()=>controller.abort(),10000);
+    const timer = setTimeout(()=>controller.abort(),12000);
     try{
       const response = await fetch(url,{method:'GET',headers:{'Accept':'application/json'},signal:controller.signal,cache:'no-store'});
-      if(!response.ok) throw new Error(`HTTP ${response.status}`);
+      if(!response.ok) throw new Error(`HTTP ${response.status}${proxyUrl?' from fixture relay':''}`);
       const json = await response.json();
       const events = Array.isArray(json.events) ? json.events : [];
       return events.map(ev=>normalizeFixture(ev,league.name)).filter(Boolean);
+    } catch(error){
+      if(!proxyUrl && (error instanceof TypeError || error?.name === 'AbortError')){
+        throw new Error('Browser cannot reach ESPN directly (likely CORS/network block). Configure the Cloudflare Worker URL in DEFAULT_PROXY_URL to use /fixtures relay.');
+      }
+      throw error;
     } finally { clearTimeout(timer); }
   }
   async function loadFixtures(force = false){
@@ -10339,7 +10350,7 @@ Ami tomar page-er current state onujayi guide dite pari. Full AI chat backend co
       const bad = settled.length-good.length;
       if(!good.length){
         fixtureList = previousFixtures;
-        fixtureError = 'ESPN feed could not be reached from this browser.';
+        fixtureError = proxyUrl ? 'The Cloudflare fixture relay could not reach ESPN. Check Worker deployment and try Refresh.' : 'ESPN is blocked from this browser (CORS/network). Deploy the Worker and set DEFAULT_PROXY_URL to enable its /fixtures relay.';
         renderFixtures(bad);
         setStatus('Fixture feed unavailable · cached data kept');
         return fixtureList;
@@ -10373,7 +10384,7 @@ Ami tomar page-er current state onujayi guide dite pari. Full AI chat backend co
       list.innerHTML = '';
       const empty = document.createElement('div');
       empty.className = 'sb-fixture-empty';
-      empty.textContent = fixtureList.length ? `${fixtureError} Showing the last cached fixture list.` : `${fixtureError} Check the internet connection and tap Refresh. This feed is public and does not require a key.`;
+      empty.textContent = fixtureList.length ? `${fixtureError} Showing the last cached fixture list.` : `${fixtureError} Check the internet connection and tap Refresh. No ESPN API key is needed; if browser access is blocked, configure the Cloudflare Worker relay in DEFAULT_PROXY_URL.`;
       list.appendChild(empty);
       if(fixtureList.length) renderFixtureCards(list,fixtureList);
       return;
