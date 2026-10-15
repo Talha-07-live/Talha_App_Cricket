@@ -10166,6 +10166,14 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
   const DEFAULT_PROXY_URL = 'https://buddyai.talha07.workers.dev';
   const SPORTSDB_BASE = 'https://www.thesportsdb.com/api/v1/json/123';
   const GOOGLE_SCORES_URL = 'https://www.google.com/search?q=football+scores';
+  const ESPN_LEAGUES = [
+    {slug:'eng.1',name:'Premier League'},
+    {slug:'esp.1',name:'La Liga'},
+    {slug:'ger.1',name:'Bundesliga'},
+    {slug:'ita.1',name:'Serie A'},
+    {slug:'fra.1',name:'Ligue 1'},
+    {slug:'uefa.champions',name:'UEFA Champions League'}
+  ];
   const LEAGUES = [
     {id:'4328',name:'Premier League'},
     {id:'4335',name:'La Liga'},
@@ -10412,6 +10420,43 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
     const events = Array.isArray(json.events) ? json.events : [];
     return events.map(event=>normalizeSportsDbFixture(event,league.name)).filter(Boolean);
   }
+  function normalizeEspnFixture(event, leagueName){
+    const competition = event?.competitions?.[0];
+    const competitors = Array.isArray(competition?.competitors) ? competition.competitors : [];
+    const home = competitors.find(c=>c.homeAway==='home') || competitors[0];
+    const away = competitors.find(c=>c.homeAway==='away') || competitors[1];
+    const status = event?.status?.type || competition?.status?.type || {};
+    const state = String(status.state || '').toLowerCase();
+    const completed = Boolean(status.completed) || state==='post';
+    if(completed || !home?.team?.displayName || !away?.team?.displayName || !event?.date) return null;
+    const live = state==='in';
+    const homeScore = home.score ?? '';
+    const awayScore = away.score ?? '';
+    const score = live && homeScore !== '' && awayScore !== '' ? `${homeScore} – ${awayScore}` : (live ? 'LIVE' : 'vs');
+    const statusText = String(status.shortDetail || status.detail || (live ? 'LIVE' : 'Upcoming')).trim();
+    const homeName = String(home.team.displayName);
+    const awayName = String(away.team.displayName);
+    return {
+      id:String(event.id || `${leagueName}-${event.date}-${homeName}-${awayName}`),
+      date:event.date,
+      timeKnown:true,
+      league:leagueName,
+      home:homeName,
+      away:awayName,
+      state:live?'in':'pre',
+      live,
+      status:statusText,
+      score,
+      featured:isFeaturedTeam(homeName) || isFeaturedTeam(awayName),
+      pageLink:`https://www.google.com/search?q=${encodeURIComponent(`${homeName} vs ${awayName} ${leagueName} score` )}`
+    };
+  }
+  async function fetchEspnFixtures(league){
+    const url = `https://site.api.espn.com/apis/site/v2/sports/soccer/${encodeURIComponent(league.slug)}/scoreboard?dates=${dateRangeBD(8)}&limit=100`;
+    const json = await requestSportsData(url);
+    const events = Array.isArray(json.events) ? json.events : [];
+    return events.map(event=>normalizeEspnFixture(event,league.name)).filter(Boolean);
+  }
   async function loadFixtures(force = false){
     if(fixturePromise) return fixturePromise;
     const now = Date.now();
@@ -10441,12 +10486,13 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
       const good = settled.filter(x=>x.status==='fulfilled');
       if(!good.length){
         fixtureList = previousFixtures;
-        fixtureError = 'unavailable';
-        renderFixtures();
-        setStatus('Ready to help');
-        return fixtureList;
       }
-      const items = good.flatMap(x=>x.value);
+      let items = good.flatMap(x=>x.value);
+      if(!items.length){
+        const fallbackSettled = await Promise.allSettled(ESPN_LEAGUES.map(fetchEspnFixtures));
+        items = fallbackSettled.filter(x=>x.status==='fulfilled').flatMap(x=>x.value);
+      }
+      if(!items.length) throw new Error('No live or upcoming matches returned');
       const seen = new Set();
       fixtureList = items.filter(item=>{
         const k = `${item.date}|${item.home}|${item.away}`;
@@ -10583,6 +10629,8 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
       model:DEFAULT_MODEL,
       contents,
       context:getContext(),
+      systemInstruction:buildSystemInstruction(),
+      userIntent:wantsMatches(question) ? 'Explain live and upcoming football matches inside the Buddy chat using only the supplied fixture feed.' : 'Answer the user using the current page context.',
       fixtures:fixtureList.slice(0,12).map(f=>({league:f.league,home:f.home,away:f.away,state:f.state,status:f.status,score:f.score,date:f.date,featured:f.featured}))
     };
     const controller = new AbortController();
@@ -10673,6 +10721,12 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
       else if(proxyUrl){
         try{
           answer=await askGemini(question);
+          if(wantsMatches(question) && fixtureList.length){
+            const grounded=fixturesSummary();
+            if(!answer || !fixtureList.some(f=>answer.toLowerCase().includes(String(f.home).toLowerCase()))){
+              answer=`${grounded}\n\nAI explanation: Ei list-er LIVE match-gulo ekhon cholche, আর UPCOMING match-gulo Bangladesh time অনুযায়ী পরে শুরু হবে। Specific match-er detail chaile team-er naam bolo.`;
+            }
+          }
           setStatus('Ready to help');
         }catch(error){
           setStatus('Ready to help');
