@@ -2186,10 +2186,19 @@ body.low-power .card::after{
 #sbLauncher:after{content:"";position:absolute;inset:-70% 35% 35% -70%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.85),transparent);transform:rotate(18deg);animation:sbLauncherShine 3.8s ease-in-out infinite;pointer-events:none}
 #sbLauncher:hover{filter:brightness(1.08) saturate(1.08);transform:translateY(-3px) scale(1.03);box-shadow:0 18px 38px rgba(0,0,0,.45),0 0 0 6px rgba(192,132,252,.2),0 0 36px rgba(103,232,249,.38),inset 0 1px 1px rgba(255,255,255,.95)}
 #sbLauncher.dragging{cursor:grabbing;transition:none;filter:brightness(1.08);box-shadow:0 15px 32px rgba(0,0,0,.42),0 0 0 6px rgba(192,132,252,.2)}
-#sbLauncher .sb-pet-face{display:block;width:45px;height:45px;line-height:1;filter:drop-shadow(0 3px 3px rgba(50,30,70,.3));animation:sbPetFloat 2.8s ease-in-out infinite;pointer-events:none}
+#sbLauncher .sb-pet-face{display:block;width:45px;height:45px;line-height:1;filter:drop-shadow(0 3px 3px rgba(20,220,255,.3));animation:sbPetFloat 2.8s ease-in-out infinite;pointer-events:none}
 #sbLauncher .sb-pet-face svg{display:block;width:100%;height:100%;overflow:visible}
 #sbLauncher .sb-pet-spark{position:absolute;top:3px;right:4px;font-size:11px;color:#fff9c2;text-shadow:0 1px 4px rgba(70,40,100,.7);animation:sbSpark 1.8s ease-in-out infinite;pointer-events:none}
 #sbLauncher .sb-pet-online{position:absolute;bottom:3px;left:3px;width:8px;height:8px;border-radius:50%;background:#43f4bc;border:2px solid #51417d;pointer-events:none}
+#sbLauncher .sb-robot-arm{transform-box:fill-box;transform-origin:80% 75%;}
+#sbLauncher .sb-robot-eye{transform-box:fill-box;transform-origin:center;}
+#sbLauncher .sb-robot-aura{transform-box:fill-box;transform-origin:center;opacity:0;}
+#sbLauncher.sb-say-hello .sb-robot-arm{animation:sbRobotWave .72s ease-in-out 5}
+#sbLauncher.sb-say-hello .sb-robot-eye{animation:sbRobotBlink .2s ease-in-out 3}
+#sbLauncher.sb-say-hello .sb-robot-mouth{animation:sbRobotMouth 1.1s ease-in-out 3}
+#sbLauncher.sb-aura-pop .sb-robot-aura{animation:sbAuraPop 2.4s cubic-bezier(.16,1,.3,1) both}
+#sbLauncher .sb-hello-bubble{position:absolute;right:-5px;top:-28px;padding:5px 8px;border:1px solid rgba(255,255,255,.55);border-radius:999px;background:linear-gradient(135deg,#12254e,#7536a8);color:#fff;font-size:9px;font-weight:900;letter-spacing:.25px;white-space:nowrap;opacity:0;transform:translateY(5px) scale(.8);pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+#sbLauncher.sb-say-hello .sb-hello-bubble{animation:sbHelloPop 4.2s ease both}
 #sbLauncher[aria-expanded="true"]{filter:brightness(1.04)}
 #sbPanel{position:fixed;left:auto;right:18px;top:auto;bottom:calc(91px + var(--sb-keyboard-gap) + var(--sb-safe-bottom));z-index:10084;width:min(390px,calc(100vw - 24px));height:min(650px,calc(100dvh - 120px - var(--sb-keyboard-gap)));min-height:420px;display:flex;flex-direction:column;overflow:hidden;border-radius:23px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(155deg,rgba(18,15,33,.99),rgba(5,7,16,.99));box-shadow:0 25px 70px rgba(0,0,0,.58),0 0 42px rgba(124,58,237,.15),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);transform-origin:bottom right;animation:sbPanelIn .2s cubic-bezier(.2,.85,.25,1) both}
 #sbHeader{display:flex;align-items:center;gap:10px;padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(105deg,rgba(124,58,237,.2),rgba(6,182,212,.06))}
@@ -2254,6 +2263,11 @@ body.low-power .card::after{
 .sb-help-action small{display:block;margin-top:3px;color:rgba(255,255,255,.43);font-size:9px;line-height:1.45}
 #sbFooter{padding:8px 12px;border-top:1px solid rgba(255,255,255,.06);font-size:8px;line-height:1.4;color:rgba(255,255,255,.3);text-align:center}
 @keyframes sbPetFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes sbRobotWave{0%,100%{transform:rotate(0deg)}35%{transform:rotate(24deg)}65%{transform:rotate(-18deg)}}
+@keyframes sbRobotBlink{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.08)}}
+@keyframes sbRobotMouth{0%,100%{transform:scaleX(1);opacity:.75}50%{transform:scaleX(1.35);opacity:1}}
+@keyframes sbAuraPop{0%{opacity:0;transform:scale(.55)}24%{opacity:.95}100%{opacity:0;transform:scale(1.65)}}
+@keyframes sbHelloPop{0%,12%{opacity:0;transform:translateY(5px) scale(.8)}20%,78%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-4px) scale(.95)}}
 @keyframes sbSpark{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}
 @keyframes sbHintIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 @keyframes sbPanelIn{from{opacity:0;transform:translateY(7px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
@@ -10056,19 +10070,23 @@ updateAnalytics();
   <div id="sbLauncherHint" role="button" tabindex="0" aria-label="Open Stream Buddy">Drag me anywhere · Tap to chat 🐾</div>
   <button id="sbLauncher" type="button" aria-label="Open Stream Buddy assistant. Drag to move, tap to chat." title="Drag me anywhere · Tap to chat" aria-expanded="false" aria-controls="sbPanel">
     <span class="sb-pet-face" aria-hidden="true">
-      <svg viewBox="0 0 64 64" role="presentation" focusable="false">
-        <path d="M12 25 9 9Q8 5 13 8L27 17M52 25 55 9Q56 5 51 8L37 17" fill="#fff0d9" stroke="#5a3d71" stroke-width="3.2" stroke-linejoin="round"/>
-        <path d="M13 17 13 12 22 19M51 17 51 12 42 19" fill="#f9a8d4"/>
-        <path d="M8 33C8 19 18 15 32 15S56 19 56 33 46 55 32 55 8 47 8 33Z" fill="#fff3dc" stroke="#5a3d71" stroke-width="3.2"/>
-        <ellipse cx="22" cy="32" rx="3.1" ry="4.2" fill="#30223f"/><ellipse cx="42" cy="32" rx="3.1" ry="4.2" fill="#30223f"/>
-        <circle cx="23" cy="30.5" r="1" fill="#fff"/><circle cx="43" cy="30.5" r="1" fill="#fff"/>
-        <ellipse cx="16.5" cy="39" rx="4.2" ry="2.5" fill="#f9a8d4" opacity=".8"/><ellipse cx="47.5" cy="39" rx="4.2" ry="2.5" fill="#f9a8d4" opacity=".8"/>
-        <path d="M29 38Q32 41 35 38Q34 46 32 46Q30 46 29 38Z" fill="#ec78a8" stroke="#5a3d71" stroke-width="1.4" stroke-linejoin="round"/>
-        <path d="M32 45Q28 49 25 45M32 45Q36 49 39 45" fill="none" stroke="#5a3d71" stroke-width="1.8" stroke-linecap="round"/>
+      <svg viewBox="0 0 80 80" role="presentation" focusable="false">
+        <defs><linearGradient id="robotShell" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset=".62" stop-color="#f1f5f9"/><stop offset="1" stop-color="#cbd5e1"/></linearGradient><radialGradient id="robotGlow"><stop stop-color="#67e8f9" stop-opacity=".85"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/></radialGradient></defs>
+        <circle class="sb-robot-aura" cx="40" cy="41" r="27" fill="none" stroke="#67e8f9" stroke-width="1.5"/><circle class="sb-robot-aura" cx="40" cy="41" r="22" fill="url(#robotGlow)" opacity=".22"/>
+        <path d="M40 13V7" stroke="#dffaff" stroke-width="2.5" stroke-linecap="round"/><circle cx="40" cy="6" r="2.8" fill="#67e8f9" stroke="#fff" stroke-width="1"/>
+        <rect x="17" y="16" width="46" height="34" rx="16" fill="url(#robotShell)" stroke="#fff" stroke-width="2"/>
+        <path d="M24 24Q40 15 56 24" fill="none" stroke="#fff" stroke-width="2" opacity=".8"/>
+        <line x1="29" y1="32" x2="51" y2="32" stroke="#30343b" stroke-width="1.7"/><circle class="sb-robot-eye" cx="29" cy="32" r="3.3" fill="#20242b"/><circle class="sb-robot-eye" cx="51" cy="32" r="3.3" fill="#20242b"/>
+        <path class="sb-robot-mouth" d="M37 39Q40 41 43 39" fill="none" stroke="#59636f" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M17 29H10M63 29H70" stroke="#dbe4ed" stroke-width="4" stroke-linecap="round"/><circle cx="9" cy="29" r="2.8" fill="#67e8f9"/>
+        <ellipse cx="40" cy="59" rx="17" ry="14" fill="url(#robotShell)" stroke="#fff" stroke-width="2"/><circle cx="40" cy="58" r="4" fill="#e0f2fe" stroke="#94a3b8" stroke-width="1.2"/>
+        <path d="M24 55 14 63" stroke="#e2e8f0" stroke-width="7" stroke-linecap="round"/><path class="sb-robot-arm" d="M56 55 68 43" stroke="#e2e8f0" stroke-width="7" stroke-linecap="round"/><path d="M67 43q5-6 9 0M67 43q7 0 7 6" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+        <path d="M32 69v6M48 69v6" stroke="#dbe4ed" stroke-width="5" stroke-linecap="round"/><path d="M26 76h11M43 76h11" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
       </svg>
     </span>
     <span class="sb-pet-spark" aria-hidden="true">✦</span>
     <span class="sb-pet-online" aria-hidden="true"></span>
+    <span class="sb-hello-bubble" aria-hidden="true">Hi! Hello! 👋</span>
   </button>
   <section id="sbPanel" role="dialog" aria-label="Stream Buddy AI assistant" hidden>
     <header id="sbHeader">
@@ -10680,9 +10698,6 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
     const keyboardGap=vv ? Math.max(0,window.innerHeight-(vv.height+vv.offsetTop)) : 0;
     root.style.setProperty('--sb-keyboard-gap',keyboardGap+'px');
     if(!$('sbPanel').hidden) positionPanelNearLauncher();
-    const r=launcher.getBoundingClientRect();
-    const view=visibleViewport();
-    if(r.bottom>view.bottom-8) setPetPosition(r.left,view.bottom-r.height-12,false);
   }
   function positionHintNearLauncher(){
     if(!hint || hint.hidden) return;
@@ -10863,6 +10878,15 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
   setTimeout(()=>{
     if($('sbPanel').hidden) $('sbLauncherHint').hidden=false;
   },1600);
+  function robotGreeting(){
+    if(!$('sbPanel').hidden) return;
+    launcher.classList.remove('sb-say-hello','sb-aura-pop');
+    void launcher.offsetWidth;
+    launcher.classList.add('sb-say-hello','sb-aura-pop');
+    setTimeout(()=>launcher.classList.remove('sb-say-hello','sb-aura-pop'),4800);
+  }
+  setTimeout(robotGreeting,5200);
+  setInterval(robotGreeting,22000);
 })();
 </script>
 
