@@ -10165,6 +10165,7 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
   const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
   const DEFAULT_PROXY_URL = 'https://buddyai.talha07.workers.dev';
   const SPORTSDB_BASE = 'https://www.thesportsdb.com/api/v1/json/123';
+  const OPENLIGADB_BASE = 'https://api.openligadb.de';
   const GOOGLE_SCORES_URL = 'https://www.google.com/search?q=football+scores';
   const ESPN_LEAGUES = [
     {slug:'eng.1',name:'Premier League'},
@@ -10457,6 +10458,20 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
     const events = Array.isArray(json.events) ? json.events : [];
     return events.map(event=>normalizeEspnFixture(event,league.name)).filter(Boolean);
   }
+  async function fetchOpenLigaFixtures(){
+    const season = getBDDateParts().year;
+    const json = await requestSportsData(`${OPENLIGADB_BASE}/getmatchdata/bl1/${season}`);
+    const matches = Array.isArray(json) ? json : [];
+    return matches.map(match=>{
+      const home = String(match?.team1?.teamName || '').trim();
+      const away = String(match?.team2?.teamName || '').trim();
+      const date = String(match?.matchDateTimeUTC || match?.matchDateTime || '').trim();
+      if(!home || !away || !date || match?.matchIsFinished) return null;
+      const result = Array.isArray(match?.matchResults) ? match.matchResults.find(r=>r.resultTypeID===2) || match.matchResults[0] : null;
+      const score = result?.pointsTeam1 != null && result?.pointsTeam2 != null ? `${result.pointsTeam1} – ${result.pointsTeam2}` : 'vs';
+      return {id:String(match.matchID || `openliga-${date}-${home}-${away}`),date,timeKnown:true,league:'Bundesliga',home,away,state:'pre',live:false,status:'Upcoming',score,featured:isFeaturedTeam(home)||isFeaturedTeam(away),pageLink:`https://www.google.com/search?q=${encodeURIComponent(`${home} vs ${away} Bundesliga score`)}`};
+    }).filter(Boolean);
+  }
   async function loadFixtures(force = false){
     if(fixturePromise) return fixturePromise;
     const now = Date.now();
@@ -10491,6 +10506,10 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
       if(!items.length){
         const fallbackSettled = await Promise.allSettled(ESPN_LEAGUES.map(fetchEspnFixtures));
         items = fallbackSettled.filter(x=>x.status==='fulfilled').flatMap(x=>x.value);
+      }
+      if(!items.length){
+        const openLiga = await Promise.allSettled([fetchOpenLigaFixtures()]);
+        items = openLiga.filter(x=>x.status==='fulfilled').flatMap(x=>x.value);
       }
       if(!items.length) throw new Error('No live or upcoming matches returned');
       const seen = new Set();
