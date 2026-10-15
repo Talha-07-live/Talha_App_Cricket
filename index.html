@@ -2273,21 +2273,34 @@ body.low-power .card::after{
 @keyframes sbPanelIn{from{opacity:0;transform:translateY(7px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes sbLauncherShine{0%,45%{transform:translate3d(-35%,-35%,0) rotate(18deg);opacity:0}58%{opacity:.9}78%,100%{transform:translate3d(155%,155%,0) rotate(18deg);opacity:0}}
 @media(max-width:600px){
-  #sbLauncher{width:60px;height:60px;border-radius:21px;right:14px}
+  #sbLauncher{width:56px;height:56px;border-radius:19px;right:12px;bottom:calc(18px + var(--sb-keyboard-gap) + var(--sb-safe-bottom))}
   #sbLauncher .sb-pet-face{width:43px;height:43px}
-  #sbLauncherHint{max-width:175px;padding:9px 11px;font-size:10px}
-  #sbPanel{left:7px;right:7px;width:auto;height:min(76dvh,620px);min-height:360px;border-radius:20px;transform-origin:center bottom}
-  #sbHeader{padding:12px 11px 10px;gap:8px}
+  #sbLauncherHint{max-width:calc(100vw - 82px);padding:9px 10px;font-size:10px}
+  #sbPanel{left:4px;right:4px;width:auto;height:min(72dvh,620px);max-height:calc(100dvh - 16px - var(--sb-keyboard-gap));min-height:0;border-radius:20px;transform-origin:center bottom}
+  #sbHeader{padding:10px 10px 9px;gap:7px}
   #sbMascot{width:35px;height:35px;border-radius:12px}
   #sbHeaderCopy strong{font-size:12px}
   #sbHeaderCopy small{font-size:9px}
-  .sb-tab{padding:8px 3px;font-size:9px}
+  .sb-head-pill{padding:5px 6px;font-size:7px}
+  .sb-head-btn{width:34px;height:34px}
+  #sbTabs{gap:4px;padding:7px 8px 6px}
+  .sb-tab{min-height:38px;padding:8px 3px;font-size:9px}
   .sb-message{font-size:10.5px}
+  #sbMessages{padding:10px 9px 6px}
+  #sbSuggestions{padding:2px 9px 7px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  #sbSuggestions::-webkit-scrollbar{display:none}
+  .sb-chip{flex:0 0 auto;min-height:34px;padding:8px 10px}
+  #sbForm{gap:6px;padding-left:8px;padding-right:8px}
+  #sbInput{min-height:44px;padding:11px 12px;font-size:16px;line-height:1.3}
+  #sbSend{width:46px;height:46px}
+  #sbChatFoot{padding-bottom:7px}
 }
 @media(max-width:360px){
-  #sbPanel{left:5px;right:5px;height:min(78dvh,600px);min-height:340px}
-  #sbLauncher{width:56px;height:56px}
+  #sbPanel{left:3px;right:3px;height:min(74dvh,580px)}
+  #sbLauncher{width:52px;height:52px}
   #sbLauncher .sb-pet-face{width:40px;height:40px}
+  .sb-head-pill{display:none}
+  #sbHeaderCopy small{max-width:130px}
 }
 @media(prefers-reduced-motion:reduce){
   #streamBuddyRoot *,#streamBuddyRoot *:before,#streamBuddyRoot *:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -10838,6 +10851,12 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
   });
   $('sbInput').addEventListener('input',()=>{
     const input=$('sbInput');input.style.height='auto';input.style.height=Math.min(input.scrollHeight,115)+'px';
+  });
+  $('sbInput').addEventListener('focus',()=>{
+    window.setTimeout(()=>{
+      updateKeyboardInset();
+      $('sbMessages').scrollTop=$('sbMessages').scrollHeight;
+    },120);
   });
   document.addEventListener('click',event=>{
     if(root.contains(event.target)) return;
