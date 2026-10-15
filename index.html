@@ -2176,20 +2176,22 @@ body.low-power .card::after{
   }
 }
 
-#streamBuddyRoot{font-family:inherit;color:#fff}
+#streamBuddyRoot{font-family:inherit;color:#fff;--sb-keyboard-gap:0px;--sb-safe-bottom:env(safe-area-inset-bottom,0px)}
 #streamBuddyRoot [hidden]{display:none!important}
 #sbLauncherHint{position:fixed;left:0;top:0;z-index:10085;max-width:190px;padding:9px 11px;border-radius:14px 14px 4px 14px;border:1px solid rgba(255,255,255,.13);background:rgba(12,10,22,.96);color:#fff;font-size:10px;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.35);cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);animation:sbHintIn .25s ease both}
 #sbLauncherHint:after{content:"";position:absolute;right:-5px;bottom:9px;width:9px;height:9px;background:#0c0a16;border-right:1px solid rgba(255,255,255,.13);border-bottom:1px solid rgba(255,255,255,.13);transform:rotate(-45deg)}
 #sbLauncherHint.sb-hint-right:after{left:-5px;right:auto;transform:rotate(135deg)}
-#sbLauncher{position:fixed;left:auto;top:auto;right:16px;bottom:36px;z-index:10086;width:49px;height:49px;border:1px solid rgba(255,255,255,.34);border-radius:18px;background:linear-gradient(145deg,#f9a8d4,#a78bfa 55%,#67e8f9);box-shadow:0 9px 25px rgba(0,0,0,.34),0 0 0 4px rgba(192,132,252,.14);display:grid;place-items:center;cursor:grab;color:#fff;transition:box-shadow .18s ease,filter .18s ease;isolation:isolate;touch-action:none;user-select:none;-webkit-user-select:none;will-change:left,top}
-#sbLauncher:hover{filter:brightness(1.06);box-shadow:0 12px 30px rgba(0,0,0,.4),0 0 0 5px rgba(192,132,252,.18)}
+#sbLauncher{position:fixed;left:auto;top:auto;right:16px;bottom:calc(36px + var(--sb-keyboard-gap) + var(--sb-safe-bottom));z-index:10086;width:64px;height:64px;padding:3px;border:1px solid rgba(255,255,255,.72);border-radius:22px;background:linear-gradient(145deg,#fff 0 5%,#f9a8d4 25%,#a78bfa 58%,#67e8f9 100%);box-shadow:0 14px 30px rgba(0,0,0,.42),0 0 0 5px rgba(192,132,252,.16),0 0 28px rgba(103,232,249,.28),inset 0 1px 1px rgba(255,255,255,.9);display:grid;place-items:center;cursor:grab;color:#fff;transition:box-shadow .22s ease,filter .22s ease,transform .22s ease;isolation:isolate;touch-action:none;user-select:none;-webkit-user-select:none;will-change:left,top,bottom;overflow:hidden}
+#sbLauncher:before{content:"";position:absolute;inset:4px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.58),transparent 32%,rgba(255,255,255,.08) 58%,rgba(255,255,255,.3));mix-blend-mode:screen;pointer-events:none;z-index:-1}
+#sbLauncher:after{content:"";position:absolute;inset:-70% 35% 35% -70%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.85),transparent);transform:rotate(18deg);animation:sbLauncherShine 3.8s ease-in-out infinite;pointer-events:none}
+#sbLauncher:hover{filter:brightness(1.08) saturate(1.08);transform:translateY(-3px) scale(1.03);box-shadow:0 18px 38px rgba(0,0,0,.45),0 0 0 6px rgba(192,132,252,.2),0 0 36px rgba(103,232,249,.38),inset 0 1px 1px rgba(255,255,255,.95)}
 #sbLauncher.dragging{cursor:grabbing;transition:none;filter:brightness(1.08);box-shadow:0 15px 32px rgba(0,0,0,.42),0 0 0 6px rgba(192,132,252,.2)}
-#sbLauncher .sb-pet-face{display:block;width:34px;height:34px;line-height:1;filter:drop-shadow(0 2px 2px rgba(50,30,70,.18));animation:sbPetFloat 2.8s ease-in-out infinite;pointer-events:none}
+#sbLauncher .sb-pet-face{display:block;width:45px;height:45px;line-height:1;filter:drop-shadow(0 3px 3px rgba(50,30,70,.3));animation:sbPetFloat 2.8s ease-in-out infinite;pointer-events:none}
 #sbLauncher .sb-pet-face svg{display:block;width:100%;height:100%;overflow:visible}
 #sbLauncher .sb-pet-spark{position:absolute;top:3px;right:4px;font-size:11px;color:#fff9c2;text-shadow:0 1px 4px rgba(70,40,100,.7);animation:sbSpark 1.8s ease-in-out infinite;pointer-events:none}
 #sbLauncher .sb-pet-online{position:absolute;bottom:3px;left:3px;width:8px;height:8px;border-radius:50%;background:#43f4bc;border:2px solid #51417d;pointer-events:none}
 #sbLauncher[aria-expanded="true"]{filter:brightness(1.04)}
-#sbPanel{position:fixed;left:auto;right:18px;top:auto;bottom:91px;z-index:10084;width:min(360px,calc(100vw - 24px));height:min(650px,calc(100dvh - 120px));min-height:420px;display:flex;flex-direction:column;overflow:hidden;border-radius:23px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(155deg,rgba(18,15,33,.99),rgba(5,7,16,.99));box-shadow:0 25px 70px rgba(0,0,0,.58),0 0 42px rgba(124,58,237,.15);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);transform-origin:bottom right;animation:sbPanelIn .2s cubic-bezier(.2,.85,.25,1) both}
+#sbPanel{position:fixed;left:auto;right:18px;top:auto;bottom:calc(91px + var(--sb-keyboard-gap) + var(--sb-safe-bottom));z-index:10084;width:min(390px,calc(100vw - 24px));height:min(650px,calc(100dvh - 120px - var(--sb-keyboard-gap)));min-height:420px;display:flex;flex-direction:column;overflow:hidden;border-radius:23px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(155deg,rgba(18,15,33,.99),rgba(5,7,16,.99));box-shadow:0 25px 70px rgba(0,0,0,.58),0 0 42px rgba(124,58,237,.15),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);transform-origin:bottom right;animation:sbPanelIn .2s cubic-bezier(.2,.85,.25,1) both}
 #sbHeader{display:flex;align-items:center;gap:10px;padding:14px 14px 12px;border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(105deg,rgba(124,58,237,.2),rgba(6,182,212,.06))}
 #sbMascot{width:39px;height:39px;flex:0 0 auto;display:grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,#8b5cf6,#06b6d4);font-size:21px;box-shadow:0 7px 18px rgba(99,102,241,.22)}
 #sbHeaderCopy{min-width:0;flex:1}
@@ -2217,11 +2219,12 @@ body.low-power .card::after{
 #sbSuggestions{display:flex;gap:6px;flex-wrap:wrap;padding:3px 12px 9px}
 .sb-chip{border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:7px 9px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.78);font-size:9px;cursor:pointer;max-width:100%}
 .sb-chip:hover{border-color:rgba(34,211,238,.32);background:rgba(6,182,212,.08);color:#fff}
-#sbForm{display:flex;align-items:flex-end;gap:8px;padding:10px 11px;border-top:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.18)}
+#sbForm{display:flex;align-items:flex-end;gap:8px;padding:10px 11px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.3);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
 #sbInput{display:block;width:100%;min-width:0;max-height:115px;min-height:42px;resize:none;padding:11px 12px;border:1px solid rgba(255,255,255,.11);border-radius:13px;background:rgba(255,255,255,.055);color:#fff;font:inherit;font-size:11px;line-height:1.4;outline:none;user-select:text;-webkit-user-select:text}
 #sbInput::placeholder{color:rgba(255,255,255,.37)}
 #sbInput:focus{border-color:rgba(139,92,246,.8)}
-#sbSend{width:42px;height:42px;flex:0 0 auto;border:0;border-radius:13px;background:linear-gradient(145deg,#8b5cf6,#0891b2);color:#fff;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 5px 14px rgba(79,70,229,.22)}
+#sbSend{width:46px;height:46px;flex:0 0 auto;border:1px solid rgba(255,255,255,.28);border-radius:15px;background:linear-gradient(145deg,#b794ff,#8b5cf6 48%,#0891b2);color:#fff;font-size:17px;font-weight:900;cursor:pointer;box-shadow:0 7px 18px rgba(79,70,229,.35),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .16s ease,filter .16s ease}
+#sbSend:hover{filter:brightness(1.1);transform:translateY(-2px)}
 #sbSend:disabled{opacity:.42;cursor:wait}
 #sbChatFoot{padding:0 13px 9px;font-size:8px;line-height:1.4;color:rgba(255,255,255,.35);text-align:center}
 #sbMatchScroll{overflow-y:auto;min-height:0;flex:1;padding:12px;scrollbar-width:thin;scrollbar-color:rgba(139,92,246,.4) transparent}
@@ -2254,11 +2257,12 @@ body.low-power .card::after{
 @keyframes sbSpark{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}
 @keyframes sbHintIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 @keyframes sbPanelIn{from{opacity:0;transform:translateY(7px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes sbLauncherShine{0%,45%{transform:translate3d(-35%,-35%,0) rotate(18deg);opacity:0}58%{opacity:.9}78%,100%{transform:translate3d(155%,155%,0) rotate(18deg);opacity:0}}
 @media(max-width:600px){
-  #sbLauncher{width:47px;height:47px;border-radius:17px}
-  #sbLauncher .sb-pet-face{width:33px;height:33px}
+  #sbLauncher{width:60px;height:60px;border-radius:21px;right:14px}
+  #sbLauncher .sb-pet-face{width:43px;height:43px}
   #sbLauncherHint{max-width:175px;padding:9px 11px;font-size:10px}
-  #sbPanel{left:8px;right:8px;width:auto;height:min(76dvh,620px);min-height:380px;border-radius:19px}
+  #sbPanel{left:7px;right:7px;width:auto;height:min(76dvh,620px);min-height:360px;border-radius:20px;transform-origin:center bottom}
   #sbHeader{padding:12px 11px 10px;gap:8px}
   #sbMascot{width:35px;height:35px;border-radius:12px}
   #sbHeaderCopy strong{font-size:12px}
@@ -2267,9 +2271,9 @@ body.low-power .card::after{
   .sb-message{font-size:10.5px}
 }
 @media(max-width:360px){
-  #sbPanel{left:6px;right:6px;height:min(78dvh,600px);min-height:360px}
-  #sbLauncher{width:44px;height:44px}
-  #sbLauncher .sb-pet-face{width:30px;height:30px}
+  #sbPanel{left:5px;right:5px;height:min(78dvh,600px);min-height:340px}
+  #sbLauncher{width:56px;height:56px}
+  #sbLauncher .sb-pet-face{width:40px;height:40px}
 }
 @media(prefers-reduced-motion:reduce){
   #streamBuddyRoot *,#streamBuddyRoot *:before,#streamBuddyRoot *:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -10667,6 +10671,19 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
   function clamp(value,min,max){
     return Math.max(min,Math.min(value,Math.max(min,max)));
   }
+  function visibleViewport(){
+    const vv=window.visualViewport;
+    return vv ? {top:vv.offsetTop,bottom:vv.offsetTop+vv.height,height:vv.height} : {top:0,bottom:window.innerHeight,height:window.innerHeight};
+  }
+  function updateKeyboardInset(){
+    const vv=window.visualViewport;
+    const keyboardGap=vv ? Math.max(0,window.innerHeight-(vv.height+vv.offsetTop)) : 0;
+    root.style.setProperty('--sb-keyboard-gap',keyboardGap+'px');
+    if(!$('sbPanel').hidden) positionPanelNearLauncher();
+    const r=launcher.getBoundingClientRect();
+    const view=visibleViewport();
+    if(r.bottom>view.bottom-8) setPetPosition(r.left,view.bottom-r.height-12,false);
+  }
   function positionHintNearLauncher(){
     if(!hint || hint.hidden) return;
     const r = launcher.getBoundingClientRect();
@@ -10691,6 +10708,7 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
     const panel = $('sbPanel');
     if(!panel || panel.hidden) return;
     const r = launcher.getBoundingClientRect();
+    const view = visibleViewport();
     const mobile = window.innerWidth <= 600;
     panel.style.bottom = 'auto';
     panel.style.top = '8px';
@@ -10710,9 +10728,9 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
     const below = r.bottom+10;
     let top;
     if(above>=8) top=above;
-    else if(below+h<=window.innerHeight-8) top=below;
-    else top=clamp(r.top-h/2,8,window.innerHeight-h-8);
-    panel.style.top = top+'px';
+    else if(below+h<=view.bottom-8) top=below;
+    else top=clamp(r.top-h/2,view.top+8,view.bottom-h-8);
+    panel.style.top = clamp(top,view.top+8,Math.max(view.top+8,view.bottom-h-8))+'px';
     if(!mobile){
       const w = panel.getBoundingClientRect().width || 360;
       panel.style.left = clamp(parseFloat(panel.style.left)||12,12,window.innerWidth-w-12)+'px';
@@ -10780,8 +10798,14 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
   window.addEventListener('resize',()=>{
     const r=launcher.getBoundingClientRect();
     setPetPosition(r.left,r.top,false);
+    updateKeyboardInset();
   },{passive:true});
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',updateKeyboardInset,{passive:true});
+    window.visualViewport.addEventListener('scroll',updateKeyboardInset,{passive:true});
+  }
   restorePetPosition();
+  updateKeyboardInset();
   launcher.addEventListener('click',event=>{
     if(suppressPetClick){event.preventDefault();event.stopImmediatePropagation();suppressPetClick=false;return;}
     $('sbPanel').hidden ? openPanel('chat') : closePanel();
