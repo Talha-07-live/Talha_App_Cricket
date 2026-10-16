@@ -2222,6 +2222,9 @@ body.low-power .card::after{
 #sbMessages{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:13px 12px 8px;scrollbar-width:thin;scrollbar-color:rgba(139,92,246,.4) transparent}
 .sb-message{max-width:91%;margin:0 0 10px;padding:10px 11px;border-radius:14px;font-size:11px;line-height:1.62;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 4px 13px rgba(0,0,0,.12)}
 .sb-message.bot{align-self:flex-start;margin-right:auto;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.07);border-bottom-left-radius:5px;color:rgba(255,255,255,.91)}
+.sb-message.bot.is-typing::after{content:'▌';display:inline-block;margin-left:2px;color:var(--accent-2);animation:sbCaret .75s steps(1,end) infinite}
+.sb-message.bot.is-complete::after{display:none}
+@keyframes sbCaret{0%,45%{opacity:1}46%,100%{opacity:0}}
 .sb-message.user{margin-left:auto;background:linear-gradient(130deg,rgba(124,58,237,.92),rgba(67,56,202,.9));border:1px solid rgba(196,181,253,.15);border-bottom-right-radius:5px;color:white}
 .sb-message .sb-msg-meta{display:block;margin-top:5px;color:rgba(255,255,255,.35);font-size:8px}
 .sb-message.typing{color:rgba(255,255,255,.52);font-style:italic}
@@ -10301,10 +10304,17 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
       positionHintNearLauncher();
     },duration);
   }
-  function appendMessage(text, role = 'bot', meta = ''){
+  function appendMessage(text, role = 'bot', meta = '', options = {}){
     const node = document.createElement('div');
     node.className = 'sb-message '+(role==='user'?'user':'bot');
-    node.textContent = String(text || '');
+    const messageText = String(text || '');
+    const shouldAnimate = role !== 'user' && options.animate !== false;
+    if(shouldAnimate){
+      node.classList.add('is-typing');
+      node.textContent = '';
+    }else{
+      node.textContent = messageText;
+    }
     if(meta){
       const m = document.createElement('span');
       m.className = 'sb-msg-meta';
@@ -10313,7 +10323,28 @@ Channel khujte, page-er next step bujhte, player-er problem solve korte, ba live
     }
     $('sbMessages').appendChild(node);
     $('sbMessages').scrollTop = $('sbMessages').scrollHeight;
+    if(shouldAnimate) typeMessage(node, messageText, meta);
     return node;
+  }
+  function typeMessage(node, text, meta = ''){
+    const length = text.length;
+    // Short replies feel natural and readable; long replies finish sooner.
+    const charDelay = length <= 90 ? 42 : length <= 220 ? 28 : length <= 500 ? 17 : 9;
+    const linePause = length <= 220 ? 180 : length <= 700 ? 105 : 55;
+    let index = 0;
+    const writeNext = () => {
+      if(!node.isConnected) return;
+      if(index >= text.length){
+        node.classList.remove('is-typing');
+        node.classList.add('is-complete');
+        return;
+      }
+      const next = text[index++];
+      node.insertBefore(document.createTextNode(next), node.querySelector('.sb-msg-meta') || null);
+      $('sbMessages').scrollTop = $('sbMessages').scrollHeight;
+      window.setTimeout(writeNext, next === '\n' ? linePause : charDelay);
+    };
+    window.setTimeout(writeNext, Math.min(120, charDelay * 2));
   }
   function addTyping(){
     const node = document.createElement('div');
