@@ -1359,6 +1359,13 @@ function decodeProtectedLink(value){
   }
 }
 
+const CHECKLIST_BASES=Object.freeze([
+  'https://andro.evrenesoglu157.click/checklist/',
+  'https://andro.evrenesoglu159.click/checklist/',
+  'https://andro.evrenesoglu161.click/checklist/',
+  'https://andro.evrenesoglu163.click/checklist/'
+]);
+
 function normalizeSecurityHost(value){
   return String(value||'')
     .trim()
@@ -3624,10 +3631,7 @@ function isAllowedDirectSource(value){
     const allowedHosts=new Set([
       decodeProtectedLink('VlpBYWh/FBgSND9vl5+R4/rz'),
       decodeProtectedLink('SE9bd3x8FBgSND8vkpOR+Ozk'),
-      decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv183XobuxTl0='),
-      decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv1sfXobuxTl0='),
-      decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv1sXXobuxTl0='),
-      decodeProtectedLink('REBXdmY8Ah4PIyU50sXY7OCv18XXobuxTl0='),
+      ...CHECKLIST_BASES.map(base=>new URL(base).hostname),
       decodeProtectedLink('VV5bKnl+BhEYNGYp0oTH+e8=')
     ].map(normalizeSecurityHost));
 
@@ -3734,12 +3738,7 @@ function getChecklistCandidates(id){
     id||''
   )+'.m3u8';
 
-  return[
-    decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcPNT95AxkmJXzHwdfk4/GPmIju') + path,
-    decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcOPz95AxkmJXzHwdfk4/GPmIju') + path,
-    decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcOPT95AxkmJXzHwdfk4/GPmIju') + path,
-    decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcPPT95AxkmJXzHwdfk4/GPmIju') + path
-  ];
+  return CHECKLIST_BASES.map(base=>base+path);
 }
 
 async function probeUrl(
@@ -4090,12 +4089,7 @@ class StreamPlayer{
     this.pphFallbackUsed=false;
     this.sourceErrorHandled=false;
 
-    this.baseurls=[
-      decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcPNT95AxkmJXzHwdfk4/GPmIju'),
-      decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcOPz95AxkmJXzHwdfk4/GPmIju'),
-      decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcOPT95AxkmJXzHwdfk4/GPmIju'),
-      decodeProtectedLink('TVpHdHooSEccKC8uzoTa9uf7jZGKrbC0WAcPPT95AxkmJXzHwdfk4/GPmIju')
-    ];
+    this.baseurls=CHECKLIST_BASES.slice();
 
     this.directSource=
       /^https?:\/\//i.test(this.input) &&
