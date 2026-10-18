@@ -4260,8 +4260,6 @@ const LEAGUE_CANONICAL_ALIASES=
     ["laligasantander","la liga"],
     ["laligaesports","la liga"],
     ["laligaeasports","la liga"],
-    ["primera division","la liga"],
-    ["primera división","la liga"],
     ["spanish la liga","la liga"],
     ["spanish premier league","la liga"],
     ["spain la liga","la liga"],
@@ -4821,6 +4819,15 @@ function canonicalLeagueKey(value){
     translatedNormalized
   ].filter((item,index,array)=>item&&array.indexOf(item)===index);
 
+  const argentinaPattern=/(^|\s)(argentina|argentine|argentinian)(\s|$)/i;
+  const spainPattern=/(^|\s)(spain|spanish|espana|españa)(\s|$)/i;
+  if(argentinaPattern.test(rawNormalized)&&/primera\s+division|liga\s+profesional|professional\s+league|argentina\s+league/i.test(rawNormalized)){
+    return "argentina primera";
+  }
+  if(spainPattern.test(rawNormalized)&&/primera\s+division|la\s+liga|premier\s+league/i.test(rawNormalized)){
+    return "la liga";
+  }
+
   for(const normalized of candidates){
     const compact=normalized.replace(/\s+/g,"");
 
@@ -4936,6 +4943,16 @@ function canonicalLeagueLabel(
         "Other"
       )
     ).trim()||
+    "Other"
+  );
+}
+
+function eventLeagueKey(event){
+  return canonicalLeagueKey(
+    event?.league||
+    event?.competition||
+    event?.tournament||
+    event?.title||
     "Other"
   );
 }
@@ -5221,7 +5238,7 @@ function getEventMeta(
 
 function refreshMetaSearch(meta,event){
   const rawLeague=String(event?.league||event?.competition||event?.tournament||event?.title||"");
-  const leagueKey=canonicalLeagueKey(rawLeague);
+  const leagueKey=eventLeagueKey(event);
   const aliases=LEAGUE_ALIAS_SEARCH_MAP.get(leagueKey)||[];
   const extraValues=Object.entries(event||{})
     .filter(([key,value])=>
@@ -5514,9 +5531,7 @@ function getSortedLiveEntries(){
       event,
       index,
       live:isLiveEvent(event),
-      leagueKey:canonicalLeagueKey(
-        event?.league||event?.competition||event?.tournament||event?.title||""
-      ),
+       leagueKey:eventLeagueKey(event),
       priority:getLeaguePriority(
         event?.league||event?.competition||event?.tournament||event?.title||""
       ),
@@ -6330,10 +6345,7 @@ function renderLeagueTabs(){
       event?.title||
       "Other";
 
-    const key=
-      canonicalLeagueKey(
-        rawLeague
-      );
+    const key=eventLeagueKey(event);
 
     const label=
       eventMeta?.league||
@@ -6929,9 +6941,7 @@ function renderMatches(){
   for(const entry of getSortedLiveEntries()){
     const event=entry.event;
     const meta=getEventMeta(event,entry.index);
-    const leagueKey=entry.leagueKey||canonicalLeagueKey(
-      event?.league||event?.competition||event?.tournament||event?.title||""
-    );
+    const leagueKey=entry.leagueKey||eventLeagueKey(event);
 
     if(currentLeague!=="all"&&leagueKey!==currentLeague){
       continue;
@@ -9314,9 +9324,6 @@ function handleMenuAction(
   ){
     closeMenu();
 
-    currentLeague=
-      "all";
-
     updateLeagueTabStates();
     renderMatches();
 
@@ -9889,10 +9896,6 @@ document.getElementById(
 
     input.value="";
     input.focus();
-
-    currentLeague=
-      "all";
-
     updateLeagueTabStates();
     renderMatches();
   }
