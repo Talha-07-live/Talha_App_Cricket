@@ -3279,6 +3279,35 @@ const inputId=
   pageURL.searchParams.get('stream') ||
   '';
 
+// These channels are hosted by the external event player. Keep the list
+// explicit so only the requested IDs are routed away from the local HLS path.
+const EXTERNAL_EVENT_CHANNEL_IDS=new Set([
+  'androstreamlivebs1','androstreamlivebs2','androstreamlivebs3','androstreamlivebs4','androstreamlivebs5',
+  'androstreamlivebsm1','androstreamlivebsm2','androstreamlivess1','androstreamlivess2','androstreamlivessplus1',
+  'androstreamlivets','androstreamlivets1','androstreamlivets2','androstreamlivets3','androstreamlivets4',
+  'androstreamlivesm1','androstreamlivesm2','androstreamlivees1','androstreamlivees2','androstreamliveidm',
+  'androstreamlivetrt1','androstreamlivetrts','androstreamlivetrtsy','androstreamliveatv','androstreamliveas',
+  'androstreamlivea2','androstreamlivetjk','androstreamliveht','androstreamlivenba','androstreamlivetv8',
+  'androstreamlivetv85','androstreamlivetb','androstreamlivetb1','androstreamlivetb2','androstreamlivetb3',
+  'androstreamlivetb4','androstreamlivetb5','androstreamlivetb6','androstreamlivetb7','androstreamlivetb8',
+  'androstreamlivefb','androstreamlivecbcs','androstreamlivegs','androstreamlivesptstv','androstreamliveexn',
+  'androstreamliveexn1','androstreamliveexn2','androstreamliveexn3','androstreamliveexn4','androstreamliveexn5',
+  'androstreamliveexn6','androstreamliveexn7','androstreamliveexn8'
+]);
+
+function isExternalEventChannel(id){
+  return EXTERNAL_EVENT_CHANNEL_IDS.has(
+    String(id||'').trim().toLowerCase()
+  );
+}
+
+function getExternalEventUrl(id){
+  return(
+    'https://mahsunsports.xyz/event.html?id='+
+    encodeURIComponent(String(id||'').trim())
+  );
+}
+
 const ua=
   navigator.userAgent ||
   navigator.vendor ||
@@ -4101,6 +4130,14 @@ class StreamPlayer{
     this.feedSource=null;
     this.streamPath=null;
 
+    if(isExternalEventChannel(this.channelId)){
+      this.source=getExternalEventUrl(this.channelId);
+      this.sourceMode='external-event';
+      warmUrl(this.source);
+      this.showPphFallbackIframe(this.source);
+      return;
+    }
+
     const forced=routeParam();
 
     if(this.directSource){
@@ -4327,7 +4364,10 @@ class StreamPlayer{
       return false;
     }
 
-    if(!this.isPphEligible()){
+    if(
+      !this.isPphEligible() &&
+      !(explicitUrl && isExternalEventChannel(this.channelId))
+    ){
       return false;
     }
 
