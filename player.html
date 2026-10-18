@@ -1149,6 +1149,7 @@ input[type="range"]::-moz-range-thumb{
       <iframe id="pph-fallback-frame"
               title="Backup Player"
               allow="autoplay; fullscreen; picture-in-picture; encrypted-media; web-share"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
               allowfullscreen
               frameborder="0"
               scrolling="no"></iframe>
@@ -1378,12 +1379,8 @@ function decodeProtectedLink(value){
   }
 }
 
-const CHECKLIST_BASES=Object.freeze([
-  'https://andro.evrenesoglu157.click/checklist/',
-  'https://andro.evrenesoglu159.click/checklist/',
-  'https://andro.evrenesoglu161.click/checklist/',
-  'https://andro.evrenesoglu163.click/checklist/'
-]);
+// Checklist fallback is intentionally disabled. No checklist host is probed.
+const CHECKLIST_BASES=Object.freeze([]);
 
 function normalizeSecurityHost(value){
   return String(value||'')
@@ -4074,7 +4071,6 @@ function routeParam(){
   return[
     'auto',
     'cinema',
-    'checklist',
     'pph',
     'feed'
   ].includes(value)
