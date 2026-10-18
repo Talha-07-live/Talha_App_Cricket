@@ -2439,6 +2439,9 @@ body.low-power .card::after{
             <span class="live-dot"></span>
             Live: <b id="pcbLive">00</b>
           </span>
+          <span class="pcb-item pcb-static">
+            📺 24/7: <b id="pcbStatic">00</b>
+          </span>
         </div>
 
         <div class="player-container">
@@ -2493,6 +2496,10 @@ body.low-power .card::after{
 
         <div class="servers" id="serverContainer" aria-live="polite"></div>
 
+        <div id="staticSectionWrap" style="margin-top:18px">
+          <p class="panel-subtitle">24/7 Channels (<span id="staticChannelCount">0</span>)</p>
+          <div class="servers" id="staticServerContainer"></div>
+        </div>
 
       </aside>
 
@@ -2802,41 +2809,61 @@ function decodeStaticChannelToken(token){
   }
 }
 
-const STATIC_CHANNELS=[];
-
-// These channels must never be rendered, even when they arrive from a feed.
-const BLOCKED_CHANNEL_IDS=new Set([
-  "androstreamlivebs1","androstreamlivebs2","androstreamlivebs3","androstreamlivebs4","androstreamlivebs5",
-  "androstreamlivebsm1","androstreamlivebsm2","androstreamlivess1","androstreamlivess2","androstreamlivessplus1",
-  "androstreamlivets","androstreamlivets1","androstreamlivets2","androstreamlivets3","androstreamlivets4",
-  "androstreamlivesm1","androstreamlivesm2","androstreamlivees1","androstreamlivees2","androstreamliveidm",
-  "androstreamlivetrt1","androstreamlivetrts","androstreamlivetrtsy","androstreamliveatv","androstreamliveas",
-  "androstreamlivea2","androstreamlivetjk","androstreamliveht","androstreamlivenba","androstreamlivetv8",
-  "androstreamlivetv85","androstreamlivetb","androstreamlivetb1","androstreamlivetb2","androstreamlivetb3",
-  "androstreamlivetb4","androstreamlivetb5","androstreamlivetb6","androstreamlivetb7","androstreamlivetb8",
-  "androstreamlivefb","androstreamlivecbcs","androstreamlivegs","androstreamlivesptstv","androstreamliveexn",
-  "androstreamliveexn1","androstreamliveexn2","androstreamliveexn3","androstreamliveexn4","androstreamliveexn5",
-  "androstreamliveexn6","androstreamliveexn7","androstreamliveexn8"
-]);
-
-function isBlockedChannel(event){
-  const values=[
-    event?.id,event?.channelId,event?.streamId,event?.eventId,event?.matchId,event?.sourceId,
-    event?.url,event?.streamUrl,event?.link,event?.href,event?.playUrl,event?.playerUrl
-  ].map(value=>String(value||"").trim().toLowerCase()).filter(Boolean);
-
-  return values.some(value=>{
-    if(BLOCKED_CHANNEL_IDS.has(value)) return true;
-    try{
-      const decoded=decodeURIComponent(value);
-      if(BLOCKED_CHANNEL_IDS.has(decoded)) return true;
-      const match=decoded.match(/[?&](?:id|channel|channel_id|stream_id)=([^&#]+)/i);
-      return !!match&&BLOCKED_CHANNEL_IDS.has(String(match[1]).toLowerCase());
-    }catch(e){
-      return false;
-    }
-  });
-}
+const STATIC_CHANNELS=[
+  {title:"BeIN Sports 1",staticToken:"NQ8IGg4sJwYXBAwBNkRTNhJd"},
+  {title:"BeIN Sports 2",staticToken:"NQ8IGg4sJwYXBAwBNkRTNhJe"},
+  {title:"BeIN Sports 3",staticToken:"NQ8IGg4sJwYXBAwBNkRTNhJf"},
+  {title:"BeIN Sports 4",staticToken:"NQ8IGg4sJwYXBAwBNkRTNhJY"},
+  {title:"BeIN Sports 5",staticToken:"NQ8IGg4sJwYXBAwBNkRTNhJZ"},
+  {title:"BeIN Sports Max 1",staticToken:"NQ8IGg4sJwYXBAwBNkRTNhIBWQ"},
+  {title:"BeIN Sports Max 2",staticToken:"NQ8IGg4sJwYXBAwBNkRTNhIBWg"},
+  {title:"S Sport",staticToken:"NQ8IGg4sJwYXBAwBNkRTJxJd"},
+  {title:"S Sport 2",staticToken:"NQ8IGg4sJwYXBAwBNkRTJxJe"},
+  {title:"S Sport Plus",staticToken:"NQ8IGg4sJwYXBAwBNkRTJxIcBBQsYg"},
+  {title:"Tivibu Spor",staticToken:"NQ8IGg4sJwYXBAwBNkRTIBI"},
+  {title:"Tivibu Spor 1",staticToken:"NQ8IGg4sJwYXBAwBNkRTIBJd"},
+  {title:"Tivibu Spor 2",staticToken:"NQ8IGg4sJwYXBAwBNkRTIBJe"},
+  {title:"Tivibu Spor 3",staticToken:"NQ8IGg4sJwYXBAwBNkRTIBJf"},
+  {title:"Tivibu Spor 4",staticToken:"NQ8IGg4sJwYXBAwBNkRTIBJY"},
+  {title:"Smart Spor 1",staticToken:"NQ8IGg4sJwYXBAwBNkRTJwxd"},
+  {title:"Smart Spor 2",staticToken:"NQ8IGg4sJwYXBAwBNkRTJwxe"},
+  {title:"Euro Sport 1",staticToken:"NQ8IGg4sJwYXBAwBNkRTMRJd"},
+  {title:"Euro Sport 2",staticToken:"NQ8IGg4sJwYXBAwBNkRTMRJe"},
+  {title:"iDMAN Tv",staticToken:"NQ8IGg4sJwYXBAwBNkRTPQUB"},
+  {title:"Trt 1",staticToken:"NQ8IGg4sJwYXBAwBNkRTIBMYWQ"},
+  {title:"Trt Spor",staticToken:"NQ8IGg4sJwYXBAwBNkRTIBMYGw"},
+  {title:"TRT Sports Star",staticToken:"NQ8IGg4sJwYXBAwBNkRTIBMYGxg"},
+  {title:"Atv",staticToken:"NQ8IGg4sJwYXBAwBNkRTNRUa"},
+  {title:"A Spor",staticToken:"NQ8IGg4sJwYXBAwBNkRTNRI"},
+  {title:"A2",staticToken:"NQ8IGg4sJwYXBAwBNkRTNVM"},
+  {title:"Tjk Tv",staticToken:"NQ8IGg4sJwYXBAwBNkRTIAsH"},
+  {title:"Ht Spor",staticToken:"NQ8IGg4sJwYXBAwBNkRTPBU"},
+  {title:"Nba Tv",staticToken:"NQ8IGg4sJwYXBAwBNkRTOgMN"},
+  {title:"Tv8",staticToken:"NQ8IGg4sJwYXBAwBNkRTIBdU"},
+  {title:"Tv8,5",staticToken:"NQ8IGg4sJwYXBAwBNkRTIBdUXQ"},
+  {title:"Tabi Spor",staticToken:"NQ8IGg4sJwYXBAwBNkRTIAM"},
+  {title:"Tabi Spor 1",staticToken:"NQ8IGg4sJwYXBAwBNkRTIANd"},
+  {title:"Tabi Spor 2",staticToken:"NQ8IGg4sJwYXBAwBNkRTIANe"},
+  {title:"Tabi Spor 3",staticToken:"NQ8IGg4sJwYXBAwBNkRTIANf"},
+  {title:"Tabi Spor 4",staticToken:"NQ8IGg4sJwYXBAwBNkRTIANY"},
+  {title:"Tabi Spor 5",staticToken:"NQ8IGg4sJwYXBAwBNkRTIANZ"},
+  {title:"Tabi Spor 6",staticToken:"NQ8IGg4sJwYXBAwBNkRTIANa"},
+  {title:"Tabi Spor 7",staticToken:"NQ8IGg4sJwYXBAwBNkRTIANb"},
+  {title:"Tabi Spor 8",staticToken:"NQ8IGg4sJwYXBAwBNkRTIANU"},
+  {title:"Fb Tv",staticToken:"NQ8IGg4sJwYXBAwBNkRTMgM"},
+  {title:"Cbc Sport",staticToken:"NQ8IGg4sJwYXBAwBNkRTNwMPGw"},
+  {title:"Gs Tv",staticToken:"NQ8IGg4sJwYXBAwBNkRTMxI"},
+  {title:"Sports Tv",staticToken:"NQ8IGg4sJwYXBAwBNkRTJxEYGxUp"},
+  {title:"Exxen Tv",staticToken:"NQ8IGg4sJwYXBAwBNkRTMRkC"},
+  {title:"Exxen Sports 1",staticToken:"NQ8IGg4sJwYXBAwBNkRTMRkCWQ"},
+  {title:"Exxen Sports 2",staticToken:"NQ8IGg4sJwYXBAwBNkRTMRkCWg"},
+  {title:"Exxen Sports 3",staticToken:"NQ8IGg4sJwYXBAwBNkRTMRkCWw"},
+  {title:"Exxen Sports 4",staticToken:"NQ8IGg4sJwYXBAwBNkRTMRkCXA"},
+  {title:"Exxen Sports 5",staticToken:"NQ8IGg4sJwYXBAwBNkRTMRkCXQ"},
+  {title:"Exxen Sports 6",staticToken:"NQ8IGg4sJwYXBAwBNkRTMRkCXg"},
+  {title:"Exxen Sports 7",staticToken:"NQ8IGg4sJwYXBAwBNkRTMRkCXw"},
+  {title:"Exxen Sports 8",staticToken:"NQ8IGg4sJwYXBAwBNkRTMRkCUA"}
+];
 
 let liveEvents=[];
 let currentLeague="all";
@@ -5327,10 +5354,6 @@ function normalizeAndDedupeFeed(events){
       continue;
     }
 
-    if(isBlockedChannel(event)){
-      continue;
-    }
-
     const title=normalizeSearchText(event.title||"");
     const url=String(event.url||event.streamUrl||event.link||event.href||"").trim();
     const ids=[event.channelId,event.streamId,event.eventId,event.matchId,event.sourceId,event.id]
@@ -6881,7 +6904,7 @@ function renderMatches(){
   const staticWrap=document.getElementById("staticSectionWrap");
 
   if(staticWrap){
-    staticWrap.style.display="none";
+    staticWrap.style.display="";
   }
 
   const container=document.getElementById("serverContainer");
@@ -7891,7 +7914,7 @@ function feedError(
   }
 
   setStatus(
-    "Feed sync failed",
+    "Feed sync failed · 24/7 available below",
     "offline"
   );
 
