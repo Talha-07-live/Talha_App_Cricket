@@ -144,23 +144,6 @@ body{
   background:#000;
 }
 
-/* The event page is cross-origin, so its own buttons cannot be edited from
-   this player. Mask only its top utility strip; the video and center controls
-   remain fully interactive so playback is not interrupted. */
-#external-event-ui-mask{
-  position:absolute;
-  inset:0 0 auto 0;
-  z-index:2;
-  display:none;
-  height:clamp(72px, 11vh, 96px);
-  background:#000;
-  pointer-events:auto;
-}
-
-#pph-fallback-layer.external-event-active #external-event-ui-mask{
-  display:block;
-}
-
 #custom-poster-overlay{
   position:absolute;
   inset:0;
@@ -1153,8 +1136,6 @@ input[type="range"]::-moz-range-thumb{
               allowfullscreen
               frameborder="0"
               scrolling="no"></iframe>
-      <div id="external-event-ui-mask"
-           aria-hidden="true"></div>
     </div>
   </div>
 
@@ -1559,7 +1540,6 @@ function stopProtectedPlayback(){
       'pph-fallback-layer'
     );
 
-    layer?.classList.remove('external-event-active');
     layer?.classList.remove('active');
   }catch(e){}
 }
@@ -4412,16 +4392,6 @@ class StreamPlayer{
     const layer=document.getElementById(
       'pph-fallback-layer'
     );
-
-    if(layer){
-      layer.classList.toggle(
-        'external-event-active',
-        !!(
-          explicitUrl &&
-          isExternalEventChannel(this.channelId)
-        )
-      );
-    }
 
     const frame=document.getElementById(
       'pph-fallback-frame'
