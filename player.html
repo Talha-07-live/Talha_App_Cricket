@@ -126,6 +126,7 @@ body{
   width:100%;
   height:100%;
   display:none;
+  background:#000;
   overflow:hidden;
 }
 
@@ -140,6 +141,24 @@ body{
   border:0;
   margin:0;
   padding:0;
+  background:#000;
+}
+
+/* The event page is cross-origin, so its own buttons cannot be edited from
+   this player. Mask only its top utility strip; the video and center controls
+   remain fully interactive so playback is not interrupted. */
+#external-event-ui-mask{
+  position:absolute;
+  inset:0 0 auto 0;
+  z-index:2;
+  display:none;
+  height:clamp(72px, 11vh, 96px);
+  background:#000;
+  pointer-events:auto;
+}
+
+#pph-fallback-layer.external-event-active #external-event-ui-mask{
+  display:block;
 }
 
 #custom-poster-overlay{
@@ -1130,10 +1149,11 @@ input[type="range"]::-moz-range-thumb{
       <iframe id="pph-fallback-frame"
               title="Backup Player"
               allow="autoplay; fullscreen; picture-in-picture; encrypted-media; web-share"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
               allowfullscreen
               frameborder="0"
               scrolling="no"></iframe>
+      <div id="external-event-ui-mask"
+           aria-hidden="true"></div>
     </div>
   </div>
 
@@ -1358,7 +1378,12 @@ function decodeProtectedLink(value){
   }
 }
 
-const CHECKLIST_BASES=Object.freeze([]);
+const CHECKLIST_BASES=Object.freeze([
+  'https://andro.evrenesoglu157.click/checklist/',
+  'https://andro.evrenesoglu159.click/checklist/',
+  'https://andro.evrenesoglu161.click/checklist/',
+  'https://andro.evrenesoglu163.click/checklist/'
+]);
 
 function normalizeSecurityHost(value){
   return String(value||'')
@@ -1537,6 +1562,7 @@ function stopProtectedPlayback(){
       'pph-fallback-layer'
     );
 
+    layer?.classList.remove('external-event-active');
     layer?.classList.remove('active');
   }catch(e){}
 }
@@ -3273,6 +3299,8 @@ const inputId=
   pageURL.searchParams.get('stream') ||
   '';
 
+// These channels are hosted by the external event player. Keep the list
+// explicit so only the requested IDs are routed away from the local HLS path.
 const EXTERNAL_EVENT_CHANNEL_IDS=new Set([
   'androstreamlivebs1','androstreamlivebs2','androstreamlivebs3','androstreamlivebs4','androstreamlivebs5',
   'androstreamlivebsm1','androstreamlivebsm2','androstreamlivess1','androstreamlivess2','androstreamlivessplus1',
@@ -4046,6 +4074,7 @@ function routeParam(){
   return[
     'auto',
     'cinema',
+    'checklist',
     'pph',
     'feed'
   ].includes(value)
@@ -4387,6 +4416,16 @@ class StreamPlayer{
     const layer=document.getElementById(
       'pph-fallback-layer'
     );
+
+    if(layer){
+      layer.classList.toggle(
+        'external-event-active',
+        !!(
+          explicitUrl &&
+          isExternalEventChannel(this.channelId)
+        )
+      );
+    }
 
     const frame=document.getElementById(
       'pph-fallback-frame'
