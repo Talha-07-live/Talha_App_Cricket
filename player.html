@@ -126,7 +126,6 @@ body{
   width:100%;
   height:100%;
   display:none;
-  background:#000;
   overflow:hidden;
 }
 
@@ -141,7 +140,6 @@ body{
   border:0;
   margin:0;
   padding:0;
-  background:#000;
 }
 
 #custom-poster-overlay{
@@ -1360,7 +1358,6 @@ function decodeProtectedLink(value){
   }
 }
 
-// Checklist fallback is intentionally disabled. No checklist host is probed.
 const CHECKLIST_BASES=Object.freeze([]);
 
 function normalizeSecurityHost(value){
@@ -3276,8 +3273,6 @@ const inputId=
   pageURL.searchParams.get('stream') ||
   '';
 
-// These channels are hosted by the external event player. Keep the list
-// explicit so only the requested IDs are routed away from the local HLS path.
 const EXTERNAL_EVENT_CHANNEL_IDS=new Set([
   'androstreamlivebs1','androstreamlivebs2','androstreamlivebs3','androstreamlivebs4','androstreamlivebs5',
   'androstreamlivebsm1','androstreamlivebsm2','androstreamlivess1','androstreamlivess2','androstreamlivessplus1',
