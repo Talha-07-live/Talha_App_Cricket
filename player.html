@@ -1104,7 +1104,7 @@ input[type="range"]::-moz-range-thumb{
       </svg>
 
       <div id="player-loading-indicator">
-        <span>PLEASE WAIT · LOADING</span>
+        <span id="player-loading-message">PLEASE WAIT · LOADING</span>
         <span id="player-loading-dots"></span>
       </div>
     </div>
@@ -1362,6 +1362,25 @@ function decodeProtectedLink(value){
 
 // Checklist fallback is intentionally disabled. No checklist host is probed.
 const CHECKLIST_BASES=Object.freeze([]);
+
+/*
+ * Live HLS manifests can briefly fail while the stream is still healthy.
+ * Retry with backoff and keep reconnecting instead of showing a false
+ * permanent "Stream Not Found" screen.
+ */
+const PLAYBACK_RETRY_CONFIG=Object.freeze({
+  startupTimeoutMs:12000,
+  maxSourceAttempts:4,
+  retryDelaysMs:Object.freeze([
+    700,
+    1400,
+    2800,
+    5000,
+    9000,
+    15000
+  ]),
+  initialResolveDelayMs:2500
+});
 
 function normalizeSecurityHost(value){
   return String(value||'')
@@ -1635,6 +1654,46 @@ function showLoadingIndicator(){
   if(loading){
     loading.classList.remove('hide');
   }
+}
+
+function setLoadingMessage(value){
+  const message=document.getElementById(
+    'player-loading-message'
+  );
+
+  if(message){
+    message.textContent=String(
+      value||'PLEASE WAIT · LOADING'
+    );
+  }
+}
+
+function resetLoadingMessage(){
+  setLoadingMessage(
+    'PLEASE WAIT · LOADING'
+  );
+}
+
+function hideFinalWarning(){
+  const warning=document.getElementById(
+    'uyarikutu'
+  );
+
+  if(warning){
+    warning.style.display='none';
+    warning.setAttribute(
+      'aria-hidden',
+      'true'
+    );
+  }
+}
+
+function showRetryIndicator(){
+  hideFinalWarning();
+  setLoadingMessage(
+    'RECONNECTING · RETRYING'
+  );
+  showLoadingIndicator();
 }
 
 function warmConnection(hostname){
@@ -2727,16 +2786,22 @@ function bindCurrentVideo(video){
 
   const handlePlaying=()=>{
 
+    const player=window.activeStreamPlayer;
+
+    player?.markPlaybackHealthy?.();
+
     hidePoster();
     hideLoadingIndicator();
     applyVideoFilters();
 
-    window.activeStreamPlayer?.updatePipButton?.();
+    player?.updatePipButton?.();
   };
 
   const handleTimeUpdate=()=>{
 
     if(video.currentTime>0){
+
+      window.activeStreamPlayer?.markPlaybackHealthy?.();
 
       hidePoster();
       hideLoadingIndicator();
@@ -2756,17 +2821,12 @@ function bindCurrentVideo(video){
 
     const player=window.activeStreamPlayer;
 
-    if(
-      player &&
-      player.isPphEligible() &&
-      !player.pphFallbackUsed
-    ){
+    if(player){
 
-      player.showPphFallbackIframe();
-
-    }else if(player){
-
-      player.handlePlaybackError();
+      player.handlePlaybackError(
+        'video error',
+        video
+      );
     }
   };
 
@@ -4071,6 +4131,15 @@ class StreamPlayer{
     this.checklistTried=false;
     this.feedTried=false;
 
+    this.retryTimer=0;
+    this.startupWatchdogTimer=0;
+    this.healthCheckTimer=0;
+    this.initRetryTimer=0;
+    this.initRetryAttempts=0;
+    this.retrying=false;
+    this.sourceRetryAttempts=0;
+    this.playbackHealthy=false;
+
     this.init();
   }
 
@@ -4113,6 +4182,8 @@ class StreamPlayer{
     this.feedTried=false;
     this.pphFallbackUsed=false;
     this.sourceErrorHandled=false;
+    this.playbackHealthy=false;
+    this.sourceRetryAttempts=0;
 
     this.baseurls=CHECKLIST_BASES.slice();
 
@@ -4275,12 +4346,12 @@ class StreamPlayer{
 
     if(!this.source){
 
-      this.showFinalWarning(
-        'Unable to fetch stream address.\nPlease check the channel ID or source link.'
-      );
+      this.scheduleInitialResolveRetry();
 
       return;
     }
+
+    this.initRetryAttempts=0;
 
     const params=new URLSearchParams(
       window.location.search
@@ -4327,6 +4398,7 @@ class StreamPlayer{
 
     observePlayerVideo();
     startAutoplayRetries();
+    this.armStartupWatchdog();
   }
 
   safeDecode(value){
@@ -4343,6 +4415,236 @@ class StreamPlayer{
     return isPphFallbackChannel(
       this.channelId
     );
+  }
+
+  clearRetryTimer(){
+
+    if(this.retryTimer){
+      clearTimeout(
+        this.retryTimer
+      );
+      this.retryTimer=0;
+    }
+  }
+
+  clearStartupWatchdog(){
+
+    if(this.startupWatchdogTimer){
+      clearTimeout(
+        this.startupWatchdogTimer
+      );
+      this.startupWatchdogTimer=0;
+    }
+  }
+
+  clearHealthCheck(){
+
+    if(this.healthCheckTimer){
+      clearTimeout(
+        this.healthCheckTimer
+      );
+      this.healthCheckTimer=0;
+    }
+  }
+
+  isVideoActuallyPlaying(){
+
+    const video=this.getCurrentVideo();
+
+    return !!(
+      video &&
+      !video.paused &&
+      video.readyState>=2 &&
+      !video.error
+    );
+  }
+
+  isPlaybackHealthy(){
+
+    return(
+      this.playbackHealthy||
+      this.isVideoActuallyPlaying()
+    );
+  }
+
+  armStartupWatchdog(){
+
+    this.clearStartupWatchdog();
+
+    this.startupWatchdogTimer=setTimeout(
+      ()=>{
+        this.startupWatchdogTimer=0;
+
+        if(
+          this.pphFallbackUsed||
+          this.isPlaybackHealthy()
+        ){
+          return;
+        }
+
+        this.handlePlaybackError(
+          'startup timeout'
+        );
+      },
+      PLAYBACK_RETRY_CONFIG.startupTimeoutMs
+    );
+  }
+
+  markPlaybackHealthy(){
+
+    this.playbackHealthy=true;
+    this.sourceRetryAttempts=0;
+    this.sourceErrorHandled=false;
+
+    this.clearStartupWatchdog();
+    this.clearRetryTimer();
+    this.clearHealthCheck();
+
+    hideFinalWarning();
+    hidePoster();
+    hideLoadingIndicator();
+  }
+
+  scheduleInitialResolveRetry(){
+
+    if(
+      this.initRetryTimer||
+      this.pphFallbackUsed
+    ){
+      return;
+    }
+
+    this.initRetryAttempts++;
+    showRetryIndicator();
+
+    const delay=Math.min(
+      15000,
+      PLAYBACK_RETRY_CONFIG.initialResolveDelayMs*
+      Math.min(
+        this.initRetryAttempts,
+        4
+      )
+    );
+
+    this.initRetryTimer=setTimeout(
+      ()=>{
+        this.initRetryTimer=0;
+        this.init();
+      },
+      delay
+    );
+  }
+
+  schedulePlaybackRetry(reason){
+
+    if(
+      this.pphFallbackUsed||
+      this.retryTimer
+    ){
+      return;
+    }
+
+    this.sourceErrorHandled=true;
+
+    const attempt=Math.max(
+      1,
+      this.sourceRetryAttempts+1
+    );
+
+    const delays=
+      PLAYBACK_RETRY_CONFIG.retryDelaysMs;
+
+    const delay=
+      delays[
+        Math.min(
+          attempt-1,
+          delays.length-1
+        )
+      ];
+
+    showRetryIndicator(
+      reason
+    );
+
+    this.retryTimer=setTimeout(
+      ()=>{
+        this.retryTimer=0;
+        this.retryCurrentSource(
+          reason
+        );
+      },
+      delay
+    );
+  }
+
+  async retryCurrentSource(reason){
+
+    if(
+      this.pphFallbackUsed||
+      this.retrying
+    ){
+      return;
+    }
+
+    this.retrying=true;
+    showRetryIndicator(
+      reason
+    );
+
+    try{
+
+      if(!this.source){
+
+        this.scheduleInitialResolveRetry();
+        return;
+      }
+
+      this.sourceRetryAttempts++;
+
+      if(
+        this.sourceRetryAttempts<=
+        PLAYBACK_RETRY_CONFIG.maxSourceAttempts
+      ){
+
+        await this.loadSource(
+          this.source
+        );
+
+        return;
+      }
+
+      this.sourceRetryAttempts=0;
+
+      const switched=
+        await this.switchToNextBase(
+          reason
+        );
+
+      if(
+        !switched &&
+        this.source
+      ){
+
+        await this.loadSource(
+          this.source
+        );
+      }
+
+    }catch(error){
+
+      console.warn(
+        'Playback retry failed:',
+        error
+      );
+
+      this.schedulePlaybackRetry(
+        reason
+      );
+
+    }finally{
+
+      this.retrying=false;
+    }
   }
 
   getPphFallbackUrl(){
@@ -4378,6 +4680,7 @@ class StreamPlayer{
     this.pphFallbackUsed=true;
     this.sourceErrorHandled=true;
 
+    hideFinalWarning();
     clearAutoplayTimers();
 
     try{
@@ -4477,7 +4780,11 @@ class StreamPlayer{
 
   showFinalWarning(messageText){
 
+    this.clearRetryTimer();
+    this.clearStartupWatchdog();
+    this.clearHealthCheck();
     hideLoadingIndicator();
+    resetLoadingMessage();
 
     const warning=document.getElementById(
       'uyarikutu'
@@ -4493,6 +4800,10 @@ class StreamPlayer{
 
     if(warning){
       warning.style.display='flex';
+      warning.setAttribute(
+        'aria-hidden',
+        'false'
+      );
     }
   }
 
@@ -4590,12 +4901,16 @@ class StreamPlayer{
 
     this.source=newSource;
     this.sourceErrorHandled=false;
+    this.playbackHealthy=false;
 
+    this.clearStartupWatchdog();
+    this.clearHealthCheck();
     clearAutoplayTimers();
 
     showLoadingIndicator();
 
     warmUrl(newSource);
+    this.armStartupWatchdog();
 
     try{
 
@@ -5338,14 +5653,20 @@ class StreamPlayer{
 
   buildSource(){
 
-    if(!this.streamPath){
+    const base=
+      this.baseurls?.[
+        this.currentBaseIndex
+      ];
+
+    if(
+      !this.streamPath||
+      !base
+    ){
       return null;
     }
 
     return(
-      this.baseurls[
-        this.currentBaseIndex
-      ]+
+      base+
       this.streamPath
     );
   }
@@ -5476,6 +5797,8 @@ class StreamPlayer{
     this.player.on(
       Clappr.Events.PLAYER_PLAY,
       ()=>{
+
+        hideFinalWarning();
         hidePoster();
         applyVideoFilters();
       }
@@ -5484,6 +5807,8 @@ class StreamPlayer{
     this.player.on(
       Clappr.Events.PLAYER_PLAYING,
       ()=>{
+
+        this.markPlaybackHealthy();
 
         hidePoster();
         hideLoadingIndicator();
@@ -5539,18 +5864,9 @@ class StreamPlayer{
             container.on(
               Clappr.Events.CONTAINER_ERROR,
               ()=>{
-
-                if(
-                  this.isPphEligible() &&
-                  !this.pphFallbackUsed
-                ){
-
-                  this.showPphFallbackIframe();
-
-                }else{
-
-                  this.handlePlaybackError();
-                }
+                this.handlePlaybackError(
+                  'container error'
+                );
               }
             );
           }
@@ -5586,36 +5902,36 @@ class StreamPlayer{
     this.player.on(
       Clappr.Events.PLAYER_ERROR,
       ()=>{
-
-        if(
-          this.isPphEligible() &&
-          !this.pphFallbackUsed
-        ){
-
-          this.showPphFallbackIframe();
-
-        }else{
-
-          this.handlePlaybackError();
-        }
+        this.handlePlaybackError(
+          'player error'
+        );
       }
     );
   }
 
-  handlePlaybackError(){
+  handlePlaybackError(
+    reason='playback error',
+    mediaElement=null
+  ){
 
+
+    /*
+     * Clappr can emit a late error during a live reconnect. If the
+     * current video is genuinely playing, keep it alive and do not
+     * show the permanent error screen.
+     */
     if(
-      this.isPphEligible() &&
-      !this.pphFallbackUsed
+      reason!=='startup timeout' &&
+      this.playbackHealthy &&
+      this.isVideoActuallyPlaying()
     ){
-
-      this.showPphFallbackIframe();
-
       return;
     }
 
-    this.switchToNextBase(
-      'playback error'
+    this.playbackHealthy=false;
+    hideFinalWarning();
+    this.schedulePlaybackRetry(
+      reason
     );
   }
 
@@ -5718,9 +6034,26 @@ class StreamPlayer{
         }
       }
 
-      this.showFinalWarning(
-        'Playback failed.\nThe stream is currently unavailable.'
+      /*
+       * There may be no alternate resolver left, but the source can
+       * recover later. Keep retrying the same source instead of
+       * presenting a false "Stream Not Found" modal.
+       */
+      showRetryIndicator(
+        reason
       );
+      this.sourceRetryAttempts=0;
+
+      if(this.source){
+
+        await this.loadSource(
+          this.source
+        );
+
+        return true;
+      }
+
+      this.scheduleInitialResolveRetry();
 
       return false;
 
