@@ -827,23 +827,6 @@ input[type="range"]::-moz-range-thumb{
   line-height:1.6;
 }
 
-.smart-retry-btn {
-  margin-top: 14px;
-  padding: 8px 16px;
-  background: var(--skin-accent);
-  color: #000;
-  border: none;
-  border-radius: 8px;
-  font-weight: 800;
-  font-size: 11px;
-  cursor: pointer;
-  box-shadow: 0 0 12px var(--skin-glow);
-  transition: transform .2s ease;
-}
-.smart-retry-btn:hover {
-  transform: scale(1.05);
-}
-
 #security-blocker{
   position:fixed;
   inset:0;
@@ -1341,7 +1324,6 @@ input[type="range"]::-moz-range-thumb{
     <div id="uyari-inner">
       <h2>Stream Not Found</h2>
       <div id="uyari-mesaj"></div>
-      <button class="smart-retry-btn" onclick="window.location.reload()">🔄 Smart Retry Stream</button>
     </div>
   </div>
 </div>
@@ -1378,6 +1360,7 @@ function decodeProtectedLink(value){
   }
 }
 
+// Checklist fallback is intentionally disabled. No checklist host is probed.
 const CHECKLIST_BASES=Object.freeze([]);
 
 function normalizeSecurityHost(value){
@@ -3293,6 +3276,8 @@ const inputId=
   pageURL.searchParams.get('stream') ||
   '';
 
+// These channels are hosted by the external event player. Keep the list
+// explicit so only the requested IDs are routed away from the local HLS path.
 const EXTERNAL_EVENT_CHANNEL_IDS=new Set([
   'androstreamlivebs1','androstreamlivebs2','androstreamlivebs3','androstreamlivebs4','androstreamlivebs5',
   'androstreamlivebsm1','androstreamlivebsm2','androstreamlivess1','androstreamlivess2','androstreamlivessplus1',
@@ -4289,20 +4274,11 @@ class StreamPlayer{
     }
 
     if(!this.source){
-      // Smart Auto-Recovery fallback try before showing warning
-      if (isAndroChannel(this.channelId)) {
-        const smartCinema = await resolveCinemaSource(this.channelId, 3000);
-        if (smartCinema) {
-          this.source = smartCinema;
-          this.sourceMode = 'cinema';
-        }
-      }
-    }
 
-    if(!this.source){
       this.showFinalWarning(
         'Unable to fetch stream address.\nPlease check the channel ID or source link.'
       );
+
       return;
     }
 
