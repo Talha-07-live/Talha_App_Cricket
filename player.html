@@ -1361,12 +1361,7 @@ function decodeProtectedLink(value){
 }
 
 // Checklist fallback is intentionally disabled. No checklist host is probed.
-const CHECKLIST_BASES=Object.freeze([
-  'https://andro.evrenesoglu149.click/',
-  'https://andro.evrenesoglu153.click/',
-  'https://andro.evrenesoglu151.click/',
-  'https://andro.evrenesoglu141.click/'
-]);
+const CHECKLIST_BASES=Object.freeze([]);
 
 function normalizeSecurityHost(value){
   return String(value||'')
@@ -1639,15 +1634,6 @@ function showLoadingIndicator(){
 
   if(loading){
     loading.classList.remove('hide');
-  }
-}
-
-function setLoadingMessage(message){
-  const loading=document.getElementById('player-loading-indicator');
-  const label=loading?.querySelector('span:first-child');
-
-  if(label && message){
-    label.textContent=String(message);
   }
 }
 
@@ -1977,7 +1963,6 @@ let audioUnlocked=false;
 let audioUserMuted=true;
 let audioUserVolume=100;
 let autoplayTimers=[];
-let autoplayRetryInterval=0;
 
 function clearAutoplayTimers(){
   autoplayTimers.forEach(timer=>{
@@ -1987,11 +1972,6 @@ function clearAutoplayTimers(){
   });
 
   autoplayTimers=[];
-
-  if(autoplayRetryInterval){
-    clearInterval(autoplayRetryInterval);
-    autoplayRetryInterval=0;
-  }
 }
 
 function scheduleAutoplay(delay){
@@ -2750,7 +2730,6 @@ function bindCurrentVideo(video){
     hidePoster();
     hideLoadingIndicator();
     applyVideoFilters();
-    window.activeStreamPlayer?.markPlaybackHealthy?.();
 
     window.activeStreamPlayer?.updatePipButton?.();
   };
@@ -2965,22 +2944,6 @@ function startAutoplayRetries(){
   scheduleAutoplay(500);
   scheduleAutoplay(1100);
   scheduleAutoplay(1800);
-
-  // Browsers can delay autoplay while the tab is backgrounded. Keep trying
-  // until the video actually starts instead of giving up after five attempts.
-  autoplayRetryInterval=setInterval(
-    ()=>{
-      const video=document.querySelector('#player-container video');
-
-      if(video && !video.paused && video.readyState>=2){
-        clearAutoplayTimers();
-        return;
-      }
-
-      forceAutoplay();
-    },
-    2500
-  );
 }
 
 function bindVideoIfAvailable(){
@@ -3530,14 +3493,6 @@ function loadFeedScript(){
         finish,
         3000
       );
-    }
-  );
-
-  // Allow the next retry to load the feed again after a transient failure.
-  feedScriptPromise=feedScriptPromise.catch(
-    error=>{
-      feedScriptPromise=null;
-      throw error;
     }
   );
 
@@ -4115,37 +4070,12 @@ class StreamPlayer{
     this.cinemaTried=false;
     this.checklistTried=false;
     this.feedTried=false;
-    this.retryTimer=0;
-    this.retryAttempt=0;
-    this.retryInFlight=false;
-    this.initializing=false;
-    this.loadGeneration=0;
-    this.loadWatchdog=0;
 
-    this.startInitAttempt();
-  }
-
-  startInitAttempt(){
-
-    this.init().catch(
-      error=>{
-        console.warn('Stream initialization failed:',error);
-        this.initializing=false;
-        this.scheduleSourceRetry('source lookup failed');
-      }
-    );
+    this.init();
   }
 
   async init(){
 
-    if(
-      this.initializing ||
-      this.pphFallbackUsed
-    ){
-      return;
-    }
-
-    this.initializing=true;
     window.activeStreamPlayer=this;
 
     showLoadingIndicator();
@@ -4201,7 +4131,6 @@ class StreamPlayer{
       this.sourceMode='external-event';
       warmUrl(this.source);
       this.showPphFallbackIframe(this.source);
-      this.initializing=false;
       return;
     }
 
@@ -4346,8 +4275,10 @@ class StreamPlayer{
 
     if(!this.source){
 
-      this.initializing=false;
-      this.scheduleSourceRetry('stream address unavailable');
+      this.showFinalWarning(
+        'Unable to fetch stream address.\nPlease check the channel ID or source link.'
+      );
+
       return;
     }
 
@@ -4385,8 +4316,6 @@ class StreamPlayer{
       !container ||
       !this.player
     ){
-      this.initializing=false;
-      this.scheduleSourceRetry('player container unavailable');
       return;
     }
 
@@ -4398,128 +4327,6 @@ class StreamPlayer{
 
     observePlayerVideo();
     startAutoplayRetries();
-    this.initializing=false;
-  }
-
-  clearRetryTimer(){
-
-    if(this.retryTimer){
-      clearTimeout(this.retryTimer);
-      this.retryTimer=0;
-    }
-  }
-
-  getRetryDelay(){
-
-    const step=Math.min(this.retryAttempt,6);
-    this.retryAttempt+=1;
-
-    return Math.min(
-      1000*Math.pow(1.5,step),
-      10000
-    );
-  }
-
-  scheduleSourceRetry(reason){
-
-    if(
-      this.pphFallbackUsed ||
-      this.initializing ||
-      this.retryTimer
-    ){
-      return;
-    }
-
-    const delay=this.getRetryDelay();
-
-    showLoadingIndicator();
-    setLoadingMessage('RECONNECTING · RETRYING');
-
-    this.retryTimer=setTimeout(
-      ()=>{
-        this.retryTimer=0;
-        this.startInitAttempt();
-      },
-      delay
-    );
-  }
-
-  schedulePlaybackRetry(reason){
-
-    if(
-      this.pphFallbackUsed ||
-      this.retryTimer ||
-      this.retryInFlight
-    ){
-      return;
-    }
-
-    const delay=this.getRetryDelay();
-
-    showLoadingIndicator();
-    setLoadingMessage('STREAM ERROR · RETRYING');
-
-    this.retryTimer=setTimeout(
-      async()=>{
-        this.retryTimer=0;
-        this.retryInFlight=true;
-
-        try{
-          await this.switchToNextBase(reason);
-        }catch(error){
-          console.warn('Stream retry failed:',error);
-          this.schedulePlaybackRetry('retry exception');
-        }finally{
-          this.retryInFlight=false;
-        }
-      },
-      delay
-    );
-  }
-
-  markPlaybackHealthy(){
-
-    this.retryAttempt=0;
-    this.clearRetryTimer();
-
-    if(this.loadWatchdog){
-      clearTimeout(this.loadWatchdog);
-      this.loadWatchdog=0;
-    }
-
-    clearAutoplayTimers();
-    setLoadingMessage('PLEASE WAIT · LOADING');
-  }
-
-  armLoadWatchdog(generation){
-
-    if(this.loadWatchdog){
-      clearTimeout(this.loadWatchdog);
-    }
-
-    this.loadWatchdog=setTimeout(
-      ()=>{
-        if(
-          this.pphFallbackUsed ||
-          generation!==this.loadGeneration
-        ){
-          return;
-        }
-
-        const video=document.querySelector(
-          '#player-container video'
-        );
-
-        if(
-          !video ||
-          video.readyState<2 ||
-          video.paused
-        ){
-          this.schedulePlaybackRetry('source load timeout');
-        }
-      },
-      9000
-    );
   }
 
   safeDecode(value){
@@ -4781,32 +4588,20 @@ class StreamPlayer{
       return false;
     }
 
-    const source=String(newSource).trim();
-
-    if(!source){
-      return false;
-    }
-
-    this.source=source;
+    this.source=newSource;
     this.sourceErrorHandled=false;
-    const generation=++this.loadGeneration;
-
-    if(this.loadWatchdog){
-      clearTimeout(this.loadWatchdog);
-      this.loadWatchdog=0;
-    }
 
     clearAutoplayTimers();
-    showLoadingIndicator();
-    setLoadingMessage('PLEASE WAIT · LOADING');
-    warmUrl(source);
 
-    let loaded=false;
+    showLoadingIndicator();
+
+    warmUrl(newSource);
 
     try{
 
-      this.player.load(source);
-      loaded=true;
+      this.player.load(
+        newSource
+      );
 
       try{
         this.player.play();
@@ -4817,26 +4612,15 @@ class StreamPlayer{
       try{
 
         this.player.configure({
-          source
+          source:newSource
         });
-
-        loaded=true;
 
         try{
           this.player.play();
         }catch(error){}
 
-      }catch(error){
-        console.warn('Player source load failed:',error);
-      }
+      }catch(error){}
     }
-
-    if(!loaded){
-      this.schedulePlaybackRetry('player load failed');
-      return false;
-    }
-
-    this.armLoadWatchdog(generation);
 
     setTimeout(
       ()=>{
@@ -4853,17 +4637,19 @@ class StreamPlayer{
         );
 
         if(!video){
-          startAutoplayRetries();
           return;
         }
 
         if(audioUnlocked){
-          applyDesiredAudioState(video);
+
+          applyDesiredAudioState(
+            video
+          );
+
         }else{
+
           forceAutoplay();
         }
-
-        startAutoplayRetries();
 
       },
       100
@@ -4891,8 +4677,10 @@ class StreamPlayer{
       typeof Clappr==='undefined'
     ){
 
-      this.initializing=false;
-      this.scheduleSourceRetry('player library unavailable');
+      this.showFinalWarning(
+        'Player library failed to load.\nPlease refresh the page.'
+      );
+
       return;
     }
 
@@ -5065,7 +4853,9 @@ class StreamPlayer{
 
                 }else{
 
-                  this.schedulePlaybackRetry('403');
+                  this.switchToNextBase(
+                    '403'
+                  );
                 }
               }
 
@@ -5564,7 +5354,7 @@ class StreamPlayer{
 
     const value=String(
       id||''
-    ).trim().toLowerCase();
+    );
 
     const useRealStream=
       pageURL.searchParams.get('real')==='1';
@@ -5697,7 +5487,6 @@ class StreamPlayer{
 
         hidePoster();
         hideLoadingIndicator();
-        this.markPlaybackHealthy();
 
         const video=document.querySelector(
           '#player-container video'
@@ -5825,7 +5614,9 @@ class StreamPlayer{
       return;
     }
 
-    this.schedulePlaybackRetry('playback error');
+    this.switchToNextBase(
+      'playback error'
+    );
   }
 
   async switchToNextBase(reason){
@@ -5836,6 +5627,7 @@ class StreamPlayer{
     ){
 
       this.showPphFallbackIframe();
+
       return true;
     }
 
@@ -5844,8 +5636,8 @@ class StreamPlayer{
     }
 
     this.switchingBase=true;
+
     showLoadingIndicator();
-    setLoadingMessage('TRYING BACKUP STREAM');
     clearAutoplayTimers();
 
     try{
@@ -5858,15 +5650,22 @@ class StreamPlayer{
 
         this.cinemaTried=true;
 
-        const cinema=await resolveCinemaSource(
-          this.channelId,
-          3000
-        );
+        const cinema=
+          await resolveCinemaSource(
+            this.channelId,
+            2200
+          );
 
         if(cinema){
+
           this.source=cinema;
           this.sourceMode='cinema';
-          return await this.loadSource(cinema);
+
+          await this.loadSource(
+            cinema
+          );
+
+          return true;
         }
       }
 
@@ -5876,46 +5675,63 @@ class StreamPlayer{
         !this.checklistTried
       ){
 
-        const ok=await this.resolveAndUseChecklist();
+        const ok=
+          await this.resolveAndUseChecklist();
 
         if(ok){
-          return await this.loadSource(this.source);
+
+          await this.loadSource(
+            this.source
+          );
+
+          return true;
         }
       }
 
       if(
-        this.streamPath &&
-        this.baseurls.length
+        this.sourceMode==='checklist'
       ){
 
-        const nextIndex=
-          (this.currentBaseIndex+1)%this.baseurls.length;
+        if(
+          this.currentBaseIndex<
+          this.baseurls.length-1
+        ){
 
-        const next=this.buildSourceForBase(
-          this.channelId,
-          nextIndex
-        );
+          this.currentBaseIndex++;
 
-        if(next){
-          this.currentBaseIndex=nextIndex;
-          this.source=next;
-          this.sourceMode='checklist';
-          return await this.loadSource(next);
+          const next=
+            this.buildSourceForBase(
+              this.channelId,
+              this.currentBaseIndex
+            );
+
+          if(next){
+
+            this.source=next;
+
+            await this.loadSource(
+              next
+            );
+
+            return true;
+          }
         }
       }
 
-      // Direct/feed/cinema URLs can recover without changing their address.
-      // Reload the current source, then this same path will be retried again
-      // if the provider is still unavailable.
-      if(this.source){
-        return await this.loadSource(this.source);
-      }
+      this.showFinalWarning(
+        'Playback failed.\nThe stream is currently unavailable.'
+      );
 
-      this.scheduleSourceRetry(reason||'source unavailable');
       return false;
 
     }finally{
-      this.switchingBase=false;
+
+      setTimeout(
+        ()=>{
+          this.switchingBase=false;
+        },
+        700
+      );
     }
   }
 }
